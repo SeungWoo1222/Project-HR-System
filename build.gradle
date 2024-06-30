@@ -20,9 +20,9 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Thymeleaf 의존성 추가
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0' // MyBatis 의존성 추가
-	// implementation 'mysql:mysql-connector-java' // MySQL 커넥터
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Thymeleaf
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0' // MyBatis
+	implementation 'mysql:mysql-connector-java:8.0.30' // MySQL
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
