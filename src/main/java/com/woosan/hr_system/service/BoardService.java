@@ -1,4 +1,6 @@
 package com.woosan.hr_system.service;
 
-public class BoardService {
+import com.woosan.hr_system.service.impl.BoardServiceImpl;
+
+public class BoardService implements BoardServiceImpl {
 }
