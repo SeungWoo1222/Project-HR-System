@@ -1,6 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.employee.service.EmployeeService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmployeeServiceImpl implements EmployeeService {
 }
