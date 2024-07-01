@@ -1,4 +1,4 @@
 package com.woosan.hr_system.service.impl;
 
-public interface EmployeeServiceImpl {
+public interface AttendanceService {
 }
