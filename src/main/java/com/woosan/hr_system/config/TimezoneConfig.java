@@ -1,4 +1,4 @@
-package com.woosan.config;
+package com.woosan.hr_system.config;
 
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
