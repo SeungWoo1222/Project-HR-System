@@ -19,6 +19,8 @@
         <result property="departmentId" column="department_id"/>
         <result property="positionId" column="position_id"/>
         <result property="remainingLeave" column="remaining_leave"/>
+        <result property="lastModified" column="last_modified"/>
+        <result property="modifiedBy" column="modified_by"/>
     </resultMap>
 
     <select id="getEmployeeById" resultMap="EmployeeResultMap">
@@ -36,7 +38,21 @@
 
     <update id="updateEmployee">
         UPDATE employees
-        SET name=#{name}, birth=#{birth}, resident_registration_number=#{residentRegistrationNumber}, phone=#{phone}, email=#{email}, address=#{address}, detailed_address=#{detailedAddress}, hire_date=#{hireDate}, termination_date=#{terminationDate}, status=#{status}, department_id=#{departmentId}, position_id=#{positionId}, remaining_leave=#{remainingLeave}
+        SET name=#{name},
+        birth=#{birth},
+        resident_registration_number=#{residentRegistrationNumber},
+        phone=#{phone},
+        email=#{email},
+        address=#{address},
+        detailed_address=#{detailedAddress},
+        hire_date=#{hireDate},
+        termination_date=#{terminationDate},
+        status=#{status},
+        department_id=#{departmentId},
+        position_id=#{positionId},
+        remaining_leave=#{remainingLeave},
+        last_modified=#{lastModified},
+        modified_by=#{modifiedBy},
         WHERE employee_id=#{employeeId}
     </update>
 

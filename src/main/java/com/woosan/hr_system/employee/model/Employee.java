@@ -1,6 +1,6 @@
 package com.woosan.hr_system.employee.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Employee {
     private String employeeId;
@@ -11,12 +11,14 @@ public class Employee {
     private String email;
     private String address;
     private String detailedAddress;
-    private Date hireDate;
-    private Date terminationDate;
+    private LocalDateTime hireDate;
+    private LocalDateTime terminationDate;
     private String status;
     private String departmentId;
     private int positionId;
     private int remainingLeave;
+    private LocalDateTime lastModified;
+    private String modifiedBy;
 
     // Getters and Setters
     public String getEmployeeId() {
@@ -83,19 +85,19 @@ public class Employee {
         this.detailedAddress = detailedAddress;
     }
 
-    public Date getHireDate() {
+    public LocalDateTime getHireDate() {
         return hireDate;
     }
 
-    public void setHireDate(Date hireDate) {
+    public void setHireDate(LocalDateTime hireDate) {
         this.hireDate = hireDate;
     }
 
-    public Date getTerminationDate() {
+    public LocalDateTime getTerminationDate() {
         return terminationDate;
     }
 
-    public void setTerminationDate(Date terminationDate) {
+    public void setTerminationDate(LocalDateTime terminationDate) {
         this.terminationDate = terminationDate;
     }
 
@@ -129,5 +131,22 @@ public class Employee {
 
     public void setRemainingLeave(int remainingLeave) {
         this.remainingLeave = remainingLeave;
+    }
+
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 }
