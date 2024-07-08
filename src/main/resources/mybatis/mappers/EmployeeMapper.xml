@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woosan.hr_system.employee.dao.EmployeeDAO">
+
+    <resultMap id="EmployeeResultMap" type="com.woosan.hr_system.employee.model.Employee">
+        <id property="employeeId" column="employee_id"/>
+        <result property="name" column="name"/>
+        <result property="birth" column="birth"/>
+        <result property="residentRegistrationNumber" column="resident_registration_number"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="address" column="address"/>
+        <result property="detailedAddress" column="detailed_address"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="terminationDate" column="termination_date"/>
+        <result property="status" column="status"/>
+        <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+        <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+        <result property="remainingLeave" column="remaining_leave"/>
+        <result property="lastModified" column="last_modified"/>
+        <result property="modifiedBy" column="modified_by"/>
+    </resultMap>
+
+    <select id="getEmployeeById" resultMap="EmployeeResultMap">
+        SELECT * FROM employees WHERE employee_id = #{employeeId}
+    </select>
+
+    <select id="getAllEmployees" resultMap="EmployeeResultMap">
+        SELECT * FROM employees
+    </select>
+
+    <insert id="insertEmployee">
+        INSERT INTO employees (employee_id, name, birth, resident_registration_number, phone, email, address, detailed_address, hire_date, termination_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
+        VALUES (#{employeeId}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailedAddress}, #{hireDate}, #{terminationDate}, #{status}, #{departmentCode}, #{positionCode}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+    </insert>
+
+    <update id="updateEmployee">
+        UPDATE employees
+        SET name=#{name},
+        birth=#{birth},
+        resident_registration_number=#{residentRegistrationNumber},
+        phone=#{phone},
+        email=#{email},
+        address=#{address},
+        detailed_address=#{detailedAddress},
+        hire_date=#{hireDate},
+        termination_date=#{terminationDate},
+        status=#{status},
+        department_id=#{departmentCode},
+        position_id=#{positionCode},
+        remaining_leave=#{remainingLeave},
+        last_modified=#{lastModified},
+        modified_by=#{modifiedBy},
+        WHERE employee_id=#{employeeId}
+    </update>
+
+    <delete id="deleteEmployee">
+        DELETE FROM employees WHERE employee_id=#{employeeId}
+    </delete>
+</mapper>
