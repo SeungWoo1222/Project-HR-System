@@ -2,6 +2,7 @@ package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.employee.service.EmployeeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,8 +60,8 @@ public class EmployeeController {
 
     @PatchMapping("/{employeeId}") // 사원 정보 일부 수정
     public String updateEmployeePartial(@PathVariable String employeeId, @RequestBody Map<String, Object> updates) {
-      employeeService.updateEmployeePartial(employeeId, updates);
-      return "redirect:/employees/edit";
+        employeeService.updateEmployeePartial(employeeId, updates);
+        return "redirect:/employees/edit";
     }
 
     @GetMapping("/delete/{employeeId}") // 사원 정보 영구 삭제
