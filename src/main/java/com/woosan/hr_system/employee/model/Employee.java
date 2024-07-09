@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Employee {
     private String employeeId;
+    private String password;
     private String name;
     private String birth;
     private String residentRegistrationNumber;
@@ -29,9 +30,11 @@ public class Employee {
         this.employeeId = employeeId;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) { this.password = password; }
+
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
@@ -49,9 +52,7 @@ public class Employee {
         return residentRegistrationNumber;
     }
 
-    public void setResidentRegistrationNumber(String residentRegistrationNumber) {
-        this.residentRegistrationNumber = residentRegistrationNumber;
-    }
+    public void setResidentRegistrationNumber(String residentRegistrationNumber) { this.residentRegistrationNumber = residentRegistrationNumber; }
 
     public String getPhone() {
         return phone;
@@ -109,21 +110,13 @@ public class Employee {
         this.status = status;
     }
 
-    public Department getDepartment() {
-        return department;
-    }
+    public Department getDepartment() { return department; }
 
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
+    public void setDepartment(Department department) { this.department = department; }
 
-    public String getDepartmentCode() {
-        return department.getCode();
-    }
+    public String getDepartmentCode() { return department.getCode(); }
 
-    public void setDepartmentCode(String code) {
-        this.department = Department.fromCode(code);
-    }
+    public void setDepartmentCode(String code) { this.department = Department.fromCode(code); }
 
     public Position getPosition() {
         return position;
@@ -148,7 +141,6 @@ public class Employee {
     public void setRemainingLeave(int remainingLeave) {
         this.remainingLeave = remainingLeave;
     }
-
 
     public LocalDateTime getLastModified() {
         return lastModified;

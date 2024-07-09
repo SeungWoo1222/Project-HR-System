@@ -6,6 +6,7 @@
 
     <resultMap id="EmployeeResultMap" type="com.woosan.hr_system.employee.model.Employee">
         <id property="employeeId" column="employee_id"/>
+        <result property="password" column="password"/>
         <result property="name" column="name"/>
         <result property="birth" column="birth"/>
         <result property="residentRegistrationNumber" column="resident_registration_number"/>
@@ -32,13 +33,14 @@
     </select>
 
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, name, birth, resident_registration_number, phone, email, address, detailed_address, hire_date, termination_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
-        VALUES (#{employeeId}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailedAddress}, #{hireDate}, #{terminationDate}, #{status}, #{departmentCode}, #{positionCode}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detailed_address, hire_date, termination_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
+        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailedAddress}, #{hireDate}, #{terminationDate}, #{status}, #{departmentCode}, #{positionCode}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
     </insert>
 
     <update id="updateEmployee">
         UPDATE employees
         SET name=#{name},
+        password=#{password},
         birth=#{birth},
         resident_registration_number=#{residentRegistrationNumber},
         phone=#{phone},
@@ -52,7 +54,7 @@
         position_id=#{positionCode},
         remaining_leave=#{remainingLeave},
         last_modified=#{lastModified},
-        modified_by=#{modifiedBy},
+        modified_by=#{modifiedBy}
         WHERE employee_id=#{employeeId}
     </update>
 
