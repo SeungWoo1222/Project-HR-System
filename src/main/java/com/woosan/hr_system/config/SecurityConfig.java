@@ -20,7 +20,15 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers("/*", "/employee/employeeList","/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login","/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                /*
+                                .requestMatchers("/").hasRole("사원") // 사원 권한
+                                .requestMatchers("/").hasRole("대리") // 대리 권한
+                                .requestMatchers("/").hasRole("과장") // 과장 권한
+                                .requestMatchers("/").hasRole("차장") // 차장 권한
+                                .requestMatchers("/").hasRole("부장") // 부장 권한
+                                .requestMatchers("/").hasRole("사장") // 사장 권한
+                                */
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
 

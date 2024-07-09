@@ -31,14 +31,14 @@ public class EmployeeController {
         return "employee/view";
     }
 
-    @GetMapping("/new") // 신규 사원 등록 페이지 이동
+    @GetMapping("/register") // 신규 사원 등록 페이지 이동
     public String newEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
-        return "employee/new";
+        return "employee/register";
     }
 
     @PostMapping // 신규 사원 등록
-    public String saveEmployee(@ModelAttribute Employee employee) {
+    public String registerEmployee(@ModelAttribute Employee employee) {
         employeeService.insertEmployee(employee);
         return "redirect:/employees";
     }
