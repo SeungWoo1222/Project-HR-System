@@ -18,9 +18,9 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // 요청에 대한 인가 설정
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/index", "/auth/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                .authorizeHttpRequests(authorizeHttpRequests ->
+                        authorizeHttpRequests
+                                .requestMatchers("/*", "/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
 
