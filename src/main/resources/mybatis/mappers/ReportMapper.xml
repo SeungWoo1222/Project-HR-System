@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
+
+    <!-- Select all reports -->
+    <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+        report_id AS reportId,
+        employee_id AS employeeId,
+        title,
+        content,
+        created_date AS createdDate,
+        modified_date AS modifiedDate,
+        approver_id AS approverId,
+        status,
+        reject_reason AS rejectReason
+        FROM reports
+    </select>
+
+    <!-- Select report by ID -->
+    <select id="getReportById" parameterType="int" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+        report_id AS reportId,
+        employee_id AS employeeId,
+        title,
+        content,
+        created_date AS createdDate,
+        modified_date AS modifiedDate,
+        approver_id AS approverId,
+        status,
+        reject_reason AS rejectReason
+        FROM reports
+        WHERE report_id = #{reportId}
+    </select>
+
+    <!-- Insert a new report -->
+    <insert id="insertReport" parameterType="com.woosan.hr_system.report.model.Report">
+        INSERT INTO reports (
+        employee_id,
+        title,
+        content,
+        created_date,
+        approver_id,
+        status,
+        reject_reason
+        ) VALUES (
+        #{employeeId},
+        #{title},
+        #{content},
+        #{createdDate},
+        #{approverId},
+        #{status},
+        #{rejectReason}
+        )
+    </insert>
+
+    <!-- Update an existing report -->
+    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET
+        title = #{title},
+        content = #{content},
+        modified_date = #{modifiedDate},
+        status = #{status},
+        reject_reason = #{rejectReason}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <!-- Delete a report -->
+    <delete id="deleteReport" parameterType="int">
+        DELETE FROM reports
+        WHERE report_id = #{reportId}
+    </delete>
+
+</mapper>

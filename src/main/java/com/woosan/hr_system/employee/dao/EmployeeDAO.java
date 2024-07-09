@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.dao;
 
 import com.woosan.hr_system.employee.model.Employee;
 import java.util.List;
-
 public interface EmployeeDAO {
 
     Employee getEmployeeById(String employeeId); // 특정 사원 정보 조회
