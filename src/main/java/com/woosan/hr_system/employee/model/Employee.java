@@ -1,6 +1,7 @@
 package com.woosan.hr_system.employee.model;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class Employee {
     private String employeeId;
@@ -12,16 +13,17 @@ public class Employee {
     private String email;
     private String address;
     private String detailedAddress;
-    private LocalDateTime hireDate;
-    private LocalDateTime terminationDate;
-    private String status;
     private Department department;
     private Position position;
-    private int remainingLeave;
+    private Date hireDate;
+    private Date terminationDate;
+    private String status;
     private LocalDateTime lastModified;
     private String modifiedBy;
+    private int remainingLeave;
 
     // Getters and Setters
+
     public String getEmployeeId() {
         return employeeId;
     }
@@ -30,11 +32,17 @@ public class Employee {
         this.employeeId = employeeId;
     }
 
-    public String getPassword() { return password; }
+    public String getPassword() {
+        return password;
+    }
 
-    public void setPassword(String password) { this.password = password; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -52,7 +60,9 @@ public class Employee {
         return residentRegistrationNumber;
     }
 
-    public void setResidentRegistrationNumber(String residentRegistrationNumber) { this.residentRegistrationNumber = residentRegistrationNumber; }
+    public void setResidentRegistrationNumber(String residentRegistrationNumber) {
+        this.residentRegistrationNumber = residentRegistrationNumber;
+    }
 
     public String getPhone() {
         return phone;
@@ -86,37 +96,13 @@ public class Employee {
         this.detailedAddress = detailedAddress;
     }
 
-    public LocalDateTime getHireDate() {
-        return hireDate;
+    public Department getDepartment() {
+        return department;
     }
 
-    public void setHireDate(LocalDateTime hireDate) {
-        this.hireDate = hireDate;
+    public void setDepartment(Department department) {
+        this.department = department;
     }
-
-    public LocalDateTime getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDateTime terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Department getDepartment() { return department; }
-
-    public void setDepartment(Department department) { this.department = department; }
-
-    public String getDepartmentCode() { return department.getCode(); }
-
-    public void setDepartmentCode(String code) { this.department = Department.fromCode(code); }
 
     public Position getPosition() {
         return position;
@@ -126,20 +112,28 @@ public class Employee {
         this.position = position;
     }
 
-    public int getPositionCode() {
-        return position.getCode();
+    public Date getHireDate() {
+        return hireDate;
     }
 
-    public void setPositionCode(int code) {
-        this.position = Position.fromCode(code);
+    public void setHireDate(Date hireDate) {
+        this.hireDate = hireDate;
     }
 
-    public int getRemainingLeave() {
-        return remainingLeave;
+    public Date getTerminationDate() {
+        return terminationDate;
     }
 
-    public void setRemainingLeave(int remainingLeave) {
-        this.remainingLeave = remainingLeave;
+    public void setTerminationDate(Date terminationDate) {
+        this.terminationDate = terminationDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getLastModified() {
@@ -156,5 +150,13 @@ public class Employee {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public int getRemainingLeave() {
+        return remainingLeave;
+    }
+
+    public void setRemainingLeave(int remainingLeave) {
+        this.remainingLeave = remainingLeave;
     }
 }

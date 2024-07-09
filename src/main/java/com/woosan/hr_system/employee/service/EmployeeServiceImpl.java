@@ -35,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeDAO.updateEmployee(employee);
     }
 
-    @Override // 사원 정보 일부 수정 (변경 가능한 column - name, birth, phone, email, address, detailed_address)
+    @Override // 사원 정보 일부 수정 (변경 가능한 column - password, name, birth, phone, email, address, detailed_address)
     public void updateEmployeePartial(String employeeId, Map<String, Object> updates) {
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee != null) {

@@ -20,7 +20,7 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers("/*", "/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/*", "/employee/employeeList","/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
 
