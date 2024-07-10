@@ -58,8 +58,8 @@ public class EmployeeController {
 
     @PatchMapping("/{employeeId}") // 사원 정보 일부 수정
     public String updateEmployeePartial(@PathVariable String employeeId, @RequestBody Map<String, Object> updates) {
-      employeeService.updateEmployeePartial(employeeId, updates);
-      return "redirect:/employee/edit";
+        employeeService.updateEmployeePartial(employeeId, updates);
+        return "redirect:/employee/edit";
     }
 
     @GetMapping("/delete/{employeeId}") // 사원 정보 영구 삭제
