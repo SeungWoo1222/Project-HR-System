@@ -1,0 +1,20 @@
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <typeAliases>
+        <package name="com.woosan.hr_system.employee.model.Employee"/>
+        <package name="com.woosan.hr_system.report.model.Report"/>
+    </typeAliases>
+    <typeHandlers>
+        <typeHandler handler="com.woosan.hr_system.employee.model.DepartmentTypeHandler" javaType="com.woosan.hr_system.employee.model.Department"/>
+        <typeHandler handler="com.woosan.hr_system.employee.model.PositionTypeHandler" javaType="com.woosan.hr_system.employee.model.Position"/>
+    </typeHandlers>
+    <mappers>
+        <mapper resource="mybatis/mappers/EmployeeMapper.xml"/>
+        <mapper resource="mybatis/mappers/ReportMapper.xml"/>
+    </mappers>
+</configuration>

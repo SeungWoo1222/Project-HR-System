@@ -1,9 +1,12 @@
 package com.woosan.hr_system.employee.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class Employee {
     private String employeeId;
+    private String password;
     private String name;
     private String birth;
     private String residentRegistrationNumber;
@@ -11,22 +14,31 @@ public class Employee {
     private String email;
     private String address;
     private String detailedAddress;
-    private LocalDateTime hireDate;
-    private LocalDateTime terminationDate;
-    private String status;
     private Department department;
     private Position position;
+    private LocalDate hireDate;
+    private LocalDate terminationDate;
+    private String status;
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
 
     // Getters and Setters
+
     public String getEmployeeId() {
         return employeeId;
     }
 
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getName() {
@@ -85,44 +97,12 @@ public class Employee {
         this.detailedAddress = detailedAddress;
     }
 
-    public LocalDateTime getHireDate() {
-        return hireDate;
-    }
-
-    public void setHireDate(LocalDateTime hireDate) {
-        this.hireDate = hireDate;
-    }
-
-    public LocalDateTime getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDateTime terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Department getDepartment() {
         return department;
     }
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public String getDepartmentCode() {
-        return department.getCode();
-    }
-
-    public void setDepartmentCode(String code) {
-        this.department = Department.fromCode(code);
     }
 
     public Position getPosition() {
@@ -133,22 +113,29 @@ public class Employee {
         this.position = position;
     }
 
-    public int getPositionCode() {
-        return position.getCode();
+    public LocalDate getHireDate() {
+        return hireDate;
     }
 
-    public void setPositionCode(int code) {
-        this.position = Position.fromCode(code);
+    public void setHireDate(LocalDate hireDate) {
+        this.hireDate = hireDate;
     }
 
-    public int getRemainingLeave() {
-        return remainingLeave;
+    public LocalDate getTerminationDate() {
+        return terminationDate;
     }
 
-    public void setRemainingLeave(int remainingLeave) {
-        this.remainingLeave = remainingLeave;
+    public void setTerminationDate(LocalDate terminationDate) {
+        this.terminationDate = terminationDate;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public LocalDateTime getLastModified() {
         return lastModified;
@@ -164,5 +151,13 @@ public class Employee {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public int getRemainingLeave() {
+        return remainingLeave;
+    }
+
+    public void setRemainingLeave(int remainingLeave) {
+        this.remainingLeave = remainingLeave;
     }
 }
