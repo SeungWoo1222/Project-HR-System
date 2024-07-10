@@ -28,6 +28,7 @@ public class SecurityConfig {
                                 .requestMatchers("/").hasRole("차장") // 차장 권한
                                 .requestMatchers("/").hasRole("부장") // 부장 권한
                                 .requestMatchers("/").hasRole("사장") // 사장 권한
+
                         */
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용

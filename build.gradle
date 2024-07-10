@@ -21,6 +21,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Thymeleaf
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0' // Thymeleaf Layout
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0' // MyBatis
 	implementation 'mysql:mysql-connector-java:8.0.30' // MySQL
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security

@@ -1,20 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>홈페이지</title>
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-</head>
-<body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
 
-<header>
-</header>
-
-<main>
-    <p>메인 페이지다 냥~</p>
-</main>
-
-<footer>
-</footer>
-</body>
+    <div layout:fragment="content">
+        <div class="content">
+            <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
+            여기에 추가 컨텐츠 넣으면 됨~~ 뀨로링
+        </div>
+    </div>
 </html>
