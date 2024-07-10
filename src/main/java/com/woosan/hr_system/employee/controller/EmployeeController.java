@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/employees")
+@RequestMapping("/employee")
 public class EmployeeController {
 
     @Autowired
@@ -37,10 +37,10 @@ public class EmployeeController {
         return "employee/register";
     }
 
-    @PostMapping // 신규 사원 등록
+    @PostMapping("/register") // 신규 사원 등록
     public String registerEmployee(@ModelAttribute Employee employee) {
         employeeService.insertEmployee(employee);
-        return "redirect:/employees";
+        return "redirect:/employee/register";
     }
 
     @GetMapping("/edit/{employeeId}") // 사원 정보 수정 페이지 이동
@@ -53,19 +53,19 @@ public class EmployeeController {
     @PostMapping("/update") // 사원 정보 전체 수정
     public String updateEmployee(@ModelAttribute Employee employee) {
         employeeService.updateEmployee(employee);
-        return "redirect:/employees/edit";
+        return "redirect:/employee/edit";
     }
 
     @PatchMapping("/{employeeId}") // 사원 정보 일부 수정
     public String updateEmployeePartial(@PathVariable String employeeId, @RequestBody Map<String, Object> updates) {
       employeeService.updateEmployeePartial(employeeId, updates);
-      return "redirect:/employees/edit";
+      return "redirect:/employee/edit";
     }
 
     @GetMapping("/delete/{employeeId}") // 사원 정보 영구 삭제
     public String deleteEmployee(@PathVariable String employeeId) {
         employeeService.deleteEmployee(employeeId);
-        return "redirect:/employees";
+        return "redirect:/employee";
     }
 
 }

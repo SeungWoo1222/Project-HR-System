@@ -6,86 +6,92 @@
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header>
-</header>
+  <header> </header>
 
-<main>
-  <section class="employee-register-section">
-    <div class="employee-register-container">
-      <h2>사원 등록</h2>
-      <form th:action="@{/employee/register}" method="post">
-        <div class="form-group">
-          <label for="name">이름</label>
-          <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="birth">생년월일 (주민번호 앞자리)</label>
-          <input type="text" id="birth" name="birth" maxlength="6" required>
-        </div>
-        <div class="form-group">
-          <label for="resident_registration_number">주민번호 뒷자리</label>
-          <input type="text" id="resident_registration_number" name="resident_registration_number" maxlength="7" required>
-        </div>
-        <div class="form-group">
-          <label for="phone2">전화번호</label>
-          <select class="phone" id="phone1" name="phone1">
-            <option value="010">010</option>
-          </select>
-          <input type="text" class="phone" id="phone2" name="phone2" maxlength="4" required>
-          <input type="text" class="phone" id="phone3" name="phone3" maxlength="4" required>
-        </div>
-        <div class="form-group">
-          <label for="email">이메일</label>
-          <input type="text" id="email" name="email" required>
-          <select id="email_domain" name="email_domain">
-            <option value="naver.com">naver.com</option>
-            <option value="gmail.com">gmail.com</option>
-            <option value="daum.net">daum.net</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="address">주소</label>
-          <input type="text" id="address" name="address" required>
-        </div>
-        <div class="form-group">
-          <label for="detailed_address">상세 주소</label>
-          <input type="text" id="detailed_address" name="detailed_address" required>
-        </div>
-        <div class="form-group">
-          <label for="department">부서</label>
-          <select id="department" name="department" required>
-            <option value="PR">생산</option>
-            <option value="QC">품질관리</option>
-            <option value="SA">영업</option>
-            <option value="MK">마케팅</option>
-            <option value="FI">재무</option>
-            <option value="HR">인사</option>
-            <option value="RD">연구개발</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="position">직위</label>
-          <select id="position" name="position" required>
-            <option value="1">사원</option>
-            <option value="2">대리</option>
-            <option value="3">과장</option>
-            <option value="4">차장</option>
-            <option value="5">부장</option>
-            <option value="6">사장</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="hire_date">입사일</label>
-          <input type="date" id="hire_date" name="hire_date" required>
-        </div>
-        <button type="submit" class="btn">등록</button>
-      </form>
-    </div>
-  </section>
-</main>
+  <main>
+    <section class="employee-register-section">
+      <div class="employee-register-container">
+        <h2>사원 등록</h2>
+        <form th:action="@{/employee/register}" method="post" onsubmit="combineEmail()">
+          <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="birth">생년월일 (주민번호 앞자리)</label>
+            <input type="text" id="birth" name="birth" maxlength="6" required>
+          </div>
+          <div class="form-group">
+            <label for="residentRegistrationNumber">주민번호 뒷자리</label>
+            <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber" maxlength="7" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">전화번호</label>
+            <input type="text" class="phone" id="phone" name="phone" maxlength="15" required>
+          </div>
+          <div class="form-group">
+            <label for="email_local">이메일</label>
+            <input type="text" id="email_local" name="email_local" required>
+            @
+            <select id="email_domain" name="email_domain">
+              <option value="naver.com">naver.com</option>
+              <option value="gmail.com">gmail.com</option>
+              <option value="daum.net">daum.net</option>
+            </select>
+            <input type="hidden" id="email" name="email">
+          </div>
+          <div class="form-group">
+            <label for="address">주소</label>
+            <input type="text" id="address" name="address" required>
+          </div>
+          <div class="form-group">
+            <label for="detailedAddress">상세 주소</label>
+            <input type="text" id="detailedAddress" name="detailedAddress" required>
+          </div>
+          <div class="form-group">
+            <label for="department">부서</label>
+            <select id="department" name="department" required>
+              <option value="PR">생산</option>
+              <option value="QC">품질관리</option>
+              <option value="SA">영업</option>
+              <option value="MK">마케팅</option>
+              <option value="FI">재무</option>
+              <option value="HR">인사</option>
+              <option value="RD">연구개발</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="position">직위</label>
+            <select id="position" name="position" required>
+              <option value="사원">사원</option>
+              <option value="대리">대리</option>
+              <option value="과장">과장</option>
+              <option value="차장">차장</option>
+              <option value="부장">부장</option>
+              <option value="사장">사장</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="hireDate">입사일</label>
+            <input type="date" id="hireDate" name="hireDate" required>
+          </div>
+          <button type="submit" class="btn">등록</button>
+        </form>
+      </div>
+    </section>
+  </main>
 
-<footer>
-  <p>&copy; 2024 WooSan Company</p>
-</footer>
+  <footer>
+    <p>&copy; 2024 WooSan Company</p>
+  </footer>
+
+  <script>
+    function combineEmail() {
+      const emailLocal = document.getElementById("email_local").value;
+      const emailDomain = document.getElementById("email_domain").value;
+      const email = emailLocal + "@" + emailDomain;
+      document.getElementById("email").value = email;
+    }
+  </script>
 </body>
 </html>

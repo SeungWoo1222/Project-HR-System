@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -15,12 +16,12 @@ public class Employee {
     private String detailedAddress;
     private Department department;
     private Position position;
-    private Date hireDate;
-    private Date terminationDate;
+    private LocalDate hireDate;
+    private LocalDate terminationDate;
     private String status;
+    private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
-    private int remainingLeave;
 
     // Getters and Setters
 
@@ -112,19 +113,19 @@ public class Employee {
         this.position = position;
     }
 
-    public Date getHireDate() {
+    public LocalDate getHireDate() {
         return hireDate;
     }
 
-    public void setHireDate(Date hireDate) {
+    public void setHireDate(LocalDate hireDate) {
         this.hireDate = hireDate;
     }
 
-    public Date getTerminationDate() {
+    public LocalDate getTerminationDate() {
         return terminationDate;
     }
 
-    public void setTerminationDate(Date terminationDate) {
+    public void setTerminationDate(LocalDate terminationDate) {
         this.terminationDate = terminationDate;
     }
 

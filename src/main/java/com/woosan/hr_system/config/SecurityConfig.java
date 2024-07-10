@@ -18,18 +18,19 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // 요청에 대한 인가 설정
-                .authorizeHttpRequests(authorizeHttpRequests ->
-                        authorizeHttpRequests
-                                .requestMatchers("/auth/login","/css/**", "/js/**", "/file/**", "/images/**").permitAll() // 이 경로는 인증 없이 접근 허용
-                                /*
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/employee/register", "/auth/login", "/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                        /*
                                 .requestMatchers("/").hasRole("사원") // 사원 권한
                                 .requestMatchers("/").hasRole("대리") // 대리 권한
                                 .requestMatchers("/").hasRole("과장") // 과장 권한
                                 .requestMatchers("/").hasRole("차장") // 차장 권한
                                 .requestMatchers("/").hasRole("부장") // 부장 권한
                                 .requestMatchers("/").hasRole("사장") // 사장 권한
-                                */
+                        */
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
+                        //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
                 )
 
                 // 폼 기반 인증 설정
@@ -55,15 +56,11 @@ public class SecurityConfig {
                                 .sessionFixation().migrateSession() // 세션 고정 보호 설정
                                 .maximumSessions(1) // 하나의 세션만 허용
                                 .maxSessionsPreventsLogin(true)
-                                // session 만료 > 현재 페이지에서 session 만료 알림창 > login 페이지로 이동으로 구현 예정
                                 .expiredUrl("/auth/login?expired") // 세션 완료 시 리다이렉트할 URL
                 )
 
-                // CSRF 보호 설정 - Restful API 사용으로 비활성화
-//                .csrf(csrf ->
-//                        csrf
-//                                .ignoringAntMatchers("/h2-console/**") // 특정 경로에서 CSRF 보호 비활성화
-//                )
+                // CSRF 보호 설정
+                .csrf(csrf -> csrf.disable()) // RESTful API 사용으로 CSRF 보호 비활성화
 
                 // 헤더 설정
                 .headers(headers ->

@@ -14,7 +14,6 @@ public class AuthController {
     public String login() {
         return "/auth/login";
     }
-
     @PostMapping("/auth/login") // 로그인 인증
     public String loginProcess() {
         return "redirect:/auth/login";

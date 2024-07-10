@@ -18,6 +18,7 @@ public enum Position {
         return rank;
     }
 
+    // fromRank 메소드: 주어진 rank 값을 이용해 해당하는 Position enum 값을 반환합니다.
     public static Position fromRank(int rank) {
         for (Position position : Position.values()) {
             if (position.getRank() == rank) {
@@ -25,5 +26,15 @@ public enum Position {
             }
         }
         throw new IllegalArgumentException("Unknown rank: " + rank);
+    }
+
+    // 사원의 이름을 이용해 해당하는 rank 값을 반환하는 메소드
+    public static int getRankByPositionName(String name) {
+        for (Position position : Position.values()) {
+            if (position.name().equals(name)) {
+                return position.getRank();
+            }
+        }
+        throw new IllegalArgumentException("Unknown position name: " + name);
     }
 }

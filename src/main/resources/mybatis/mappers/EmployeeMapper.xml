@@ -60,4 +60,11 @@
     <delete id="deleteEmployee">
         DELETE FROM employees WHERE employee_id=#{employeeId}
     </delete>
+
+    <select id="countEmployeesByCurrentYear" resultType="int">
+        SELECT COUNT(*)
+        FROM employees
+        WHERE YEAR(hire_date) = YEAR(CURDATE())
+    </select>
+
 </mapper>

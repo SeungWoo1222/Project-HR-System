@@ -34,4 +34,8 @@ public class EmployeeDAO {
     public void deleteEmployee(String employeeId) { // 사원 정보 일부 수정 (변경 가능한 column - password, name, birth, phone, email, address, detailed_address)
         sqlSession.delete(NAMESPACE + ".deleteEmployee", employeeId);
     }
+
+    public int countEmployeesByCurrentYear() { // 이번 년도 입사한 사람의 수
+        return sqlSession.selectOne(NAMESPACE + ".countEmployeesByCurrentYear");
+    };
 }
