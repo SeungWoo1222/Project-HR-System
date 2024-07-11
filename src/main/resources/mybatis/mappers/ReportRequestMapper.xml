@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.report.dao.ReportRequestDAO">
+
+    <insert id="createReportRequest" parameterType="com.woosan.hr_system.report.model.ReportRequest">
+        INSERT INTO report_requests (requester_id, employee_id, request_date, due_date, request_note, report_id)
+        VALUES (#{requesterId}, #{employeeId}, #{requestDate}, #{dueDate}, #{requestNote}, #{reportId})
+    </insert>
+
+    <select id="getReportRequestById" parameterType="int" resultType="com.woosan.hr_system.report.model.ReportRequest">
+        SELECT * FROM report_requests WHERE request_id = #{requestId}
+    </select>
+
+    <update id="updateReportRequest" parameterType="com.woosan.hr_system.report.model.ReportRequest">
+        UPDATE report_requests
+        SET requester_id = #{requesterId}, employee_id = #{employeeId}, request_date = #{requestDate},
+        due_date = #{dueDate}, request_note = #{requestNote}, report_id = #{reportId}
+        WHERE request_id = #{requestId}
+    </update>
+
+    <delete id="deleteReportRequest" parameterType="int">
+        DELETE FROM report_requests WHERE request_id = #{requestId}
+    </delete>
+
+    <select id="getReportRequestsByEmployeeId" parameterType="String" resultType="com.woosan.hr_system.report.model.ReportRequest">
+        SELECT * FROM report_requests WHERE employee_id = #{employeeId}
+    </select>
+
+</mapper>

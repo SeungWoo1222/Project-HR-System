@@ -4,7 +4,11 @@ import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -27,9 +31,38 @@ public class ReportServiceImpl implements ReportService {
         reportDAO.insertReport(report);
     }
 
-    @Override // 보고서 수정
+    @Override // 보고서 전체 수정
     public void updateReport(Report report) {
         reportDAO.updateReport(report);
+    }
+
+    @Override // 보고서 일부 수정 (제목, 내용, 결재자, 결재상태(결재자만 가능), 거절사유(결재자만 가능), 업무완료날짜, 파일첨부)
+    public void updateReportPartial(int reportId, Map<String, Object> updates) {
+        Report report = reportDAO.getReportById(reportId);
+        if (report != null) {
+            if (updates.containsKey("title")) {
+                report.setTitle((String)updates.get("title"));
+            }
+            if (updates.containsKey("content")) {
+                report.setContent((String)updates.get("content"));
+            }
+            if (updates.containsKey("approver_id")) {
+                report.setApproverId((String)updates.get("approver_id"));
+            }
+            if (updates.containsKey("status")) {
+                report.setStatus((String)updates.get("status"));
+            }
+            if (updates.containsKey("reject_reason")) {
+                report.setRejectReason((String)updates.get("reject_reason"));
+            }
+            if (updates.containsKey("complete_date")) {
+                report.setCompleteDate((Timestamp) updates.get("complete_date"));
+            }
+            if (updates.containsKey("file_path")) {
+                report.setFilePath((String)updates.get("file_path"));
+            }
+            reportDAO.updateReport(report);
+        }
     }
 
     @Override // 보고서 삭제
