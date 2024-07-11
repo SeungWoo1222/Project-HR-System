@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout}">
+      layout:decorate="~{fragments/layout :: layout(title='홈')}">
 
-    <div layout:fragment="content">
+<th:block layout:fragment="css">
+</th:block>
+
+    <div layout:fragment="~{content}">
         <div class="content">
             <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
             여기에 추가 컨텐츠 넣으면 됨~~ 뀨로링

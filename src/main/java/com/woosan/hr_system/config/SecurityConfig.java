@@ -20,7 +20,7 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/employee/register", "/auth/login", "/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
                         /*
                                 .requestMatchers("/").hasRole("사원") // 사원 권한
                                 .requestMatchers("/").hasRole("대리") // 대리 권한
@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/auth/login") // 사용자 정의 로그인 페이지 경로
-                                .defaultSuccessUrl("/index", true) // 로그인 성공 시 리다이렉트될 경로
+                                .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트될 경로
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
                 )
 
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .logout(logout ->
                         logout
                                 .logoutUrl("/logout") // 로그아웃 URL
-                                .logoutSuccessUrl("/index") // 로그아웃 성공 시 리다이렉트될 경로
+                                .logoutSuccessUrl("/auth/login") // 로그아웃 성공 시 리다이렉트될 경로
                                 .permitAll() // 로그아웃 URL은 인증 없이 접근 허용
                 )
 
