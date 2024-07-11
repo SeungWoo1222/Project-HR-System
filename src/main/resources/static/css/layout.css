@@ -112,13 +112,39 @@ body {
 }
 
 .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     padding: 10px 0;
     background-color: #fafafa;
     color: #888;
-    position: absolute;
-    bottom: 0;
+    position: relative;
     width: 100%;
+}
+
+.footer p {
+    margin: 0 15px 0 0;
+}
+
+.icon-link {
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.icon-link:hover {
+    transform: scale(1.2);
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+}
+
+.notion-icon .icon {
+    width: 30px;
+    height: 30px;
 }
 
 .btn {
