@@ -21,15 +21,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/employee/register", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
-                        /*
-                                .requestMatchers("/").hasRole("사원") // 사원 권한
-                                .requestMatchers("/").hasRole("대리") // 대리 권한
-                                .requestMatchers("/").hasRole("과장") // 과장 권한
-                                .requestMatchers("/").hasRole("차장") // 차장 권한
-                                .requestMatchers("/").hasRole("부장") // 부장 권한
-                                .requestMatchers("/").hasRole("사장") // 사장 권한
 
-                        */
+                                // 일반 사원 권한
+                                .requestMatchers("/").hasRole("사원")
+                                .requestMatchers("/").hasRole("대리")
+                                .requestMatchers("/").hasRole("과장")
+                                // 관리자 권한
+                                .requestMatchers("/admin").hasRole("차장")
+                                .requestMatchers("/admin").hasRole("부장")
+                                .requestMatchers("/admin").hasRole("사장")
+
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
                 )
@@ -59,7 +60,7 @@ public class SecurityConfig {
                                 .sessionFixation().migrateSession() // 세션 고정 보호 설정
                                 .maximumSessions(1) // 하나의 세션만 허용
                                 .maxSessionsPreventsLogin(true)
-                                .expiredUrl("/auth/login?expired") // 세션 완료 시 리다이렉트할 URL
+                                .expiredUrl("/auth/expired") // 세션 만료 시 리다이렉트할 URL
                 )
 
                 // CSRF 보호 설정

@@ -11,14 +11,17 @@ public class AuthController {
     public String home() {
         return "/home";
     }
+
     @GetMapping("/auth/login") // 로그인 페이지 이동
     public String login() {
         return "/auth/login";
     }
+
     @PostMapping("/auth/login") // 로그인 인증 로직
     public String loginProcess() {
         return "/home";
     }
+
     @GetMapping("/auth/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다.");

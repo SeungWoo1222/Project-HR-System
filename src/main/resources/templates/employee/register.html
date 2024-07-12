@@ -1,16 +1,25 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>사원 등록</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-  <header> </header>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='사원 등록')}">
 
-  <main>
-    <section class="employee-register-section">
-      <div class="employee-register-container">
+<th:block layout:fragment="css">
+
+</th:block>
+
+<th:block layout:fragment="script">
+  <script>
+    function combineEmail() {
+      const emailLocal = document.getElementById("email_local").value;
+      const emailDomain = document.getElementById("email_domain").value;
+      const email = emailLocal + "@" + emailDomain;
+      document.getElementById("email").value = email;
+    }
+  </script>
+</th:block>
+
+  <div layout:fragment="~{content}">
+      <div class="content">
         <h2>사원 등록</h2>
         <form th:action="@{/employee/register}" method="post" onsubmit="combineEmail()">
           <div class="form-group">
@@ -78,20 +87,5 @@
           <button type="submit" class="btn">등록</button>
         </form>
       </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2024 WooSan Company</p>
-  </footer>
-
-  <script>
-    function combineEmail() {
-      const emailLocal = document.getElementById("email_local").value;
-      const emailDomain = document.getElementById("email_domain").value;
-      const email = emailLocal + "@" + emailDomain;
-      document.getElementById("email").value = email;
-    }
-  </script>
-</body>
+  </div>
 </html>
