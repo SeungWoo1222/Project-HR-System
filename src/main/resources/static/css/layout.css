@@ -119,7 +119,7 @@ body {
 
 .footer {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -128,6 +128,14 @@ body {
     color: #888;
     position: relative;
     width: 100%;
+}
+
+.footer #icon-area {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
 .footer p {
