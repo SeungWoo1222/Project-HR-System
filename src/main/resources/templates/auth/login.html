@@ -8,8 +8,8 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script>
-
+    <script th:if="${logoutMessage}">
+        alert("로그아웃 되었습니다.");
     </script>
 </th:block>
 
