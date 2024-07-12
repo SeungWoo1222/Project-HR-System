@@ -4,6 +4,7 @@ import com.woosan.hr_system.report.model.Report;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import com.woosan.hr_system.report.model.FileMetadata;
 
 import java.util.List;
 
@@ -32,5 +33,9 @@ public class ReportDAO {
     // 보고서 삭제
     public void deleteReport(int reportId) {
         sqlSession.delete(NAMESPACE + ".deleteReport", reportId);
+    }
+    // 보고서 파일 첨부
+    public void insertFileMetadata(FileMetadata fileMetadata) {
+        sqlSession.insert(NAMESPACE + ".insertFileMetadata", fileMetadata);
     }
 }
