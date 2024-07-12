@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div class="sidebar" th:fragment="sidebar">
+        <ul>
+            <li><a th:href="@{/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
+        </ul>
+        <p class="section-sidebar">출퇴근 및 방문</p>
+        <ul>
+            <li><a th:href="@{/attendance}"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 출퇴근</a></li>
+            <li><a th:href="@{/schedule}"><img src="/images/icons/location.png" alt="Schedule" width="20"> 방문 일정</a></li>
+            <li><a th:href="@{/leave}"><img src="/images/icons/leave.png" alt="Leave" width="20"> 휴가</a></li>
+            <li><a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a></li>
+        </ul>
+        <p class="section-sidebar">커뮤니케이션</p>
+        <ul>
+            <!--        <li><a th:href="@{/task}"><img src="/images/task-icon.png" alt="Task" width="20"> 할 일</a></li>-->
+            <li><a th:href="@{/announcement}"><img src="/images/icons/announcement.png" alt="Announcement" width="20"> 공지 및 설문</a></li>
+            <li><a th:href="@{/report}"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</a></li>
+            <li><a th:href="@{/forum}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>
+        </ul>
+        <p class="section-sidebar">관리</p>
+        <ul>
+            <li><a th:href="@{/myinfo}"><img src="/images/icons/myinfo.png" alt="MyInfo" width="20"> 내 정보</a></li>
+            <li><a th:href="@{/members}"><img src="/images/icons/members.png" alt="Members" width="20"> 구성원</a></li>
+        </ul>
+    </div>
+</html>

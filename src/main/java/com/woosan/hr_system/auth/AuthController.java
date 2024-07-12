@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class AuthController {
-    @GetMapping("/index") // 홈페이지 이동
+    @GetMapping("/home") // 홈페이지 이동
     public String home() {
-        return "/index";
+        return "/home";
     }
     @GetMapping("/auth/login") // 로그인 페이지 이동
     public String login() {
@@ -16,6 +16,8 @@ public class AuthController {
     }
     @PostMapping("/auth/login") // 로그인 인증
     public String loginProcess() {
-        return "redirect:/auth/login";
+        return "/home";
     }
+
+
 }
