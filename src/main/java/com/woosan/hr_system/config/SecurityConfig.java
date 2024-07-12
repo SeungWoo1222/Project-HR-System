@@ -23,13 +23,9 @@ public class SecurityConfig {
                                 .requestMatchers("/employee/register", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 일반 사원 권한
-                                .requestMatchers("/").hasRole("사원")
-                                .requestMatchers("/").hasRole("대리")
-                                .requestMatchers("/").hasRole("과장")
+                                .requestMatchers("/").hasAnyRole("사원", "대리", "과장")
                                 // 관리자 권한
-                                .requestMatchers("/admin").hasRole("차장")
-                                .requestMatchers("/admin").hasRole("부장")
-                                .requestMatchers("/admin").hasRole("사장")
+                                .requestMatchers("/admin").hasAnyRole("차장", "부장", "사장")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용

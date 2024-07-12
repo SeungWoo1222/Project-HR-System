@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="sidebar" th:fragment="sidebar">
         <ul>
             <li><a th:href="@{/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
@@ -17,6 +17,17 @@
             <li><a th:href="@{/announcement}"><img src="/images/icons/announcement.png" alt="Announcement" width="20"> 공지 및 설문</a></li>
             <li><a th:href="@{/report}"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</a></li>
             <li><a th:href="@{/forum}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>
+        </ul>
+        <p class="section-sidebar">부서</p>
+        <ul sec:authorize="isAuthenticated()">
+            <!-- HR 인사부서 -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/employee-management.png" alt="" width="20"> 사원 관리</a></li> <!-- Employee Management -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/performance-management.png" alt="" width="20"> 성과 관리</a></li> <!-- Performance Management -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</a></li> <!-- Leave Management -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/recruitment-and-selection.png" alt="" width="20"> 채용 및 선발</a></li> <!-- Recruitment and Selection -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/training-and-development.png" alt="" width="20"> 교육 및 개발</a></li> <!-- Training and Development -->
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 보상 및 복리후생</a></li> <!-- Compensation and Benefits -->
+
         </ul>
         <p class="section-sidebar">관리</p>
         <ul>
