@@ -6,22 +6,10 @@
         <title th:text="${title}">하루하루</title>
 
         <link rel="stylesheet" th:href="@{/css/layout.css}">
+        <script th:src="@{/js/layout.js}"></script>
 
         <!-- 각 페이지의 script가 작성될 위치 -->
-        <th:block layout:fragment="script">
-            <script>
-                // 로그아웃 확인
-                document.addEventListener("DOMContentLoaded", function() {
-                    const logoutLink = document.getElementById("logout-link");
-                    logoutLink.addEventListener("click", function(event) {
-                        event.preventDefault();
-                        if (confirm("정말 로그아웃하시겠습니까?")) {
-                            window.location.href = logoutLink.href;
-                        }
-                    });
-                });
-            </script>
-        </th:block>
+        <th:block layout:fragment="script"></th:block>
 
         <!-- 각 페이지의 css가 작성될 위치 -->
         <th:block layout:fragment="css"></th:block>
