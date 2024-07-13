@@ -1,26 +1,26 @@
 package com.woosan.hr_system.auth;
 
-import com.woosan.hr_system.employee.model.Department;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
+    private static final long serialVersionUID = 1L;
 
     private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
-    private final Department department;
+    private final String department;
 
-    public CustomUserDetails (String username, String password, Collection<? extends GrantedAuthority> authorities, Department department) {
+    public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities, String department) {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.department = department;
     }
 
-    public Department getDepartment() {
+    public String getDepartment() {
         return department;
     }
 
@@ -59,3 +59,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
+

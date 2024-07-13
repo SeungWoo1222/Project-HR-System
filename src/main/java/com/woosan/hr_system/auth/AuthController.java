@@ -1,16 +1,32 @@
 package com.woosan.hr_system.auth;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
+
 @Controller
 public class AuthController {
-    @GetMapping("/home") // 홈페이지 이동
-    public String home() {
-        return "/home";
+    @GetMapping("/home")
+    public String home(Model model) {
+        return "home";
     }
+//    @GetMapping("/home") // 홈페이지 이동
+//    public String home(Model model) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+//        model.addAttribute("username", userDetails.getUsername());
+//        model.addAttribute("password", userDetails.getPassword());
+//        model.addAttribute("authorities", userDetails.getAuthorities());
+//        model.addAttribute("department", userDetails.getDepartment());
+//        return "/home";
+//    }
 
     @GetMapping("/auth/login") // 로그인 페이지 이동
     public String login() {
