@@ -16,6 +16,26 @@ document.addEventListener("DOMContentLoaded", function() {
             window.location.href = logoutLink.href;
         }
     });
+
+    // 현재 URL에 따라 활성화된 메뉴 항목 표시
+    var currentUrl = window.location.pathname;
+    var menuItems = document.querySelectorAll('.sidebar ul li a, .submenu li a');
+
+    menuItems.forEach(function(menuItem) {
+        if (menuItem.getAttribute('href') === currentUrl) {
+            var parentLi = menuItem.closest('li');
+            if (parentLi) {
+                parentLi.classList.add('active');
+                var parentUl = parentLi.closest('ul');
+                if (parentUl.classList.contains('submenu')) {
+                    parentUl.style.display = 'block';  // 하위 메뉴 표시
+                    parentUl.closest('li').classList.add('open'); // 상위 메뉴 활성화
+                } else {
+                    parentLi.classList.add('.active');
+                }
+            }
+        }
+    });
 });
 
 // 사이드바 메뉴 토글 여닫기
