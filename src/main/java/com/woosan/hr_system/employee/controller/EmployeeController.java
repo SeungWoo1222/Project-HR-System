@@ -24,7 +24,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @GetMapping // 모든 사원 정보 조회
+    @GetMapping("/list") // 모든 사원 정보 조회
     public String listEmployees(Model model) {
         List<Employee> employees = employeeService.getAllEmployees();
         model.addAttribute("employees", employees);

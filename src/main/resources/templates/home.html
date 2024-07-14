@@ -8,24 +8,6 @@
 
     <div layout:fragment="~{content}">
         <div class="content">
-            <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/employee/terminate}" method="post" enctype="multipart/form-data">
-                <div>
-                    <label for="terminationReason">퇴사 사유</label>
-                    <textarea id="terminationReason" name="terminationReason" rows="4" cols="50"></textarea>
-                </div>
-                <div>
-                    <label for="terminationDate">퇴사 날짜</label>
-                    <input type="date" id="terminationDate" name="terminationDate">
-                </div>
-                <div>
-                    <label for="terminationDocuments">첨부 파일</label>
-                    <input type="file" id="terminationDocuments" name="terminationDocuments">
-                </div>
-                <div>
-                    <button type="submit">퇴사 처리</button>
-                </div>
-            </form>
         </div>
     </div>
 </html>
