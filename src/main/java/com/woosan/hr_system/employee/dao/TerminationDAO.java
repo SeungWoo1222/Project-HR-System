@@ -23,4 +23,16 @@ public class TerminationDAO {
     public List<Termination> getAllTerminatedEmployees() { // 모든 퇴사 사원 정보 조회
         return sqlSession.selectList(NAMESPACE + "getAllTerminatedEmployees");
     }
+
+    public void insertTermination(Termination termination) { // 새로운 퇴사 사원 정보 삽입
+        sqlSession.insert(NAMESPACE + "insertTermination", termination);
+    }
+
+    public void updateTermination(Termination termination) { // 기존 퇴사 사원 정보 업데이트
+        sqlSession.update(NAMESPACE + "updateTermination", termination);
+    }
+
+    public void deleteTermination(String employeeId) { // 퇴사 사원 정보 삭제
+        sqlSession.delete(NAMESPACE + "deleteTermination", employeeId);
+    }
 }

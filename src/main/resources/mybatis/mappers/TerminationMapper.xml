@@ -23,4 +23,25 @@
         SELECT * FROM termination
     </select>
 
+    <!-- 새로운 퇴사 사원 정보 삽입 -->
+    <insert id="insertTermination" parameterType="com.woosan.hr_system.employee.model.Termination">
+        INSERT INTO termination (employee_id, termination_reason, termination_date, termination_documents)
+        VALUES (#{employeeId}, #{terminationReason}, #{terminationDate}, #{terminationDocuments})
+    </insert>
+
+    <!-- 퇴사 사원 정보 업데이트 -->
+    <update id="updateTermination" parameterType="com.woosan.hr_system.employee.model.Termination">
+        UPDATE termination
+        SET termination_reason = #{terminationReason},
+            termination_date = #{terminationDate},
+            termination_documents = #{terminationDocuments}
+        WHERE employee_id = #{employeeId}
+    </update>
+
+    <!-- 퇴사 사원 정보 삭제 -->
+    <delete id="deleteTermination" parameterType="String">
+        DELETE FROM termination
+        WHERE employee_id = #{employeeId}
+    </delete>
+
 </mapper>
