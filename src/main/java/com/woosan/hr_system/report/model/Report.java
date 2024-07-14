@@ -12,6 +12,8 @@ public class Report {
     private String approverId;
     private String status;
     private String rejectReason;
+    private Timestamp completeDate;
+    private String filePath;
 
     // Getters and Setters
     public int getReportId() {
@@ -84,5 +86,21 @@ public class Report {
 
     public void setRejectReason(String rejectReason) {
         this.rejectReason = rejectReason;
+    }
+
+    public Timestamp getCompleteDate() {
+        return completeDate;
+    }
+
+    public void setCompleteDate(Timestamp completeDate) {
+        this.completeDate = completeDate;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

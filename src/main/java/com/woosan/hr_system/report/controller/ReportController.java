@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import com.woosan.hr_system.report.model.FileMetadata;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -60,5 +63,15 @@ public class ReportController {
     public String deleteReport(@PathVariable("id") int id) {
         reportService.deleteReport(id);
         return "redirect:/reports";
+    }
+
+    @PostMapping("/{reportId}/upload") // 보고서 파일 첨부
+    public List<FileMetadata> uploadFiles(@PathVariable Long reportId, @RequestParam("files") MultipartFile[] files) {
+        try {
+            return reportService.uploadFiles(reportId, files);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("File upload failed");
+        }
     }
 }

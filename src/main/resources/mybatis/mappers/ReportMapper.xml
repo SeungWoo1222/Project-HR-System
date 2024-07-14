@@ -8,30 +8,30 @@
     <!-- Select all reports -->
     <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
-        report_id AS reportId,
-        employee_id AS employeeId,
-        title,
-        content,
-        created_date AS createdDate,
-        modified_date AS modifiedDate,
-        approver_id AS approverId,
-        status,
-        reject_reason AS rejectReason
+            report_id AS reportId,
+            employee_id AS employeeId,
+            title,
+            content,
+            created_date AS createdDate,
+            modified_date AS modifiedDate,
+            approver_id AS approverId,
+            status,
+            reject_reason AS rejectReason
         FROM reports
     </select>
 
     <!-- Select report by ID -->
     <select id="getReportById" parameterType="int" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
-        report_id AS reportId,
-        employee_id AS employeeId,
-        title,
-        content,
-        created_date AS createdDate,
-        modified_date AS modifiedDate,
-        approver_id AS approverId,
-        status,
-        reject_reason AS rejectReason
+            report_id AS reportId,
+            employee_id AS employeeId,
+            title,
+            content,
+            created_date AS createdDate,
+            modified_date AS modifiedDate,
+            approver_id AS approverId,
+            status,
+            reject_reason AS rejectReason
         FROM reports
         WHERE report_id = #{reportId}
     </select>
@@ -39,33 +39,33 @@
     <!-- Insert a new report -->
     <insert id="insertReport" parameterType="com.woosan.hr_system.report.model.Report">
         INSERT INTO reports (
-        employee_id,
-        title,
-        content,
-        created_date,
-        approver_id,
-        status,
-        reject_reason
+            employee_id,
+            title,
+            content,
+            created_date,
+            approver_id,
+            status,
+            reject_reason
         ) VALUES (
-        #{employeeId},
-        #{title},
-        #{content},
-        #{createdDate},
-        #{approverId},
-        #{status},
-        #{rejectReason}
-        )
+                     #{employeeId},
+                     #{title},
+                     #{content},
+                     #{createdDate},
+                     #{approverId},
+                     #{status},
+                     #{rejectReason}
+                 )
     </insert>
 
     <!-- Update an existing report -->
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
         SET
-        title = #{title},
-        content = #{content},
-        modified_date = #{modifiedDate},
-        status = #{status},
-        reject_reason = #{rejectReason}
+            title = #{title},
+            content = #{content},
+            modified_date = #{modifiedDate},
+            status = #{status},
+            reject_reason = #{rejectReason}
         WHERE report_id = #{reportId}
     </update>
 
@@ -74,5 +74,24 @@
         DELETE FROM reports
         WHERE report_id = #{reportId}
     </delete>
+
+    <!-- Insert file metadata -->
+    <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
+        INSERT INTO file_metadata (
+            report_id,
+            cloud_server_file_url,
+            original_filename,
+            uuid_filename,
+            size,
+            upload_date
+        ) VALUES (
+                     #{reportId},
+                     #{cloudServerFileUrl},
+                     #{originalFilename},
+                     #{uuidFilename},
+                     #{size},
+                     #{uploadDate}
+                 )
+    </insert>
 
 </mapper>
