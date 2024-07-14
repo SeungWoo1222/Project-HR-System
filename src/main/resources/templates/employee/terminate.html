@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='퇴사 관리')}">
+
+<th:block layout:fragment="css"></th:block>
+
+<th:block layout:fragment="script"></th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <h1>퇴사 예정 및 퇴사 사원 목록</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>사원 ID</th>
+                <th>이름</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>입사일</th>
+                <th>상태</th>
+                <th>퇴사 사유</th>
+                <th>퇴사 날짜</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="employee : ${employees}">
+                <td th:text="${employee.employeeId}">사원 ID</td>
+                <td th:text="${employee.name}">이름</td>
+                <td th:text="${employee.department}">부서</td>
+                <td th:text="${employee.position}">직급</td>
+                <td th:text="${employee.hireDate}">입사일</td>
+                <td th:text="${employee.status}">상태</td>
+                <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
+                <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</html>

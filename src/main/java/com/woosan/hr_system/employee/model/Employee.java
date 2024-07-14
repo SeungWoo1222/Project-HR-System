@@ -17,11 +17,11 @@ public class Employee {
     private Department department;
     private Position position;
     private LocalDate hireDate;
-    private LocalDate terminationDate;
     private String status;
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
+    private Termination termination;
 
     // Getters and Setters
 
@@ -121,14 +121,6 @@ public class Employee {
         this.hireDate = hireDate;
     }
 
-    public LocalDate getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDate terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -160,4 +152,8 @@ public class Employee {
     public void setRemainingLeave(int remainingLeave) {
         this.remainingLeave = remainingLeave;
     }
+
+    public Termination getTermination() { return termination; }
+
+    public void setTermination(Termination termination) { this.termination = termination; }
 }

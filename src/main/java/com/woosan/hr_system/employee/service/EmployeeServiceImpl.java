@@ -1,13 +1,16 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.dao.TerminationDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.model.Termination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +19,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeDAO employeeDAO;
+
+    @Autowired
+    private TerminationDAO terminationDAO;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -88,8 +94,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
+    @Override
+    public List<Employee> getTerminatedEmployees() {
+        List<Employee> employees = employeeDAO.getTerminatedEmployees();
+        List<Termination> terminations = terminationDAO.getAllTerminatedEmployees();
+        for (Employee employee : employees) {
+            for (Termination termination : terminations) {
+                if (employee.getEmployeeId().equals(termination.getEmployeeId())) {
+                    employee.setTermination(termination);
+                    break;
+                }
+            }
+        }
+        return employees;
+    }
+
     @Override // 사원 정보 삭제
     public void deleteEmployee(String employeeId) {
         employeeDAO.deleteEmployee(employeeId);
     }
+
+
+
 }

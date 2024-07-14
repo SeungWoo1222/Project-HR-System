@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.employee.dao.TerminationDAO">
+
+    <resultMap id="TerminationResultMap" type="com.woosan.hr_system.employee.model.Termination">
+        <id property="employeeId" column="employee_id"/>
+        <result property="terminationReason" column="termination_reason"/>
+        <result property="terminationDate" column="termination_date"/>
+        <result property="terminationDocuments" column="termination_documents"/>
+    </resultMap>
+
+    <!-- id를 이용한 퇴사 사원 정보 조회 -->
+    <select id="getTerminatedEmployee" resultMap="TerminationResultMap" parameterType="String">
+        SELECT * FROM termination
+        WHERE employeeId = #{employeeId}
+    </select>
+
+    <!-- 모든 퇴사 사원 정보 조회 -->
+    <select id="getAllTerminatedEmployees" resultMap="TerminationResultMap">
+        SELECT * FROM termination
+    </select>
+
+</mapper>

@@ -62,6 +62,13 @@ public class EmployeeController {
         return "redirect:/employee/edit";
     }
 
+    @GetMapping("/terminate") // 사원 퇴사 처리 페이지 이동
+    public String terminateEmployees(Model model) {
+        List<Employee> employees = employeeService.getTerminatedEmployees();
+        model.addAttribute("employees", employees);
+        return "employee/terminate";
+    }
+
     @GetMapping("/delete/{employeeId}") // 사원 정보 영구 삭제
     public String deleteEmployee(@PathVariable String employeeId) {
         employeeService.deleteEmployee(employeeId);

@@ -10,6 +10,6 @@ public interface EmployeeService {
     void insertEmployee(Employee employee);
     void updateEmployee(Employee employee);
     void updateEmployeePartial(String employeeId, Map<String, Object> updates);
+    List<Employee> getTerminatedEmployees();
     void deleteEmployee(String employeeId);
-
 }

@@ -38,4 +38,9 @@ public class EmployeeDAO {
     public int countEmployeesByCurrentYear() { // 이번 년도 입사한 사람의 수
         return sqlSession.selectOne(NAMESPACE + ".countEmployeesByCurrentYear");
     };
+
+    public List<Employee> getTerminatedEmployees() { // 퇴사 (퇴사, 퇴직, 해고, 계약 만료) 처리된 사원 정보 조회
+        return sqlSession.selectList(NAMESPACE + ".getTerminatedEmployees");
+    };
+
 }
