@@ -10,12 +10,14 @@
         <result property="terminationReason" column="termination_reason"/>
         <result property="terminationDate" column="termination_date"/>
         <result property="terminationDocuments" column="termination_documents"/>
+        <result property="processedBy" column="processed_by"/>
+        <result property="terminationProcessedDate" column="termination_processed_date"/>
     </resultMap>
 
     <!-- id를 이용한 퇴사 사원 정보 조회 -->
     <select id="getTerminatedEmployee" resultMap="TerminationResultMap" parameterType="String">
         SELECT * FROM termination
-        WHERE employeeId = #{employeeId}
+        WHERE employee_id = #{employeeId}
     </select>
 
     <!-- 모든 퇴사 사원 정보 조회 -->
@@ -25,8 +27,8 @@
 
     <!-- 새로운 퇴사 사원 정보 삽입 -->
     <insert id="insertTermination" parameterType="com.woosan.hr_system.employee.model.Termination">
-        INSERT INTO termination (employee_id, termination_reason, termination_date, termination_documents)
-        VALUES (#{employeeId}, #{terminationReason}, #{terminationDate}, #{terminationDocuments})
+        INSERT INTO termination (employee_id, termination_reason, termination_date, termination_documents, processed_by, termination_processed_date)
+        VALUES (#{employeeId}, #{terminationReason}, #{terminationDate}, #{terminationDocuments}, #{processedBy}, #{terminationProcessedDate})
     </insert>
 
     <!-- 퇴사 사원 정보 업데이트 -->
@@ -34,7 +36,9 @@
         UPDATE termination
         SET termination_reason = #{terminationReason},
             termination_date = #{terminationDate},
-            termination_documents = #{terminationDocuments}
+            termination_documents = #{terminationDocuments},
+            processed_by = #{processedBy},
+            termination_processed_date = #{terminationProcessedDate}
         WHERE employee_id = #{employeeId}
     </update>
 

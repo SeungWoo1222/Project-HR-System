@@ -1,12 +1,19 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.model.Termination;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +31,23 @@ public class EmployeeController {
         return "employee/list";
     }
 
-    @GetMapping("/{employeeId}") // 특정 사원 정보 조회
-    public String getEmployee(@PathVariable String employeeId, Model model) {
+    @GetMapping("/{employeeId}") // 사원 정보 상세 조회
+    public String getEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "error/404";
+        }
         model.addAttribute("employee", employee);
-        return "employee/view";
+        return "employee/detail";
+    }
+    @GetMapping("/detail/{employeeId}") // 사원 정보 상세 조회
+    public String viewEmployee(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "error/404";
+        }
+        model.addAttribute("employee", employee);
+        return "employee/detail";
     }
 
     @GetMapping("/register") // 신규 사원 등록 페이지 이동
@@ -44,7 +63,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/edit/{employeeId}") // 사원 정보 수정 페이지 이동
-    public String editEmployeeForm(@PathVariable String employeeId, Model model) {
+    public String editEmployeeForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
         return "employee/edit";
@@ -57,22 +76,53 @@ public class EmployeeController {
     }
 
     @PatchMapping("/{employeeId}") // 사원 정보 일부 수정
-    public String updateEmployeePartial(@PathVariable String employeeId, @RequestBody Map<String, Object> updates) {
+    public String updateEmployeePartial(@PathVariable("employeeId") String employeeId, @RequestBody Map<String, Object> updates) {
         employeeService.updateEmployeePartial(employeeId, updates);
         return "redirect:/employee/edit";
     }
 
-    @GetMapping("/terminate") // 사원 퇴사 처리 페이지 이동
+    @PostMapping("/delete/{employeeId}") // 사원 정보 영구 삭제 로직
+    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
+        employeeService.deleteEmployee(employeeId);
+        return "redirect:/employee/terminate";
+    }
+
+    @GetMapping("/terminate") // 사원 퇴사 관리 페이지 이동
     public String terminateEmployees(Model model) {
-        List<Employee> employees = employeeService.getTerminatedEmployees();
-        model.addAttribute("employees", employees);
+        List<Employee> preTerminationEmployees = employeeService.getPreTerminationEmployees();
+        List<Employee> terminatedEmployees = employeeService.getTerminatedEmployees();
+        List<Employee> preDeletionEmployees = employeeService.getPreDeletionEmployees();
+        model.addAttribute("preTerminationEmployees", preTerminationEmployees);
+        model.addAttribute("terminatedEmployees", terminatedEmployees);
+        model.addAttribute("preDeletionEmployees", preDeletionEmployees);
         return "employee/terminate";
     }
 
-    @GetMapping("/delete/{employeeId}") // 사원 정보 영구 삭제
-    public String deleteEmployee(@PathVariable String employeeId) {
-        employeeService.deleteEmployee(employeeId);
-        return "redirect:/employee";
+    @PostMapping("/terminate/{employeeId}") // 사원 퇴사 처리 로직
+    public String terminateEmployee(@PathVariable("employeeId") String employeeId,
+                                    @RequestParam("terminationReason") String terminationReason,
+                                    @RequestParam("terminationDate") LocalDate terminationDate) {
+        employeeService.terminateEmployee(employeeId, terminationReason, terminationDate);
+        return "redirect:/employee/terminate";
     }
 
+    @GetMapping("/termination-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
+    public String viewEmployeeForTermination(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "error/404";
+        }
+        model.addAttribute("employee", employee);
+        return "employee/termination-form";
+    }
+
+    @GetMapping("/termination-detail/{employeeId}") // 사원 정보 상세 조회 페이지 이동 (퇴사 정보 포함)
+    public String viewTerminatedEmployee(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeWithTermination(employeeId);
+        if (employee == null) {
+            return "error/404";
+        }
+        model.addAttribute("employee", employee);
+        return "employee/termination-detail";
+    }
 }

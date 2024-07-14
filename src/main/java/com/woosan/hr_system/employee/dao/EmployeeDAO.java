@@ -31,7 +31,7 @@ public class EmployeeDAO {
         sqlSession.update(NAMESPACE + ".updateEmployee", employee);
     }
 
-    public void deleteEmployee(String employeeId) { // 사원 정보 일부 수정 (변경 가능한 column - password, name, birth, phone, email, address, detailed_address)
+    public void deleteEmployee(String employeeId) {
         sqlSession.delete(NAMESPACE + ".deleteEmployee", employeeId);
     }
 
@@ -39,8 +39,15 @@ public class EmployeeDAO {
         return sqlSession.selectOne(NAMESPACE + ".countEmployeesByCurrentYear");
     };
 
-    public List<Employee> getTerminatedEmployees() { // 퇴사 (퇴사, 퇴직, 해고, 계약 만료) 처리된 사원 정보 조회
+    public List<Employee> getPreTerminationEmployees() { // 퇴사 예정인 사원 정보 조회
+        return sqlSession.selectList(NAMESPACE + ".getPreTerminationEmployees");
+    };
+
+    public List<Employee> getTerminatedEmployees() { // 퇴사 후 2개월 이내의 사원 정보 조회
         return sqlSession.selectList(NAMESPACE + ".getTerminatedEmployees");
     };
 
+    public List<Employee> getPreDeletionEmployees() { // 퇴사 후 12개월이 지난 사원 정보 조회
+        return sqlSession.selectList(NAMESPACE + ".getPreDeletionEmployees");
+    };
 }

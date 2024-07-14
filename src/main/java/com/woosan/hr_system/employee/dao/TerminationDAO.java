@@ -16,7 +16,7 @@ public class TerminationDAO {
 
     private static final String NAMESPACE = "com.woosan.hr_system.employee.dao.TerminationDAO.";
 
-    public Employee getTerminatedEmployee(String employeeId) { // id를 이용한 퇴사 사원 정보 조회
+    public Termination getTerminatedEmployee(String employeeId) { // id를 이용한 퇴사 사원 정보 조회
         return sqlSession.selectOne(NAMESPACE + "getTerminatedEmployee" ,employeeId);
     }
 

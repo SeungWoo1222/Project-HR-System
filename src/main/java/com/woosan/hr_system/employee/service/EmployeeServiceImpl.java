@@ -1,13 +1,17 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.TerminationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Termination;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,6 +33,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) {
         return employeeDAO.getEmployeeById(employeeId);
+    }
+
+    @Override // id를 이용한 특정 사원 정보 조회 (Termination 정보 포함)
+    public Employee getEmployeeWithTermination(String employeeId) {
+        Employee employee = employeeDAO.getEmployeeById(employeeId);
+        employee.setTermination(terminationDAO.getTerminatedEmployee(employee.getEmployeeId()));
+        return employee;
     }
 
     @Override // 모든 사원 정보 조회
@@ -94,9 +105,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    @Override
+    @Override // 사원 정보 삭제
+    public void deleteEmployee(String employeeId) {
+        employeeDAO.deleteEmployee(employeeId);
+        terminationDAO.deleteTermination(employeeId);
+    }
+
+    @Override // 퇴사 예정인 사원 정보 조회
+    public List<Employee> getPreTerminationEmployees() {
+        List<Employee> employees = employeeDAO.getPreTerminationEmployees();
+        return employees;
+    }
+
+    @Override // 퇴사 후 2개월 이내의 사원 정보 조회
     public List<Employee> getTerminatedEmployees() {
         List<Employee> employees = employeeDAO.getTerminatedEmployees();
+        return mergeEmployeeWithTermination(employees);
+    }
+
+    @Override // 퇴사 후 12개월이 지난 사원 정보 조회
+    public List<Employee> getPreDeletionEmployees() {
+        List<Employee> employees = employeeDAO.getPreDeletionEmployees();
+        return mergeEmployeeWithTermination(employees);
+    }
+
+    // 사원 목록에 해당 사원의 퇴사정보를 합쳐주는 메소드
+    private List<Employee> mergeEmployeeWithTermination(List<Employee> employees) {
         List<Termination> terminations = terminationDAO.getAllTerminatedEmployees();
         for (Employee employee : employees) {
             for (Termination termination : terminations) {
@@ -109,11 +143,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employees;
     }
 
-    @Override // 사원 정보 삭제
-    public void deleteEmployee(String employeeId) {
-        employeeDAO.deleteEmployee(employeeId);
-    }
+    @Override // 사원 퇴사 처리 로직
+    public void terminateEmployee(String employeeId, String terminationReason, LocalDate terminationDate) {
+        // 재직 상태 - 퇴사 처리
+        Employee employee = employeeDAO.getEmployeeById(employeeId);
+        employee.setStatus("퇴사");
+        employeeDAO.updateEmployee(employee);
 
+        // 퇴사 테이블에 정보 등록
+        Termination termination = new Termination();
+        termination.setEmployeeId(employeeId);
+        termination.setTerminationReason(terminationReason);
+        termination.setTerminationDate(terminationDate);
+        termination.setTerminationProcessedDate(LocalDateTime.now());
+
+        // 로그인된 사용자 정보
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            termination.setProcessedBy(userDetails.getUsername());
+        }
+
+        // 파일 첨부 기능 구현 후 추가 예정
+        // termination.setTerminationDocuments(terminationDocuments);
+        terminationDAO.insertTermination(termination);
+    }
 
 
 }

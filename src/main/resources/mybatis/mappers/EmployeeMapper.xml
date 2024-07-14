@@ -20,6 +20,14 @@
         <result property="remainingLeave" column="remaining_leave"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
+        <association property="termination" javaType="com.woosan.hr_system.employee.model.Termination">
+            <id property="employeeId" column="employee_id"/>
+            <result property="terminationReason" column="termination_reason"/>
+            <result property="terminationDate" column="termination_date"/>
+            <result property="terminationDocuments" column="termination_documents"/>
+            <result property="processedBy" column="processed_by"/>
+            <result property="terminationProcessedDate" column="termination_processed_date"/>
+        </association>
     </resultMap>
 
     <select id="getEmployeeById" resultMap="EmployeeResultMap">
@@ -65,10 +73,29 @@
         WHERE YEAR(hire_date) = YEAR(CURDATE())
     </select>
 
-    <select id="getTerminatedEmployees" resultMap="EmployeeResultMap">
+    <!-- 퇴사 예정인 사원 정보 조회 -->
+    <select id="getPreTerminationEmployees" resultMap="EmployeeResultMap">
         SELECT *
         FROM employees
-        WHERE status IN ('퇴사 예정', '퇴사');
+        WHERE status IN ('퇴사 예정');
+    </select>
+
+    <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
+    <select id="getTerminatedEmployees" resultMap="EmployeeResultMap">
+        SELECT e.*, t.termination_date
+        FROM employees e
+                 LEFT JOIN termination t ON e.employee_id = t.employee_id
+        WHERE e.status = '퇴사'
+          AND t.termination_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH);
+    </select>
+
+    <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
+    <select id="getPreDeletionEmployees" resultMap="EmployeeResultMap">
+        SELECT e.*, t.termination_date
+        FROM employees e
+                 LEFT JOIN termination t ON e.employee_id = t.employee_id
+        WHERE e.status = '퇴사'
+            AND t.termination_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH);
     </select>
 
 </mapper>
