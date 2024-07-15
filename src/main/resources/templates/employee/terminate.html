@@ -3,9 +3,13 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout :: layout(title='퇴사 관리')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/modal.css}">
+</th:block>
 
-<th:block layout:fragment="script"></th:block>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/modal.js}"></script>
+</th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
@@ -33,9 +37,7 @@
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
                 <td>
-                    <a th:href="@{/employee/termination-form/{employeeId}(employeeId=${employee.employeeId})}">
-                        <button type="button">퇴사 처리</button>
-                    </a>
+                    <button type="button" onclick="openModal('/employee/termination-form/${employee.employeeId}')">퇴사 처리</button>
                 </td>
             </tr>
             </tbody>
@@ -67,9 +69,7 @@
                 <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
                 <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
                 <td>
-                    <a th:href="@{/employee/termination-detail/{employeeId}(employeeId=${employee.employeeId})}">
-                        <button type="button">상세 정보 조회</button>
-                    </a>
+                    <button type="button" onclick="openModal('/employee/termination-detail/MK08004')">상세 정보 조회</button>
                 </td>
             </tr>
             </tbody>
@@ -101,13 +101,14 @@
                 <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
                 <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
                 <td>
-                    <form th:action="@{/employee/delete/{employeeId}(employeeId=${employee.employeeId})}" method="post">
-                        <button type="submit">삭제하기</button>
-                    </form>
+                    <button type="button" onclick="openModal('/employee/delete-form/')">삭제하기</button>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<div th:replace="~{fragments/modal :: modal}"></div>
+
 </html>
