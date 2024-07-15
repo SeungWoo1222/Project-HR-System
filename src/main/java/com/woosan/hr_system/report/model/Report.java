@@ -1,9 +1,10 @@
 package com.woosan.hr_system.report.model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Report {
-    private int reportId;
+    private Long reportId;
     private String employeeId;
     private String title;
     private String content;
@@ -12,15 +13,15 @@ public class Report {
     private String approverId;
     private String status;
     private String rejectReason;
-    private Timestamp completeDate;
+    private Date completeDate;
     private String filePath;
 
     // Getters and Setters
-    public int getReportId() {
+    public Long getReportId() {
         return reportId;
     }
 
-    public void setReportId(int reportId) {
+    public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
 
@@ -88,11 +89,11 @@ public class Report {
         this.rejectReason = rejectReason;
     }
 
-    public Timestamp getCompleteDate() {
+    public Date getCompleteDate() {
         return completeDate;
     }
 
-    public void setCompleteDate(Timestamp completeDate) {
+    public void setCompleteDate(Date completeDate) {
         this.completeDate = completeDate;
     }
 

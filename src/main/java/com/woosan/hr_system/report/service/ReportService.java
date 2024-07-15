@@ -9,10 +9,10 @@ import com.woosan.hr_system.report.model.FileMetadata;
 
 public interface ReportService {
     List<Report> getAllReports();
-    Report getReportById(int reportId);
+    Report getReportById(Long reportId);
     void insertReport(Report report);
     void updateReport(Report report);
-    void updateReportPartial(int reportId, Map<String, Object> updates);
-    void deleteReport(int reportId);
+    void updateReportPartial(Long reportId, Map<String, Object> updates);
+    void deleteReport(Long reportId);
     List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
 }

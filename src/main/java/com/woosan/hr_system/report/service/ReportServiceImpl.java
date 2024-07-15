@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.woosan.hr_system.report.model.FileMetadata;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.io.File;
@@ -30,12 +32,15 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // id를 이용한 특정 보고서 조회
-    public Report getReportById(int reportId) {
+    public Report getReportById(Long reportId) {
         return reportDAO.getReportById(reportId);
     }
 
     @Override // 보고서 등록
     public void insertReport(Report report) {
+        if (report.getStatus() == null) {
+            report.setStatus("미처리"); // 비어있다면 "미처리" 값 설정
+        }
         reportDAO.insertReport(report);
     }
 
@@ -45,7 +50,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 일부 수정 (제목, 내용, 결재자, 결재상태(결재자만 가능), 거절사유(결재자만 가능), 업무완료날짜, 파일첨부)
-    public void updateReportPartial(int reportId, Map<String, Object> updates) {
+    public void updateReportPartial(Long reportId, Map<String, Object> updates) {
         Report report = reportDAO.getReportById(reportId);
         if (report != null) {
             if (updates.containsKey("title")) {
@@ -64,8 +69,16 @@ public class ReportServiceImpl implements ReportService {
                 report.setRejectReason((String)updates.get("reject_reason"));
             }
             if (updates.containsKey("complete_date")) {
-                report.setCompleteDate((Timestamp) updates.get("complete_date"));
+                String completeDateStr = (String) updates.get("complete_date");
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate localDate = LocalDate.parse(completeDateStr, formatter);
+                    report.setCompleteDate(java.sql.Date.valueOf(localDate));
+                } catch (Exception e) {
+                    throw new RuntimeException("날짜 형식이 잘못되었습니다.");
+                }
             }
+
             if (updates.containsKey("file_path")) {
                 report.setFilePath((String)updates.get("file_path"));
             }
@@ -74,7 +87,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 삭제
-    public void deleteReport(int reportId) {
+    public void deleteReport(Long reportId) {
         reportDAO.deleteReport(reportId);
     }
 

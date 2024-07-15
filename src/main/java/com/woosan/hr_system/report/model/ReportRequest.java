@@ -1,22 +1,23 @@
 package com.woosan.hr_system.report.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class ReportRequest {
-    private int requestId;
+    private Long requestId;
     private String requesterId;
     private String employeeId;
-    private Date requestDate;
+    private Timestamp requestDate;
     private Date dueDate;
     private String requestNote;
-    private int reportId;
+    private Long reportId;
 
     // Getters and Setters
-    public int getRequestId() {
+    public Long getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(int requestId) {
+    public void setRequestId(Long requestId) {
         this.requestId = requestId;
     }
 
@@ -36,11 +37,11 @@ public class ReportRequest {
         this.employeeId = employeeId;
     }
 
-    public Date getRequestDate() {
+    public Timestamp getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
+    public void setRequestDate(Timestamp requestDate) {
         this.requestDate = requestDate;
     }
 
@@ -60,11 +61,11 @@ public class ReportRequest {
         this.requestNote = requestNote;
     }
 
-    public int getReportId() {
+    public Long getReportId() {
         return reportId;
     }
 
-    public void setReportId(int reportId) {
+    public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
 }

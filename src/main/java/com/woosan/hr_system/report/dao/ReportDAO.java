@@ -19,7 +19,7 @@ public class ReportDAO {
         return sqlSession.selectList(NAMESPACE + ".getAllReports");
     }
     // 특정 보고서 조회
-    public Report getReportById(int reportId) {
+    public Report getReportById(Long reportId) {
         return sqlSession.selectOne(NAMESPACE + ".getReportById", reportId);
     }
     // 보고서 작성
@@ -31,7 +31,7 @@ public class ReportDAO {
         sqlSession.update(NAMESPACE + ".updateReport", report);
     }
     // 보고서 삭제
-    public void deleteReport(int reportId) {
+    public void deleteReport(Long reportId) {
         sqlSession.delete(NAMESPACE + ".deleteReport", reportId);
     }
     // 보고서 파일 첨부

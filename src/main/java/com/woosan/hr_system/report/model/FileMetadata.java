@@ -3,7 +3,7 @@ package com.woosan.hr_system.report.model;
 import java.util.Date;
 
 public class FileMetadata {
-    private Long id;
+    private Long fileId;
     private Long reportId;
     private String cloudServerFileUrl;
     private String originalFilename;
@@ -12,11 +12,11 @@ public class FileMetadata {
     private Date uploadDate;
 
     public Long getId() {
-        return id;
+        return fileId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long fileId) {
+        this.fileId = fileId;
     }
 
     public Long getReportId() {
