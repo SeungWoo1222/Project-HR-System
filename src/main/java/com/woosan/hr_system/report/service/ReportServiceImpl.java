@@ -1,24 +1,22 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.report.dao.ReportDAO;
+import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.woosan.hr_system.report.model.FileMetadata;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.Date;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -26,47 +24,59 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
 
-    @Override // 모든 보고서 조회
+    @Override
     public List<Report> getAllReports() {
         return reportDAO.getAllReports();
     }
 
-    @Override // id를 이용한 특정 보고서 조회
+    @Override
     public Report getReportById(Long reportId) {
         return reportDAO.getReportById(reportId);
     }
 
-    @Override // 보고서 등록
-    public void insertReport(Report report) {
-        if (report.getStatus() == null) {
-            report.setStatus("미처리"); // 비어있다면 "미처리" 값 설정
-        }
+    @Override
+    public void createReport(String title, String content, String approverId, Date completeDateSql, MultipartFile file) throws IOException {
+        // 보고서 생성 및 저장
+        Report report = new Report();
+        report.setTitle(title);
+        report.setContent(content);
+        report.setApproverId(approverId);
+        report.setCompleteDate(completeDateSql);
+        report.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+        report.setModifiedDate(new Timestamp(System.currentTimeMillis()));
+        report.setStatus("미처리"); // 기본 상태 설정
+
         reportDAO.insertReport(report);
+
+        // 파일 업로드
+        if (!file.isEmpty()) {
+            reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
+        }
     }
 
-    @Override // 보고서 전체 수정
+    @Override
     public void updateReport(Report report) {
         reportDAO.updateReport(report);
     }
 
-    @Override // 보고서 일부 수정 (제목, 내용, 결재자, 결재상태(결재자만 가능), 거절사유(결재자만 가능), 업무완료날짜, 파일첨부)
+    @Override
     public void updateReportPartial(Long reportId, Map<String, Object> updates) {
         Report report = reportDAO.getReportById(reportId);
         if (report != null) {
             if (updates.containsKey("title")) {
-                report.setTitle((String)updates.get("title"));
+                report.setTitle((String) updates.get("title"));
             }
             if (updates.containsKey("content")) {
-                report.setContent((String)updates.get("content"));
+                report.setContent((String) updates.get("content"));
             }
             if (updates.containsKey("approver_id")) {
-                report.setApproverId((String)updates.get("approver_id"));
+                report.setApproverId((String) updates.get("approver_id"));
             }
             if (updates.containsKey("status")) {
-                report.setStatus((String)updates.get("status"));
+                report.setStatus((String) updates.get("status"));
             }
             if (updates.containsKey("reject_reason")) {
-                report.setRejectReason((String)updates.get("reject_reason"));
+                report.setRejectReason((String) updates.get("reject_reason"));
             }
             if (updates.containsKey("complete_date")) {
                 String completeDateStr = (String) updates.get("complete_date");
@@ -80,18 +90,18 @@ public class ReportServiceImpl implements ReportService {
             }
 
             if (updates.containsKey("file_path")) {
-                report.setFilePath((String)updates.get("file_path"));
+                report.setFilePath((String) updates.get("file_path"));
             }
             reportDAO.updateReport(report);
         }
     }
 
-    @Override // 보고서 삭제
+    @Override
     public void deleteReport(Long reportId) {
         reportDAO.deleteReport(reportId);
     }
 
-    @Override // 파일 첨부
+    @Override
     public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {
         List<FileMetadata> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -120,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
         metadata.setOriginalFilename(originalFilename);
         metadata.setUuidFilename(uuidFilename);
         metadata.setSize(size);
-        metadata.setUploadDate(new Date());
+        metadata.setUploadDate(new java.util.Date());
 
         reportDAO.insertFileMetadata(metadata);
 

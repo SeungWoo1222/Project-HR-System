@@ -4,7 +4,7 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
         /* 파일 업로드 관련 스타일 */
         .file-list {
@@ -38,7 +38,7 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{example.js}"></script> <!-- 외부 JS도 요렇게 -->
+    <script th:src="@{/js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // 파일 아이템 삭제

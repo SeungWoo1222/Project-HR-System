@@ -14,6 +14,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 
@@ -38,12 +39,6 @@ public class ReportController {
         return "report/detail";
     }
 
-//    @GetMapping("/write") // 보고서 작성
-//    public String showCreateForm(Model model) {
-//        model.addAttribute("report", new Report());
-//        return "report/write";
-//    }
-
     @GetMapping("/write") // 보고서 작성페이지 이동
     public String showCreateForm(Model model) {
         model.addAttribute("report", new Report());
@@ -58,35 +53,19 @@ public class ReportController {
                                @RequestParam("file") MultipartFile file,
                                Model model) {
         try {
-            // 보고서 저장
-            Report report = new Report();
-            report.setTitle(title);
-            report.setContent(content);
-            report.setApproverId(approverId);
-            report.setCreatedDate(new Timestamp(System.currentTimeMillis())); //현재 시간으로 설정
-            report.setModifiedDate(new Timestamp(System.currentTimeMillis())); //현재 시간으로 설정
-
-
             // completeDate를 Date로 변환
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate localDate = LocalDate.parse(completeDate, formatter);
-                report.setCompleteDate(Date.valueOf(localDate));
-            } catch (Exception e) {
-                model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
-                return "report/write";
-            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(completeDate, formatter);
+            Date completeDateSql = Date.valueOf(localDate);
 
-            reportService.insertReport(report);
-
-            // 파일이 있는 경우 파일 첨부 메소드 실행
-            if (!file.isEmpty()) {
-                reportService.uploadFiles(report.getReportId(), new MultipartFile[]{file});
-            }
+            // 보고서 저장을 서비스 레이어에 위임
+            reportService.createReport(title, content, approverId, completeDateSql, file);
 
             model.addAttribute("message", "보고서 작성 완료");
             return "redirect:/report/report-home";
-
+        } catch (DateTimeParseException e) {
+            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
+            return "report/write";
         } catch (IOException e) {
             model.addAttribute("message", "파일 업로드 실패");
             e.printStackTrace();

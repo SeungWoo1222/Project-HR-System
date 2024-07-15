@@ -77,11 +77,11 @@
 
     <!-- Insert file metadata -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
-        INSERT INTO file_metadata (
+        INSERT INTO report_files (
             report_id,
             cloud_server_file_url,
-            original_filename,
-            uuid_filename,
+            original_file_name,
+            uuid_file_name,
             size,
             upload_date
         ) VALUES (
