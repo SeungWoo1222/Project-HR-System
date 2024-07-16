@@ -35,13 +35,18 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void createReport(String title, String content, String approverId, Date completeDateSql, MultipartFile file) throws IOException {
+    public FileMetadata getReportFileById(Long fileId) {
+        return reportDAO.getReportFileById(fileId);
+    }
+
+    @Override
+    public void createReport(String title, String content, String approverId, Date completeDate, MultipartFile file) throws IOException {
         // 보고서 생성 및 저장
         Report report = new Report();
         report.setTitle(title);
         report.setContent(content);
         report.setApproverId(approverId);
-        report.setCompleteDate(completeDateSql);
+        report.setCompleteDate(completeDate);
         report.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         report.setModifiedDate(new Timestamp(System.currentTimeMillis()));
         report.setStatus("미처리"); // 기본 상태 설정
@@ -90,7 +95,7 @@ public class ReportServiceImpl implements ReportService {
             }
 
             if (updates.containsKey("file_path")) {
-                report.setFilePath((String) updates.get("file_path"));
+                report.setFileId((Long) updates.get("file_path"));
             }
             reportDAO.updateReport(report);
         }

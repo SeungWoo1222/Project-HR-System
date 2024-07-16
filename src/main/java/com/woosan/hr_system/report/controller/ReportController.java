@@ -32,12 +32,24 @@ public class ReportController {
         return "report/report-home";
     }
 
-    @GetMapping("/{id}") // 특정 보고서 조회
-    public String getReportById(@PathVariable("id") Long id, Model model) {
-        Report report = reportService.getReportById(id);
+    @GetMapping("/{reportId}") // 특정 보고서 조회
+    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
-        return "report/detail";
+
+        if (report.getFileId() != null) {
+            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
+            model.addAttribute("reportFile", reportFile);
+        }
+        return "report/view";
     }
+
+//    @GetMapping("/{id}") // 특정 보고서 조회
+//    public String getReportById(@PathVariable("id") Long id, Model model) {
+//        Report report = reportService.getReportById(id);
+//        model.addAttribute("report", report);
+//        return "report/detail";
+//    }
 
     @GetMapping("/write") // 보고서 작성페이지 이동
     public String showCreateForm(Model model) {

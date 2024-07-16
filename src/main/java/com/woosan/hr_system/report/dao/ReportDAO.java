@@ -25,6 +25,10 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + ".getReportById", reportId);
     }
 
+    public FileMetadata getReportFileById(Long fileId) {
+        return sqlSession.selectOne(NAMESPACE + ".getReportFileById", fileId);
+    }
+
     public void insertReport(Report report) {
         sqlSession.insert(NAMESPACE + ".insertReport", report);
     }

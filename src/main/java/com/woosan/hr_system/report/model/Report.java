@@ -14,7 +14,7 @@ public class Report {
     private String status;
     private String rejectReason;
     private Date completeDate;
-    private String filePath;
+    private Long fileId;
 
     // Getters and Setters
     public Long getReportId() {
@@ -97,11 +97,11 @@ public class Report {
         this.completeDate = completeDate;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public Long getFileId() {
+        return fileId;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileId(Long filePath) {
+        this.fileId = filePath;
     }
 }

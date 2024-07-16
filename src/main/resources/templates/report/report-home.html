@@ -4,14 +4,14 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
     <style>
-        /*// 여기에 CSS를 입력*/
+        /* 여기에 CSS를 입력 */
     </style>
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
+    <script th:src="@{/js/example.js}"></script>
     <script>
         // 여기에 JS 코드를 입력
     </script>
@@ -23,11 +23,13 @@
         <div id="report-list">
             <ul>
                 <th:block th:each="report : ${reports}">
-                    <li th:text="${report.title}"></li>
+                    <li>
+                        <a th:href="@{/report/{id}(id=${report.reportId})}">[[${report.title}]]</a>
+                    </li>
                 </th:block>
             </ul>
         </div>
-        <button onclick="location.href='/report/write'">보고서 작성하기</button> <!-- 보고서 작성하기 버튼 -->
+        <button onclick="location.href='/report/write'">보고서 작성하기</button>
     </div>
 </div>
 </html>

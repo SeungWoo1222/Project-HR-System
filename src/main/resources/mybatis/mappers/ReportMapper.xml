@@ -21,12 +21,13 @@
     </select>
 
     <!-- Select report by ID -->
-    <select id="getReportById" parameterType="int" resultType="com.woosan.hr_system.report.model.Report">
+    <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
             employee_id AS employeeId,
             title,
             content,
+            complete_date AS completeDate,
             created_date AS createdDate,
             modified_date AS modifiedDate,
             approver_id AS approverId,
@@ -43,6 +44,8 @@
             title,
             content,
             created_date,
+            modified_date,
+            complete_date,
             approver_id,
             status,
             reject_reason
@@ -51,6 +54,8 @@
                      #{title},
                      #{content},
                      #{createdDate},
+                     #{modifiedDate},
+                     #{completeDate},
                      #{approverId},
                      #{status},
                      #{rejectReason}
@@ -70,7 +75,7 @@
     </update>
 
     <!-- Delete a report -->
-    <delete id="deleteReport" parameterType="int">
+    <delete id="deleteReport" parameterType="long">
         DELETE FROM reports
         WHERE report_id = #{reportId}
     </delete>
@@ -94,4 +99,17 @@
                  )
     </insert>
 
+    <!-- Select file metadata by ID -->
+    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+        SELECT
+            file_id AS fileId,
+            report_id AS reportId,
+            cloud_server_file_url AS cloudServerFileUrl,
+            original_file_name AS originalFilename,
+            uuid_file_name AS uuidFilename,
+            size,
+            upload_date AS uploadDate
+        FROM report_files
+        WHERE file_id = #{fileId}
+    </select>
 </mapper>

@@ -12,7 +12,8 @@ import com.woosan.hr_system.report.model.FileMetadata;
 public interface ReportService {
     List<Report> getAllReports();
     Report getReportById(Long reportId);
-    void createReport(String title, String content, String approverId, Date completeDateSql, MultipartFile file) throws IOException;
+    FileMetadata getReportFileById(Long fileId);
+    void createReport(String title, String content, String approverId, Date completeDate, MultipartFile file) throws IOException;
     void updateReport(Report report);
     void updateReportPartial(Long reportId, Map<String, Object> updates);
     void deleteReport(Long reportId);

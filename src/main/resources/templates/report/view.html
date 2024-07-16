@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='보고서 조회')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <style>
+        /*// 여기에 CSS를 입력*/
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
+    <script>
+        // 여기에 JS 코드를 입력
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
+        <h1>[[${report.title}]]</h1>
+        <p>내용: [[${report.content}]]</p>
+        <p>업무 처리 날짜: [[${report.completeDate}]]</p>
+        <p>작성일: [[${report.createdDate}]]</p>
+        <p>결재자: [[${report.approverId}]]</p>
+        <p>결재 상태: [[${report.status}]]</p>
+        <p>거절 사유: [[${report.rejectReason}]]</p>
+
+
+        <div th:if="${reportFile != null}">
+            <p>첨부 파일: <a th:href="@{${reportFile.cloud_server_file_url}}">[[${reportFile.original_file_name}]]</a></p>
+        </div>
+
+        <a href="/report/report-home">목록으로 돌아가기</a>
+    </div>
+</div>
+</html>
