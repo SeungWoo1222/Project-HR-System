@@ -4,14 +4,14 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서 조회')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{css/layout.css}">
     <style>
-        /*// 여기에 CSS를 입력*/
+        /* 여기에 CSS를 입력 */
     </style>
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
+    <script th:src="@{js/example.js}"></script>
     <script>
         // 여기에 JS 코드를 입력
     </script>
@@ -19,21 +19,24 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-        <h1>[[${report.title}]]</h1>
-        <p>내용: [[${report.content}]]</p>
-        <p>업무 처리 날짜: [[${report.completeDate}]]</p>
-        <p>작성일: [[${report.createdDate}]]</p>
-        <p>결재자: [[${report.approverId}]]</p>
-        <p>결재 상태: [[${report.status}]]</p>
-        <p>거절 사유: [[${report.rejectReason}]]</p>
-
+        <h1 th:text="${report.title}">제목</h1>
+        <p th:text="'내용: ' + ${report.content}">내용</p>
+        <p th:text="'업무 처리 날짜: ' + ${report.completeDate}">업무 처리 날짜</p>
+        <p th:text="'작성일: ' + ${report.createdDate}">작성일</p>
+        <p th:text="'결재자: ' + ${report.approverId}">결재자</p>
+        <p th:text="'결재 상태: ' + ${report.status}">결재 상태</p>
+        <p th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
         <div th:if="${reportFile != null}">
-            <p>첨부 파일: <a th:href="@{${reportFile.cloud_server_file_url}}">[[${reportFile.original_file_name}]]</a></p>
+            <p>
+                첨부 파일:
+                <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
+            </p>
         </div>
 
-        <a href="/report/report-home">목록으로 돌아가기</a>
+        <a th:href="@{'/report/edit?reportId=' + ${report.reportId}}">수정</a>
+        <a>삭제</a>
+        <a href="/report/report-home">목록으로</a>
     </div>
 </div>
 </html>

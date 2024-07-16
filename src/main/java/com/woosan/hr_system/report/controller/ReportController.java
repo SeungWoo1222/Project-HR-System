@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.controller;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
 
 @Controller
 @RequestMapping("/report")
@@ -44,13 +44,6 @@ public class ReportController {
         return "report/view";
     }
 
-//    @GetMapping("/{id}") // 특정 보고서 조회
-//    public String getReportById(@PathVariable("id") Long id, Model model) {
-//        Report report = reportService.getReportById(id);
-//        model.addAttribute("report", report);
-//        return "report/detail";
-//    }
-
     @GetMapping("/write") // 보고서 작성페이지 이동
     public String showCreateForm(Model model) {
         model.addAttribute("report", new Report());
@@ -70,7 +63,6 @@ public class ReportController {
             LocalDate localDate = LocalDate.parse(completeDate, formatter);
             Date completeDateSql = Date.valueOf(localDate);
 
-            // 보고서 저장을 서비스 레이어에 위임
             reportService.createReport(title, content, approverId, completeDateSql, file);
 
             model.addAttribute("message", "보고서 작성 완료");
@@ -85,18 +77,20 @@ public class ReportController {
         }
     }
 
-    @GetMapping("/edit/{id}") // 보고서 수정 페이지 이동
-    public String showEditForm(@PathVariable("id") Long id, Model model) {
-        Report report = reportService.getReportById(id);
+    @GetMapping("/edit")
+    public String editReport(@RequestParam("reportId") Long reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
-        return "report/form";
+        return "report/edit";
     }
 
-    @PostMapping("/update/{id}") // 보고서 수정
-    public String updateReport(@PathVariable("id") Long id, @ModelAttribute Report report) {
-        report.setReportId(id);
-        reportService.updateReport(report);
-        return "redirect:/reports";
+    @PostMapping("/update")
+    public String updateReport(@RequestParam("reportId") Long reportId,
+                               @RequestParam("title") String title,
+                               @RequestParam("content") String content,
+                               @RequestParam("completeDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate completeDate) {
+        reportService.updateReport(reportId, title, content, completeDate);
+        return "redirect:/report/" + reportId;
     }
 
     @GetMapping("/delete/{id}") // 보고서 삭제
@@ -104,14 +98,4 @@ public class ReportController {
         reportService.deleteReport(id);
         return "redirect:/reports";
     }
-
-//    @PostMapping
-//    public List<FileMetadata> uploadFiles(@PathVariable Long reportId, @RequestParam("files") MultipartFile[] files) {
-//        try {
-//            return reportService.uploadFiles(reportId, files);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("File upload failed");
-//        }
-//    }
 }

@@ -65,12 +65,7 @@
     <!-- Update an existing report -->
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
-        SET
-            title = #{title},
-            content = #{content},
-            modified_date = #{modifiedDate},
-            status = #{status},
-            reject_reason = #{rejectReason}
+        SET title = #{title}, content = #{content}, complete_date = #{completeDate}
         WHERE report_id = #{reportId}
     </update>
 

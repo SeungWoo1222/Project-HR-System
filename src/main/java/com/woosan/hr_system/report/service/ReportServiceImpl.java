@@ -60,46 +60,20 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void updateReport(Report report) {
+    public void updateReport(Long id, String title, String content, LocalDate completeDate) {
+        Report report = reportDAO.getReportById(id);
+        if (title != null) {
+            report.setTitle(title);
+        }
+        if (content != null) {
+            report.setContent(content);
+        }
+        if (completeDate != null) {
+            report.setCompleteDate(Date.valueOf(completeDate));
+        }
         reportDAO.updateReport(report);
     }
 
-    @Override
-    public void updateReportPartial(Long reportId, Map<String, Object> updates) {
-        Report report = reportDAO.getReportById(reportId);
-        if (report != null) {
-            if (updates.containsKey("title")) {
-                report.setTitle((String) updates.get("title"));
-            }
-            if (updates.containsKey("content")) {
-                report.setContent((String) updates.get("content"));
-            }
-            if (updates.containsKey("approver_id")) {
-                report.setApproverId((String) updates.get("approver_id"));
-            }
-            if (updates.containsKey("status")) {
-                report.setStatus((String) updates.get("status"));
-            }
-            if (updates.containsKey("reject_reason")) {
-                report.setRejectReason((String) updates.get("reject_reason"));
-            }
-            if (updates.containsKey("complete_date")) {
-                String completeDateStr = (String) updates.get("complete_date");
-                try {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    LocalDate localDate = LocalDate.parse(completeDateStr, formatter);
-                    report.setCompleteDate(java.sql.Date.valueOf(localDate));
-                } catch (Exception e) {
-                    throw new RuntimeException("날짜 형식이 잘못되었습니다.");
-                }
-            }
-
-            if (updates.containsKey("file_path")) {
-                report.setFileId((Long) updates.get("file_path"));
-            }
-            reportDAO.updateReport(report);
-        }
-    }
 
     @Override
     public void deleteReport(Long reportId) {

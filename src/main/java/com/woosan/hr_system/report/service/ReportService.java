@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.woosan.hr_system.report.model.Report;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import com.woosan.hr_system.report.model.FileMetadata;
@@ -14,8 +15,8 @@ public interface ReportService {
     Report getReportById(Long reportId);
     FileMetadata getReportFileById(Long fileId);
     void createReport(String title, String content, String approverId, Date completeDate, MultipartFile file) throws IOException;
-    void updateReport(Report report);
-    void updateReportPartial(Long reportId, Map<String, Object> updates);
     void deleteReport(Long reportId);
     List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
+
+    void updateReport(Long id, String title, String content, LocalDate CompleteDate);
 }
