@@ -47,7 +47,6 @@ public class ReportDAO {
         for (MultipartFile file : files) {
             // 파일 메타데이터 저장
             FileMetadata metadata = new FileMetadata();
-            metadata.setReportId(reportId);
             metadata.setOriginalFilename(file.getOriginalFilename());
             metadata.setUuidFilename(UUID.randomUUID().toString());
             metadata.setSize(file.getSize());
@@ -63,10 +62,14 @@ public class ReportDAO {
         sqlSession.update(NAMESPACE + ".updateReport", report);
     }
 
+    // 결재 처리
+    public void updateApprovalStatus(Report report) {
+        sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
+    }
+
     // 보고서 삭제
     public void deleteReport(Long id) {
         sqlSession.delete(NAMESPACE + ".deleteReport", id);
-        System.out.println("DAO 전달완료");
     }
 
     // 파일 삭제

@@ -85,7 +85,6 @@ public class ReportServiceImpl implements ReportService {
     // 파일 정보 저장
     private FileMetadata saveMetadata(Long reportId, String originalFilename, String uuidFilename, String filePath, long size) {
         FileMetadata metadata = new FileMetadata();
-        metadata.setReportId(reportId);
         metadata.setCloudServerFileUrl("Cloud URL"); // 클라우드 URL 추후 설정
         metadata.setOriginalFilename(originalFilename);
         metadata.setUuidFilename(uuidFilename);
@@ -110,6 +109,14 @@ public class ReportServiceImpl implements ReportService {
             report.setCompleteDate(Date.valueOf(completeDate));
         }
         reportDAO.updateReport(report);
+    }
+
+    @Override
+    public void updateApprovalStatus(Long reportId, String status, String rejectReason) {
+        Report report = reportDAO.getReportById(reportId);
+        report.setStatus(status);
+        report.setRejectReason(rejectReason);
+        reportDAO.updateApprovalStatus(report);
     }
 
 

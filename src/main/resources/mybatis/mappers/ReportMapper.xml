@@ -80,14 +80,12 @@
     <!-- 파일 DB 정보 생성 -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
         INSERT INTO report_files (
-            report_id,
             cloud_server_file_url,
             original_file_name,
             uuid_file_name,
             size,
             upload_date
         ) VALUES (
-                     #{reportId},
                      #{cloudServerFileUrl},
                      #{originalFilename},
                      #{uuidFilename},
@@ -100,6 +98,13 @@
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
         SET title = #{title}, content = #{content}, complete_date = #{completeDate}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <!-- 결재처리 -->
+    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET status = #{status}, reject_reason = #{rejectReason}
         WHERE report_id = #{reportId}
     </update>
 

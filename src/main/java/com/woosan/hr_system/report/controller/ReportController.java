@@ -18,7 +18,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/report")
@@ -95,9 +97,15 @@ public class ReportController {
         return "redirect:/report/" + reportId;
     }
 
-    @DeleteMapping("/delete/{reportId}") // 보고서 삭제
-    public String deleteReport(@PathVariable("reportId") Long id, RedirectAttributes redirectAttributes) {
-        reportService.deleteReport(id);
-        return "redirect:/report/report-home";
+    @PostMapping("/approve")
+    public String approveReport(@RequestParam("reportId") Long reportId,
+                                @RequestParam("status") String status,
+                                @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
+        try {
+            reportService.updateApprovalStatus(reportId, status, rejectionReason);
+            return "redirect:/report/report-home"; // 변경 후 다시 보고서 보기 페이지로 리다이렉트
+        } catch (Exception e) {
+            return "error"; // 에러 페이지로 리다이렉트하거나 에러 메시지 표시
+        }
     }
 }

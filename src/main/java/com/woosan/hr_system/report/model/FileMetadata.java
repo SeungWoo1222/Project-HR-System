@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class FileMetadata {
     private Long fileId;
-    private Long reportId;
     private String cloudServerFileUrl;
     private String originalFilename;
     private String uuidFilename;
@@ -17,14 +16,6 @@ public class FileMetadata {
 
     public void setId(Long fileId) {
         this.fileId = fileId;
-    }
-
-    public Long getReportId() {
-        return reportId;
-    }
-
-    public void setReportId(Long reportId) {
-        this.reportId = reportId;
     }
 
     public String getCloudServerFileUrl() {
