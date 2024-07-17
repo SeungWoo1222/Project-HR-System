@@ -1,5 +1,6 @@
 package com.woosan.hr_system.report.dao;
 
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportRequest;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
@@ -11,7 +12,12 @@ public class ReportRequestDAO {
     @Autowired
     private SqlSession sqlSession;
 
-    private static final String NAMESPACE = "com.woosan.hr_system.report.mapper.ReportMapper";
+    private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportRequestDAO";
+
+    // 보고서 전체 조회
+    public List<ReportRequest> getAllReportRequests() {
+        return sqlSession.selectList(NAMESPACE + ".getAllReportRequests");
+    }
 
     // 작성 요청 생성
     public void createReportRequest(ReportRequest request) {

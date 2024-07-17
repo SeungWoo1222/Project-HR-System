@@ -1,6 +1,8 @@
 package com.woosan.hr_system.report.controller;
 
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportRequest;
+import com.woosan.hr_system.report.service.ReportRequestService;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,15 +27,26 @@ import java.util.Map;
 @Controller
 @RequestMapping("/report")
 public class ReportController {
-
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private ReportRequestService reportRequestService;
 
-    @GetMapping("/report-home") // 모든 보고서 조회
-    public String getAllReports(Model model) {
-        List<Report> reports = reportService.getAllReports();
-        model.addAttribute("reports", reports);
+    @GetMapping("/report-home") // report-home 페이지 이동
+    public String reportHome() {
         return "report/report-home";
+    }
+
+    @GetMapping("/get-all-reports") // 모든 보고서 목록 조회
+    @ResponseBody
+    public List<Report> getAllReports() {
+        return reportService.getAllReports();
+    }
+
+    @GetMapping("/get-all-report-requests") // 모든 보고서 요청 목록 조회
+    @ResponseBody
+    public List<ReportRequest> getAllReportRequests() {
+        return reportRequestService.getAllReportRequests();
     }
 
     @GetMapping("/{reportId}") // 특정 보고서 조회

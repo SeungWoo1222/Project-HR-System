@@ -4,6 +4,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportRequestDAO">
+    <!-- 모든 보고서 조회 -->
+    <select id="getAllReportRequests" resultType="com.woosan.hr_system.report.model.ReportRequest">
+        SELECT
+            requester_id AS requesterId,
+            employee_id AS employeeId
+        FROM report_requests
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <insert id="createReportRequest" parameterType="com.woosan.hr_system.report.model.ReportRequest">
         INSERT INTO report_requests (requester_id, employee_id, request_date, due_date, request_note, report_id)

@@ -1,19 +1,22 @@
 package com.woosan.hr_system.report.controller;
 
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportRequest;
 import com.woosan.hr_system.report.service.ReportRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
-@RequestMapping("/reportRequests")
+@Controller
+@RequestMapping("/reportRequest")
 public class ReportRequestController {
 
     @Autowired
     private ReportRequestService reportRequestService;
 
-    @PostMapping("/create") // 작성 요청 생성
+    @PostMapping("/create") // 요청 생성
     public String createReportRequest(@RequestBody ReportRequest request) {
         reportRequestService.createReportRequest(request);
         return "Report request created successfully";

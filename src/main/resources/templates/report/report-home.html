@@ -12,8 +12,27 @@
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/example.js}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        // 여기에 JS 코드를 입력
+        $(document).ready(function() {
+            // 모든 보고서 가져오기
+            $.get("/report/get-all-reports", function(data) {
+                var reportList = $("#report-list ul");
+                reportList.empty();
+                data.forEach(function(report) {
+                    reportList.append("<li><a href='/report/" + report.reportId + "'>" + report.title + "</a></li>");
+                });
+            });
+
+            // 모든 보고서 요청 가져오기
+            $.get("/report/get-all-report-requests", function(data) {
+                var reportRequestList = $("#report-request-list ul");
+                reportRequestList.empty();
+                data.forEach(function(reportRequest) {
+                    reportRequestList.append("<li>" + reportRequest.requesterId + "님이 " + reportRequest.employeeId + "님에게 요청하신 보고서입니다.</li>");
+                });
+            });
+        });
     </script>
 </th:block>
 
@@ -22,14 +41,16 @@
         <h1>보고서 목록</h1>
         <div id="report-list">
             <ul>
-                <th:block th:each="report : ${reports}">
-                    <li>
-                        <a th:href="@{/report/{id}(id=${report.reportId})}">[[${report.title}]]</a>
-                    </li>
-                </th:block>
+                <!-- AJAX를 통해 동적으로 채워질 부분 -->
             </ul>
         </div>
         <button onclick="location.href='/report/write'">보고서 작성하기</button>
+        <h1>보고서 작성 요청 목록</h1>
+        <div id="report-request-list">
+            <ul>
+                <!-- AJAX를 통해 동적으로 채워질 부분 -->
+            </ul>
+        </div>
     </div>
 </div>
 </html>

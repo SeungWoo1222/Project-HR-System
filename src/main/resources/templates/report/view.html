@@ -33,9 +33,10 @@
         <p th:text="'작성일: ' + ${report.createdDate}">작성일</p>
         <p th:text="'결재자: ' + ${report.approverId}">결재자</p>
         <p th:text="'결재 상태: ' + ${report.status}">결재 상태</p>
-        <p th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
+        <!-- 결재 상태가 거절일 경우에만 거절 사유를 표시 -->
+        <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
-        <!-- 결재 상태 변경 기능 시작 -->
+        <!-- 결재 상태 변경 기능 -->
         <form th:action="@{/report/approve}" method="post">
             <input type="hidden" name="reportId" th:value="${report.reportId}" />
             <div>
@@ -51,7 +52,6 @@
             </div>
             <button type="submit">결재 상태 변경</button>
         </form>
-        <!-- 결재 상태 변경 기능 끝 -->
 
         <div th:if="${reportFile != null}">
             <p>

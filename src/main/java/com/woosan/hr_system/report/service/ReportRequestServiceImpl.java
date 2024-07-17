@@ -1,6 +1,7 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.report.dao.ReportRequestDAO;
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,11 @@ public class ReportRequestServiceImpl implements ReportRequestService {
 
     @Autowired
     private ReportRequestDAO reportRequestDAO;
+
+    @Override // 모든 보고서 조회
+    public List<ReportRequest> getAllReportRequests() {
+        return reportRequestDAO.getAllReportRequests();
+    }
 
     @Override // 작성 요청 생성
     public void createReportRequest(ReportRequest request) {
