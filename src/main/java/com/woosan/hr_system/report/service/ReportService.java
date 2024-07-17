@@ -15,7 +15,7 @@ public interface ReportService {
     Report getReportById(Long reportId);
     FileMetadata getReportFileById(Long fileId);
     void createReport(String title, String content, String approverId, Date completeDate, MultipartFile file) throws IOException;
-    void deleteReport(Long reportId);
+    void deleteReport(Long id);
     List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
 
     void updateReport(Long id, String title, String content, LocalDate CompleteDate);

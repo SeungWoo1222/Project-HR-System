@@ -5,7 +5,7 @@
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
 
-    <!-- Select all reports -->
+    <!-- 모든 보고서 조회 -->
     <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
@@ -20,7 +20,7 @@
         FROM reports
     </select>
 
-    <!-- Select report by ID -->
+    <!-- 특정 보고서 조회 -->
     <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
@@ -37,7 +37,22 @@
         WHERE report_id = #{reportId}
     </select>
 
-    <!-- Insert a new report -->
+    <!-- 특정 파일 조회 -->
+    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+        SELECT
+            file_id AS fileId,
+            report_id AS reportId,
+            cloud_server_file_url AS cloudServerFileUrl,
+            original_file_name AS originalFilename,
+            uuid_file_name AS uuidFilename,
+            size,
+            upload_date AS uploadDate
+
+        FROM report_files
+        WHERE file_id = #{fileId}
+    </select>
+
+    <!-- 보고서 생성 -->
     <insert id="insertReport" parameterType="com.woosan.hr_system.report.model.Report">
         INSERT INTO reports (
             employee_id,
@@ -62,20 +77,7 @@
                  )
     </insert>
 
-    <!-- Update an existing report -->
-    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET title = #{title}, content = #{content}, complete_date = #{completeDate}
-        WHERE report_id = #{reportId}
-    </update>
-
-    <!-- Delete a report -->
-    <delete id="deleteReport" parameterType="long">
-        DELETE FROM reports
-        WHERE report_id = #{reportId}
-    </delete>
-
-    <!-- Insert file metadata -->
+    <!-- 파일 DB 정보 생성 -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
         INSERT INTO report_files (
             report_id,
@@ -94,17 +96,20 @@
                  )
     </insert>
 
-    <!-- Select file metadata by ID -->
-    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
-        SELECT
-            file_id AS fileId,
-            report_id AS reportId,
-            cloud_server_file_url AS cloudServerFileUrl,
-            original_file_name AS originalFilename,
-            uuid_file_name AS uuidFilename,
-            size,
-            upload_date AS uploadDate
-        FROM report_files
-        WHERE file_id = #{fileId}
-    </select>
+    <!-- 보고서 수정 -->
+    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET title = #{title}, content = #{content}, complete_date = #{completeDate}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <!-- 보고서 삭제 -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM reports WHERE report_id = #{reportId}
+    </delete>
+
+    <!-- 파일 삭제 -->
+    <delete id="deleteFileMetadataByReportId" parameterType="long">
+        DELETE FROM report_files WHERE report_id = #{reportId}
+    </delete>
 </mapper>

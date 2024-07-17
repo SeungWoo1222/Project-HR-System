@@ -4,11 +4,13 @@ import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.woosan.hr_system.report.model.FileMetadata;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -44,13 +46,13 @@ public class ReportController {
         return "report/view";
     }
 
-    @GetMapping("/write") // 보고서 작성페이지 이동
+    @GetMapping("/write") // 보고서 작성 페이지 이동
     public String showCreateForm(Model model) {
         model.addAttribute("report", new Report());
         return "report/write";  // write.html로 연결
     }
 
-    @PostMapping("/write") // 보고서 작성
+    @PostMapping("/write") // 보고서 생성
     public String createReport(@RequestParam("title") String title,
                                @RequestParam("content") String content,
                                @RequestParam("approverId") String approverId,
@@ -77,14 +79,14 @@ public class ReportController {
         }
     }
 
-    @GetMapping("/edit")
+    @GetMapping("/edit") // 수정 페이지 이동
     public String editReport(@RequestParam("reportId") Long reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
         return "report/edit";
     }
 
-    @PostMapping("/update")
+    @PostMapping("/update") // 보고서 수정
     public String updateReport(@RequestParam("reportId") Long reportId,
                                @RequestParam("title") String title,
                                @RequestParam("content") String content,
@@ -93,9 +95,9 @@ public class ReportController {
         return "redirect:/report/" + reportId;
     }
 
-    @GetMapping("/delete/{id}") // 보고서 삭제
-    public String deleteReport(@PathVariable("id") Long id) {
+    @DeleteMapping("/delete/{reportId}") // 보고서 삭제
+    public String deleteReport(@PathVariable("reportId") Long id, RedirectAttributes redirectAttributes) {
         reportService.deleteReport(id);
-        return "redirect:/reports";
+        return "redirect:/report/report-home";
     }
 }
