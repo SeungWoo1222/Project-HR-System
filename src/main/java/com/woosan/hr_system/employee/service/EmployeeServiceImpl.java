@@ -2,9 +2,9 @@ package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.dao.TerminationDAO;
+import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.model.Termination;
+import com.woosan.hr_system.employee.model.Resignation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeDAO employeeDAO;
 
     @Autowired
-    private TerminationDAO terminationDAO;
+    private ResignationDAO resignationDAO;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -35,10 +34,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeDAO.getEmployeeById(employeeId);
     }
 
-    @Override // id를 이용한 특정 사원 정보 조회 (Termination 정보 포함)
-    public Employee getEmployeeWithTermination(String employeeId) {
+    @Override // id를 이용한 특정 사원 정보 조회 (Resignation 정보 포함)
+    public Employee getEmployeeWithResignation(String employeeId) {
         Employee employee = employeeDAO.getEmployeeById(employeeId);
-        employee.setTermination(terminationDAO.getTerminatedEmployee(employee.getEmployeeId()));
+        if (employee == null) {
+            return null;
+        }
+        employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
         return employee;
     }
 
@@ -108,34 +110,34 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override // 사원 정보 삭제
     public void deleteEmployee(String employeeId) {
         employeeDAO.deleteEmployee(employeeId);
-        terminationDAO.deleteTermination(employeeId);
+        resignationDAO.deleteResignation(employeeId);
     }
 
     @Override // 퇴사 예정인 사원 정보 조회
-    public List<Employee> getPreTerminationEmployees() {
-        List<Employee> employees = employeeDAO.getPreTerminationEmployees();
+    public List<Employee> getPreResignationEmployees() {
+        List<Employee> employees = employeeDAO.getPreResignationEmployees();
         return employees;
     }
 
     @Override // 퇴사 후 2개월 이내의 사원 정보 조회
-    public List<Employee> getTerminatedEmployees() {
-        List<Employee> employees = employeeDAO.getTerminatedEmployees();
-        return mergeEmployeeWithTermination(employees);
+    public List<Employee> getResignedEmployees() {
+        List<Employee> employees = employeeDAO.getResignedEmployees();
+        return mergeEmployeeWithResignation(employees);
     }
 
     @Override // 퇴사 후 12개월이 지난 사원 정보 조회
     public List<Employee> getPreDeletionEmployees() {
         List<Employee> employees = employeeDAO.getPreDeletionEmployees();
-        return mergeEmployeeWithTermination(employees);
+        return mergeEmployeeWithResignation(employees);
     }
 
     // 사원 목록에 해당 사원의 퇴사정보를 합쳐주는 메소드
-    private List<Employee> mergeEmployeeWithTermination(List<Employee> employees) {
-        List<Termination> terminations = terminationDAO.getAllTerminatedEmployees();
+    private List<Employee> mergeEmployeeWithResignation(List<Employee> employees) {
+        List<Resignation> resignations = resignationDAO.getAllResignedEmployees();
         for (Employee employee : employees) {
-            for (Termination termination : terminations) {
-                if (employee.getEmployeeId().equals(termination.getEmployeeId())) {
-                    employee.setTermination(termination);
+            for (Resignation resignation : resignations) {
+                if (employee.getEmployeeId().equals(resignation.getEmployeeId())) {
+                    employee.setResignation(resignation);
                     break;
                 }
             }
@@ -144,29 +146,29 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public void terminateEmployee(String employeeId, String terminationReason, LocalDate terminationDate) {
+    public void resignEmployee(String employeeId, String ResignationReason, LocalDate ResignationDate) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         employee.setStatus("퇴사");
         employeeDAO.updateEmployee(employee);
 
         // 퇴사 테이블에 정보 등록
-        Termination termination = new Termination();
-        termination.setEmployeeId(employeeId);
-        termination.setTerminationReason(terminationReason);
-        termination.setTerminationDate(terminationDate);
-        termination.setTerminationProcessedDate(LocalDateTime.now());
+        Resignation resignation = new Resignation();
+        resignation.setEmployeeId(employeeId);
+        resignation.setResignationReason(ResignationReason);
+        resignation.setResignationDate(ResignationDate);
+        resignation.setProcessedDate(LocalDateTime.now());
 
         // 로그인된 사용자 정보
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            termination.setProcessedBy(userDetails.getUsername());
+            resignation.setProcessedBy(userDetails.getUsername());
         }
 
         // 파일 첨부 기능 구현 후 추가 예정
         // termination.setTerminationDocuments(terminationDocuments);
-        terminationDAO.insertTermination(termination);
+        resignationDAO.insertResignation(resignation);
     }
 
 

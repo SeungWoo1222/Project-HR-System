@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class Employee {
     private String employeeId;
@@ -21,7 +20,7 @@ public class Employee {
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
-    private Termination termination;
+    private Resignation resignation;
 
     // Getters and Setters
 
@@ -153,7 +152,7 @@ public class Employee {
         this.remainingLeave = remainingLeave;
     }
 
-    public Termination getTermination() { return termination; }
+    public Resignation getResignation() { return resignation; }
 
-    public void setTermination(Termination termination) { this.termination = termination; }
+    public void setResignation(Resignation resignation) { this.resignation = resignation; }
 }

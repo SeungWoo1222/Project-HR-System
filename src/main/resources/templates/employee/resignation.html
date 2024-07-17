@@ -25,7 +25,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="employee : ${preTerminationEmployees}">
+            <tr th:each="employee : ${preResignationEmployees}">
                 <td th:text="${employee.employeeId}">사원 ID</td>
                 <td th:text="${employee.name}">이름</td>
                 <td th:text="${employee.department}">부서</td>
@@ -33,7 +33,7 @@
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
                 <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/termination-form/' + this.getAttribute('employeeId'))">퇴사 처리</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/resignation-form/' + this.getAttribute('employeeId'))">퇴사 처리</button>
                 </td>
             </tr>
             </tbody>
@@ -55,17 +55,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="employee : ${terminatedEmployees}">
+            <tr th:each="employee : ${resignedEmployees}">
                 <td th:text="${employee.employeeId}">사원 ID</td>
                 <td th:text="${employee.name}">이름</td>
                 <td th:text="${employee.department}">부서</td>
                 <td th:text="${employee.position}">직급</td>
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
-                <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
-                <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
+                <td th:text="${employee.resignation?.resignationReason}">퇴사 사유</td>
+                <td th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
                 <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/termination-detail/', this.getAttribute('employeeId'))">상세 정보 조회</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/resignation-detail/' + this.getAttribute('employeeId'))">상세 정보 조회</button>
                 </td>
             </tr>
             </tbody>
@@ -94,8 +94,8 @@
                 <td th:text="${employee.position}">직급</td>
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
-                <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
-                <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
+                <td th:text="${employee.resignation?.resignationReason}">퇴사 사유</td>
+                <td th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
                 <td>
                     <button type="button" onclick="openModal('/employee/delete-form/')">삭제하기</button>
                 </td>
@@ -104,7 +104,5 @@
         </table>
     </div>
 </div>
-
-<div th:replace="~{fragments/modal :: modal}"></div>
 
 </html>

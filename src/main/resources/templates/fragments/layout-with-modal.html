@@ -67,20 +67,19 @@
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <div id="modal-body">
-            <!-- 모달 컨텐츠가 여기에 로드됩니다. -->
+            <!-- 모달 컨텐츠 -->
         </div>
     </div>
 </div>
 
 <script>
     // 모달 열기 함수
-    function openModal(contentUrl, employeeId) {
+    function openModal(contentUrl) {
         var modal = document.getElementById("myModal");
         var modalBody = document.getElementById("modal-body");
-        var url = contentUrl + employeeId;
 
         // 컨텐츠 로드
-        fetch(url)
+        fetch(contentUrl)
             .then(response => response.text())
             .then(html => {
                 modalBody.innerHTML = html;

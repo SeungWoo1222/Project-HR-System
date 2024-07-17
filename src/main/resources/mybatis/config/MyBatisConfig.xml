@@ -7,7 +7,7 @@
     </settings>
     <typeAliases>
         <package name="com.woosan.hr_system.employee.model.Employee"/>
-        <package name="com.woosan.hr_system.employee.model.Termination"/>
+        <package name="com.woosan.hr_system.employee.model.Resignation"/>
         <package name="com.woosan.hr_system.report.model.Report"/>
     </typeAliases>
     <typeHandlers>
@@ -16,7 +16,7 @@
     </typeHandlers>
     <mappers>
         <mapper resource="mybatis/mappers/EmployeeMapper.xml"/>
-        <mapper resource="mybatis/mappers/TerminationMapper.xml"/>
+        <mapper resource="mybatis/mappers/ResignationMapper.xml"/>
         <mapper resource="mybatis/mappers/ReportMapper.xml"/>
     </mappers>
 </configuration>

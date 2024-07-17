@@ -49,7 +49,7 @@
                 </tr>
                 <tr>
                     <th>입사일</th>
-                    <td th:text="${#temporals.format(employee.hireDate, 'yyyy-MM-dd')}">입사일</td>
+                    <td th:text="${employee.hireDate}">입사일</td>
                 </tr>
                 <tr>
                     <th>상태</th>
@@ -61,7 +61,7 @@
                 </tr>
                 <tr>
                     <th>마지막 수정일</th>
-                    <td th:text="${#temporals.format(employee.lastModified, 'yyyy-MM-dd HH:mm:ss')}">마지막 수정일</td>
+                    <td th:text="${employee.lastModified}">마지막 수정일</td>
                 </tr>
                 <tr>
                     <th>수정자</th>
@@ -72,14 +72,14 @@
 
         <div>
             <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/employee/terminate/{employeeId}(employeeId=${employee.employeeId})}" method="post">
+            <form th:action="@{/employee/resignation/{employeeId}(employeeId=${employee.employeeId})}" method="post">
                 <div>
-                    <label for="terminationReason">퇴사 사유</label>
-                    <textarea id="terminationReason" name="terminationReason" rows="4" cols="50"></textarea>
+                    <label for="resignationReason">퇴사 사유</label>
+                    <textarea id="resignationReason" name="resignationReason" rows="4" cols="50"></textarea>
                 </div>
                 <div>
-                    <label for="terminationDate">퇴사 날짜</label>
-                    <input type="date" id="terminationDate" name="terminationDate">
+                    <label for="resignationDate">퇴사 날짜</label>
+                    <input type="date" id="resignationDate" name="resignationDate">
                 </div>
                 <div>
                     <button type="submit">퇴사 처리</button>

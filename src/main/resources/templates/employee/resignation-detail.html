@@ -49,7 +49,7 @@
                 </tr>
                 <tr>
                     <th>입사일</th>
-                    <td th:text="${#temporals.format(employee.hireDate, 'yyyy-MM-dd')}">입사일</td>
+                    <td th:text="${employee.hireDate}">입사일</td>
                 </tr>
                 <tr>
                     <th>상태</th>
@@ -61,7 +61,7 @@
                 </tr>
                 <tr>
                     <th>마지막 수정일</th>
-                    <td th:text="${#temporals.format(employee.lastModified, 'yyyy-MM-dd HH:mm:ss')}">마지막 수정일</td>
+                    <td th:text="${employee.lastModified}">마지막 수정일</td>
                 </tr>
                 <tr>
                     <th>수정자</th>
@@ -69,19 +69,19 @@
                 </tr>
                 <tr>
                     <th>퇴사 날짜</th>
-                    <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
+                    <td th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
                 </tr>
                 <tr>
                     <th>퇴사 사유</th>
-                    <td th:text="${employee.termination?.getTerminationReason()}">퇴사 사유</td>
+                    <td th:text="${employee.resignation?.getResignationReason()}">퇴사 사유</td>
                 </tr>
                 <tr>
                     <th>퇴사 처리한 사원 ID</th>
-                    <td th:text="${employee.termination?.getProcessedBy()}">처리 사원</td>
+                    <td th:text="${employee.resignation?.getProcessedBy()}">처리 사원</td>
                 </tr>
                 <tr>
                     <th>퇴사 처리한 일시</th>
-                    <td th:text="${employee.termination?.getTerminationProcessedDate()}">처리 일시</td>
+                    <td th:text="${employee.resignation?.getProcessedDate()}">처리 일시</td>
                 </tr>
             </table>
             </div>

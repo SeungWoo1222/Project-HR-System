@@ -8,14 +8,14 @@ import java.util.Map;
 
 public interface EmployeeService {
     Employee getEmployeeById(String employeeId);
-    Employee getEmployeeWithTermination(String employeeId);
+    Employee getEmployeeWithResignation(String employeeId);
     List<Employee> getAllEmployees();
     void insertEmployee(Employee employee);
     void updateEmployee(Employee employee);
     void updateEmployeePartial(String employeeId, Map<String, Object> updates);
     void deleteEmployee(String employeeId);
-    List<Employee> getPreTerminationEmployees();
-    List<Employee> getTerminatedEmployees();
+    List<Employee> getPreResignationEmployees();
+    List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
-    void terminateEmployee(String employeeId, String terminationReason, LocalDate terminationDate);
+    void resignEmployee(String employeeId, String resignationReason, LocalDate resignationDate);
 }

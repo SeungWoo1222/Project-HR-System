@@ -20,13 +20,13 @@
         <result property="remainingLeave" column="remaining_leave"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
-        <association property="termination" javaType="com.woosan.hr_system.employee.model.Termination">
+        <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
             <id property="employeeId" column="employee_id"/>
-            <result property="terminationReason" column="termination_reason"/>
-            <result property="terminationDate" column="termination_date"/>
-            <result property="terminationDocuments" column="termination_documents"/>
+            <result property="resignationReason" column="resignation_reason"/>
+            <result property="resignationDate" column="resignation_date"/>
+            <result property="resignationDocuments" column="resignation_documents"/>
             <result property="processedBy" column="processed_by"/>
-            <result property="terminationProcessedDate" column="termination_processed_date"/>
+            <result property="processedDate" column="processed_date"/>
         </association>
     </resultMap>
 
@@ -74,28 +74,28 @@
     </select>
 
     <!-- 퇴사 예정인 사원 정보 조회 -->
-    <select id="getPreTerminationEmployees" resultMap="EmployeeResultMap">
+    <select id="getPreResignationEmployees" resultMap="EmployeeResultMap">
         SELECT *
         FROM employees
         WHERE status IN ('퇴사 예정');
     </select>
 
     <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
-    <select id="getTerminatedEmployees" resultMap="EmployeeResultMap">
-        SELECT e.*, t.termination_date
+    <select id="getResignedEmployees" resultMap="EmployeeResultMap">
+        SELECT e.*, r.resignation_date
         FROM employees e
-                 LEFT JOIN termination t ON e.employee_id = t.employee_id
+                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
-          AND t.termination_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH);
+          AND r.resignation_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH);
     </select>
 
     <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
     <select id="getPreDeletionEmployees" resultMap="EmployeeResultMap">
-        SELECT e.*, t.termination_date
+        SELECT e.*, r.resignation_date
         FROM employees e
-                 LEFT JOIN termination t ON e.employee_id = t.employee_id
+                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
-            AND t.termination_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH);
+            AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH);
     </select>
 
 </mapper>
