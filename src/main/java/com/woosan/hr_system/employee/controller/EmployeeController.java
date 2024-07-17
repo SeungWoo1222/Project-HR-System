@@ -3,6 +3,8 @@ package com.woosan.hr_system.employee.controller;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -122,10 +124,22 @@ public class EmployeeController {
         return "employee/resignation-detail";
     }
 
-    @PostMapping("/delete/{employeeId}") // 사원 정보 영구 삭제 로직
-    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
-        employeeService.deleteEmployee(employeeId);
-        return "redirect:/employee/resignation";
+    @PostMapping("/delete/{employeeId}") // 사원 영구 삭제 로직
+    @ResponseBody
+    public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
+        String message = employeeService.deleteEmployee(employeeId);
+        switch (message) {
+            case "success":
+                return ResponseEntity.ok("사원이 삭제되었습니다.");
+            case "null":
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사원을 찾을 수 없습니다.");
+            case "no_resignation":
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원의 퇴사 정보가 없습니다.");
+            case "not_expired":
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("퇴사 후 1년이 지나지 않았습니다.");
+            default:
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
+        }
     }
     // 퇴사 관련 로직 end-point
 }

@@ -13,7 +13,7 @@ public interface EmployeeService {
     void insertEmployee(Employee employee);
     void updateEmployee(Employee employee);
     void updateEmployeePartial(String employeeId, Map<String, Object> updates);
-    void deleteEmployee(String employeeId);
+    String deleteEmployee(String employeeId);
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
