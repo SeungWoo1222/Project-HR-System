@@ -82,12 +82,6 @@ public class EmployeeController {
     // 수정 관련 로직 end-point
 
     // 퇴사 관련 로직 start-point
-    @PostMapping("/delete/{employeeId}") // 사원 정보 영구 삭제 로직
-    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
-        employeeService.deleteEmployee(employeeId);
-        return "redirect:/employee/resignation";
-    }
-
     @GetMapping("/resignation") // 사원 퇴사 관리 페이지 이동
     public String viewResignationManagement(Model model) {
         List<Employee> preResignationEmployees = employeeService.getPreResignationEmployees();
@@ -99,6 +93,16 @@ public class EmployeeController {
         return "/employee/resignation";
     }
 
+    @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
+    public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "error/employee-error";
+        }
+        model.addAttribute("employee", employee);
+        return "employee/resignation-form";
+    }
+
     @PostMapping("/resign/{employeeId}") // 사원 퇴사 처리 로직
     public String resignEmployee(@PathVariable("employeeId") String employeeId,
                                     @RequestParam("resignationReason") String resignationReason,
@@ -107,24 +111,21 @@ public class EmployeeController {
         return "redirect:/employee/resignation";
     }
 
-    @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
-    public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
-        model.addAttribute("employee", employee);
-        return "employee/resignation-form";
-    }
 
     @GetMapping("/resignation-detail/{employeeId}") // 사원 정보 상세 조회 페이지 이동 (퇴사 정보 포함)
     public String viewResignedEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeWithResignation(employeeId);
         if (employee == null) {
-            return "error/404";
+            return "error/employee-error";
         }
         model.addAttribute("employee", employee);
         return "employee/resignation-detail";
+    }
+
+    @PostMapping("/delete/{employeeId}") // 사원 정보 영구 삭제 로직
+    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
+        employeeService.deleteEmployee(employeeId);
+        return "redirect:/employee/resignation";
     }
     // 퇴사 관련 로직 end-point
 }
