@@ -76,6 +76,14 @@
                     <td th:text="${employee.resignation?.getResignationReason()}">퇴사 사유</td>
                 </tr>
                 <tr>
+                    <th>퇴사 코드</th>
+                    <td th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
+                </tr>
+                <tr>
+                    <th>구체적 사유</th>
+                    <td th:text="${employee.resignation?.specificReason}">구체적 사유</td>
+                </tr>
+                <tr>
                     <th>퇴사 처리한 사원 ID</th>
                     <td th:text="${employee.resignation?.getProcessedBy()}">처리 사원</td>
                 </tr>

@@ -227,3 +227,10 @@ body {
     background-color: #18a8f1;
     color: white;
 }
+
+/* Error Message styles */
+.error-message {
+    color: #ff0000;
+    text-align: left;
+    margin-bottom: 15px;
+}

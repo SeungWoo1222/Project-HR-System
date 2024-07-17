@@ -23,6 +23,8 @@
         <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
             <id property="employeeId" column="employee_id"/>
             <result property="resignationReason" column="resignation_reason"/>
+            <result property="codeNumber" column="code_number"/>
+            <result property="specificReason" column="specific_reason"/>
             <result property="resignationDate" column="resignation_date"/>
             <result property="resignationDocuments" column="resignation_documents"/>
             <result property="processedBy" column="processed_by"/>

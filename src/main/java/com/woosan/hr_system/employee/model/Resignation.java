@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 public class Resignation {
     private String employeeId;
     private String resignationReason;
+    private String codeNumber;
+    private String specificReason;
     private LocalDate resignationDate;
     private String resignationDocuments;
     private String processedBy;
@@ -33,6 +35,21 @@ public class Resignation {
 
     public void setResignationReason(String resignationReason) {
         this.resignationReason = resignationReason;
+    }
+    public String getSpecificReason() {
+        return specificReason;
+    }
+
+    public void setSpecificReason(String specificReason) {
+        this.specificReason = specificReason;
+    }
+
+    public String getCodeNumber() {
+        return codeNumber;
+    }
+
+    public void setCodeNumber(String codeNumber) {
+        this.codeNumber = codeNumber;
     }
 
     public String getResignationDocuments() {

@@ -106,11 +106,16 @@ public class EmployeeController {
     }
 
     @PostMapping("/resign/{employeeId}") // 사원 퇴사 처리 로직
-    public String resignEmployee(@PathVariable("employeeId") String employeeId,
+    public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                     @RequestParam("resignationReason") String resignationReason,
+                                    @RequestParam("codeNumber") String codeNumber,
+                                    @RequestParam("specificReason") String specificReason,
                                     @RequestParam("resignationDate") LocalDate resignationDate) {
-        employeeService.resignEmployee(employeeId, resignationReason, resignationDate);
-        return "redirect:/employee/resignation";
+        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate);
+        if ("null".equals(message)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeId + "' 사원을 찾을 수 없습니다.");
+        }
+        return ResponseEntity.ok("'" + employeeId + "' 사원이 퇴사 처리되었습니다.");
     }
 
 

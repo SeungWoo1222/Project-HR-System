@@ -17,5 +17,5 @@ public interface EmployeeService {
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
-    void resignEmployee(String employeeId, String resignationReason, LocalDate resignationDate);
+    String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate);
 }

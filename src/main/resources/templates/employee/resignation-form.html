@@ -72,15 +72,32 @@
 
         <div>
             <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/employee/resignation/{employeeId}(employeeId=${employee.employeeId})}" method="post">
-                <div>
-                    <label for="resignationReason">퇴사 사유</label>
-                    <textarea id="resignationReason" name="resignationReason" rows="4" cols="50"></textarea>
-                </div>
+            <form th:action="@{/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" method="post" onsubmit="submitResignationForm(event)">
                 <div>
                     <label for="resignationDate">퇴사 날짜</label>
                     <input type="date" id="resignationDate" name="resignationDate">
                 </div>
+                <div>
+                    <label for="resignationReason">퇴사 사유</label>
+                    <select id="resignationReason" name="resignationReason" onchange="updateCodeNumber()">
+                        <option value="">선택하세요</option>
+                        <option value="1">1. 자진퇴사</option>
+                        <option value="2">2. 권고사직</option>
+                        <option value="3">3. 정년 등 기간만료에 의한 이직</option>
+                        <option value="4">4. 기타</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="codeNumber">코드 번호</label>
+                    <select id="codeNumber" name="codeNumber">
+                        <option value="">선택하세요</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="specificReason">구체적 사유 (10자 이상 기재)</label>
+                    <textarea id="specificReason" name="specificReason" rows="2" cols="20"></textarea>
+                </div>
+                <div id="error-message" class="error-message"></div>
                 <div>
                     <button type="submit">퇴사 처리</button>
                 </div>

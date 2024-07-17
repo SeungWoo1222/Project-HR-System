@@ -165,20 +165,72 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public void resignEmployee(String employeeId, String ResignationReason, LocalDate ResignationDate) {
+    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "null";
+        }
         employee.setStatus("퇴사");
         employeeDAO.updateEmployee(employee);
 
-        // 퇴사 테이블에 정보 등록
         Resignation resignation = new Resignation();
+
+        // 퇴사 사유 분류
+        switch (resignationReason) {
+            case "1":
+                resignation.setResignationReason("1. 자진퇴사");
+                break;
+            case "2":
+                resignation.setResignationReason("2. 권고사직 : 회사 사정과 근로자 귀책에 의한 이직");
+                break;
+            case "3":
+                resignation.setResignationReason("3. 정년 등 기간만료에 의한 이직");
+                break;
+            case "4":
+                resignation.setResignationReason("4. 기타");
+                break;
+        }
+
+        // 퇴사 코드 분류
+        switch (codeNumber) {
+            case "11":
+                resignation.setCodeNumber("11. 개인사정으로 인한 자진퇴사");
+                break;
+            case "12":
+                resignation.setCodeNumber("12. 사업장 이전, 근로조건(계약조건) 변동, 임금체불 등으로 자진퇴사");
+                break;
+            case "22":
+                resignation.setCodeNumber("22. 폐업, 도산(예정 포함), 공사 중단");
+                break;
+            case "23":
+                resignation.setCodeNumber("23. 경영상 필요 및 회사 불황으로 인원 감축 등에 의한 퇴사 (해고•권고사직•계약파기 포함)");
+                break;
+            case "26":
+                resignation.setCodeNumber("26. 피보험자의 귀책사유에 의한 징계해고•권고사직 또는 계약 파기");
+                break;
+            case "31":
+                resignation.setCodeNumber("31. 정년");
+                break;
+            case "32":
+                resignation.setCodeNumber("32. 계약기간만료, 공사 종료");
+                break;
+            case "41":
+                resignation.setCodeNumber("41. 고용보험 비적용");
+                break;
+            case "42":
+                resignation.setCodeNumber("42. 이중고용");
+                break;
+
+        }
+
+        // 퇴사 테이블에 나머지 정보 등록
         resignation.setEmployeeId(employeeId);
-        resignation.setResignationReason(ResignationReason);
-        resignation.setResignationDate(ResignationDate);
+        resignation.setSpecificReason(specificReason);
+        resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
 
-        // 로그인된 사용자 정보
+        // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -188,6 +240,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 파일 첨부 기능 구현 후 추가 예정
         // termination.setTerminationDocuments(terminationDocuments);
         resignationDAO.insertResignation(resignation);
+        return "success";
     }
 
 

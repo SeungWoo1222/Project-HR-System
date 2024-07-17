@@ -8,6 +8,8 @@
     <resultMap id="ResignationResultMap" type="com.woosan.hr_system.employee.model.Resignation">
         <id property="employeeId" column="employee_id"/>
         <result property="resignationReason" column="resignation_reason"/>
+        <result property="codeNumber" column="code_number"/>
+        <result property="specificReason" column="specific_reason"/>
         <result property="resignationDate" column="resignation_date"/>
         <result property="resignationDocuments" column="resignation_documents"/>
         <result property="processedBy" column="processed_by"/>
@@ -27,14 +29,16 @@
 
     <!-- 새로운 사직 사원 정보 삽입 -->
     <insert id="insertResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
-        INSERT INTO resignation (employee_id, resignation_reason, resignation_date, resignation_documents, processed_by, processed_date)
-        VALUES (#{employeeId}, #{resignationReason}, #{resignationDate}, #{resignationDocuments}, #{processedBy}, #{processedDate})
+        INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, resignation_documents, processed_by, processed_date)
+        VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{resignationDocuments}, #{processedBy}, #{processedDate})
     </insert>
 
     <!-- 사직 사원 정보 업데이트 -->
     <update id="updateResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
         UPDATE resignation
         SET resignation_reason = #{resignationReason},
+            code_number = #{codeNumber},
+            specific_reason = #{specificReason},
             resignation_date = #{resignationDate},
             resignation_documents = #{resignationDocuments},
             processed_by = #{processedBy},
