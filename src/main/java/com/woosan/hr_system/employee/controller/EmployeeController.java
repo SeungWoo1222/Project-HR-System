@@ -106,7 +106,7 @@ public class EmployeeController {
         return "redirect:/employee/terminate";
     }
 
-    @GetMapping("/termination-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
+    @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
     public String viewEmployeeForTermination(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         if (employee == null) {

@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='퇴사 관리')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='퇴사 관리')}">
 
-<th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/modal.css}">
-</th:block>
+<th:block layout:fragment="css"></th:block>
 
-<th:block layout:fragment="script">
-    <script th:src="@{/js/modal.js}"></script>
-</th:block>
+<th:block layout:fragment="script"></th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
@@ -37,7 +33,7 @@
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
                 <td>
-                    <button type="button" onclick="openModal('/employee/termination-form/${employee.employeeId}')">퇴사 처리</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/termination-form/' + this.getAttribute('employeeId'))">퇴사 처리</button>
                 </td>
             </tr>
             </tbody>
@@ -69,7 +65,7 @@
                 <td th:text="${employee.termination?.terminationReason}">퇴사 사유</td>
                 <td th:text="${employee.termination?.terminationDate}">퇴사 날짜</td>
                 <td>
-                    <button type="button" onclick="openModal('/employee/termination-detail/MK08004')">상세 정보 조회</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/termination-detail/', this.getAttribute('employeeId'))">상세 정보 조회</button>
                 </td>
             </tr>
             </tbody>
