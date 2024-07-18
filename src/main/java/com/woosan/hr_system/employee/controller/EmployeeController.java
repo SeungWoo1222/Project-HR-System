@@ -49,16 +49,16 @@ public class EmployeeController {
     // 조회 관련 로직 end-point
 
     // 등록 관련 로직 start-point
-    @GetMapping("/register") // 신규 사원 등록 페이지 이동
+    @GetMapping("/registration") // 신규 사원 등록 페이지 이동
     public String newEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
-        return "employee/register";
+        return "employee/registration";
     }
 
-    @PostMapping("/register") // 신규 사원 등록
+    @PostMapping("/registration") // 신규 사원 등록
     public String registerEmployee(@ModelAttribute Employee employee) {
         employeeService.insertEmployee(employee);
-        return "redirect:/employee/register";
+        return "redirect:/employee/registration";
     }
     // 등록 관련 로직 end-point
 

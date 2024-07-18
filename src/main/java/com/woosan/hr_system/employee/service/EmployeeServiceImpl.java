@@ -242,6 +242,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignationDAO.insertResignation(resignation);
         return "success";
     }
-
-
 }
