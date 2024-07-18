@@ -234,3 +234,8 @@ body {
     text-align: left;
     margin-bottom: 15px;
 }
+
+/* Table styles */
+ .list tbody tr:hover {
+     background-color: #C3E8FB;
+ }
