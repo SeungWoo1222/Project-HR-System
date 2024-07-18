@@ -1,5 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.Search.PageRequest;
+import com.woosan.hr_system.Search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,15 @@ public class EmployeeController {
 
     // 조회 관련 로직 start-point
     @GetMapping("/list") // 모든 사원 정보 조회
-    public String listEmployees(Model model) {
-        List<Employee> employees = employeeService.getAllEmployees();
-        model.addAttribute("employees", employees);
+    public String getEmployees(@RequestParam(name = "page", defaultValue = "0") int page,
+                               @RequestParam(name = "size", defaultValue = "10") int size,
+                               @RequestParam(name = "keyword", required = false) String keyword,
+                               Model model) {
+        PageRequest pageRequest = new PageRequest(page, size, keyword);
+        PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
+        model.addAttribute("employees", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage());
+        model.addAttribute("totalPages", pageResult.getTotalPages());
         return "employee/list";
     }
 
@@ -37,15 +45,16 @@ public class EmployeeController {
         model.addAttribute("employee", employee);
         return "employee/detail";
     }
-    @GetMapping("/detail/{employeeId}") // 사원 정보 상세 조회
-    public String viewEmployeeDetail(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
-        model.addAttribute("employee", employee);
-        return "employee/detail";
-    }
+
+//    @GetMapping("/detail/{employeeId}") // 사원 정보 상세 조회
+//    public String viewEmployeeDetail(@PathVariable("employeeId") String employeeId, Model model) {
+//        Employee employee = employeeService.getEmployeeById(employeeId);
+//        if (employee == null) {
+//            return "error/404";
+//        }
+//        model.addAttribute("employee", employee);
+//        return "employee/detail";
+//    }
     // 조회 관련 로직 end-point
 
     // 등록 관련 로직 start-point

@@ -45,6 +45,18 @@
             </tr>
             </tbody>
         </table>
+        <div>
+            <span th:if="${currentPage > 0}">
+                <a th:href="@{'/employees/list?page=' + ${currentPage - 1} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">이전</a>
+            </span>
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{'/employees/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                   th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+            </span>
+            <span th:if="${currentPage < totalPages - 1}">
+                <a th:href="@{'/employees/list?page=' + ${currentPage + 1} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">다음</a>
+            </span>
+        </div>
     </div>
 </div>
 </html>

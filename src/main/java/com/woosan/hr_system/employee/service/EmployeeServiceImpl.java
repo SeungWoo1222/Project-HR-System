@@ -1,11 +1,14 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.Search.PageRequest;
+import com.woosan.hr_system.Search.PageResult;
 import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,8 +48,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 모든 사원 정보 조회
-    public List<Employee> getAllEmployees() {
-        return employeeDAO.getAllEmployees();
+    public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Employee> employees = employeeDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset);
+        int total = employeeDAO.count(pageRequest.getKeyword());
+
+        return new PageResult<>(employees, (int) Math.ceil((double)total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // 사원 정보 등록
