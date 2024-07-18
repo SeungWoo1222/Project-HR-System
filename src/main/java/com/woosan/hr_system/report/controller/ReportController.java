@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.woosan.hr_system.report.model.FileMetadata;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -66,8 +67,7 @@ public class ReportController {
         try {
             // completeDate를 Date로 변환
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDate = LocalDate.parse(completeDate, formatter);
-            Date completeDateSql = Date.valueOf(localDate);
+            LocalDate completeDateSql = LocalDate.parse(completeDate, formatter);
 
             reportService.createReport(title, content, approverId, completeDateSql, file);
 
@@ -99,7 +99,7 @@ public class ReportController {
         return "redirect:/report/" + reportId;
     }
 
-    @PostMapping("/approve")
+    @PostMapping("/approve") // 결재 처리
     public String approveReport(@RequestParam("reportId") Long reportId,
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
@@ -109,5 +109,11 @@ public class ReportController {
         } catch (Exception e) {
             return "error"; // 에러 페이지로 리다이렉트하거나 에러 메시지 표시
         }
+    }
+
+    @DeleteMapping("/delete/{reportId}") // 보고서 삭제
+    public String deleteReport(@PathVariable("reportId") Long id, RedirectAttributes redirectAttributes) {
+        reportService.deleteReport(id);
+        return "redirect:/report/report-home";
     }
 }

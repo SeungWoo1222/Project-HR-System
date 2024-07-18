@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,15 +41,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 생성
-    public void createReport(String title, String content, String approverId, Date completeDate, MultipartFile file) throws IOException {
+    public void createReport(String title, String content, String approverId, LocalDate completeDateSql, MultipartFile file) throws IOException {
         // 보고서 생성 및 저장
         Report report = new Report();
+        LocalDateTime now = LocalDateTime.now();
+
         report.setTitle(title);
         report.setContent(content);
         report.setApproverId(approverId);
-        report.setCompleteDate(completeDate);
-        report.setCreatedDate(new Timestamp(System.currentTimeMillis()));
-        report.setModifiedDate(new Timestamp(System.currentTimeMillis()));
+        report.setCompleteDate(completeDateSql);
+        report.setCreatedDate(now);
+        report.setModifiedDate(now);
         report.setStatus("미처리"); // 기본 상태 설정
 
         reportDAO.insertReport(report);
@@ -106,7 +109,7 @@ public class ReportServiceImpl implements ReportService {
             report.setContent(content);
         }
         if (completeDate != null) {
-            report.setCompleteDate(Date.valueOf(completeDate));
+            report.setCompleteDate(completeDate);
         }
         reportDAO.updateReport(report);
     }

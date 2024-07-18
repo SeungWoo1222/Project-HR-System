@@ -1,14 +1,16 @@
 package com.woosan.hr_system.report.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ReportRequest {
     private Long requestId;
     private String requesterId;
     private String employeeId;
-    private Timestamp requestDate;
-    private Date dueDate;
+    private LocalDateTime requestDate;
+    private LocalDate dueDate;
     private String requestNote;
     private Long reportId;
 
@@ -37,19 +39,19 @@ public class ReportRequest {
         this.employeeId = employeeId;
     }
 
-    public Timestamp getRequestDate() {
+    public LocalDateTime getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Timestamp requestDate) {
+    public void setRequestDate(LocalDateTime requestDate) {
         this.requestDate = requestDate;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 

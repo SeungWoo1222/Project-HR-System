@@ -24,11 +24,12 @@
         <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
         <p th:text="'요청자 : ' + ${request.requesterId}"></p>
 
-<!--        <a th:href="@{'/report/edit?reportId=' + ${request.requestId}}">수정</a>-->
+        <a th:href="@{'/request/edit?requestId=' + ${request.requestId}}">수정</a>
 
-<!--        <form th:action="@{'/report/delete/' + ${report.reportId}}" method="post" style="display:inline;">-->
-<!--            <input type="hidden" name="_method" value="delete">-->
-<!--            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>-->
+        <form th:action="@{'/request/delete/' + ${request.requestId}}" method="post" style="display:inline;">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" onclick="return confirm('정말 이 요청을 삭제하시겠습니까?');">삭제</button>
+        </form>
 
         <a th:href="@{/report/report-home}">목록으로</a>
     </div>

@@ -13,6 +13,12 @@ public class ReportRequestDAO {
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportRequestDAO";
 
+    // 요청 생성
+    public void insertRequest(ReportRequest request) {
+        System.out.println("다오");
+        sqlSession.insert(NAMESPACE + ".insertRequest", request);
+    }
+
     // 요청 전체 조회
     public List<ReportRequest> getAllReportRequests() {
         return sqlSession.selectList(NAMESPACE + ".getAllReportRequests");
@@ -21,6 +27,17 @@ public class ReportRequestDAO {
     // 특정 요청 조회
     public ReportRequest getRequestById(Long requestId) {
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
+    }
+
+    // 요청 수정
+    public void updateRequest(ReportRequest request) {
+        System.out.println("다오");
+        sqlSession.update(NAMESPACE + ".updateRequest", request);
+    }
+
+    // 요청 삭제
+    public void deleteRequest(Long requestId) {
+        sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
     }
 
 

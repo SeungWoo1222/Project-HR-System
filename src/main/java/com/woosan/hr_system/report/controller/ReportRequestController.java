@@ -4,9 +4,19 @@ import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportRequest;
 import com.woosan.hr_system.report.service.ReportRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Controller
@@ -15,6 +25,32 @@ public class ReportRequestController {
 
     @Autowired
     private ReportRequestService reportRequestService;
+
+    @GetMapping("/write") // 요청 생성 페이지 이동
+    public String showRequestForm(Model model) {
+        model.addAttribute("request", new ReportRequest());
+        return "report/request/request-write";
+    }
+
+    @PostMapping("/write") // 요청 생성
+    public String createRequest(@RequestParam("employeeId") String employeeId,
+                                @RequestParam("dueDate") String dueDate,
+                                @RequestParam("requestNote") String requestNote,
+                                Model model) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate dueDateSql = LocalDate.parse(dueDate, formatter);
+            LocalDateTime requestDate = null; //생성시간 표시용
+
+            reportRequestService.createRequest(employeeId, dueDateSql, requestNote, requestDate);
+
+            model.addAttribute("message", "보고서 작성 완료");
+            return "redirect:/report/report-home";
+        } catch (DateTimeParseException e) {
+            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
+            return "report/request/request-write";
+        }
+    }
 
     @GetMapping("/get-all-report-requests") // 모든 보고서 요청 목록 조회
     @ResponseBody
@@ -29,6 +65,27 @@ public class ReportRequestController {
         return "report/request/request-view";
     }
 
+    @GetMapping("/edit")
+    public String editRequest(@RequestParam(name = "requestId") Long requestId, Model model) {
+        ReportRequest request = reportRequestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "report/request/request-edit";
+    }
+
+    @PostMapping("/update")
+    public String updateRequest(@RequestParam("requestId") Long requestId,
+                                @RequestParam("employeeId") String employeeId,
+                                @RequestParam("requestNote") String requestNote,
+                                @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
+        reportRequestService.updateRequest(requestId, employeeId, requestNote, dueDate);
+        return "redirect:/request/" + requestId;
+    }
+
+    @DeleteMapping("/delete/{requestId}") // 보고서 삭제
+    public String deleteRequest(@PathVariable("requestId") Long id, RedirectAttributes redirectAttributes) {
+        reportRequestService.deleteRequest(id);
+        return "redirect:/report/report-home";
+    }
 
 
 

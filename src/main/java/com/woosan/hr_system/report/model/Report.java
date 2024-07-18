@@ -1,19 +1,19 @@
 package com.woosan.hr_system.report.model;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Report {
     private Long reportId;
     private String employeeId;
     private String title;
     private String content;
-    private Timestamp createdDate;
-    private Timestamp modifiedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private String approverId;
     private String status;
     private String rejectReason;
-    private Date completeDate;
+    private LocalDate completeDate;
     private Long fileId;
 
     // Getters and Setters
@@ -49,19 +49,19 @@ public class Report {
         this.content = content;
     }
 
-    public Timestamp getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Timestamp createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Timestamp getModifiedDate() {
+    public LocalDateTime getModifiedDate() {
         return modifiedDate;
     }
 
-    public void setModifiedDate(Timestamp modifiedDate) {
+    public void setModifiedDate(LocalDateTime modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 
@@ -89,11 +89,11 @@ public class Report {
         this.rejectReason = rejectReason;
     }
 
-    public Date getCompleteDate() {
+    public LocalDate getCompleteDate() {
         return completeDate;
     }
 
-    public void setCompleteDate(Date completeDate) {
+    public void setCompleteDate(LocalDate completeDate) {
         this.completeDate = completeDate;
     }
 
