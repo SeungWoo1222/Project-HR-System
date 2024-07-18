@@ -13,10 +13,17 @@ public class ReportRequestServiceImpl implements ReportRequestService {
     @Autowired
     private ReportRequestDAO reportRequestDAO;
 
-    @Override // 모든 보고서 조회
+    @Override // 모든 요청 조회
     public List<ReportRequest> getAllReportRequests() {
         return reportRequestDAO.getAllReportRequests();
     }
+
+    @Override // 특정 요청 조회
+    public ReportRequest getRequestById(Long requestId) {
+        System.out.println("서비스");
+        return reportRequestDAO.getRequestById(requestId);
+    }
+
 
     @Override // 작성 요청 생성
     public void createReportRequest(ReportRequest request) {

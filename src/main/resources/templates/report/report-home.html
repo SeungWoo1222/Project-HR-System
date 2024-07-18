@@ -29,7 +29,7 @@
                 var reportRequestList = $("#report-request-list ul");
                 reportRequestList.empty();
                 data.forEach(function(reportRequest) {
-                    reportRequestList.append("<li>" + reportRequest.requesterId + "님이 " + reportRequest.employeeId + "님에게 요청하신 보고서입니다.</li>");
+                    reportRequestList.append("<li><a href='/report/request/" + reportRequest.requestId + "'>" + reportRequest.requesterId + "님이 " + reportRequest.employeeId + "님에게 요청하신 보고서입니다.</a></li>");
                 });
             });
         });

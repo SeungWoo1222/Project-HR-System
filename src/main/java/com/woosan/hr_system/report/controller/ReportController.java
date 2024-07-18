@@ -6,23 +6,18 @@ import com.woosan.hr_system.report.service.ReportRequestService;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.woosan.hr_system.report.model.FileMetadata;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/report")
@@ -59,6 +54,14 @@ public class ReportController {
             model.addAttribute("reportFile", reportFile);
         }
         return "report/view";
+    }
+
+    @GetMapping("/request/{requestId}") // 특정 요청 조회
+    public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
+        System.out.println("컨트롤러");
+        ReportRequest request = reportRequestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "report/request-view";
     }
 
     @GetMapping("/write") // 보고서 작성 페이지 이동

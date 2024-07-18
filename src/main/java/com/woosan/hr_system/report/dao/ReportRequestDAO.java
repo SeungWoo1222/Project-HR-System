@@ -11,13 +11,27 @@ import org.springframework.stereotype.Repository;
 public class ReportRequestDAO {
     @Autowired
     private SqlSession sqlSession;
-
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportRequestDAO";
 
-    // 보고서 전체 조회
+    // 요청 전체 조회
     public List<ReportRequest> getAllReportRequests() {
         return sqlSession.selectList(NAMESPACE + ".getAllReportRequests");
     }
+
+    // 특정 요청 조회
+    public ReportRequest getRequestById(Long requestId) {
+        System.out.println("다오");
+        return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
+    }
+
+
+
+
+
+
+
+
+
 
     // 작성 요청 생성
     public void createReportRequest(ReportRequest request) {

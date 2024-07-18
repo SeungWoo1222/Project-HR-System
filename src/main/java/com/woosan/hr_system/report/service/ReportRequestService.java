@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface ReportRequestService {
     List<ReportRequest> getAllReportRequests();
+    ReportRequest getRequestById(Long requestId);
+
+
     void createReportRequest(ReportRequest request);
     ReportRequest getReportRequestById(int requestId);
     void updateReportRequest(ReportRequest request);
