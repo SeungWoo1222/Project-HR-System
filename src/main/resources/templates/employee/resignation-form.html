@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<div>
+    <div>
+        <!-- 사원 이미지 들어갈 예정 -->
+        <img>
+        <div>
+            <table>
+                <tr>
+                    <th>사원 ID</th>
+                    <td th:text="${employee.employeeId}">사원 ID</td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td th:text="${employee.name}">이름</td>
+                </tr>
+                <tr>
+                    <th>생년월일</th>
+                    <td th:text="${employee.birth}">생년월일</td>
+                </tr>
+                <tr>
+                    <th>주민등록번호</th>
+                    <td th:text="${employee.residentRegistrationNumber}">주민등록번호</td>
+                </tr>
+                <tr>
+                    <th>전화번호</th>
+                    <td th:text="${employee.phone}">전화번호</td>
+                </tr>
+                <tr>
+                    <th>이메일</th>
+                    <td th:text="${employee.email}">이메일</td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td th:text="${employee.address}">주소</td>
+                </tr>
+                <tr>
+                    <th>상세 주소</th>
+                    <td th:text="${employee.detailedAddress}">상세 주소</td>
+                </tr>
+                <tr>
+                    <th>부서</th>
+                    <td th:text="${employee.department.name}">부서</td>
+                </tr>
+                <tr>
+                    <th>직급</th>
+                    <td th:text="${employee.position.name}">직급</td>
+                </tr>
+                <tr>
+                    <th>입사일</th>
+                    <td th:text="${employee.hireDate}">입사일</td>
+                </tr>
+                <tr>
+                    <th>상태</th>
+                    <td th:text="${employee.status}">상태</td>
+                </tr>
+                <tr>
+                    <th>남은 연차</th>
+                    <td th:text="${employee.remainingLeave}">남은 연차</td>
+                </tr>
+                <tr>
+                    <th>마지막 수정일</th>
+                    <td th:text="${employee.lastModified}">마지막 수정일</td>
+                </tr>
+                <tr>
+                    <th>수정자</th>
+                    <td th:text="${employee.modifiedBy}">수정자</td>
+                </tr>
+            </table>
+            </div>
+
+        <div>
+            <!-- 퇴사 처리 폼 -->
+            <form th:action="@{/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" method="post" onsubmit="submitResignationForm(event)">
+                <div>
+                    <label for="resignationDate">퇴사 날짜</label>
+                    <input type="date" id="resignationDate" name="resignationDate">
+                </div>
+                <div>
+                    <label for="resignationReason">퇴사 사유</label>
+                    <select id="resignationReason" name="resignationReason" onchange="updateCodeNumber()">
+                        <option value="">선택하세요</option>
+                        <option value="1">1. 자진퇴사</option>
+                        <option value="2">2. 권고사직</option>
+                        <option value="3">3. 정년 등 기간만료에 의한 이직</option>
+                        <option value="4">4. 기타</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="codeNumber">코드 번호</label>
+                    <select id="codeNumber" name="codeNumber">
+                        <option value="">선택하세요</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="specificReason">구체적 사유 (10자 이상 기재)</label>
+                    <textarea id="specificReason" name="specificReason" rows="2" cols="20"></textarea>
+                </div>
+                <div id="error-message" class="error-message"></div>
+                <div>
+                    <button type="submit">퇴사 처리</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</html>

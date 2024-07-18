@@ -1,33 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='사원 상세 정보')}">
-
-<th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{example.css}"> <!-- 외부 CSS는 이렇게 -->
-    <style>
-        /* 여기에 CSS를 입력 */
-    </style>
-</th:block>
-
-<th:block layout:fragment="script">
-    <script th:src="@{example.js}"></script> <!-- 외부 JS도 요렇게 -->
-    <script>
-        /* 여기에 JS 코드를 입력 */
-    </script>
-</th:block>
-
-<div layout:fragment="~{content}">
-    <div class="content">
-        <h1>사원 상세 정보</h1>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<div>
+    <div>
+        <!-- 사원 이미지 들어갈 예정 -->
+        <img>
         <table>
             <tr>
                 <th>사원 ID</th>
                 <td th:text="${employee.employeeId}">사원 ID</td>
-            </tr>
-            <tr>
-                <th>비밀번호</th>
-                <td th:text="${employee.password}">비밀번호</td>
             </tr>
             <tr>
                 <th>이름</th>
@@ -55,7 +35,7 @@
             </tr>
             <tr>
                 <th>상세 주소</th>
-                <td th:text="${employee.detailedAddress}">상세 주소</td>
+                <td th:text="${employee.detailAddress}">상세 주소</td>
             </tr>
             <tr>
                 <th>부서</th>
@@ -67,7 +47,7 @@
             </tr>
             <tr>
                 <th>입사일</th>
-                <td th:text="${#dates.format(employee.hireDate, 'yyyy-MM-dd')}">입사일</td>
+                <td th:text="${#temporals.format(employee.hireDate, 'yyyy-MM-dd')}">입사일</td>
             </tr>
             <tr>
                 <th>상태</th>

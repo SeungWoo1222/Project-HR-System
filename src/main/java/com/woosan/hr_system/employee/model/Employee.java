@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class Employee {
     private String employeeId;
@@ -13,15 +12,15 @@ public class Employee {
     private String phone;
     private String email;
     private String address;
-    private String detailedAddress;
+    private String detailAddress;
     private Department department;
     private Position position;
     private LocalDate hireDate;
-    private LocalDate terminationDate;
     private String status;
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
+    private Resignation resignation;
 
     // Getters and Setters
 
@@ -89,12 +88,12 @@ public class Employee {
         this.address = address;
     }
 
-    public String getDetailedAddress() {
-        return detailedAddress;
+    public String getDetailAddress() {
+        return detailAddress;
     }
 
-    public void setDetailedAddress(String detailedAddress) {
-        this.detailedAddress = detailedAddress;
+    public void setDetailAddress(String detailAddress) {
+        this.detailAddress = detailAddress;
     }
 
     public Department getDepartment() {
@@ -119,14 +118,6 @@ public class Employee {
 
     public void setHireDate(LocalDate hireDate) {
         this.hireDate = hireDate;
-    }
-
-    public LocalDate getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDate terminationDate) {
-        this.terminationDate = terminationDate;
     }
 
     public String getStatus() {
@@ -160,4 +151,8 @@ public class Employee {
     public void setRemainingLeave(int remainingLeave) {
         this.remainingLeave = remainingLeave;
     }
+
+    public Resignation getResignation() { return resignation; }
+
+    public void setResignation(Resignation resignation) { this.resignation = resignation; }
 }
