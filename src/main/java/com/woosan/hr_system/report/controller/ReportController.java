@@ -61,7 +61,7 @@ public class ReportController {
         System.out.println("컨트롤러");
         ReportRequest request = reportRequestService.getRequestById(requestId);
         model.addAttribute("request", request);
-        return "report/request-view";
+        return "report/request/request-view";
     }
 
     @GetMapping("/write") // 보고서 작성 페이지 이동
