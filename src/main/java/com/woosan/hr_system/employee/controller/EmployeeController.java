@@ -4,6 +4,8 @@ import com.woosan.hr_system.Search.PageRequest;
 import com.woosan.hr_system.Search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.Map;
 @RequestMapping("/employee")
 public class EmployeeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     @Autowired
     private EmployeeService employeeService;
 
@@ -26,13 +30,20 @@ public class EmployeeController {
     @GetMapping("/list") // 모든 사원 정보 조회
     public String getEmployees(@RequestParam(name = "page", defaultValue = "0") int page,
                                @RequestParam(name = "size", defaultValue = "10") int size,
-                               @RequestParam(name = "keyword", required = false) String keyword,
+                               @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                Model model) {
+
+        // 매개변수 값 로그에 출력
+        logger.debug("‼️Page: {}, Size: {}, Keyword: {} ‼️", page, size, keyword);
+
         PageRequest pageRequest = new PageRequest(page, size, keyword);
         PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
+
         model.addAttribute("employees", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage());
         model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
         return "employee/list";
     }
 
@@ -45,16 +56,6 @@ public class EmployeeController {
         model.addAttribute("employee", employee);
         return "employee/detail";
     }
-
-//    @GetMapping("/detail/{employeeId}") // 사원 정보 상세 조회
-//    public String viewEmployeeDetail(@PathVariable("employeeId") String employeeId, Model model) {
-//        Employee employee = employeeService.getEmployeeById(employeeId);
-//        if (employee == null) {
-//            return "error/404";
-//        }
-//        model.addAttribute("employee", employee);
-//        return "employee/detail";
-//    }
     // 조회 관련 로직 end-point
 
     // 등록 관련 로직 start-point
