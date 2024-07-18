@@ -12,7 +12,7 @@
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
         <result property="address" column="address"/>
-        <result property="detailedAddress" column="detailed_address"/>
+        <result property="detailAddress" column="detail_address"/>
         <result property="hireDate" column="hire_date"/>
         <result property="status" column="status"/>
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
@@ -41,8 +41,8 @@
     </select>
 
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detailed_address, hire_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
-        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailedAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
+        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
     </insert>
 
     <update id="updateEmployee">
@@ -54,7 +54,7 @@
         phone=#{phone},
         email=#{email},
         address=#{address},
-        detailed_address=#{detailedAddress},
+        detail_address=#{detailAddress},
         hire_date=#{hireDate},
         status=#{status},
         department_id=#{department},

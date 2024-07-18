@@ -56,9 +56,12 @@ public class EmployeeController {
     }
 
     @PostMapping("/registration") // 신규 사원 등록
-    public String registerEmployee(@ModelAttribute Employee employee) {
-        employeeService.insertEmployee(employee);
-        return "redirect:/employee/registration";
+    public ResponseEntity<String> registerEmployee(@ModelAttribute Employee employee) {
+        String message = employeeService.insertEmployee(employee);
+        if (message.equals("fail")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("입력 정보에서 오류가 발생하였습니다.");
+        }
+        return ResponseEntity.ok( "'" + employee.getName() + "' 사원이 신규 사원으로 등록되었습니다.");
     }
     // 등록 관련 로직 end-point
 

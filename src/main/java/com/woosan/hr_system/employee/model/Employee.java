@@ -12,7 +12,7 @@ public class Employee {
     private String phone;
     private String email;
     private String address;
-    private String detailedAddress;
+    private String detailAddress;
     private Department department;
     private Position position;
     private LocalDate hireDate;
@@ -88,12 +88,12 @@ public class Employee {
         this.address = address;
     }
 
-    public String getDetailedAddress() {
-        return detailedAddress;
+    public String getDetailAddress() {
+        return detailAddress;
     }
 
-    public void setDetailedAddress(String detailedAddress) {
-        this.detailedAddress = detailedAddress;
+    public void setDetailAddress(String detailAddress) {
+        this.detailAddress = detailAddress;
     }
 
     public Department getDepartment() {

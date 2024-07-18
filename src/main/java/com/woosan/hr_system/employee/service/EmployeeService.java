@@ -10,7 +10,7 @@ public interface EmployeeService {
     Employee getEmployeeById(String employeeId);
     Employee getEmployeeWithResignation(String employeeId);
     List<Employee> getAllEmployees();
-    void insertEmployee(Employee employee);
+    String insertEmployee(Employee employee);
     void updateEmployee(Employee employee);
     void updateEmployeePartial(String employeeId, Map<String, Object> updates);
     String deleteEmployee(String employeeId);

@@ -50,26 +50,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 정보 등록
-    public void insertEmployee(Employee employee) {
-        // BB
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String BB = employee.getHireDate().format(formatter).substring(2, 4);
-        // CCC
-        int currentYearEmpolyeesCount = employeeDAO.countEmployeesByCurrentYear();
-        String CCC = String.format("%03d", currentYearEmpolyeesCount + 1);
-        //  Employee ID 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
-        employee.setEmployeeId(employee.getDepartment() + BB + CCC);
+    public String insertEmployee(Employee employee) {
+        if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null ) {
+            return "fail";
+        } else {
+            //  Employee ID 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String BB = employee.getHireDate().format(formatter).substring(2, 4);
+            int currentYearEmpolyeesCount = employeeDAO.countEmployeesByCurrentYear();
+            String CCC = String.format("%03d", currentYearEmpolyeesCount + 1);
+            employee.setEmployeeId(employee.getDepartment() + BB + CCC);
 
-        // 첫 비밀번호는 생년월일
-        employee.setPassword(passwordEncoder.encode(employee.getBirth()));
+            // 첫 비밀번호 생년월일로 설정
+            employee.setPassword(passwordEncoder.encode(employee.getBirth()));
 
-        // 재직 상태
-        employee.setStatus("재직");
+            // 재직 상태 설정
+            employee.setStatus("재직");
 
-        // 연차
-        employee.setRemainingLeave(11);
+            // 기본 연차 11일 설정
+            employee.setRemainingLeave(11);
 
-        employeeDAO.insertEmployee(employee);
+            employeeDAO.insertEmployee(employee);
+
+            return "success";
+        }
     }
 
     @Override // 사원 정보 수정
@@ -97,7 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.setAddress((String)updates.get("address"));
             }
             if (updates.containsKey("detailed_address")) {
-                employee.setDetailedAddress((String)updates.get("detailed_address"));
+                employee.setDetailAddress((String)updates.get("detailed_address"));
             }
 
             employee.setLastModified(LocalDateTime.now());

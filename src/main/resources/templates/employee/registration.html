@@ -4,88 +4,210 @@
       layout:decorate="~{fragments/layout :: layout(title='사원 등록')}">
 
 <th:block layout:fragment="css">
-
+  <!-- 필요한 CSS 추가 -->
 </th:block>
 
 <th:block layout:fragment="script">
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script th:src="@{/js/daum-postcode-API.js}"></script>
   <script>
+    // 이메일 조합 로직
     function combineEmail() {
-      const emailLocal = document.getElementById("email_local").value;
-      const emailDomain = document.getElementById("email_domain").value;
+      const emailLocal = document.getElementById("emailLocal").value;
+      const emailDomain = document.getElementById("emailDomain").value;
       const email = emailLocal + "@" + emailDomain;
       document.getElementById("email").value = email;
+    }
+
+    // 상세주소 조합 로직
+    function combineDetailAddress() {
+      const detailAddressInput = document.getElementById("detailAddressInput").value;
+      const extraAddress = document.getElementById("extraAddress").value;
+      const detailAddress = detailAddressInput + extraAddress;
+      document.getElementById("detailAddress").value = detailAddress;
+    }
+
+    // 전화번호 포맷팅 로직
+    function formatPhoneNumber() {
+      const phoneInput = document.getElementById("phoneInput").value.replace(/\D/g, ''); // 숫자 이외의 문자 제거
+      const match = phoneInput.match(/^(\d{3})(\d{4})(\d{4})$/); // 3자리-4자리-4자리 매칭
+      if (match) {
+        const formattedPhone = match[1] + '-' + match[2] + '-' + match[3];
+        document.getElementById("phone").value = formattedPhone;
+      } else {
+        document.getElementById("phone").value = phoneInput; // 매칭되지 않으면 숫자만 설정
+      }
+    }
+
+    // 유효성 검사 로직
+    function validateForm(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const birth = document.getElementById("birth").value.trim();
+      const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
+      const phoneInput = document.getElementById("phoneInput").value.trim();
+      const emailLocal = document.getElementById("emailLocal").value.trim();
+      const emailDomain = document.getElementById("emailDomain").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const detailAddressInput = document.getElementById("detailAddressInput").value.trim();
+      const department = document.getElementById("department").value;
+      const position = document.getElementById("position").value;
+      const hireDate = document.getElementById("hireDate").value;
+      const errorMessage = document.querySelector(".error-message");
+
+      errorMessage.textContent = "";
+
+      if (name === "") {
+        errorMessage.textContent = "이름을 입력해주세요.";
+        return false;
+      }
+      if (birth === "" || birth.length !== 6 || !/^\d+$/.test(birth)) {
+        errorMessage.textContent = "유효한 생년월일(6자리 숫자)을 입력해주세요.";
+        return false;
+      }
+      if (residentRegistrationNumber === "" || residentRegistrationNumber.length !== 7 || !/^\d+$/.test(residentRegistrationNumber)) {
+        errorMessage.textContent = "유효한 주민번호 뒷자리(7자리 숫자)를 입력해주세요.";
+        return false;
+      }
+      if (phoneInput === "" || !/^\d{11}$/.test(phoneInput)) {
+        errorMessage.textContent = "'-'를 제외한 유효한 전화번호를 입력해주세요.";
+        return false;
+      }
+      if (emailLocal === "") {
+        errorMessage.textContent = "이메일을 입력해주세요.";
+        return false;
+      }
+      if (emailDomain === "") {
+        errorMessage.textContent = "이메일 도메인을 선택해주세요.";
+        return false;
+      }
+      if (address === "") {
+        errorMessage.textContent = "주소를 입력해주세요.";
+        return false;
+      }
+      if (detailAddressInput === "") {
+        errorMessage.textContent = "상세 주소를 입력해주세요.";
+        return false;
+      }
+      if (department === "") {
+        errorMessage.textContent = "부서를 선택해주세요.";
+        return false;
+      }
+      if (position === "") {
+        errorMessage.textContent = "직위를 선택해주세요.";
+        return false;
+      }
+      if (hireDate === "") {
+        errorMessage.textContent = "입사일을 선택해주세요.";
+        return false;
+      }
+
+      combineEmail();
+      combineDetailAddress();
+      formatPhoneNumber();
+      console.log(document.getElementById("phone").value.trim());
+      console.log(document.getElementById("phoneInput").value.trim());
+
+      // AJAX 요청
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            alert(xhr.responseText);
+            window.location = "/employee/list";
+          } else {
+            alert(xhr.responseText);
+            window.location.reload();
+          }
+        }
+      };
+      xhr.send(formData);
     }
   </script>
 </th:block>
 
-  <div layout:fragment="~{content}">
-      <div class="content">
-        <h2>사원 등록</h2>
-        <form th:action="@{/employee/register}" method="post" onsubmit="combineEmail()">
-          <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" required>
-          </div>
-          <div class="form-group">
-            <label for="birth">생년월일 (주민번호 앞자리)</label>
-            <input type="text" id="birth" name="birth" maxlength="6" required>
-          </div>
-          <div class="form-group">
-            <label for="residentRegistrationNumber">주민번호 뒷자리</label>
-            <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber" maxlength="7" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">전화번호</label>
-            <input type="text" class="phone" id="phone" name="phone" maxlength="15" required>
-          </div>
-          <div class="form-group">
-            <label for="email_local">이메일</label>
-            <input type="text" id="email_local" name="email_local" required>
-            @
-            <select id="email_domain" name="email_domain">
-              <option value="naver.com">naver.com</option>
-              <option value="gmail.com">gmail.com</option>
-              <option value="daum.net">daum.net</option>
-            </select>
-            <input type="hidden" id="email" name="email">
-          </div>
-          <div class="form-group">
-            <label for="address">주소</label>
-            <input type="text" id="address" name="address" required>
-          </div>
-          <div class="form-group">
-            <label for="detailedAddress">상세 주소</label>
-            <input type="text" id="detailedAddress" name="detailedAddress" required>
-          </div>
-          <div class="form-group">
-            <label for="department">부서</label>
-            <select id="department" name="department" required>
-              <option value="PR">생산</option>
-              <option value="QC">품질관리</option>
-              <option value="SA">영업</option>
-              <option value="MK">마케팅</option>
-              <option value="FI">재무</option>
-              <option value="HR">인사</option>
-              <option value="RD">연구개발</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="position">직위</label>
-            <select id="position" name="position" required>
-              <option value="사원">사원</option>
-              <option value="대리">대리</option>
-              <option value="과장">과장</option>
-              <option value="차장">차장</option>
-              <option value="부장">부장</option>
-              <option value="사장">사장</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="hireDate">입사일</label>
-            <input type="date" id="hireDate" name="hireDate" required>
-          </div>
-          <button type="submit" class="btn">등록</button>
-        </form>
+<div layout:fragment="~{content}">
+  <div class="content">
+    <h2>사원 등록</h2>
+    <form th:action="@{/employee/registration}" method="post" onsubmit="validateForm(event)">
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input type="text" id="name" name="name">
       </div>
+      <div class="form-group">
+        <label for="birth">생년월일 (주민번호 앞자리)</label>
+        <input type="text" id="birth" name="birth" maxlength="6">
+      </div>
+      <div class="form-group">
+        <label for="residentRegistrationNumber">주민번호 뒷자리</label>
+        <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber" maxlength="7">
+      </div>
+      <div class="form-group">
+        <label for="phone">전화번호</label>
+        <input type="text" class="phoneInput" id="phoneInput" name="phoneInput" maxlength="11" placeholder="01012345678">
+        <input type="hidden" id="phone" name="phone">
+      </div>
+      <div class="form-group">
+        <label for="emailLocal">이메일</label>
+        <input type="text" id="emailLocal" name="emailLocal">
+        @
+        <select id="emailDomain" name="emailDomain">
+          <option value="naver.com">naver.com</option>
+          <option value="gmail.com">gmail.com</option>
+          <option value="daum.net">daum.net</option>
+        </select>
+        <input type="hidden" id="email" name="email">
+      </div>
+      <div class="form-group">
+        <label for="address">주소</label>
+        <input type="text" id="address" name="address" readonly>
+        <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
+      </div>
+      <div class="form-group">
+        <label for="detailAddress">상세 주소</label>
+        <input type="text" id="detailAddressInput" name="detailAddressInput">
+        <input type="text" id="extraAddress" placeholder="참고항목" readonly>
+        <input type="hidden" id="detailAddress" name="detailAddress">
+      </div>
+      <div class="form-group">
+        <label for="department">부서</label>
+        <select id="department" name="department">
+          <option value="">선택하세요</option>
+          <option value="PR">생산</option>
+          <option value="QC">품질관리</option>
+          <option value="SA">영업</option>
+          <option value="MK">마케팅</option>
+          <option value="FI">재무</option>
+          <option value="HR">인사</option>
+          <option value="RD">연구개발</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="position">직위</label>
+        <select id="position" name="position">
+          <option value="">선택하세요</option>
+          <option value="사원">사원</option>
+          <option value="대리">대리</option>
+          <option value="과장">과장</option>
+          <option value="차장">차장</option>
+          <option value="부장">부장</option>
+          <option value="사장">사장</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="hireDate">입사일</label>
+        <input type="date" id="hireDate" name="hireDate">
+      </div>
+      <div class="error-message"></div>
+      <button type="submit" class="btn">등록</button>
+    </form>
   </div>
+</div>
 </html>
