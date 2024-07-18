@@ -25,11 +25,11 @@
             });
 
             // 모든 보고서 요청 가져오기
-            $.get("/report/get-all-report-requests", function(data) {
+            $.get("/request/get-all-report-requests", function(data) {
                 var reportRequestList = $("#report-request-list ul");
                 reportRequestList.empty();
                 data.forEach(function(reportRequest) {
-                    reportRequestList.append("<li><a href='/report/request/" + reportRequest.requestId + "'>" + reportRequest.requesterId + "님이 " + reportRequest.employeeId + "님에게 요청하신 보고서입니다.</a></li>");
+                    reportRequestList.append("<li><a href='/request/" + reportRequest.requestId + "'>" + reportRequest.requesterId + "님이 " + reportRequest.employeeId + "님에게 요청하신 보고서입니다.</a></li>");
                 });
             });
         });

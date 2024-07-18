@@ -1,21 +1,41 @@
-//package com.woosan.hr_system.report.controller;
-//
-//import com.woosan.hr_system.report.model.Report;
-//import com.woosan.hr_system.report.model.ReportRequest;
-//import com.woosan.hr_system.report.service.ReportRequestService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.web.bind.annotation.*;
-//import java.util.List;
-//
-//@Controller
-//@RequestMapping("/reportRequest")
-//public class ReportRequestController {
-//
-//    @Autowired
-//    private ReportRequestService reportRequestService;
-//
+package com.woosan.hr_system.report.controller;
+
+import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportRequest;
+import com.woosan.hr_system.report.service.ReportRequestService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@Controller
+@RequestMapping("/request")
+public class ReportRequestController {
+
+    @Autowired
+    private ReportRequestService reportRequestService;
+
+    @GetMapping("/get-all-report-requests") // 모든 보고서 요청 목록 조회
+    @ResponseBody
+    public List<ReportRequest> getAllReportRequests() {
+        return reportRequestService.getAllReportRequests();
+    }
+
+    @GetMapping("/{requestId}") // 특정 요청 조회
+    public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
+        ReportRequest request = reportRequestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "report/request/request-view";
+    }
+
+
+
+
+
+
+
+
 //    @PostMapping("/create") //  요청 생성
 //    public String createReportRequest(@RequestBody ReportRequest request) {
 //        reportRequestService.createReportRequest(request);
@@ -43,4 +63,4 @@
 //    public List<ReportRequest> getReportRequestsByEmployeeId(@PathVariable String employeeId) {
 //        return reportRequestService.getReportRequestsByEmployeeId(employeeId);
 //    }
-//}
+}

@@ -20,7 +20,6 @@ public class ReportRequestServiceImpl implements ReportRequestService {
 
     @Override // 특정 요청 조회
     public ReportRequest getRequestById(Long requestId) {
-        System.out.println("서비스");
         return reportRequestDAO.getRequestById(requestId);
     }
 

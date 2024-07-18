@@ -20,7 +20,6 @@ public class ReportRequestDAO {
 
     // 특정 요청 조회
     public ReportRequest getRequestById(Long requestId) {
-        System.out.println("다오");
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
     }
 

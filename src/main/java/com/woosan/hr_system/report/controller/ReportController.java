@@ -38,12 +38,6 @@ public class ReportController {
         return reportService.getAllReports();
     }
 
-    @GetMapping("/get-all-report-requests") // 모든 보고서 요청 목록 조회
-    @ResponseBody
-    public List<ReportRequest> getAllReportRequests() {
-        return reportRequestService.getAllReportRequests();
-    }
-
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -54,14 +48,6 @@ public class ReportController {
             model.addAttribute("reportFile", reportFile);
         }
         return "report/view";
-    }
-
-    @GetMapping("/request/{requestId}") // 특정 요청 조회
-    public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
-        System.out.println("컨트롤러");
-        ReportRequest request = reportRequestService.getRequestById(requestId);
-        model.addAttribute("request", request);
-        return "report/request/request-view";
     }
 
     @GetMapping("/write") // 보고서 작성 페이지 이동
