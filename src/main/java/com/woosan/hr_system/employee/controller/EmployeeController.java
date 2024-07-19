@@ -28,7 +28,7 @@ public class EmployeeController {
 
     // 조회 관련 로직 start-point
     @GetMapping("/list") // 모든 사원 정보 조회
-    public String getEmployees(@RequestParam(name = "page", defaultValue = "0") int page,
+    public String getEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "size", defaultValue = "10") int size,
                                @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                Model model) {
@@ -36,11 +36,11 @@ public class EmployeeController {
         // 매개변수 값 로그에 출력
         logger.debug("‼️Page: {}, Size: {}, Keyword: {} ‼️", page, size, keyword);
 
-        PageRequest pageRequest = new PageRequest(page, size, keyword);
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
 
         model.addAttribute("employees", pageResult.getData());
-        model.addAttribute("currentPage", pageResult.getCurrentPage());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
@@ -60,7 +60,7 @@ public class EmployeeController {
 
     // 등록 관련 로직 start-point
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동
-    public String newEmployeeForm(Model model) {
+    public String viewEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
         return "employee/registration";
     }
