@@ -100,4 +100,57 @@
             AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH);
     </select>
 
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="search" parameterType="map" resultMap="EmployeeResultMap">
+        SELECT * FROM employees
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                    employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    name LIKE CONCAT('%', #{keyword}, '%') OR
+                    birth LIKE CONCAT('%', #{keyword}, '%') OR
+                    resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                    phone LIKE CONCAT('%', #{keyword}, '%') OR
+                    email LIKE CONCAT('%', #{keyword}, '%') OR
+                    address LIKE CONCAT('%', #{keyword}, '%') OR
+                    detail_address LIKE CONCAT('%', #{keyword}, '%') OR
+                    hire_date LIKE CONCAT('%', #{keyword}, '%') OR
+                    status LIKE CONCAT('%', #{keyword}, '%') OR
+                    department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
+                    last_modified LIKE CONCAT('%', #{keyword}, '%') OR
+                    modified_by LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY hire_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="count" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM employees
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                    employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    name LIKE CONCAT('%', #{keyword}, '%') OR
+                    birth LIKE CONCAT('%', #{keyword}, '%') OR
+                    resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                    phone LIKE CONCAT('%', #{keyword}, '%') OR
+                    email LIKE CONCAT('%', #{keyword}, '%') OR
+                    address LIKE CONCAT('%', #{keyword}, '%') OR
+                    detail_address LIKE CONCAT('%', #{keyword}, '%') OR
+                    hire_date LIKE CONCAT('%', #{keyword}, '%') OR
+                    status LIKE CONCAT('%', #{keyword}, '%') OR
+                    department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                    remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
+                    last_modified LIKE CONCAT('%', #{keyword}, '%') OR
+                    modified_by LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
 </mapper>

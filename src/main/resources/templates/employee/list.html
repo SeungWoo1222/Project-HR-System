@@ -11,10 +11,33 @@
     </style>
 </th:block>
 
+<th:block layout:fragment="js">
+    <script>
+
+    </script>
+</th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>사원 조회</h1>
+        <div>
+            <form th:action="@{/employee/list}" method="get" id="pageSizeForm">
+                <input type="hidden" name="page" th:value="0"/>
+                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                    <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">1개씩 보기</option>
+                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                </select>
+                <input type="hidden" name="keyword" th:value="${keyword}"/>
+            </form>
+            <form th:action="@{/employee/list}" method="get">
+                <input type="hidden" name="page" value="0">
+                <input type="hidden" name="size" th:value="${pageSize}"/>
+                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                <button type="submit">검색</button>
+            </form>
+        </div>
         <table border="1" class="list">
             <thead>
             <tr>
@@ -45,6 +68,32 @@
             </tr>
             </tbody>
         </table>
+        <div class="pagination">
+            <span th:if="${currentPage > 0}">
+                <a th:href="@{'/employee/list?page=' + ${currentPage - 1} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                </a>
+            </span>
+            <span th:if="${totalPages <= 5}"> <!-- 5개 미만이면 그대로 노출 -->
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                       th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+            </span>
+                    <span th:if="${totalPages > 5}"> <!-- 5개 초과이면 5개만 노출 -->
+                <span th:each="i : ${#numbers.sequence(
+                                currentPage > 2 ? (currentPage < totalPages - 3 ? currentPage - 2 : totalPages - 5) : 0,
+                                currentPage > 2 ? (currentPage < totalPages - 3 ? currentPage + 2 : totalPages - 1) : 4)}">
+                    <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                       th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+            </span>
+            <span th:if="${currentPage < totalPages - 1}">
+                <a th:href="@{'/employee/list?page=' + ${currentPage + 1} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                </a>
+            </span>
+        </div>
     </div>
 </div>
 </html>

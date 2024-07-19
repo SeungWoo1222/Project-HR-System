@@ -1,14 +1,16 @@
 package com.woosan.hr_system.employee.dao;
 
+import com.woosan.hr_system.Search.SearchService;
 import com.woosan.hr_system.employee.model.Employee;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
-public class EmployeeDAO {
+public class EmployeeDAO implements SearchService<Employee> {
 
     @Autowired
     private SqlSession sqlSession;
@@ -50,4 +52,18 @@ public class EmployeeDAO {
     public List<Employee> getPreDeletionEmployees() { // 퇴사 후 12개월이 지난 사원 정보 조회
         return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees");
     };
+
+    @Override
+    public List<Employee> search(String keyword, int pageSize, int offset) { // 검색과 페이징 로직
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);;
+        params.put("pageSize", pageSize);
+        params.put("offset", offset);
+        return sqlSession.selectList(NAMESPACE + "search", params);
+    }
+
+    @Override
+    public int count(String keyword) { // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+        return sqlSession.selectOne(NAMESPACE + "count", keyword);
+    }
 }
