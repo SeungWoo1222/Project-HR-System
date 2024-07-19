@@ -32,6 +32,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // 조회 관련 로직 start-point
+    @Override // 모든 사원 정보 조회
+    public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Employee> employees = employeeDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset);
+        int total = employeeDAO.count(pageRequest.getKeyword());
+
+        return new PageResult<>(employees, (int) Math.ceil((double)total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
     @Override // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) {
         return employeeDAO.getEmployeeById(employeeId);
@@ -46,16 +56,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
         return employee;
     }
+    // 조회 관련 로직 end-point
 
-    @Override // 모든 사원 정보 조회
-    public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
-        int offset = pageRequest.getPage() * pageRequest.getSize();
-        List<Employee> employees = employeeDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset);
-        int total = employeeDAO.count(pageRequest.getKeyword());
-
-        return new PageResult<>(employees, (int) Math.ceil((double)total / pageRequest.getSize()), total, pageRequest.getPage());
-    }
-
+    // 등록 관련 로직 start-point
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
         if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null ) {
@@ -82,7 +85,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             return "success";
         }
     }
+    // 등록 관련 로직 end-point
 
+    // 수정 관련 로직 start-point
     @Override // 사원 정보 수정
     public void updateEmployee(Employee employee) {
         employeeDAO.updateEmployee(employee);
@@ -117,32 +122,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeDAO.updateEmployee(employee);
         }
     }
+    // 수정 관련 로직 end-point
 
-    @Override // 사원 정보 삭제
-    public String deleteEmployee(String employeeId) {
-        Employee employee = employeeDAO.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "null"; // 사원 정보 없음
-        } else {
-            employee.setResignation(resignationDAO.getResignedEmployee(employeeId));
-            if (employee.getResignation() == null) {
-                return "null_resignation"; // 퇴사 정보 없음
-            }
-
-            LocalDate resignationDate = employee.getResignation().getResignationDate(); // 퇴사일자
-            LocalDate oneYearLater = resignationDate.plusDays(365); // 퇴사일자 1년 경과일
-            LocalDate now = LocalDate.now();
-
-            if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
-                employeeDAO.deleteEmployee(employeeId);
-                resignationDAO.deleteResignation(employeeId);
-                return "success"; // 1년이 지남 (삭제 가능)
-            } else {
-                return "not_expired"; // 1년이 지나지 않음
-            }
-        }
-    }
-
+    // 퇴사 관련 로직 start-point
     @Override // 퇴사 예정인 사원 정보 조회
     public List<Employee> getPreResignationEmployees() {
         List<Employee> employees = employeeDAO.getPreResignationEmployees();
@@ -253,4 +235,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignationDAO.insertResignation(resignation);
         return "success";
     }
+
+    @Override // 사원 정보 삭제
+    public String deleteEmployee(String employeeId) {
+        Employee employee = employeeDAO.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "null"; // 사원 정보 없음
+        } else {
+            employee.setResignation(resignationDAO.getResignedEmployee(employeeId));
+            if (employee.getResignation() == null) {
+                return "null_resignation"; // 퇴사 정보 없음
+            }
+
+            LocalDate resignationDate = employee.getResignation().getResignationDate(); // 퇴사일자
+            LocalDate oneYearLater = resignationDate.plusDays(365); // 퇴사일자 1년 경과일
+            LocalDate now = LocalDate.now();
+
+            if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
+                employeeDAO.deleteEmployee(employeeId);
+                resignationDAO.deleteResignation(employeeId);
+                return "success"; // 1년이 지남 (삭제 가능)
+            } else {
+                return "not_expired"; // 1년이 지나지 않음
+            }
+        }
+    }
+    // 퇴사 관련 로직 end-point
 }
