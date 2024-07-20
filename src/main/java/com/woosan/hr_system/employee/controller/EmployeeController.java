@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
-import com.woosan.hr_system.Search.PageRequest;
-import com.woosan.hr_system.Search.PageResult;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import org.slf4j.Logger;

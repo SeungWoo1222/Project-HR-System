@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.Search.PageRequest;
-import com.woosan.hr_system.Search.PageResult;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 
 import java.time.LocalDate;

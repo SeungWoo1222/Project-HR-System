@@ -1,6 +1,6 @@
 package com.woosan.hr_system.employee.dao;
 
-import com.woosan.hr_system.Search.SearchService;
+import com.woosan.hr_system.search.SearchService;
 import com.woosan.hr_system.employee.model.Employee;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
