@@ -16,24 +16,24 @@
         <result property="processedDate" column="processed_date"/>
     </resultMap>
 
-    <!-- id를 이용한 사직 사원 정보 조회 -->
+    <!-- id를 이용한 퇴직 사원 정보 조회 -->
     <select id="getResignedEmployee" resultMap="ResignationResultMap" parameterType="String">
         SELECT * FROM resignation
         WHERE employee_id = #{employeeId}
     </select>
 
-    <!-- 모든 사직 사원 정보 조회 -->
+    <!-- 모든 퇴직 사원 정보 조회 -->
     <select id="getAllResignedEmployees" resultMap="ResignationResultMap">
         SELECT * FROM resignation
     </select>
 
-    <!-- 새로운 사직 사원 정보 삽입 -->
+    <!-- 새로운 퇴직 사원 정보 삽입 -->
     <insert id="insertResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
         INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, resignation_documents, processed_by, processed_date)
         VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{resignationDocuments}, #{processedBy}, #{processedDate})
     </insert>
 
-    <!-- 사직 사원 정보 업데이트 -->
+    <!-- 퇴직 사원 정보 업데이트 -->
     <update id="updateResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
         UPDATE resignation
         SET resignation_reason = #{resignationReason},
@@ -46,7 +46,7 @@
         WHERE employee_id = #{employeeId}
     </update>
 
-    <!-- 사직 사원 정보 삭제 -->
+    <!-- 퇴직 사원 정보 삭제 -->
     <delete id="deleteResignation" parameterType="String">
         DELETE FROM resignation
         WHERE employee_id = #{employeeId}

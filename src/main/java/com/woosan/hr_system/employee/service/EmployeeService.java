@@ -18,6 +18,6 @@ public interface EmployeeService {
     String insertEmployee(Employee employee);
     void updateEmployee(Employee employee);
     void updateEmployeePartial(String employeeId, Map<String, Object> updates);
-    String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate);
+    String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, String resignationDocumentsName);
     String deleteEmployee(String employeeId);
 }

@@ -37,7 +37,7 @@
                 </tr>
                 <tr>
                     <th>상세 주소</th>
-                    <td th:text="${employee.detailedAddress}">상세 주소</td>
+                    <td th:text="${employee.detailAddress}">상세 주소</td>
                 </tr>
                 <tr>
                     <th>부서</th>
@@ -72,7 +72,7 @@
 
         <div>
             <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" method="post" onsubmit="submitResignationForm(event)">
+            <form th:action="@{/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" method="post" onsubmit="submitResignationForm(event)" enctype="multipart/form-data">
                 <div>
                     <label for="resignationDate">퇴사 날짜</label>
                     <input type="date" id="resignationDate" name="resignationDate">
@@ -96,6 +96,10 @@
                 <div>
                     <label for="specificReason">구체적 사유 (10자 이상 기재)</label>
                     <textarea id="specificReason" name="specificReason" rows="2" cols="20"></textarea>
+                </div>
+                <div>
+                    <label for="resignationDocuments">첨부 파일 (10MB 이하)</label>
+                    <input type="file" id="resignationDocuments" name="resignationDocuments"/>
                 </div>
                 <div id="error-message" class="error-message"></div>
                 <div>

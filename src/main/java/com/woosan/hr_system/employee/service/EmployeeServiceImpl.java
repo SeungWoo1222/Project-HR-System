@@ -157,7 +157,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate) {
+    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, String resignationDocumentsName) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -221,6 +221,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignation.setSpecificReason(specificReason);
         resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
+        resignation.setResignationDocuments(resignationDocumentsName);
 
         // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -229,8 +230,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             resignation.setProcessedBy(userDetails.getUsername());
         }
 
-        // 파일 첨부 기능 구현 후 추가 예정
-        // termination.setTerminationDocuments(terminationDocuments);
         resignationDAO.insertResignation(resignation);
         return "success";
     }

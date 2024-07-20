@@ -40,7 +40,7 @@ function validateForm() {
             errorMessage.textContent = '퇴사사유를 선택해주세요.';
         } else if (codeNumber === "") {
             errorMessage.textContent = '퇴사코드를 선택해주세요.';
-        } else if (specificReason.length > 10 && specificReason.length < 50) {
+        } else if (specificReason.length < 10) {
             errorMessage.textContent = '구체적 사유를 10자 이상 기재해주세요.';
         }
         return false;
@@ -61,23 +61,25 @@ function submitResignationForm(event) {
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', form.action, true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
-                alert(xhr.responseText); // 성공 메시지
-                window.location.reload(); // 페이지 새로고침
+                alert(xhr.responseText);
+                window.location.reload();
             } else if (xhr.status === 404) {
-                alert(xhr.responseText); // 사원을 찾을 수 없습니다.
+                alert(xhr.responseText);
+            } else if (xhr.status === 400) {
+                alert('파일이 비어있습니다.\n 파일을 확인 후 재업로드해주세요.');
+            } else if (xhr.status === 500) {
+                alert('파일 업로드 중 오류가 발생하였습니다.\n 파일 확인 후 재업로드 또는 관리자에게 문의해주세요.');
             } else {
                 alert('퇴사처리 중 오류가 발생했습니다. 다시 시도해주세요.');
             }
         }
     };
 
-    var params = new URLSearchParams(formData).toString();
-    xhr.send(params);
+    xhr.send(formData);
 }
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -13,21 +13,4 @@ public class FileUploadController {
     @Autowired
     private S3Service s3Service;
 
-    @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
-        if (file.isEmpty()) {
-            model.addAttribute("message", "Please select a file to upload.");
-            return "upload";
-        }
-
-        try {
-            s3Service.uploadFile(file);
-            model.addAttribute("message", "File uploaded successfully: " + file.getOriginalFilename());
-        } catch (IOException e) {
-            e.printStackTrace();
-            model.addAttribute("message", "Failed to upload file: " + e.getMessage());
-        }
-
-        return "upload";
-    }
 }

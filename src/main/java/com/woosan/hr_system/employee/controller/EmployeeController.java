@@ -4,14 +4,17 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.upload.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +28,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private S3Service s3Service;
 
     // 조회 관련 로직 start-point
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -118,14 +124,27 @@ public class EmployeeController {
         return "employee/resignation-form";
     }
 
-    @PostMapping("/resign/{employeeId}") // 사원 퇴사 처리 로직
+    @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 사원 퇴사 처리 로직
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                     @RequestParam("resignationReason") String resignationReason,
                                     @RequestParam("codeNumber") String codeNumber,
                                     @RequestParam("specificReason") String specificReason,
-                                    @RequestParam("resignationDate") LocalDate resignationDate) {
-        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate);
-        if ("null".equals(message)) {
+                                    @RequestParam("resignationDate") LocalDate resignationDate,
+                                    @RequestParam("resignationDocuments") MultipartFile resignationDocuments) {
+        // 파일이 있다면 파일 업로드
+        String resignationDocumentsName = null;
+        if (resignationDocuments != null) {
+            String fileUploadMessage = s3Service.checkFile(resignationDocuments);
+            if (fileUploadMessage.equals("empty")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n 파일을 확인 후 재업로드해주세요.");
+            } else if (fileUploadMessage.equals("fail")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n 파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
+            } else {
+                resignationDocumentsName = fileUploadMessage;
+            }
+        }
+        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate, resignationDocumentsName);
+        if (message.equals("null")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeId + "' 사원을 찾을 수 없습니다.");
         }
         return ResponseEntity.ok("'" + employeeId + "' 사원이 퇴사 처리되었습니다.");
