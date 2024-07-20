@@ -157,7 +157,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, String resignationDocumentsName) {
+    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsNames) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -221,7 +221,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignation.setSpecificReason(specificReason);
         resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
-        resignation.setResignationDocuments(resignationDocumentsName);
+
+        // 파일 정보 등록
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < resignationDocumentsNames.size(); i++) {
+            sb.append(resignationDocumentsNames.get(i));
+            if (i != resignationDocumentsNames.size() - 1) {
+                sb.append(" / ");
+            }
+        }
+        resignation.setResignationDocuments(sb.toString());
 
         // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

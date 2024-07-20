@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -130,20 +131,33 @@ public class EmployeeController {
                                     @RequestParam("codeNumber") String codeNumber,
                                     @RequestParam("specificReason") String specificReason,
                                     @RequestParam("resignationDate") LocalDate resignationDate,
-                                    @RequestParam("resignationDocuments") MultipartFile resignationDocuments) {
+                                    @RequestParam("resignationDocuments") MultipartFile[] resignationDocuments) {
+        // 파일 도착 확인 로그
+        logger.debug("Received resignation documents :");
+        for (MultipartFile file : resignationDocuments) {
+            logger.debug("File name: {}, Size: {}, Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
+        }
+
+        // 파일 최대 3개 확인
+        if (resignationDocuments.length > 3) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("최대 3개의 파일만 업로드할 수 있습니다.");
+        }
+
         // 파일이 있다면 파일 업로드
-        String resignationDocumentsName = null;
-        if (resignationDocuments != null) {
-            String fileUploadMessage = s3Service.checkFile(resignationDocuments);
-            if (fileUploadMessage.equals("empty")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n 파일을 확인 후 재업로드해주세요.");
-            } else if (fileUploadMessage.equals("fail")) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n 파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
-            } else {
-                resignationDocumentsName = fileUploadMessage;
+        List<String> resignationDocumentsNames = new ArrayList<>();
+        for (MultipartFile resignationDocument : resignationDocuments) {
+            if (resignationDocument != null && !resignationDocument.isEmpty()) {
+                String fileUploadMessage = s3Service.checkFile(resignationDocument);
+                if (fileUploadMessage.equals("empty")) { // 비어있을 경우
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.");
+                } else if (fileUploadMessage.equals("fail")) { // 오류가 발생했을 경우
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
+                } else { // 성공
+                    resignationDocumentsNames.add(fileUploadMessage);
+                }
             }
         }
-        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate, resignationDocumentsName);
+        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate, resignationDocumentsNames);
         if (message.equals("null")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeId + "' 사원을 찾을 수 없습니다.");
         }

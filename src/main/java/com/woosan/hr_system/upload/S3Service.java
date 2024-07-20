@@ -42,6 +42,7 @@ public class S3Service {
         File convertedFile = convertMultiPartToFile(file);
         String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
         amazonS3.putObject(new PutObjectRequest(bucketName, fileName, convertedFile));
+        logger.debug("File put to S3 with name: {}", fileName);
         convertedFile.delete();
     }
 
