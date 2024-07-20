@@ -1,5 +1,6 @@
 package com.woosan.hr_system.report.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class FileMetadata {
@@ -8,7 +9,7 @@ public class FileMetadata {
     private String originalFilename;
     private String uuidFilename;
     private long size;
-    private Date uploadDate;
+    private LocalDate uploadDate;
 
     public Long getId() {
         return fileId;
@@ -50,11 +51,11 @@ public class FileMetadata {
         this.size = size;
     }
 
-    public Date getUploadDate() {
+    public LocalDate getUploadDate() {
         return uploadDate;
     }
 
-    public void setUploadDate(Date uploadDate) {
+    public void setUploadDate(LocalDate uploadDate) {
         this.uploadDate = uploadDate;
     }
 }

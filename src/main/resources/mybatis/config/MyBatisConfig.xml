@@ -8,7 +8,7 @@
     <typeAliases>
         <package name="com.woosan.hr_system.employee.model.Employee"/>
         <package name="com.woosan.hr_system.report.model.Report"/>
-        <package name="com.woosan.hr_system.report.model.ReportRequest"/>
+        <package name="com.woosan.hr_system.report.model.Request"/>
     </typeAliases>
     <typeHandlers>
         <typeHandler handler="com.woosan.hr_system.employee.model.DepartmentTypeHandler" javaType="com.woosan.hr_system.employee.model.Department"/>
@@ -17,6 +17,6 @@
     <mappers>
         <mapper resource="mybatis/mappers/EmployeeMapper.xml"/>
         <mapper resource="mybatis/mappers/ReportMapper.xml"/>
-        <mapper resource="mybatis/mappers/ReportRequestMapper.xml"/>
+        <mapper resource="mybatis/mappers/RequestMapper.xml"/>
     </mappers>
 </configuration>

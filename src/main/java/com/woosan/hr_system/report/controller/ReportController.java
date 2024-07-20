@@ -1,8 +1,7 @@
 package com.woosan.hr_system.report.controller;
 
 import com.woosan.hr_system.report.model.Report;
-import com.woosan.hr_system.report.model.ReportRequest;
-import com.woosan.hr_system.report.service.ReportRequestService;
+import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +13,6 @@ import com.woosan.hr_system.report.model.FileMetadata;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -26,7 +24,7 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
     @Autowired
-    private ReportRequestService reportRequestService;
+    private RequestService requestService;
 
     @GetMapping("/report-home") // report-home 페이지 이동
     public String reportHome() {
@@ -65,7 +63,7 @@ public class ReportController {
                                @RequestParam("file") MultipartFile file,
                                Model model) {
         try {
-            // completeDate를 Date로 변환
+            // completeDate를 LocalDate로 변환
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate completeDateSql = LocalDate.parse(completeDate, formatter);
 

@@ -1,11 +1,9 @@
 package com.woosan.hr_system.report.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-public class ReportRequest {
+public class Request {
     private Long requestId;
     private String requesterId;
     private String employeeId;
