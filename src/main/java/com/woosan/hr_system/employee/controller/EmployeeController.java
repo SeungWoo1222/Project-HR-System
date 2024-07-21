@@ -62,6 +62,8 @@ public class EmployeeController {
         if (employee == null) {
             return "error/404";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/detail";
     }

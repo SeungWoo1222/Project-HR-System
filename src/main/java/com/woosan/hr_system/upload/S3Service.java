@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,10 +23,15 @@ public class S3Service {
     @Autowired
     private AmazonS3 amazonS3;
 
+    @Autowired
+    private S3Client s3Client; // AWS SDK v2 S3Client
+
     private String bucketName = "haruharu-hrsystem-bucket";
 
     public String checkFile(MultipartFile file) {
-        if (file.isEmpty()) { return "empty"; }
+        if (file.isEmpty()) {
+            return "empty";
+        }
 
         try {
             String fileName = uploadFile(file);
@@ -49,5 +58,20 @@ public class S3Service {
             fos.write(file.getBytes());
         }
         return convFile;
+    }
+
+    public String getUrl(String fileName) {
+        String prefix = "https://haruharu-hrsystem-bucket.s3.amazonaws.com/";
+        return prefix + fileName;
+    }
+
+    public byte[] downloadFile(String keyName) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(keyName)
+                .build();
+
+        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+        return objectBytes.asByteArray();
     }
 }
