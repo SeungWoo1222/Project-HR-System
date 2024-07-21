@@ -53,27 +53,23 @@
     </select>
 
     <!-- 보고서 생성 -->
-    <insert id="insertReport" parameterType="com.woosan.hr_system.report.model.Report">
+    <insert id="createReport" parameterType="com.woosan.hr_system.report.model.Report">
         INSERT INTO reports (
             employee_id,
             title,
             content,
             created_date,
-            modified_date,
             complete_date,
             approver_id,
-            status,
-            reject_reason
+            status
         ) VALUES (
                      #{employeeId},
                      #{title},
                      #{content},
                      #{createdDate},
-                     #{modifiedDate},
                      #{completeDate},
                      #{approverId},
-                     #{status},
-                     #{rejectReason}
+                     #{status}
                  )
     </insert>
 
@@ -97,7 +93,7 @@
     <!-- 보고서 수정 -->
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
-        SET title = #{title}, content = #{content}, complete_date = #{completeDate}
+        SET title = #{title}, content = #{content}, complete_date = #{completeDate}, modified_date = #{modifiedDate}
         WHERE report_id = #{reportId}
     </update>
 

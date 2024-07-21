@@ -20,7 +20,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>요청 수정</h1>
-        <form action="/request/update" method="post">
+        <form action="/request/edit" method="post">
             <input type="hidden" name="requestId" th:value="${request.requestId}">
 
             <label for="employeeId">사원:</label>

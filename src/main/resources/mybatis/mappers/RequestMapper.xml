@@ -6,7 +6,7 @@
 <mapper namespace="com.woosan.hr_system.report.dao.RequestDAO">
 
     <!-- 모든 요청 조회 -->
-    <select id="getAllReportRequests" resultType="com.woosan.hr_system.report.model.Request">
+    <select id="getAllRequests" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
             request_id AS requestId,
             requester_id AS requesterId,
@@ -26,7 +26,7 @@
     </select>
 
     <!-- 요청 생성 -->
-    <insert id="insertRequest" parameterType="com.woosan.hr_system.report.model.Request">
+    <insert id="createRequest" parameterType="com.woosan.hr_system.report.model.Request">
         INSERT INTO report_requests (
             employee_id,
             due_date,
@@ -43,7 +43,7 @@
     <!-- 요청 수정 -->
     <update id="updateRequest" parameterType="com.woosan.hr_system.report.model.Request">
         UPDATE report_requests
-        SET employee_id = #{employeeId}, due_date = #{dueDate}, request_note = #{requestNote}
+        SET employee_id = #{employeeId}, due_date = #{dueDate}, request_note = #{requestNote} ,modified_date = #{modifiedDate}
         WHERE request_id = #{requestId}
     </update>
 

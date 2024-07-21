@@ -16,20 +16,13 @@ public class RequestServiceImpl implements RequestService {
     private RequestDAO requestDAO;
 
     @Override // 요청 생성
-    public void createRequest(String employeeId, LocalDate dueDateSql, String requestNote, LocalDateTime requestDate) {
-        Request request = new Request();
-        LocalDateTime now = LocalDateTime.now();
-
-        request.setRequestDate(now);
-        request.setEmployeeId(employeeId);
-        request.setDueDate(dueDateSql);
-        request.setRequestNote(requestNote);
-        requestDAO.insertRequest(request);
+    public void createRequest(Request request) {
+        requestDAO.createRequest(request);
     }
 
     @Override // 모든 요청 조회
-    public List<Request> getAllReportRequests() {
-        return requestDAO.getAllReportRequests();
+    public List<Request> getAllRequests() {
+        return requestDAO.getAllRequests();
     }
 
     @Override // 특정 요청 조회
@@ -37,16 +30,12 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getRequestById(requestId);
     }
 
-    @Override
-    public void updateRequest(Long requestId, String employeeId,String requestNote,LocalDate dueDate) {
-        Request request = requestDAO.getRequestById(requestId);
-        request.setEmployeeId(employeeId);
-        request.setRequestNote(requestNote);
-        request.setDueDate(dueDate);
+    @Override // 요청 수정
+    public void updateRequest(Request request) {
         requestDAO.updateRequest(request);
     }
 
-    @Override
+    @Override // 요청 삭제
     public void deleteRequest(Long requestId) {
         requestDAO.deleteRequest(requestId);
     }

@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 
 public class Request {
     private Long requestId;
+    private Long reportId;
     private String requesterId;
     private String employeeId;
     private LocalDateTime requestDate;
+    private LocalDateTime modifiedDate;
     private LocalDate dueDate;
     private String requestNote;
-    private Long reportId;
+
 
     // Getters and Setters
     public Long getRequestId() {
@@ -43,6 +45,14 @@ public class Request {
 
     public void setRequestDate(LocalDateTime requestDate) {
         this.requestDate = requestDate;
+    }
+
+    public LocalDateTime getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
     public LocalDate getDueDate() {

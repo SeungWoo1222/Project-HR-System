@@ -20,7 +20,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>보고서 수정</h1>
-        <form action="/report/update" method="post">
+        <form action="/report/edit" method="post">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
 
             <label for="title">제목:</label>

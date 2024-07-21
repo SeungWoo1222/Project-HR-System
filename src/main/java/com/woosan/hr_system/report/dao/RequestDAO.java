@@ -13,14 +13,14 @@ public class RequestDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.RequestDAO";
 
     // 요청 생성
-    public void insertRequest(Request request) {
-        System.out.println("다오");
-        sqlSession.insert(NAMESPACE + ".insertRequest", request);
+    public void createRequest(Request request) {
+        sqlSession.insert(NAMESPACE + ".createRequest", request);
     }
 
     // 요청 전체 조회
-    public List<Request> getAllReportRequests() {
-        return sqlSession.selectList(NAMESPACE + ".getAllReportRequests");
+    public List<Request> getAllRequests() {
+        System.out.println("리퀘스트 DAO");
+        return sqlSession.selectList(NAMESPACE + ".getAllRequests");
     }
 
     // 특정 요청 조회
@@ -30,7 +30,6 @@ public class RequestDAO {
 
     // 요청 수정
     public void updateRequest(Request request) {
-        System.out.println("다오");
         sqlSession.update(NAMESPACE + ".updateRequest", request);
     }
 

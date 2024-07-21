@@ -6,15 +6,16 @@ import java.time.LocalDateTime;
 public class Report {
     private Long reportId;
     private String employeeId;
+    private String approverId;
+    private Long fileId;
     private String title;
     private String content;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
-    private String approverId;
     private String status;
     private String rejectReason;
     private LocalDate completeDate;
-    private Long fileId;
+
 
     // Getters and Setters
     public Long getReportId() {

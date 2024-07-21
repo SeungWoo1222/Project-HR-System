@@ -34,8 +34,8 @@ public class ReportDAO {
     }
 
     // 보고서 생성
-    public void insertReport(Report report) {
-        sqlSession.insert(NAMESPACE + ".insertReport", report);
+    public void createReport(Report report) {
+        sqlSession.insert(NAMESPACE + ".createReport", report);
     }
 
     // 파일 DB 정보 생성

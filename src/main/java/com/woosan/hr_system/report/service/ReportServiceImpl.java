@@ -41,20 +41,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 생성
-    public void createReport(String title, String content, String approverId, LocalDate completeDateSql, MultipartFile file) throws IOException {
+    public void createReport(Report report, MultipartFile file) throws IOException {
         // 보고서 생성 및 저장
-        Report report = new Report();
-        LocalDateTime now = LocalDateTime.now();
-
-        report.setTitle(title);
-        report.setContent(content);
-        report.setApproverId(approverId);
-        report.setCompleteDate(completeDateSql);
-        report.setCreatedDate(now);
-        report.setModifiedDate(now);
-        report.setStatus("미처리"); // 기본 상태 설정
-
-        reportDAO.insertReport(report);
+        reportDAO.createReport(report);
 
         // 파일 업로드
         if (!file.isEmpty()) {
@@ -102,25 +91,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 수정
-    public void updateReport(Long id, String title, String content, LocalDate completeDate) {
-        Report report = reportDAO.getReportById(id);
-        if (title != null) {
-            report.setTitle(title);
-        }
-        if (content != null) {
-            report.setContent(content);
-        }
-        if (completeDate != null) {
-            report.setCompleteDate(completeDate);
-        }
+    public void updateReport(Report report) {
         reportDAO.updateReport(report);
     }
 
     @Override // 결재 처리
-    public void updateApprovalStatus(Long reportId, String status, String rejectReason) {
-        Report report = reportDAO.getReportById(reportId);
-        report.setStatus(status);
-        report.setRejectReason(rejectReason);
+    public void updateApprovalStatus(Report report) {
         reportDAO.updateApprovalStatus(report);
     }
 
