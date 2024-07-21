@@ -1,6 +1,9 @@
 package com.woosan.hr_system.report.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.report.service.ReportService;
@@ -18,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,14 +31,49 @@ public class ReportController {
     private ReportService reportService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
 
     @GetMapping("/main") // main 페이지 이동
-    public String getList(Model model) {
+    public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
+                              @RequestParam(name = "endDate", required = false) String endDate,
+                              Model model) throws JsonProcessingException {
         List<Report> reports = reportService.getAllReports();
         List<Request> requests = requestService.getAllRequests();
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
+
+        // 기본 통계 데이터를 최근 1개월로 조회
+        System.out.println("기본 통계 컨트롤러");
+        if (startDate == null && endDate == null) {
+            LocalDate end = LocalDate.now();
+            LocalDate start = end.minusMonths(1);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            startDate = start.format(formatter);
+            endDate = end.format(formatter);
+        }
+
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
+        List<Object[]> statsArray = new ArrayList<>();
+        statsArray.add(new Object[]{"월 기준 작성 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
+        for (ReportStat stat : stats) {
+            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
+        }
+        String statsJson = objectMapper.writeValueAsString(statsArray);
+        model.addAttribute("statsJson", statsJson);
+
         return "report/main"; // main.html을 반환
+    }
+
+    @GetMapping("/stats")
+    public String getReportStats(@RequestParam(name = "startDate") String startDate,
+                                 @RequestParam(name = "endDate") String endDate,
+                                 Model model) {
+        System.out.println("통계(사용자 입력) 컨트롤러 ");
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
+        model.addAttribute("stats", stats);
+
+        return "redirect:/report/main";
     }
 
     @GetMapping("/{reportId}") // 특정 보고서 조회
@@ -135,4 +174,6 @@ public class ReportController {
         reportService.deleteReport(id);
         return "redirect:/report/main";
     }
+
+
 }

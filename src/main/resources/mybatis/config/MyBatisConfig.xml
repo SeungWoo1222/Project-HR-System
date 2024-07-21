@@ -9,6 +9,7 @@
         <package name="com.woosan.hr_system.employee.model.Employee"/>
         <package name="com.woosan.hr_system.report.model.Report"/>
         <package name="com.woosan.hr_system.report.model.Request"/>
+        <package name="com.woosan.hr_system.report.model.ReportStat"/>
     </typeAliases>
     <typeHandlers>
         <typeHandler handler="com.woosan.hr_system.employee.model.DepartmentTypeHandler" javaType="com.woosan.hr_system.employee.model.Department"/>

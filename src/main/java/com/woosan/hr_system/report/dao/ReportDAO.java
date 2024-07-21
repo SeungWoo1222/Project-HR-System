@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.dao;
 
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportStat;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -78,5 +81,13 @@ public class ReportDAO {
         sqlSession.delete(NAMESPACE + ".deleteFileMetadataByReportId", reportId);
     }
 
+    // 통계
+    public List<ReportStat> getReportStats(String startDate, String endDate) {
+        System.out.println("DAO");
+        Map<String, Object> params = new HashMap<>();
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
+    }
 
 }

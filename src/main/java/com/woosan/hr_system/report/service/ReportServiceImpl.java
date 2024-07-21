@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.service;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,5 +107,11 @@ public class ReportServiceImpl implements ReportService {
         reportDAO.deleteReport(id);
     }
 
+
+    @Override
+    public List<ReportStat> getReportStats(String startDate, String endDate) {
+        System.out.println("서비스");
+        return reportDAO.getReportStats(startDate, endDate);
+    }
 
 }

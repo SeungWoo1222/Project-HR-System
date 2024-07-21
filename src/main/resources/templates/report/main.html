@@ -6,14 +6,31 @@
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{example.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
-        /*// 여기에 CSS를 입력*/
+        /* 여기에 CSS를 입력 */
     </style>
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{example.js}"></script> <!-- 외부 JS도 요렇게 -->
-    <script>
-        // 여기에 JS 코드를 입력
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['bar']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            // hidden-stats 요소에서 데이터를 읽어와서 파싱
+            var stats = JSON.parse(document.getElementById('hidden-stats').textContent);
+            var data = google.visualization.arrayToDataTable(stats);
+
+            var options = {
+                chart: {
+                    title: '보고서 작성 통계',
+                    subtitle: '총합, 완료, 미완료',
+                }
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
     </script>
 </th:block>
 
@@ -45,6 +62,12 @@
             </ul>
         </div>
         <button onclick="location.href='/request/write'">작성 요청하기</button>
+
+        <!-- 구글 차트 통계 추가 -->
+        <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+
+        <!-- 숨겨진 요소에 통계 데이터를 JSON 형식으로 저장 -->
+        <div id="hidden-stats" th:text="${statsJson}" style="display:none;"></div>
     </div>
 </div>
 </html>

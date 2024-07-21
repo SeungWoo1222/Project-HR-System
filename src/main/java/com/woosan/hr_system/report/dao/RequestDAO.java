@@ -19,7 +19,6 @@ public class RequestDAO {
 
     // 요청 전체 조회
     public List<Request> getAllRequests() {
-        System.out.println("리퀘스트 DAO");
         return sqlSession.selectList(NAMESPACE + ".getAllRequests");
     }
 

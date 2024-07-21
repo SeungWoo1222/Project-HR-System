@@ -113,4 +113,16 @@
     <delete id="deleteFileMetadataByReportId" parameterType="long">
         DELETE FROM report_files WHERE report_id = #{reportId}
     </delete>
+
+    <!-- 통계 조회 -->
+    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+        SELECT
+            DATE_FORMAT(created_date, '%Y-%m') AS month,
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
+            SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        FROM reports
+        WHERE created_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY month
+    </select>
 </mapper>
