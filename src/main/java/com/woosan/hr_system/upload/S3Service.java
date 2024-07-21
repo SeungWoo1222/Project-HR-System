@@ -2,7 +2,6 @@ package com.woosan.hr_system.upload;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.woosan.hr_system.employee.controller.EmployeeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,34 +22,32 @@ public class S3Service {
     private String bucketName = "haruharu-hrsystem-bucket";
 
     public String checkFile(MultipartFile file) {
-        String message;
-        if (file.isEmpty()) {
-            return "empty";
-        }
+        if (file.isEmpty()) { return "empty"; }
 
         try {
-            uploadFile(file);
-            return file.getOriginalFilename();
+            String fileName = uploadFile(file);
+            return fileName;
         } catch (IOException e) {
-            logger.debug("‼️File Upload Error : {} ‼️",e.getMessage());
+            logger.debug("‼️File Upload Error : {} ‼️", e.getMessage(), e);
             e.printStackTrace();
             return "fail";
         }
     }
 
-    public void uploadFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file) throws IOException {
         File convertedFile = convertMultiPartToFile(file);
         String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
         amazonS3.putObject(new PutObjectRequest(bucketName, fileName, convertedFile));
-        logger.debug("File put to S3 with name: {}", fileName);
+        logger.debug("‼️File put to S3 with name: {} ‼️", fileName);
         convertedFile.delete();
+        return fileName;
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convFile = new File(file.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(convFile)) {
+            fos.write(file.getBytes());
+        }
         return convFile;
     }
 }

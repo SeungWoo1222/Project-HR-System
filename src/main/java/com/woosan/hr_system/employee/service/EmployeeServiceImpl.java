@@ -60,8 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // 등록 관련 로직 start-point
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
-        if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null ) {
-            return "fail";
+        if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null) {
+            return "employeeEmpty";
         } else {
             //  Employee ID 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

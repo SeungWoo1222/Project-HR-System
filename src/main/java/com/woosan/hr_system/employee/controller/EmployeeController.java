@@ -1,5 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.employee.model.Department;
+import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
@@ -72,11 +74,50 @@ public class EmployeeController {
         return "employee/registration";
     }
 
-    @PostMapping("/registration") // 신규 사원 등록
-    public ResponseEntity<String> registerEmployee(@ModelAttribute Employee employee) {
+    @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 신규 사원 등록
+    public ResponseEntity<String> registerEmployee(@RequestParam("name") String name,
+                                                   @RequestParam("birth") String birth,
+                                                   @RequestParam("residentRegistrationNumber") String residentRegistrationNumber,
+                                                   @RequestParam("phone") String phone,
+                                                   @RequestParam("email") String email,
+                                                   @RequestParam("address") String address,
+                                                   @RequestParam("detailAddress") String detailAddress,
+                                                   @RequestParam("department") Department department,
+                                                   @RequestParam("position") Position position,
+                                                   @RequestParam("hireDate") LocalDate hireDate,
+                                                   @RequestParam("picture") MultipartFile picture) {
+        // 파일 도착 확인
+        logger.debug("‼️Received picture - File name: {}, Size: {}, Content Type: {} ‼️", picture.getOriginalFilename(), picture.getSize(), picture.getContentType());
+
+        // 파일 체크 후 DB에 저장할 파일명 반환
+        String pictureName;
+        String checkMessage = s3Service.checkFile(picture);
+        if (checkMessage.equals("empty")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.");
+        } else if (checkMessage.equals("fail")) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
+        } else {
+            pictureName = checkMessage;
+        }
+
+        // Employee 객체 생성 및 설정
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setBirth(birth);
+        employee.setResidentRegistrationNumber(residentRegistrationNumber);
+        employee.setPhone(phone);
+        employee.setEmail(email);
+        employee.setAddress(address);
+        employee.setDetailAddress(detailAddress);
+        employee.setDepartment(department);
+        employee.setPosition(position);
+        employee.setHireDate(hireDate);
+        employee.setPicture(pictureName);
+
+        // 사원 등록
         String message = employeeService.insertEmployee(employee);
-        if (message.equals("fail")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("입력 정보에서 오류가 발생하였습니다.");
+        if (message.equals("employeeEmpty")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("입력 정보에서 오류가 발생하였습니다.");
         }
         return ResponseEntity.ok( "'" + employee.getName() + "' 사원이 신규 사원으로 등록되었습니다.");
     }
@@ -147,13 +188,13 @@ public class EmployeeController {
         List<String> resignationDocumentsNames = new ArrayList<>();
         for (MultipartFile resignationDocument : resignationDocuments) {
             if (resignationDocument != null && !resignationDocument.isEmpty()) {
-                String fileUploadMessage = s3Service.checkFile(resignationDocument);
-                if (fileUploadMessage.equals("empty")) { // 비어있을 경우
+                String message = s3Service.checkFile(resignationDocument);
+                if (message.equals("empty")) { // 비어있을 경우
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.");
-                } else if (fileUploadMessage.equals("fail")) { // 오류가 발생했을 경우
+                } else if (message.equals("fail")) { // 오류가 발생했을 경우
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
                 } else { // 성공
-                    resignationDocumentsNames.add(fileUploadMessage);
+                    resignationDocumentsNames.add(message);
                 }
             }
         }
