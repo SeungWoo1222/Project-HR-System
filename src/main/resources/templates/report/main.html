@@ -21,12 +21,7 @@
             var stats = JSON.parse(document.getElementById('hidden-stats').textContent);
             var data = google.visualization.arrayToDataTable(stats);
 
-            var options = {
-                chart: {
-                    title: '보고서 작성 통계',
-                    subtitle: '총합, 완료, 미완료',
-                }
-            };
+            var options = {};
 
             var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
             chart.draw(data, google.charts.Bar.convertOptions(options));
@@ -63,6 +58,7 @@
         </div>
         <button onclick="location.href='/request/write'">작성 요청하기</button>
 
+        <h1>보고서 통계</h1>
         <!-- 구글 차트 통계 추가 -->
         <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
 

@@ -53,9 +53,12 @@ public class ReportController {
             endDate = end.format(formatter);
         }
 
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
+
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
-        List<Object[]> statsArray = new ArrayList<>();
-        statsArray.add(new Object[]{"월 기준 작성 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
+        List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
+        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
         for (ReportStat stat : stats) {
             statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
         }
@@ -65,15 +68,28 @@ public class ReportController {
         return "report/main"; // main.html을 반환
     }
 
-    @GetMapping("/stats")
+    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
+    public String showStatisticPage(Model model) {
+        model.addAttribute("ReportStat", new ReportStat());
+        return "report/statistic";  // write.html로 연결
+    }
+
+    @GetMapping("/stats") // 통계 날짜 설정
     public String getReportStats(@RequestParam(name = "startDate") String startDate,
                                  @RequestParam(name = "endDate") String endDate,
                                  Model model) {
-        System.out.println("통계(사용자 입력) 컨트롤러 ");
-        List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
-        model.addAttribute("stats", stats);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return "redirect:/report/main";
+        // startDate와 endDate를 "yyyy-MM-dd" 형식으로 변환
+        LocalDate start = LocalDate.parse(startDate + "-01");
+        LocalDate end = LocalDate.parse(endDate + "-01").plusMonths(1).minusDays(1);
+
+        String formattedStartDate = start.format(formatter);
+        String formattedEndDate = end.format(formatter);
+
+        model.addAttribute("startDate", formattedStartDate);
+        model.addAttribute("endDate", formattedEndDate);
+        return "redirect:/report/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
     }
 
     @GetMapping("/{reportId}") // 특정 보고서 조회
@@ -174,6 +190,4 @@ public class ReportController {
         reportService.deleteReport(id);
         return "redirect:/report/main";
     }
-
-
 }
