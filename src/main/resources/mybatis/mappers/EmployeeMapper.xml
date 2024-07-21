@@ -18,6 +18,7 @@
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
         <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
         <result property="remainingLeave" column="remaining_leave"/>
+        <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
         <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
@@ -44,8 +45,8 @@
 
     <!-- 사원 등록 -->
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, remaining_leave, last_modified, modified_by)
-        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by)
+        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
     </insert>
 
     <!-- 사원 정보 수정 -->
@@ -63,6 +64,7 @@
         status=#{status},
         department_id=#{department},
         position_id=#{position},
+        picture=#{picture},
         remaining_leave=#{remainingLeave},
         last_modified=#{lastModified},
         modified_by=#{modifiedBy}
