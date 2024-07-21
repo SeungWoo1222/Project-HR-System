@@ -164,6 +164,8 @@ public class EmployeeController {
         if (employee == null) {
             return "error/employee-error";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/resignation-form";
     }
@@ -214,6 +216,8 @@ public class EmployeeController {
         if (employee == null) {
             return "error/employee-error";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/resignation-detail";
     }

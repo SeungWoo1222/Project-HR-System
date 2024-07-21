@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
+</th:block>
+
 <div>
     <div>
-        <img th:src="${pictureUrl}"/>
+        <img class="employee-picture" th:src="${pictureUrl}"/>
         <table>
             <tr>
                 <th>사원 ID</th>
@@ -13,12 +19,8 @@
                 <td th:text="${employee.name}">이름</td>
             </tr>
             <tr>
-                <th>생년월일</th>
-                <td th:text="${employee.birth}">생년월일</td>
-            </tr>
-            <tr>
                 <th>주민등록번호</th>
-                <td th:text="${employee.residentRegistrationNumber}">주민등록번호</td>
+                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}">주민등록번호</td>
             </tr>
             <tr>
                 <th>전화번호</th>
