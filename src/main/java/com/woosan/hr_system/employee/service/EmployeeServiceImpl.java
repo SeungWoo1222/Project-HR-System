@@ -1,14 +1,13 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.Search.PageRequest;
-import com.woosan.hr_system.Search.PageResult;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,8 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // 등록 관련 로직 start-point
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
-        if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null ) {
-            return "fail";
+        if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null) {
+            return "employeeEmpty";
         } else {
             //  Employee ID 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -158,7 +157,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate) {
+    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsNames) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -223,6 +222,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
 
+        // 파일 정보 등록
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < resignationDocumentsNames.size(); i++) {
+            sb.append(resignationDocumentsNames.get(i));
+            if (i != resignationDocumentsNames.size() - 1) {
+                sb.append(" / ");
+            }
+        }
+        resignation.setResignationDocuments(sb.toString());
+
         // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -230,8 +239,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             resignation.setProcessedBy(userDetails.getUsername());
         }
 
-        // 파일 첨부 기능 구현 후 추가 예정
-        // termination.setTerminationDocuments(terminationDocuments);
         resignationDAO.insertResignation(resignation);
         return "success";
     }

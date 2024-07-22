@@ -1,4 +1,4 @@
-package com.woosan.hr_system.Search;
+package com.woosan.hr_system.search;
 
 import org.apache.ibatis.annotations.Param;
 

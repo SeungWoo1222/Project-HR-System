@@ -39,10 +39,35 @@
       }
     }
 
+    // 파일 검증
+    function validateFile(obj) {
+      const files = obj.files;
+      if (files.length > 0) {
+        const file = files[0];
+
+        if (obj) {
+          // 파일 크기 확인
+          if (file.size > 10 * 1024 * 1024) {
+            alert("파일 크기는 10MB를 초과할 수 없습니다.");
+            obj.value = ""
+            return false;
+
+          }
+          const fileTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp', 'image/heif', 'image/heif'];
+          if (!fileTypes.includes(file.type)) {
+            alert("파일 형식이 맞지 않습니다.");
+            obj.value = ""
+            return false;
+          }
+        }
+      }
+    }
+
     // 유효성 검사 로직
     function validateForm(event) {
       event.preventDefault();
 
+      var picture = document.getElementById('picture').files[0];
       const name = document.getElementById("name").value.trim();
       const birth = document.getElementById("birth").value.trim();
       const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
@@ -54,10 +79,14 @@
       const department = document.getElementById("department").value;
       const position = document.getElementById("position").value;
       const hireDate = document.getElementById("hireDate").value;
-      const errorMessage = document.querySelector(".error-message");
 
+      const errorMessage = document.querySelector(".error-message");
       errorMessage.textContent = "";
 
+      if (!picture) {
+        errorMessage.textContent = "사진을 등록해주세요.";
+        return false;
+      }
       if (name === "") {
         errorMessage.textContent = "이름을 입력해주세요.";
         return false;
@@ -106,8 +135,6 @@
       combineEmail();
       combineDetailAddress();
       formatPhoneNumber();
-      console.log(document.getElementById("phone").value.trim());
-      console.log(document.getElementById("phoneInput").value.trim());
 
       // AJAX 요청
       const form = event.target;
@@ -122,8 +149,14 @@
           if (xhr.status === 200) {
             alert(xhr.responseText);
             window.location = "/employee/list";
-          } else {
+          } else if (xhr.status === 404) {
             alert(xhr.responseText);
+          } else if (xhr.status === 400) {
+            alert('파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.');
+          } else if (xhr.status === 500) {
+            alert('파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.');
+          } else {
+            alert('사원 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
             window.location.reload();
           }
         }
@@ -136,7 +169,11 @@
 <div layout:fragment="~{content}">
   <div class="content">
     <h2>사원 등록</h2>
-    <form th:action="@{/employee/registration}" method="post" onsubmit="validateForm(event)">
+    <form th:action="@{/employee/registration}" method="post" onsubmit="validateForm(event)" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="picture">사원 사진 (10MB 이하)</label>
+        <input type="file" id="picture" name="picture" onchange="validateFile(this)">
+      </div>
       <div class="form-group">
         <label for="name">이름</label>
         <input type="text" id="name" name="name">

@@ -17,6 +17,7 @@ public class Employee {
     private Position position;
     private LocalDate hireDate;
     private String status;
+    private String picture;
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
@@ -127,6 +128,10 @@ public class Employee {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getPicture() { return picture;}
+
+    public void setPicture(String picture) { this.picture = picture; }
 
     public LocalDateTime getLastModified() {
         return lastModified;

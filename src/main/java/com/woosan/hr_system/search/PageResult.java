@@ -1,4 +1,4 @@
-package com.woosan.hr_system.Search;
+package com.woosan.hr_system.search;
 
 import java.util.List;
 

@@ -1,19 +1,25 @@
 package com.woosan.hr_system.employee.controller;
 
-import com.woosan.hr_system.Search.PageRequest;
-import com.woosan.hr_system.Search.PageResult;
+import com.woosan.hr_system.employee.model.Department;
+import com.woosan.hr_system.employee.model.Position;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.upload.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +31,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private S3Service s3Service;
 
     // 조회 관련 로직 start-point
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -53,6 +62,8 @@ public class EmployeeController {
         if (employee == null) {
             return "error/404";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/detail";
     }
@@ -65,11 +76,50 @@ public class EmployeeController {
         return "employee/registration";
     }
 
-    @PostMapping("/registration") // 신규 사원 등록
-    public ResponseEntity<String> registerEmployee(@ModelAttribute Employee employee) {
+    @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 신규 사원 등록
+    public ResponseEntity<String> registerEmployee(@RequestParam("name") String name,
+                                                   @RequestParam("birth") String birth,
+                                                   @RequestParam("residentRegistrationNumber") String residentRegistrationNumber,
+                                                   @RequestParam("phone") String phone,
+                                                   @RequestParam("email") String email,
+                                                   @RequestParam("address") String address,
+                                                   @RequestParam("detailAddress") String detailAddress,
+                                                   @RequestParam("department") Department department,
+                                                   @RequestParam("position") Position position,
+                                                   @RequestParam("hireDate") LocalDate hireDate,
+                                                   @RequestParam("picture") MultipartFile picture) {
+        // 파일 도착 확인
+        logger.debug("‼️Received picture - File name: {}, Size: {}, Content Type: {} ‼️", picture.getOriginalFilename(), picture.getSize(), picture.getContentType());
+
+        // 파일 체크 후 DB에 저장할 파일명 반환
+        String pictureName;
+        String checkMessage = s3Service.checkFile(picture);
+        if (checkMessage.equals("empty")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.");
+        } else if (checkMessage.equals("fail")) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
+        } else {
+            pictureName = checkMessage;
+        }
+
+        // Employee 객체 생성 및 설정
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setBirth(birth);
+        employee.setResidentRegistrationNumber(residentRegistrationNumber);
+        employee.setPhone(phone);
+        employee.setEmail(email);
+        employee.setAddress(address);
+        employee.setDetailAddress(detailAddress);
+        employee.setDepartment(department);
+        employee.setPosition(position);
+        employee.setHireDate(hireDate);
+        employee.setPicture(pictureName);
+
+        // 사원 등록
         String message = employeeService.insertEmployee(employee);
-        if (message.equals("fail")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("입력 정보에서 오류가 발생하였습니다.");
+        if (message.equals("employeeEmpty")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("입력 정보에서 오류가 발생하였습니다.");
         }
         return ResponseEntity.ok( "'" + employee.getName() + "' 사원이 신규 사원으로 등록되었습니다.");
     }
@@ -114,18 +164,46 @@ public class EmployeeController {
         if (employee == null) {
             return "error/employee-error";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/resignation-form";
     }
 
-    @PostMapping("/resign/{employeeId}") // 사원 퇴사 처리 로직
+    @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 사원 퇴사 처리 로직
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                     @RequestParam("resignationReason") String resignationReason,
                                     @RequestParam("codeNumber") String codeNumber,
                                     @RequestParam("specificReason") String specificReason,
-                                    @RequestParam("resignationDate") LocalDate resignationDate) {
-        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate);
-        if ("null".equals(message)) {
+                                    @RequestParam("resignationDate") LocalDate resignationDate,
+                                    @RequestParam("resignationDocuments") MultipartFile[] resignationDocuments) {
+        // 파일 도착 확인 로그
+        logger.debug("Received resignation documents :");
+        for (MultipartFile file : resignationDocuments) {
+            logger.debug("File name: {}, Size: {}, Content Type: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
+        }
+
+        // 파일 최대 3개 확인
+        if (resignationDocuments.length > 3) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("최대 3개의 파일만 업로드할 수 있습니다.");
+        }
+
+        // 파일이 있다면 파일 업로드
+        List<String> resignationDocumentsNames = new ArrayList<>();
+        for (MultipartFile resignationDocument : resignationDocuments) {
+            if (resignationDocument != null && !resignationDocument.isEmpty()) {
+                String message = s3Service.checkFile(resignationDocument);
+                if (message.equals("empty")) { // 비어있을 경우
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.");
+                } else if (message.equals("fail")) { // 오류가 발생했을 경우
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.");
+                } else { // 성공
+                    resignationDocumentsNames.add(message);
+                }
+            }
+        }
+        String message = employeeService.resignEmployee(employeeId, resignationReason, codeNumber, specificReason, resignationDate, resignationDocumentsNames);
+        if (message.equals("null")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeId + "' 사원을 찾을 수 없습니다.");
         }
         return ResponseEntity.ok("'" + employeeId + "' 사원이 퇴사 처리되었습니다.");
@@ -138,6 +216,8 @@ public class EmployeeController {
         if (employee == null) {
             return "error/employee-error";
         }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/resignation-detail";
     }
