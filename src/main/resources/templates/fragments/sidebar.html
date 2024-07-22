@@ -35,9 +35,9 @@
             <!-- HR 부서 -->
             <li sec:authorize="principal.department == 'HR'"> <a th:href="@{#}"><img src="/images/icons/employee-management.png" alt="" width="20"> 사원 관리</a>
                 <ul class="submenu">
-                    <li><a th:href="@{/employee/list}">- 전체 사원 리스트</a></li>
-                    <li><a th:href="@{/employee/register}">- 신규 사원 등록</a></li>
-                    <li><a th:href="@{/employee/retire}">- 퇴사 처리</a></li>
+                    <li><a th:href="@{/employee/list}">- 사원 조회</a></li>
+                    <li><a th:href="@{/employee/registration}">- 사원 등록 </a></li>
+                    <li><a th:href="@{/employee/resignation}">- 퇴사 관리</a></li>
                 </ul>
             </li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/performance-management.png" alt="" width="20"> 성과 관리</a></li>

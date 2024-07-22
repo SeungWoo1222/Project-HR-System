@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='타이틀로 넣을 이름을 작성해주세용~')}">
+      layout:decorate="~{fragments/layout :: layout(title='사원 상세 정보')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{example.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
-        /*// 여기에 CSS를 입력*/
+    /* 여기에 CSS 코드를 입력 */  
     </style>
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{example.js}"></script> <!-- 외부 JS도 요렇게 -->
     <script>
-        // 여기에 JS 코드를 입력
+        /* 여기에 JS 코드를 입력 */
     </script>
 </th:block>
-
+  
     <div layout:fragment="~{content}">
         <div class="content">
             <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-
         </div>
     </div>
+</div>
 </html>

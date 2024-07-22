@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class Employee {
     private String employeeId;
@@ -13,15 +12,16 @@ public class Employee {
     private String phone;
     private String email;
     private String address;
-    private String detailedAddress;
+    private String detailAddress;
     private Department department;
     private Position position;
     private LocalDate hireDate;
-    private LocalDate terminationDate;
     private String status;
+    private String picture;
     private int remainingLeave;
     private LocalDateTime lastModified;
     private String modifiedBy;
+    private Resignation resignation;
 
     // Getters and Setters
 
@@ -89,12 +89,12 @@ public class Employee {
         this.address = address;
     }
 
-    public String getDetailedAddress() {
-        return detailedAddress;
+    public String getDetailAddress() {
+        return detailAddress;
     }
 
-    public void setDetailedAddress(String detailedAddress) {
-        this.detailedAddress = detailedAddress;
+    public void setDetailAddress(String detailAddress) {
+        this.detailAddress = detailAddress;
     }
 
     public Department getDepartment() {
@@ -121,14 +121,6 @@ public class Employee {
         this.hireDate = hireDate;
     }
 
-    public LocalDate getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDate terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -136,6 +128,10 @@ public class Employee {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getPicture() { return picture;}
+
+    public void setPicture(String picture) { this.picture = picture; }
 
     public LocalDateTime getLastModified() {
         return lastModified;
@@ -160,4 +156,8 @@ public class Employee {
     public void setRemainingLeave(int remainingLeave) {
         this.remainingLeave = remainingLeave;
     }
+
+    public Resignation getResignation() { return resignation; }
+
+    public void setResignation(Resignation resignation) { this.resignation = resignation; }
 }

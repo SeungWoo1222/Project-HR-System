@@ -20,12 +20,16 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.data:spring-data-commons'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Thymeleaf
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0' // Thymeleaf Layout
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // Thymeleaf-extras-springsecurity
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0' // MyBatis
 	implementation 'mysql:mysql-connector-java:8.0.33' // MySQL
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security
+	implementation 'org.springframework.boot:spring-boot-starter-logging'// Logging
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // AWS
+	implementation 'software.amazon.awssdk:s3:2.20.64' // AWS S3
 
 	implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
@@ -38,6 +42,4 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-
 

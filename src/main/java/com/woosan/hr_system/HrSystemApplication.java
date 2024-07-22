@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.woosan.hr_system")
 public class HrSystemApplication {
 
 	public static void main(String[] args) {
