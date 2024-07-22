@@ -5,7 +5,7 @@
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
 
-    <!-- Select all reports -->
+    <!-- 모든 보고서 조회 -->
     <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
@@ -20,13 +20,14 @@
         FROM reports
     </select>
 
-    <!-- Select report by ID -->
-    <select id="getReportById" parameterType="int" resultType="com.woosan.hr_system.report.model.Report">
+    <!-- 특정 보고서 조회 -->
+    <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
             employee_id AS employeeId,
             title,
             content,
+            complete_date AS completeDate,
             created_date AS createdDate,
             modified_date AS modifiedDate,
             approver_id AS approverId,
@@ -36,56 +37,51 @@
         WHERE report_id = #{reportId}
     </select>
 
-    <!-- Insert a new report -->
-    <insert id="insertReport" parameterType="com.woosan.hr_system.report.model.Report">
+    <!-- 특정 파일 조회 -->
+    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+        SELECT
+            file_id AS fileId,
+            report_id AS reportId,
+            cloud_server_file_url AS cloudServerFileUrl,
+            original_file_name AS originalFilename,
+            uuid_file_name AS uuidFilename,
+            size,
+            upload_date AS uploadDate
+
+        FROM report_files
+        WHERE file_id = #{fileId}
+    </select>
+
+    <!-- 보고서 생성 -->
+    <insert id="createReport" parameterType="com.woosan.hr_system.report.model.Report">
         INSERT INTO reports (
             employee_id,
             title,
             content,
             created_date,
+            complete_date,
             approver_id,
-            status,
-            reject_reason
+            status
         ) VALUES (
                      #{employeeId},
                      #{title},
                      #{content},
                      #{createdDate},
+                     #{completeDate},
                      #{approverId},
-                     #{status},
-                     #{rejectReason}
+                     #{status}
                  )
     </insert>
 
-    <!-- Update an existing report -->
-    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET
-            title = #{title},
-            content = #{content},
-            modified_date = #{modifiedDate},
-            status = #{status},
-            reject_reason = #{rejectReason}
-        WHERE report_id = #{reportId}
-    </update>
-
-    <!-- Delete a report -->
-    <delete id="deleteReport" parameterType="int">
-        DELETE FROM reports
-        WHERE report_id = #{reportId}
-    </delete>
-
-    <!-- Insert file metadata -->
+    <!-- 파일 DB 정보 생성 -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
-        INSERT INTO file_metadata (
-            report_id,
+        INSERT INTO report_files (
             cloud_server_file_url,
-            original_filename,
-            uuid_filename,
+            original_file_name,
+            uuid_file_name,
             size,
             upload_date
         ) VALUES (
-                     #{reportId},
                      #{cloudServerFileUrl},
                      #{originalFilename},
                      #{uuidFilename},
@@ -94,4 +90,39 @@
                  )
     </insert>
 
+    <!-- 보고서 수정 -->
+    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET title = #{title}, content = #{content}, complete_date = #{completeDate}, modified_date = #{modifiedDate}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <!-- 결재처리 -->
+    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET status = #{status}, reject_reason = #{rejectReason}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <!-- 보고서 삭제 -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM reports WHERE report_id = #{reportId}
+    </delete>
+
+    <!-- 파일 삭제 -->
+    <delete id="deleteFileMetadataByReportId" parameterType="long">
+        DELETE FROM report_files WHERE report_id = #{reportId}
+    </delete>
+
+    <!-- 통계 조회 -->
+    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+        SELECT
+            DATE_FORMAT(complete_date, '%Y-%m') AS month,
+            COUNT(status) AS total,
+            SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
+            SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        FROM reports
+        WHERE complete_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY month
+    </select>
 </mapper>

@@ -1,22 +1,25 @@
 package com.woosan.hr_system.report.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class ReportRequest {
-    private int requestId;
+public class Request {
+    private Long requestId;
+    private Long reportId;
     private String requesterId;
     private String employeeId;
-    private Date requestDate;
-    private Date dueDate;
+    private LocalDateTime requestDate;
+    private LocalDateTime modifiedDate;
+    private LocalDate dueDate;
     private String requestNote;
-    private int reportId;
+
 
     // Getters and Setters
-    public int getRequestId() {
+    public Long getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(int requestId) {
+    public void setRequestId(Long requestId) {
         this.requestId = requestId;
     }
 
@@ -36,19 +39,27 @@ public class ReportRequest {
         this.employeeId = employeeId;
     }
 
-    public Date getRequestDate() {
+    public LocalDateTime getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
+    public void setRequestDate(LocalDateTime requestDate) {
         this.requestDate = requestDate;
     }
 
-    public Date getDueDate() {
+    public LocalDateTime getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -60,11 +71,11 @@ public class ReportRequest {
         this.requestNote = requestNote;
     }
 
-    public int getReportId() {
+    public Long getReportId() {
         return reportId;
     }
 
-    public void setReportId(int reportId) {
+    public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
 }

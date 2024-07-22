@@ -1,30 +1,22 @@
 package com.woosan.hr_system.report.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class FileMetadata {
-    private Long id;
-    private Long reportId;
+    private Long fileId;
     private String cloudServerFileUrl;
     private String originalFilename;
     private String uuidFilename;
     private long size;
-    private Date uploadDate;
+    private LocalDate uploadDate;
 
     public Long getId() {
-        return id;
+        return fileId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getReportId() {
-        return reportId;
-    }
-
-    public void setReportId(Long reportId) {
-        this.reportId = reportId;
+    public void setId(Long fileId) {
+        this.fileId = fileId;
     }
 
     public String getCloudServerFileUrl() {
@@ -59,11 +51,11 @@ public class FileMetadata {
         this.size = size;
     }
 
-    public Date getUploadDate() {
+    public LocalDate getUploadDate() {
         return uploadDate;
     }
 
-    public void setUploadDate(Date uploadDate) {
+    public void setUploadDate(LocalDate uploadDate) {
         this.uploadDate = uploadDate;
     }
 }

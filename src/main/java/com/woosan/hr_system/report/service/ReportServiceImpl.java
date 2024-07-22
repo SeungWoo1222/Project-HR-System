@@ -1,22 +1,24 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.report.dao.ReportDAO;
+import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.woosan.hr_system.report.model.FileMetadata;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.Date;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -29,56 +31,28 @@ public class ReportServiceImpl implements ReportService {
         return reportDAO.getAllReports();
     }
 
-    @Override // id를 이용한 특정 보고서 조회
-    public Report getReportById(int reportId) {
+    @Override // 특정 보고서 조회
+    public Report getReportById(Long reportId) {
         return reportDAO.getReportById(reportId);
     }
 
-    @Override // 보고서 등록
-    public void insertReport(Report report) {
-        reportDAO.insertReport(report);
+    @Override // 특정 파일 조회
+    public FileMetadata getReportFileById(Long fileId) {
+        return reportDAO.getReportFileById(fileId);
     }
 
-    @Override // 보고서 전체 수정
-    public void updateReport(Report report) {
-        reportDAO.updateReport(report);
-    }
+    @Override // 보고서 생성
+    public void createReport(Report report, MultipartFile file) throws IOException {
+        // 보고서 생성 및 저장
+        reportDAO.createReport(report);
 
-    @Override // 보고서 일부 수정 (제목, 내용, 결재자, 결재상태(결재자만 가능), 거절사유(결재자만 가능), 업무완료날짜, 파일첨부)
-    public void updateReportPartial(int reportId, Map<String, Object> updates) {
-        Report report = reportDAO.getReportById(reportId);
-        if (report != null) {
-            if (updates.containsKey("title")) {
-                report.setTitle((String)updates.get("title"));
-            }
-            if (updates.containsKey("content")) {
-                report.setContent((String)updates.get("content"));
-            }
-            if (updates.containsKey("approver_id")) {
-                report.setApproverId((String)updates.get("approver_id"));
-            }
-            if (updates.containsKey("status")) {
-                report.setStatus((String)updates.get("status"));
-            }
-            if (updates.containsKey("reject_reason")) {
-                report.setRejectReason((String)updates.get("reject_reason"));
-            }
-            if (updates.containsKey("complete_date")) {
-                report.setCompleteDate((Timestamp) updates.get("complete_date"));
-            }
-            if (updates.containsKey("file_path")) {
-                report.setFilePath((String)updates.get("file_path"));
-            }
-            reportDAO.updateReport(report);
+        // 파일 업로드
+        if (!file.isEmpty()) {
+            reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
         }
     }
 
-    @Override // 보고서 삭제
-    public void deleteReport(int reportId) {
-        reportDAO.deleteReport(reportId);
-    }
-
-    @Override // 파일 첨부
+    @Override // 파일 업로드
     public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {
         List<FileMetadata> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -93,6 +67,7 @@ public class ReportServiceImpl implements ReportService {
         return uploadedFiles;
     }
 
+    // 파일 변수 설정
     private String saveFile(MultipartFile file, String uuidFilename) throws IOException {
         String uploadDir = "/path/to/upload";
         File dest = new File(uploadDir + "/" + uuidFilename);
@@ -100,17 +75,43 @@ public class ReportServiceImpl implements ReportService {
         return dest.getAbsolutePath();
     }
 
+    // 파일 정보 저장
     private FileMetadata saveMetadata(Long reportId, String originalFilename, String uuidFilename, String filePath, long size) {
         FileMetadata metadata = new FileMetadata();
-        metadata.setReportId(reportId);
+        LocalDate now = LocalDate.now();
+
         metadata.setCloudServerFileUrl("Cloud URL"); // 클라우드 URL 추후 설정
         metadata.setOriginalFilename(originalFilename);
         metadata.setUuidFilename(uuidFilename);
         metadata.setSize(size);
-        metadata.setUploadDate(new Date());
+        metadata.setUploadDate(now);
 
         reportDAO.insertFileMetadata(metadata);
 
         return metadata;
     }
+
+    @Override // 보고서 수정
+    public void updateReport(Report report) {
+        reportDAO.updateReport(report);
+    }
+
+    @Override // 결재 처리
+    public void updateApprovalStatus(Report report) {
+        reportDAO.updateApprovalStatus(report);
+    }
+
+
+    @Override // 보고서 삭제
+    public void deleteReport(Long id) {
+        reportDAO.deleteReport(id);
+    }
+
+
+    @Override
+    public List<ReportStat> getReportStats(String startDate, String endDate) {
+        System.out.println("서비스");
+        return reportDAO.getReportStats(startDate, endDate);
+    }
+
 }
