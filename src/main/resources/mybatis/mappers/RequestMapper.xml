@@ -25,19 +25,30 @@
         WHERE request_id = #{requestId}
     </select>
 
+    <!-- 모든 사원 조회 -->
+    <select id="getAllEmployees" resultType="com.woosan.hr_system.employee.model.Employee">
+        SELECT
+            employee_id AS employeeId,
+            name
+        FROM employees
+    </select>
+
     <!-- 요청 생성 -->
     <insert id="createRequest" parameterType="com.woosan.hr_system.report.model.Request">
-        INSERT INTO report_requests (
-            employee_id,
-            due_date,
-            request_note,
-            request_date
-        ) VALUES (
-                     #{employeeId},
-                     #{dueDate},
-                     #{requestNote},
-                     #{requestDate}
-                 )
+        INSERT INTO report_requests
+        (requester_id,
+         employee_id,
+         due_date,
+         request_note,
+         request_date)
+        SELECT
+            #{requesterId},
+            e.employee_id,
+            #{dueDate},
+            #{requestNote},
+            #{requestDate}
+        FROM employees e
+        WHERE e.name = #{employeeName}
     </insert>
 
     <!-- 요청 수정 -->

@@ -1,5 +1,6 @@
 package com.woosan.hr_system.report.dao;
 
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Request;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
@@ -25,6 +26,11 @@ public class RequestDAO {
     // 특정 요청 조회
     public Request getRequestById(Long requestId) {
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
+    }
+
+    // 모든 사원 조회
+    public List<Employee> getAllEmployees() {
+        return sqlSession.selectList(NAMESPACE + ".getAllEmployees");
     }
 
     // 요청 수정

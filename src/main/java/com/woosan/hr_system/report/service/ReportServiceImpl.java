@@ -41,9 +41,26 @@ public class ReportServiceImpl implements ReportService {
         return reportDAO.getReportFileById(fileId);
     }
 
+    @Override // 보고서 통계 조회
+    public List<ReportStat> getReportStats(String startDate, String endDate) {
+        // 기본 통계 데이터를 최근 1개월로 조회
+        if (startDate == null && endDate == null) {
+            LocalDate end = LocalDate.now();
+            LocalDate start = end.minusMonths(1);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            startDate = start.format(formatter);
+            endDate = end.format(formatter);
+        }
+
+        return reportDAO.getReportStats(startDate, endDate);
+    }
+
     @Override // 보고서 생성
     public void createReport(Report report, MultipartFile file) throws IOException {
-        // 보고서 생성 및 저장
+        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
+        report.setCreatedDate(createdDate);
+        report.setStatus("미처리"); // 기본 결재 상태 설정
+
         reportDAO.createReport(report);
 
         // 파일 업로드
@@ -93,6 +110,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 보고서 수정
     public void updateReport(Report report) {
+        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정시간 설정
+        report.setModifiedDate(modified_date);
+
         reportDAO.updateReport(report);
     }
 
@@ -108,10 +128,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-    @Override
-    public List<ReportStat> getReportStats(String startDate, String endDate) {
-        System.out.println("서비스");
-        return reportDAO.getReportStats(startDate, endDate);
-    }
+
 
 }

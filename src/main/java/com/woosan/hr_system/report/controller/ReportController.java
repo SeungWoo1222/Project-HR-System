@@ -38,24 +38,13 @@ public class ReportController {
     public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
                               @RequestParam(name = "endDate", required = false) String endDate,
                               Model model) throws JsonProcessingException {
+        // 보고서, 요청 list 생성
         List<Report> reports = reportService.getAllReports();
         List<Request> requests = requestService.getAllRequests();
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
-        // 기본 통계 데이터를 최근 1개월로 조회
-        System.out.println("기본 통계 컨트롤러");
-        if (startDate == null && endDate == null) {
-            LocalDate end = LocalDate.now();
-            LocalDate start = end.minusMonths(1);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            startDate = start.format(formatter);
-            endDate = end.format(formatter);
-        }
-
-        System.out.println("Start Date: " + startDate);
-        System.out.println("End Date: " + endDate);
-
+        // 보고서 통계
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
         statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
@@ -65,12 +54,12 @@ public class ReportController {
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        return "report/main"; // main.html을 반환
+        return "report/main"; // main.html 반환
     }
 
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
     public String showStatisticPage(Model model) {
-        model.addAttribute("ReportStat", new ReportStat());
+        model.addAttribute("ReportStat", new Report());
         return "report/statistic";  // write.html로 연결
     }
 
@@ -81,6 +70,8 @@ public class ReportController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // startDate와 endDate를 "yyyy-MM-dd" 형식으로 변환
+        // 그 후 마지막날에 1달을 더하고 1일을 다시 뺌 (달마다 마지막 일수가 다름)
+        // (ex endDate = 2024-08-01, +1Month -> 2024-09-01, -1minusDays -> 2024-08-30
         LocalDate start = LocalDate.parse(startDate + "-01");
         LocalDate end = LocalDate.parse(endDate + "-01").plusMonths(1).minusDays(1);
 
@@ -106,7 +97,7 @@ public class ReportController {
 
     @GetMapping("/write") // 보고서 작성 페이지 이동
     public String showCreateForm(Model model) {
-        model.addAttribute("report", new Report());
+        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
         return "report/write";  // write.html로 연결
     }
 
@@ -118,15 +109,13 @@ public class ReportController {
                                @RequestParam("file") MultipartFile file,
                                Model model) {
         try {
+            // report 객체 설정
             Report report = new Report();
-            LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-
             report.setTitle(title);
             report.setContent(content);
             report.setApproverId(approverId);
             report.setCompleteDate(completeDate);
-            report.setCreatedDate(createdDate);
-            report.setStatus("미처리"); // 기본 결재 상태 설정
+
 
             reportService.createReport(report, file);
 
@@ -155,14 +144,12 @@ public class ReportController {
                                @RequestParam("content") String content,
                                @RequestParam("completeDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate completeDate) {
 
+        // report 객체 설정
         Report report = new Report();
-        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정시간 설정
-
         report.setReportId(reportId);
         report.setTitle(title);
         report.setContent(content);
         report.setCompleteDate(completeDate);
-        report.setModifiedDate(modified_date);
 
         reportService.updateReport(report);
         return "redirect:/report/" + reportId;
@@ -173,6 +160,7 @@ public class ReportController {
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {
+            // report 객체 설정
             Report report = new Report();
             report.setReportId(reportId);
             report.setStatus(status);

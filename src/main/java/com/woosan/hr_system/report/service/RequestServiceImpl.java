@@ -1,8 +1,12 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +21,16 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 생성
     public void createRequest(Request request) {
+        // 현재 로그인 한 사용자 employeeId 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            request.setRequesterId(userDetails.getUsername());
+        }
+
+        LocalDateTime requestDate = LocalDateTime.now(); //현재 기준 생성시간 설정
+        request.setRequestDate(requestDate);
+
         requestDAO.createRequest(request);
     }
 
@@ -30,8 +44,16 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getRequestById(requestId);
     }
 
+    @Override // 모든 임원 조회
+    public List<Employee> getEmployees() {
+        return requestDAO.getAllEmployees();
+    }
+
     @Override // 요청 수정
     public void updateRequest(Request request) {
+        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 생성시간 설정
+        request.setModifiedDate(modifiedDate);
+
         requestDAO.updateRequest(request);
     }
 

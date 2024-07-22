@@ -13,6 +13,12 @@ public class Request {
     private LocalDate dueDate;
     private String requestNote;
 
+    private String employeeName; // emplyees 테이블 name컬럼
+
+
+
+
+
 
     // Getters and Setters
     public Long getRequestId() {
@@ -78,4 +84,16 @@ public class Request {
     public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+
+
+
 }

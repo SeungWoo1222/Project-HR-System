@@ -87,7 +87,10 @@
             <textarea id="content" name="content" rows="10" required></textarea><br>
 
             <label for="approverId">결재자:</label>
-            <input type="text" id="approverId" name="approverId" required><br>
+            <input list="employeeNames" id="approverId" name="approverId" required>
+            <datalist id="employeeNames">
+                <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
+            </datalist>
 
             <label for="completeDate">업무 완료 날짜:</label>
             <input type="date" id="completeDate" name="completeDate" required><br>

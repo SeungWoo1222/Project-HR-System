@@ -7,6 +7,13 @@
     <link rel="stylesheet" th:href="@{example.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
         /* 여기에 CSS를 입력 */
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .content-section {
+            width: 48%;
+        }
     </style>
 </th:block>
 
@@ -32,33 +39,44 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-        <h1>보고서 목록</h1>
-        <div id="report-list">
-            <ul>
-                <!-- 컨트롤러에서 가져온 보고서를 표시 -->
-                <li th:each="report : ${reports}">
-                    <a th:href="@{'/report/' + ${report.reportId}}"
-                       th:text="${report.title}"></a>
-                </li>
-            </ul>
+        <div class="flex-container">
+            <div class="content-section">
+                <div style="display: flex; align-items: center;">
+                    <h1 style="margin-right: 20px;">보고서 목록</h1>
+                    <button onclick="location.href='/report/write'">보고서 작성하기</button>
+                </div>
+                <div id="report-list">
+                    <ul>
+                        <!-- 컨트롤러에서 가져온 보고서를 표시 -->
+                        <li th:each="report : ${reports}">
+                            <a th:href="@{'/report/' + ${report.reportId}}"
+                               th:text="${report.title}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="content-section">
+                <div style="display: flex; align-items: center;">
+                    <h1 style="margin-right: 20px;">작성 요청 목록</h1>
+                    <button onclick="location.href='/request/write'">작성 요청하기</button>
+                </div>
+                <div id="report-request-list">
+                    <ul>
+                        <!-- 컨트롤러에서 가져온 보고서 요청을 표시 -->
+                        <li th:each="request : ${requests}">
+                            <a th:href="@{'/request/' + ${request.requestId}}">
+                                <span th:text="${request.requesterId}"></span>님이
+                                <span th:text="${request.employeeId}"></span>님에게 요청하신 보고서입니다.
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <button onclick="location.href='/report/write'">보고서 작성하기</button>
-
-        <h1>작성 요청 목록</h1>
-        <div id="report-request-list">
-            <ul>
-                <!-- 컨트롤러에서 가져온 보고서 요청을 표시 -->
-                <li th:each="request : ${requests}">
-                    <a th:href="@{'/request/' + ${request.requestId}}">
-                        <span th:text="${request.requesterId}"></span>님이
-                        <span th:text="${request.employeeId}"></span>님에게 요청하신 보고서입니다.
-                    </a>
-                </li>
-            </ul>
+        <div style="display: flex; align-items: center;">
+            <h1 style="margin-right: 20px;">보고서 통계</h1>
+            <button onclick="location.href='/report/statistic'">통계 날짜 설정</button>
         </div>
-        <button onclick="location.href='/request/write'">작성 요청하기</button>
-
-        <h1>보고서 통계</h1>
         <!-- 구글 차트 통계 추가 -->
         <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
 

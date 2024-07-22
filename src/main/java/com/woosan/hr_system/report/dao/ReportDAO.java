@@ -36,6 +36,14 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + ".getReportFileById", fileId);
     }
 
+    // 보고서 통계 조회
+    public List<ReportStat> getReportStats(String startDate, String endDate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
+    }
+
     // 보고서 생성
     public void createReport(Report report) {
         sqlSession.insert(NAMESPACE + ".createReport", report);
@@ -81,13 +89,6 @@ public class ReportDAO {
         sqlSession.delete(NAMESPACE + ".deleteFileMetadataByReportId", reportId);
     }
 
-    // 통계
-    public List<ReportStat> getReportStats(String startDate, String endDate) {
-        System.out.println("DAO");
-        Map<String, Object> params = new HashMap<>();
-        params.put("startDate", startDate);
-        params.put("endDate", endDate);
-        return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
-    }
+
 
 }

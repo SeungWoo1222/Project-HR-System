@@ -1,9 +1,14 @@
 package com.woosan.hr_system.report.controller;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.RequestService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,25 +27,25 @@ public class RequestController {
     @Autowired
     private RequestService requestService;
 
+
     @GetMapping("/write") // 요청 생성 페이지 이동
-    public String showRequestForm(Model model) {
-        model.addAttribute("request", new Request());
+    public String showWritePage(Model model) {
+        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
         return "report/request/write";
     }
 
     @PostMapping("/write") // 요청 생성
-    public String createRequest(@RequestParam("employeeId") String employeeId,
+    public String createRequest(@RequestParam("employeeName") String employeeName,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
                                 @RequestParam("requestNote") String requestNote,
                                 Model model) {
         try {
+            // request 객체 설정
             Request request = new Request();
-            LocalDateTime requestDate = LocalDateTime.now(); //현재 기준 생성시간 설정
 
-            request.setEmployeeId(employeeId);
+            request.setEmployeeName(employeeName);
             request.setDueDate(dueDate);
             request.setRequestNote(requestNote);
-            request.setRequestDate(requestDate);
 
             requestService.createRequest(request);
 
@@ -71,15 +76,12 @@ public class RequestController {
                                 @RequestParam("employeeId") String employeeId,
                                 @RequestParam("requestNote") String requestNote,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
-
+        //request 객체 설정
         Request request = new Request();
-        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 생성시간 설정
-
         request.setRequestId(requestId);
         request.setEmployeeId(employeeId);
         request.setRequestNote(requestNote);
         request.setDueDate(dueDate);
-        request.setModifiedDate(modifiedDate);
 
         requestService.updateRequest(request);
         return "redirect:/request/" + requestId;
