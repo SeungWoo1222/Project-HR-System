@@ -39,9 +39,6 @@ public class ReportController {
                               @RequestParam(name = "endDate", required = false) String endDate,
                               Model model) throws JsonProcessingException {
         // 보고서, 요청 list 생성
-
-
-
         // yy-mm-dd 반환 받을 객체 설정
         Report report = new Report();
         report.setFormattedCreatedDate(null);
@@ -53,13 +50,12 @@ public class ReportController {
         List<Report> reports = reportService.getAllReports();
         List<Request> requests = requestService.getAllRequests();
 
-
-
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
         // 보고서 통계
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
+
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
         statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
         for (ReportStat stat : stats) {

@@ -67,6 +67,7 @@ public class RequestController {
     @GetMapping("/edit") // 요청 수정 페이지 이동
     public String editRequest(@RequestParam(name = "requestId") Long requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
+        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
         model.addAttribute("request", request);
         return "report/request/edit";
     }

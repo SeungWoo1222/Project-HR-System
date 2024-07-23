@@ -46,6 +46,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(String startDate, String endDate) {
+
         // 기본 통계 데이터를 최근 1개월로 조회
         if (startDate == null && endDate == null) {
             LocalDate end = LocalDate.now();

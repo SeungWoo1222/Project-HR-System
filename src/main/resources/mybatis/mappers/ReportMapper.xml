@@ -37,6 +37,18 @@
         WHERE report_id = #{reportId}
     </select>
 
+    <!-- 통계 조회 -->
+    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+        SELECT
+            DATE_FORMAT(complete_date, '%Y-%m') AS month,
+            COUNT(status) AS total,
+            SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
+            SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        FROM reports
+        WHERE complete_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY month
+    </select>
+
     <!-- 특정 파일 조회 -->
     <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
         SELECT
@@ -114,15 +126,5 @@
         DELETE FROM report_files WHERE report_id = #{reportId}
     </delete>
 
-    <!-- 통계 조회 -->
-    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
-        SELECT
-            DATE_FORMAT(complete_date, '%Y-%m') AS month,
-            COUNT(status) AS total,
-            SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
-            SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
-        FROM reports
-        WHERE complete_date BETWEEN #{startDate} AND #{endDate}
-        GROUP BY month
-    </select>
+
 </mapper>

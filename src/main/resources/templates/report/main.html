@@ -4,12 +4,13 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{css/layout.css}">
     <style>
         /* 여기에 CSS를 입력 */
         .table-container {
             width: 100%;
             margin-top: 20px;
+            overflow-x: auto; /* 표가 깨지지 않도록 스크롤 추가 */
         }
 
         table {
@@ -48,10 +49,13 @@
         .flex-container {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap; /* 창 크기가 작아지면 flex 아이템들이 줄바꿈 되도록 설정 */
         }
 
         .flex-item {
             width: 48%;
+            min-width: 300px; /* 최소 너비 설정 */
+            margin-bottom: 20px; /* 아래쪽 여백 추가 */
         }
 
         /* 표가 깨지지 않게 하기 위해 제목 최대 너비를 설정 */
@@ -68,8 +72,14 @@
             width: 100px;
             text-align: center;
         }
+
+        /* 반응형 디자인을 위한 미디어 쿼리 */
+        @media (max-width: 768px) {
+            .flex-item {
+                width: 100%;
+            }
+        }
     </style>
-</th:block>
 </th:block>
 
 <th:block layout:fragment="script">

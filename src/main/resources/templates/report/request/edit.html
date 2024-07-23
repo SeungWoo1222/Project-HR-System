@@ -7,6 +7,10 @@
     <link rel="stylesheet" th:href="@{css/layout.css}">
     <style>
         /* 여기에 CSS를 입력 */
+        label, input, textarea, button {
+            display: block;
+            margin: 10px 0;
+        }
     </style>
 </th:block>
 
@@ -23,13 +27,16 @@
         <form action="/request/edit" method="post">
             <input type="hidden" name="requestId" th:value="${request.requestId}">
 
-            <label for="employeeId">사원:</label>
-            <input type="text" id="employeeId" name="employeeId" th:value="${request.employeeId}">
+            <label for="employeeId">작성자</label>
+            <input list="employeeNames" id="employeeId" name="employeeId" required>
+            <datalist id="employeeNames">
+                <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
+            </datalist>
 
-            <label for="dueDate">마감 기한:</label>
+            <label for="dueDate">마감 기한</label>
             <input type="date" id="dueDate" name="dueDate" th:value="${request.dueDate}">
 
-            <label for="requestNote">요청 사항:</label>
+            <label for="requestNote">요청 사항</label>
             <textarea id="requestNote" name="requestNote" th:text="${request.requestNote}"></textarea>
 
             <button type="submit">요청 수정</button>
