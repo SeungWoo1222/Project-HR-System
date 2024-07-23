@@ -10,7 +10,9 @@
         SELECT
             request_id AS requestId,
             requester_id AS requesterId,
-            employee_id AS employeeId
+            employee_id AS employeeId,
+            DATE_FORMAT(due_date, '%y-%m-%d') AS formattedDueDate,
+            DATE_FORMAT(request_date, '%y-%m-%d') AS formattedRequestDate
         FROM report_requests
     </select>
 

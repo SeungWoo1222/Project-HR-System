@@ -21,14 +21,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 생성
     public void createRequest(Request request) {
-        // 현재 로그인 한 사용자 employeeId 추출
+        // 현재 로그인 한 사용자 employeeId를 요청자(requester_id)로 설정
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             request.setRequesterId(userDetails.getUsername());
         }
 
-        LocalDateTime requestDate = LocalDateTime.now(); //현재 기준 생성시간 설정
+        LocalDateTime requestDate = LocalDateTime.now(); //현재 기준 생성 시간 설정
         request.setRequestDate(requestDate);
 
         requestDAO.createRequest(request);
@@ -51,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 수정
     public void updateRequest(Request request) {
-        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 생성시간 설정
+        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
         request.setModifiedDate(modifiedDate);
 
         requestDAO.updateRequest(request);

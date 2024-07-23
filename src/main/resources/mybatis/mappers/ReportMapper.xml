@@ -12,7 +12,7 @@
             employee_id AS employeeId,
             title,
             content,
-            created_date AS createdDate,
+            DATE_FORMAT(created_date, '%y-%m-%d') AS formattedCreatedDate,
             modified_date AS modifiedDate,
             approver_id AS approverId,
             status,
@@ -93,7 +93,7 @@
     <!-- 보고서 수정 -->
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
-        SET title = #{title}, content = #{content}, complete_date = #{completeDate}, modified_date = #{modifiedDate}
+        SET title = #{title}, content = #{content}, approver_id = #{approverId}, complete_date = #{completeDate}, modified_date = #{modifiedDate}
         WHERE report_id = #{reportId}
     </update>
 

@@ -39,8 +39,22 @@ public class ReportController {
                               @RequestParam(name = "endDate", required = false) String endDate,
                               Model model) throws JsonProcessingException {
         // 보고서, 요청 list 생성
+
+
+
+        // yy-mm-dd 반환 받을 객체 설정
+        Report report = new Report();
+        report.setFormattedCreatedDate(null);
+
+        Request request = new Request();
+        request.setFormattedRequestDate(null);
+        request.setFormattedDueDate(null);
+
         List<Report> reports = reportService.getAllReports();
         List<Request> requests = requestService.getAllRequests();
+
+
+
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
@@ -132,8 +146,9 @@ public class ReportController {
     }
 
     @GetMapping("/edit") // 수정 페이지 이동
-    public String editReport(@RequestParam("reportId") Long reportId, Model model) {
+    public String updateReport(@RequestParam("reportId") Long reportId, Model model) {
         Report report = reportService.getReportById(reportId);
+        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
         model.addAttribute("report", report);
         return "report/edit";
     }
@@ -142,6 +157,7 @@ public class ReportController {
     public String updateReport(@RequestParam("reportId") Long reportId,
                                @RequestParam("title") String title,
                                @RequestParam("content") String content,
+                               @RequestParam("approverId") String approverId,
                                @RequestParam("completeDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate completeDate) {
 
         // report 객체 설정
@@ -149,6 +165,7 @@ public class ReportController {
         report.setReportId(reportId);
         report.setTitle(title);
         report.setContent(content);
+        report.setApproverId(approverId);
         report.setCompleteDate(completeDate);
 
         reportService.updateReport(report);

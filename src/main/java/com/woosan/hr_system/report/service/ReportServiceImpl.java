@@ -1,10 +1,13 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,6 +64,13 @@ public class ReportServiceImpl implements ReportService {
         report.setCreatedDate(createdDate);
         report.setStatus("미처리"); // 기본 결재 상태 설정
 
+        // 현재 로그인 한 사용자 employeeId를 보고서 작성자(employee_id)로 설정
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            report.setEmployeeId(userDetails.getUsername());
+        }
+
         reportDAO.createReport(report);
 
         // 파일 업로드
@@ -110,7 +120,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 보고서 수정
     public void updateReport(Report report) {
-        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정시간 설정
+        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정 시간 설정
         report.setModifiedDate(modified_date);
 
         reportDAO.updateReport(report);

@@ -15,6 +15,10 @@ public class Request {
 
     private String employeeName; // emplyees 테이블 name컬럼
 
+    // main.html에 yy-mm-dd로 반환하는 변수
+    private String formattedDueDate;
+    private String formattedRequestDate;
+
 
 
 
@@ -91,6 +95,22 @@ public class Request {
 
     public void setEmployeeName(String employeeName) {
         this.employeeName = employeeName;
+    }
+
+    public String getFormattedRequestDate() {
+        return formattedRequestDate;
+    }
+
+    public void setFormattedRequestDate(String formattedrequestDate) {
+        this.formattedRequestDate = formattedrequestDate;
+    }
+
+    public String getFormattedDueDate() {
+        return formattedDueDate;
+    }
+
+    public void setFormattedDueDate(String formattedDueDate) {
+        this.formattedDueDate = formattedDueDate;
     }
 
 

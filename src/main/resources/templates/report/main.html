@@ -1,26 +1,82 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='보고서')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{example.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
         /* 여기에 CSS를 입력 */
+        .table-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto; /* 테이블의 레이아웃을 자동으로 설정 */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            white-space: nowrap; /* 셀 내용이 한 줄로 표시되도록 설정 */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+            cursor: default;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
         .flex-container {
             display: flex;
             justify-content: space-between;
         }
-        .content-section {
+
+        .flex-item {
             width: 48%;
+        }
+
+        /* 표가 깨지지 않게 하기 위해 제목 최대 너비를 설정 */
+        .title {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        /* 공통 열 스타일 */
+        .narrow-column {
+            width: 100px;
+            text-align: center;
         }
     </style>
 </th:block>
+</th:block>
 
 <th:block layout:fragment="script">
+    <script th:src="@{js/example.js}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages':['bar']});
+        google.charts.load('current', {'packages': ['bar']});
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
@@ -40,40 +96,60 @@
     <div class="content">
         <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
         <div class="flex-container">
-            <div class="content-section">
-                <div style="display: flex; align-items: center;">
-                    <h1 style="margin-right: 20px;">보고서 목록</h1>
-                    <button onclick="location.href='/report/write'">보고서 작성하기</button>
-                </div>
-                <div id="report-list">
-                    <ul>
-                        <!-- 컨트롤러에서 가져온 보고서를 표시 -->
-                        <li th:each="report : ${reports}">
-                            <a th:href="@{'/report/' + ${report.reportId}}"
-                               th:text="${report.title}"></a>
-                        </li>
-                    </ul>
+            <div class="flex-item">
+                <h1 style="margin-right: 20px;">보고서 목록</h1>
+                <button onclick="location.href='/report/write'">보고서 작성하기</button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th class="title">제목</th>
+                            <th class="narrow-column">결재자</th>
+                            <th class="narrow-column">결재 상태</th>
+                            <th class="narrow-column">작성일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
+                            th:onclick="'location.href=\'/report/' + ${report.reportId} + '\';'">
+                            <td class="title" th:text="${report.title}"></td>
+                            <td class="narrow-column" th:text="${report.approverId}"></td>
+                            <td class="narrow-column" th:text="${report.status}"></td>
+                            <td class="narrow-column" th:text="${report.formattedCreatedDate}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="content-section">
-                <div style="display: flex; align-items: center;">
-                    <h1 style="margin-right: 20px;">작성 요청 목록</h1>
-                    <button onclick="location.href='/request/write'">작성 요청하기</button>
-                </div>
-                <div id="report-request-list">
-                    <ul>
-                        <!-- 컨트롤러에서 가져온 보고서 요청을 표시 -->
-                        <li th:each="request : ${requests}">
-                            <a th:href="@{'/request/' + ${request.requestId}}">
-                                <span th:text="${request.requesterId}"></span>님이
-                                <span th:text="${request.employeeId}"></span>님에게 요청하신 보고서입니다.
-                            </a>
-                        </li>
-                    </ul>
+
+            <!-- 작성 요청 목록 -->
+            <div class="flex-item">
+                <h1 style="margin-right: 20px;">작성 요청 목록</h1>
+                <button onclick="location.href='/request/write'">작성 요청하기</button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th class="narrow-column">요청자</th>
+                            <th class="narrow-column">마감 기한</th>
+                            <th class="narrow-column">요청 일자</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
+                            th:onclick="openModal('/request/' + this.getAttribute('requestId'))">
+                            <td class="narrow-column" th:text="${request.requesterId}"></td>
+                            <td class="narrow-column" th:text="${request.formattedDueDate}"></td>
+                            <td class="narrow-column" th:text="${request.formattedRequestDate}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div style="display: flex; align-items: center;">
+
+        <!-- 보고서 통계 -->
+        <div style="display: flex; align-items: center; margin-top: 20px;">
             <h1 style="margin-right: 20px;">보고서 통계</h1>
             <button onclick="location.href='/report/statistic'">통계 날짜 설정</button>
         </div>

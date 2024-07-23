@@ -16,6 +16,8 @@ public class Report {
     private String rejectReason;
     private LocalDate completeDate;
 
+    private String formattedCreatedDate; // main.html에 yy-mm-dd로 반환하는 변수
+
 
     // Getters and Setters
     public Long getReportId() {
@@ -104,5 +106,13 @@ public class Report {
 
     public void setFileId(Long filePath) {
         this.fileId = filePath;
+    }
+
+    public String getFormattedCreatedDate() {
+        return formattedCreatedDate;
+    }
+
+    public void setFormattedCreatedDate(String formattedCreatedDate) {
+        this.formattedCreatedDate = formattedCreatedDate;
     }
 }
