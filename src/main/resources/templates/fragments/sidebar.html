@@ -40,11 +40,11 @@
                     <li><a th:href="@{/employee/resignation}">- 퇴사 관리</a></li>
                 </ul>
             </li>
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/performance-management.png" alt="" width="20"> 성과 관리</a></li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</a></li>
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/recruitment-and-selection.png" alt="" width="20"> 채용 및 선발</a></li>
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/training-and-development.png" alt="" width="20"> 교육 및 개발</a></li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 보상 및 복리후생</a></li>
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img src="/images/icons/performance-management.png" alt="" width="20"> 성과 관리</a></li>
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img src="/images/icons/recruitment-and-selection.png" alt="" width="20"> 채용 및 선발</a></li>
+            <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img src="/images/icons/training-and-development.png" alt="" width="20"> 교육 및 개발</a></li>
             <!-- SA 부서 -->
             <li sec:authorize="principal.department == 'SA'"><a th:href="@{/}"><img src="/images/icons/.png" alt="" width="20"> 영업부서 예시</a></li>
             <li sec:authorize="principal.department == 'SA'"><a th:href="@{/}"><img src="/images/icons/.png" alt="" width="20"> 영업부서 예시</a></li>

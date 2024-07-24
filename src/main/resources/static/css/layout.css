@@ -239,3 +239,10 @@ body {
  .list tbody tr:hover {
      background-color: #C3E8FB;
  }
+
+ /* Text styles */
+.disabled {
+    text-decoration: line-through !important;
+    pointer-events: none;
+    color: gray !important;
+}
