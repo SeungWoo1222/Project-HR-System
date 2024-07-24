@@ -10,10 +10,16 @@
         SELECT
             request_id AS requestId,
             requester_id AS requesterId,
+            report_id AS reportId,
             employee_id AS employeeId,
             DATE_FORMAT(due_date, '%y-%m-%d') AS formattedDueDate,
             DATE_FORMAT(request_date, '%y-%m-%d') AS formattedRequestDate
         FROM report_requests
+        <where>
+            <if test="requesterId != null">
+                requester_id = #{requesterId}
+            </if>
+        </where>
     </select>
 
     <!-- 특정 요청 조회 -->

@@ -18,6 +18,12 @@
             status,
             reject_reason AS rejectReason
         FROM reports
+--      approverId가 정의된 경우 -> 내 결재 목록 반환, 아닌 경우, 기본 report 조회
+        <where>
+            <if test="approverId != null">
+                approver_id = #{approverId}
+            </if>
+        </where>
     </select>
 
     <!-- 특정 보고서 조회 -->

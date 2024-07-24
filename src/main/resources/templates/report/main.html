@@ -4,7 +4,7 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
     <style>
         /* 여기에 CSS를 입력 */
         .table-container {
@@ -32,7 +32,6 @@
         }
 
         tr:hover {
-            background-color: #f5f5f5;
             cursor: pointer;
         }
 
@@ -83,7 +82,6 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{js/example.js}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages': ['bar']});
@@ -100,6 +98,7 @@
             chart.draw(data, google.charts.Bar.convertOptions(options));
         }
     </script>
+    <script th:src="@{/js/report.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -110,18 +109,21 @@
                 <h1 style="margin-right: 20px;">보고서 목록</h1>
                 <button onclick="location.href='/report/write'">보고서 작성하기</button>
                 <div class="table-container">
-                    <table>
+                    <table class="list">
                         <thead>
                         <tr>
                             <th class="title">제목</th>
-                            <th class="narrow-column">결재자</th>
+                            <th class="">결재자</th>
                             <th class="narrow-column">결재 상태</th>
                             <th class="narrow-column">작성일</th>
                         </tr>
                         </thead>
                         <tbody>
+<!--                        <tr th:each="report : ${reports}" th:reportId="${report.reportId}"-->
+<!--                            th:onclick="'location.href=\'/report/' + ${report.reportId} + '\';'">-->
+
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
-                            th:onclick="'location.href=\'/report/' + ${report.reportId} + '\';'">
+                            th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
                             <td class="title" th:text="${report.title}"></td>
                             <td class="narrow-column" th:text="${report.approverId}"></td>
                             <td class="narrow-column" th:text="${report.status}"></td>

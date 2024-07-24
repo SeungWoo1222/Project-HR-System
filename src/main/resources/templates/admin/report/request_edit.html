@@ -24,11 +24,11 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>요청 수정</h1>
-        <form action="/request/edit" method="post">
+        <form action="/admin/edit" method="post">
             <input type="hidden" name="requestId" th:value="${request.requestId}">
 
             <label for="employeeId">작성자</label>
-            <input list="employeeNames" id="employeeId" name="employeeId" required>
+            <input list="employeeNames" id="employeeId" name="employeeId" th:value="${request.employeeId}">
             <datalist id="employeeNames">
                 <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
             </datalist>

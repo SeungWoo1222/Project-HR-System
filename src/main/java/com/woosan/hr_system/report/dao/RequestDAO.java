@@ -28,6 +28,11 @@ public class RequestDAO {
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
     }
 
+    // 내가 작성한 요청 조회
+    public List<Request> getMyRequests(String requesterId) {
+        return sqlSession.selectList(NAMESPACE + ".getAllRequests", requesterId);
+    }
+
     // 모든 사원 조회
     public List<Employee> getAllEmployees() {
         return sqlSession.selectList(NAMESPACE + ".getAllEmployees");
@@ -73,4 +78,6 @@ public class RequestDAO {
     public List<Request> getReportRequestsByEmployeeId(String employeeId) {
         return sqlSession.selectList(NAMESPACE + ".getReportRequestsByEmployeeId", employeeId);
     }
+
+
 }

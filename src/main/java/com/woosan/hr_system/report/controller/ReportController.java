@@ -70,7 +70,7 @@ public class ReportController {
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
     public String showStatisticPage(Model model) {
         model.addAttribute("ReportStat", new Report());
-        return "report/statistic";  // write.html로 연결
+        return "report/statistic";
     }
 
     @GetMapping("/stats") // 통계 날짜 설정
@@ -93,17 +93,7 @@ public class ReportController {
         return "redirect:/report/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
     }
 
-    @GetMapping("/{reportId}") // 특정 보고서 조회
-    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
-        Report report = reportService.getReportById(reportId);
-        model.addAttribute("report", report);
 
-        if (report.getFileId() != null) {
-            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
-            model.addAttribute("reportFile", reportFile);
-        }
-        return "report/view";
-    }
 
     @GetMapping("/write") // 보고서 작성 페이지 이동
     public String showCreateForm(Model model) {
@@ -168,26 +158,9 @@ public class ReportController {
         return "redirect:/report/" + reportId;
     }
 
-    @PostMapping("/approve") // 결재 처리
-    public String approveReport(@RequestParam("reportId") Long reportId,
-                                @RequestParam("status") String status,
-                                @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
-        try {
-            // report 객체 설정
-            Report report = new Report();
-            report.setReportId(reportId);
-            report.setStatus(status);
-            report.setRejectReason(rejectionReason);
-
-            reportService.updateApprovalStatus(report);
-            return "redirect:/report/main";
-        } catch (Exception e) {
-            return "error"; // 에러 메시지 표시
-        }
-    }
-
     @DeleteMapping("/delete/{reportId}") // 보고서 삭제
-    public String deleteReport(@PathVariable("reportId") Long id, RedirectAttributes redirectAttributes) {
+    public String deleteReport(@PathVariable("reportId") Long id,
+                               RedirectAttributes redirectAttributes) {
         reportService.deleteReport(id);
         return "redirect:/report/main";
     }

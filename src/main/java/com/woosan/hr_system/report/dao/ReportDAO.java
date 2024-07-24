@@ -36,6 +36,15 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + ".getReportFileById", fileId);
     }
 
+    // 결재할 보고서 조회
+    public List<Report> getPendingApprovalReports(String approverId) {
+        // approverId 설정(Mapper에서 approverId의 유무를 가리기 위함)
+        Map<String, Object> params = new HashMap<>();
+        params.put("approverId", approverId);
+
+        return sqlSession.selectList(NAMESPACE + ".getAllReports");
+    }
+
     // 보고서 통계 조회
     public List<ReportStat> getReportStats(String startDate, String endDate) {
         Map<String, Object> params = new HashMap<>();

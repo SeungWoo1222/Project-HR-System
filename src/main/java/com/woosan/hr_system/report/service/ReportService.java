@@ -13,9 +13,10 @@ import com.woosan.hr_system.report.model.FileMetadata;
 
 public interface ReportService {
     // 조회 관련 메소드
-    List<Report> getAllReports();
-    Report getReportById(Long reportId);
-    FileMetadata getReportFileById(Long fileId);
+    List<Report> getAllReports(); // 모든 리포트 조회
+    Report getReportById(Long reportId); // 특정 리포트 조회
+    FileMetadata getReportFileById(Long fileId); // 파일 조회
+    List<Report> getPendingApprovalReports(); // 결재할 보고서 목록 조회
 
     // 생성 관련 메소드
     void createReport(Report report, MultipartFile file) throws IOException;

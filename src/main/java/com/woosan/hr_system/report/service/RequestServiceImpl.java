@@ -39,6 +39,19 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getAllRequests();
     }
 
+    @Override // 내가 작성한 요청 조회
+    public List<Request> getMyRequests() {
+        // 내 employee_id를 기반으로 요청자(requester_id) 설정
+        String requesterId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            requesterId = userDetails.getUsername();
+        }
+
+        return requestDAO.getMyRequests(requesterId);
+    }
+
     @Override // 특정 요청 조회
     public Request getRequestById(Long requestId) {
         return requestDAO.getRequestById(requestId);
@@ -61,6 +74,7 @@ public class RequestServiceImpl implements RequestService {
     public void deleteRequest(Long requestId) {
         requestDAO.deleteRequest(requestId);
     }
+}
 
 
 
@@ -101,4 +115,4 @@ public class RequestServiceImpl implements RequestService {
 //    public List<ReportRequest> getReportRequestsByEmployeeId(String employeeId) {
 //        return reportRequestDAO.getReportRequestsByEmployeeId(employeeId);
 //    }
-}
+

@@ -59,6 +59,22 @@ public class ReportServiceImpl implements ReportService {
         return reportDAO.getReportStats(startDate, endDate);
     }
 
+    @Override // 결재할 보고서 조회
+    public List<Report> getPendingApprovalReports() {
+        // admin에서 보고서 조회할 경우
+        // 로그인한 계정 기준 employee_id를 approvalId로 설정 -> Mapper에서 결재목록을 반환해줌
+        String approvalId = null;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            approvalId = userDetails.getUsername();
+        }
+
+        return reportDAO.getPendingApprovalReports(approvalId);
+
+    }
+
     @Override // 보고서 생성
     public void createReport(Report report, MultipartFile file) throws IOException {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
