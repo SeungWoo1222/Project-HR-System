@@ -67,6 +67,18 @@ public class EmployeeController {
         model.addAttribute("employee", employee);
         return "employee/detail";
     }
+
+    @GetMapping("/myInfo") // 내 정보 조회
+    public String getMyInfo(Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeService.getAuthenticatedUser().getUsername());
+        if (employee == null) {
+            return "error/404";
+        }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("employee", employee);
+        return "employee/myInfo";
+    }
     // 조회 관련 로직 end-point
 
     // 등록 관련 로직 start-point

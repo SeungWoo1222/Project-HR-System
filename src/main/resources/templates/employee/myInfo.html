@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 정보 관리')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <img class="employee-picture" th:src="${pictureUrl}"/>
+        <table>
+            <tr>
+                <th>사원 ID</th>
+                <td th:text="${employee.employeeId}">사원 ID</td>
+            </tr>
+            <tr>
+                <th>이름</th>
+                <td th:text="${employee.name}">이름</td>
+            </tr>
+            <tr>
+                <th>주민등록번호</th>
+                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}">주민등록번호</td>
+            </tr>
+            <tr>
+                <th>전화번호</th>
+                <td th:text="${employee.phone}">전화번호</td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td th:text="${employee.email}">이메일</td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td th:text="${employee.address}">주소</td>
+            </tr>
+            <tr>
+                <th>상세 주소</th>
+                <td th:text="${employee.detailAddress}">상세 주소</td>
+            </tr>
+            <tr>
+                <th>부서</th>
+                <td th:text="${employee.department.name}">부서</td>
+            </tr>
+            <tr>
+                <th>직급</th>
+                <td th:text="${employee.position.name}">직급</td>
+            </tr>
+            <tr>
+                <th>입사일</th>
+                <td th:text="${employee.hireDate}">입사일</td>
+            </tr>
+            <tr>
+                <th>상태</th>
+                <td th:text="${employee.status}">상태</td>
+            </tr>
+            <tr>
+                <th>남은 연차</th>
+                <td th:text="${employee.remainingLeave}">남은 연차</td>
+            </tr>
+            <tr>
+                <th>마지막 수정일</th>
+                <td th:text="${employee.lastModified}">마지막 수정일</td>
+            </tr>
+            <tr>
+                <th>수정자</th>
+                <td th:text="${employee.modifiedBy}">수정자</td>
+            </tr>
+        </table>
+        <button type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="window.location.href = '/employee/edit/myInfo/' + this.getAttribute('employeeId')">정보 수정</button>
+    </div>
+</div>
+</html>

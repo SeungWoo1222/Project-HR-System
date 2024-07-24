@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.employee.model.Employee;
@@ -13,6 +14,7 @@ public interface EmployeeService {
     PageResult<Employee> searchEmployees(PageRequest pageRequest);
     Employee getEmployeeById(String employeeId);
     Employee getEmployeeWithResignation(String employeeId);
+    CustomUserDetails getAuthenticatedUser();
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
