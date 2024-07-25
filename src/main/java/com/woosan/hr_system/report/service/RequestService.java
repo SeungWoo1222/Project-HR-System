@@ -11,6 +11,7 @@ public interface RequestService {
     List<Request> getAllRequests();
     Request getRequestById(Long requestId);
     List<Request> getMyRequests();
+    List<Employee> getEmployeesByDepartment(String departmentId);
 
     void updateRequest(Request request);
     void deleteRequest(Long requestId);

@@ -34,6 +34,11 @@ public class RequestServiceImpl implements RequestService {
         requestDAO.createRequest(request);
     }
 
+    @Override
+    public List<Employee> getEmployeesByDepartment(String departmentId) {
+        return requestDAO.getEmployeesByDepartment(departmentId);
+    }
+
     @Override // 모든 요청 조회
     public List<Request> getAllRequests() {
         return requestDAO.getAllRequests();

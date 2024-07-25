@@ -7,13 +7,15 @@ public class Request {
     private Long requestId;
     private Long reportId;
     private String requesterId;
-    private String employeeId;
+    private String writerId;
     private LocalDateTime requestDate;
     private LocalDateTime modifiedDate;
     private LocalDate dueDate;
     private String requestNote;
 
-    private String employeeName; // emplyees 테이블 name컬럼
+    private String employeeId;
+    private String name;
+    private String departmentId;
 
     // main.html에 yy-mm-dd로 반환하는 변수
     private String formattedDueDate;
@@ -41,12 +43,12 @@ public class Request {
         this.requesterId = requesterId;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public String getWriterId() {
+        return writerId;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public void setWriterId(String writerId) {
+        this.writerId = writerId;
     }
 
     public LocalDateTime getRequestDate() {
@@ -89,14 +91,6 @@ public class Request {
         this.reportId = reportId;
     }
 
-    public String getEmployeeName() {
-        return employeeName;
-    }
-
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
-    }
-
     public String getFormattedRequestDate() {
         return formattedRequestDate;
     }
@@ -113,7 +107,29 @@ public class Request {
         this.formattedDueDate = formattedDueDate;
     }
 
+    public String getDepartmentId() {
+        return departmentId;
+    }
 
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 
 }

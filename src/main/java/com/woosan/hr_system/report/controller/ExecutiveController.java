@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
@@ -34,6 +35,42 @@ public class ExecutiveController {
     private EmployeeDAO employeeDAO;
     @Autowired
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
+
+    @GetMapping("/write") // 요청 생성 페이지 이동
+    public String showWritePage(Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
+        return "admin/report/request_write";
+    }
+
+    @GetMapping("/employee") // 부서 기반 임원 정보 조회
+    @ResponseBody
+    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
+        return employeeDAO.getEmployeesByDepartment(departmentId);
+    }
+
+    @PostMapping("/write") // 요청 생성
+    public String createRequest(@RequestParam("writerId") String writerId,
+                                @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
+                                @RequestParam("requestNote") String requestNote,
+                                Model model) {
+        try {
+            // request 객체 설정
+            Request request = new Request();
+
+//            request.setEmployeeName(writerId);
+            request.setDueDate(dueDate);
+            request.setRequestNote(requestNote);
+
+            requestService.createRequest(request);
+
+            model.addAttribute("message", "보고서 작성 완료");
+            return "redirect:/admin/request/main";
+        } catch (DateTimeParseException e) {
+            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
+            return "/admin/report/request_write";
+        }
+    }
 
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
@@ -110,13 +147,13 @@ public class ExecutiveController {
 
     @PostMapping("/edit") // 요청 수정
     public String updateRequest(@RequestParam("requestId") Long requestId,
-                                @RequestParam("employeeId") String employeeId,
+                                @RequestParam("writerId") String writerId,
                                 @RequestParam("requestNote") String requestNote,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
         //request 객체 설정
         Request request = new Request();
         request.setRequestId(requestId);
-        request.setEmployeeId(employeeId);
+        request.setWriterId(writerId);
         request.setRequestNote(requestNote);
         request.setDueDate(dueDate);
 
@@ -124,35 +161,7 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
-    @GetMapping("/write") // 요청 생성 페이지 이동
-    public String showWritePage(Model model) {
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("employees", employees); // employees 목록 추가
-        return "admin/report/request_write";
-    }
 
-    @PostMapping("/write") // 요청 생성
-    public String createRequest(@RequestParam("employeeName") String employeeName,
-                                @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
-                                @RequestParam("requestNote") String requestNote,
-                                Model model) {
-        try {
-            // request 객체 설정
-            Request request = new Request();
-
-            request.setEmployeeName(employeeName);
-            request.setDueDate(dueDate);
-            request.setRequestNote(requestNote);
-
-            requestService.createRequest(request);
-
-            model.addAttribute("message", "보고서 작성 완료");
-            return "redirect:/admin/request/main";
-        } catch (DateTimeParseException e) {
-            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
-            return "/admin/report/request_write";
-        }
-    }
 
     @DeleteMapping("/delete/{requestId}") // 요청 삭제
     public String deleteRequest(@PathVariable("requestId") Long id, RedirectAttributes redirectAttributes) {

@@ -11,10 +11,11 @@
             request_id AS requestId,
             requester_id AS requesterId,
             report_id AS reportId,
-            employee_id AS employeeId,
+            writer_id AS writerId,
             DATE_FORMAT(due_date, '%y-%m-%d') AS formattedDueDate,
             DATE_FORMAT(request_date, '%y-%m-%d') AS formattedRequestDate
         FROM report_requests
+--         getMyRequests메소드로 조회 했다면 requesterId가 정의 돼있음 -> 내 requester_id에 맞는 요청을 조회해옴
         <where>
             <if test="requesterId != null">
                 requester_id = #{requesterId}
@@ -26,26 +27,20 @@
     <select id="getRequestById" parameterType="long" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
             request_id AS requestId,
-            employee_id AS employeeId,
+            writer_id AS writerId,
             due_date AS dueDate,
             request_note AS requestNote
         FROM report_requests
         WHERE request_id = #{requestId}
     </select>
 
-    <!-- 모든 사원 조회 -->
-    <select id="getAllEmployees" resultType="com.woosan.hr_system.employee.model.Employee">
-        SELECT
-            employee_id AS employeeId,
-            name AS name
-        FROM employees
-    </select>
+
 
     <!-- 요청 생성 -->
     <insert id="createRequest" parameterType="com.woosan.hr_system.report.model.Request">
         INSERT INTO report_requests
         (requester_id,
-         employee_id,
+         writer_id,
          due_date,
          request_note,
          request_date)
@@ -56,13 +51,14 @@
             #{requestNote},
             #{requestDate}
         FROM employees e
-        WHERE e.name = #{employeeName}
+--         나중에 바꾸자
+        WHERE e.name = #{writerId}
     </insert>
 
     <!-- 요청 수정 -->
     <update id="updateRequest" parameterType="com.woosan.hr_system.report.model.Request">
         UPDATE report_requests
-        SET employee_id = #{employeeId}, due_date = #{dueDate}, request_note = #{requestNote} ,modified_date = #{modifiedDate}
+        SET writer_id = #{writerId}, due_date = #{dueDate}, request_note = #{requestNote} ,modified_date = #{modifiedDate}
         WHERE request_id = #{requestId}
     </update>
 

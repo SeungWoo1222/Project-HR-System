@@ -18,6 +18,11 @@ public class RequestDAO {
         sqlSession.insert(NAMESPACE + ".createRequest", request);
     }
 
+    // 부서 기반 임원 정보 조회
+    public List<Employee> getEmployeesByDepartment(String departmentId) {
+        return sqlSession.selectList(NAMESPACE + ".getEmployeesByDepartment");
+    }
+
     // 요청 전체 조회
     public List<Request> getAllRequests() {
         return sqlSession.selectList(NAMESPACE + ".getAllRequests");

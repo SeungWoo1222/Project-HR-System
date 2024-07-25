@@ -25,10 +25,10 @@
     <div class="content">
         <h1>요청 수정</h1>
         <form action="/admin/request/edit" method="post">
-            <input type="hidden" name="requestId" th:value="${request.employeeId}">
+            <input type="hidden" name="requestId" th:value="${request.requestId}">
 
-            <label for="employeeId">작성자</label>
-            <input list="employeeNames" id="employeeId" name="employeeId" th:value="${request.employeeId}">
+            <label for="writerId">작성자</label>
+            <input list="employeeNames" id="writerId" name="employeeId" th:value="${request.writerId}">
             <datalist id="employeeNames">
                 <option th:each="employee : ${employees}" th:value="${employee.employeeId}" th:text="${employee.name}"></option>
             </datalist>

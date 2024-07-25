@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
+      layout:decorate="~{fragments/layout :: layout(title='요청 작성')}">
 
 <th:block layout:fragment="css">
   <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
@@ -11,7 +11,32 @@
 
 <th:block layout:fragment="script">
   <script th:src="@{/js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
   <script>
+    function loadEmployees() {
+      var departmentId = $('#departmentId').val();
+      console.log(departmentId);
+
+      $.ajax({
+        url: `/admin/request/employee`, // API 엔드포인트를 설정
+        method: 'GET',
+        data: { departmentId: departmentId },
+        success: function(data) {
+          const select = $('#writerId');
+          select.empty(); // 기존 옵션 초기화
+          select.append('<option value="" disabled selected>작성자를 선택하세요</option>');
+          data.forEach(employee => {
+            const option = $('<option></option>')
+                    .val(employee.employeeId) // value를 employeeId로 설정
+                    .text(employee.name);
+            select.append(option);
+          });
+        },
+        error: function(error) {
+          console.error('Error:', error);
+        }
+      });
+    }
   </script>
 </th:block>
 
@@ -20,11 +45,22 @@
     <h1>보고서 작성 요청</h1>
     <form method="post" action="/admin/request/write" enctype="multipart/form-data">
 
-      <label for="employeeName">보고서 작성자:</label>
-      <input list="employeeNames" id="employeeName" name="employeeName" required>
-      <datalist id="employeeNames">
-        <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
-      </datalist>
+      <label for="departmentId">부서 선택:</label>
+      <select id="departmentId" name="departmentId" onchange="loadEmployees()" required>
+        <option value="" disabled selected>부서를 선택하세요</option>
+        <option value="PR">생산</option>
+        <option value="QC">품질 관리</option>
+        <option value="SA">영업</option>
+        <option value="MK">마케팅</option>
+        <option value="FI">재무</option>
+        <option value="HR">인사</option>
+        <option value="RD">연구개발</option>
+      </select><br>
+
+      <label for="writerId">보고서 작성자:</label>
+      <select id="writerId" name="employeeId" required>
+        <option value="" disabled selected>작성자를 선택하세요</option>
+      </select><br>
 
       <label for="dueDate">마감 기한:</label>
       <input type="date" id="dueDate" name="dueDate" required><br>

@@ -68,7 +68,7 @@
                         <tbody>
                         <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
                             th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
-                            <td th:text="${request.employeeId}"></td>
+                            <td th:text="${request.writerId}"></td>
                             <td th:text="${request.reportId}"></td>
                             <td th:text="${request.formattedDueDate}"></td>
                             <td th:text="${request.formattedRequestDate}"></td>
