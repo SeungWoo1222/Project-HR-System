@@ -1,11 +1,9 @@
 // 유효성 검사
-function validationFrom(event) {
+function validationPassword(event) {
     const password = document.getElementById('password').value;
     const errorMessage = document.getElementById('error-message');
     if (!password) {
-
         errorMessage.textContent = '비밀번호를 입력해주세요.';
-
         return false;
     }
     errorMessage.textContent = '';
@@ -14,10 +12,9 @@ function validationFrom(event) {
 }
 
 // Ajax 요청
-function submitForm(event) {
+function submitPassword(event) {
     event.preventDefault(); // 기본 폼 제출 방지
-    if (!validationFrom()) {
-
+    if (!validationPassword()) {
         return;
     }
 

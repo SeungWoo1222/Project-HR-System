@@ -152,6 +152,8 @@ public class EmployeeController {
     @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
     public String editMyInfoForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/edit/myInfo";
     }

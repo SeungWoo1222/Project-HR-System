@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 정보 관리')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 정보 조회')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
@@ -72,7 +72,7 @@
                 <td th:text="${employee.modifiedBy}">수정자</td>
             </tr>
         </table>
-        <button type="button" class="btn" data-url="/employee/edit/myInfo/" onclick="openModal('/auth/pwd?redirectUrl='+ encodeURIComponent(this.getAttribute('data-url')))">정보 수정</button>
+        <button type="button" class="btn" data-url="/employee/edit/myInfo/" th:onclick="openModal('/auth/pwd?redirectUrl='+ encodeURIComponent(this.getAttribute('data-url')))">정보 수정</button>
     </div>
 </div>
 </html>

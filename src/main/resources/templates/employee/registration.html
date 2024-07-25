@@ -53,12 +53,24 @@
             return false;
 
           }
+
+          // 파일 형식 확인
           const fileTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp', 'image/heif', 'image/heif'];
           if (!fileTypes.includes(file.type)) {
             alert("파일 형식이 맞지 않습니다.");
             obj.value = ""
             return false;
           }
+
+          // 파일명 업데이트
+          document.getElementById('file-name').textContent = file.name;
+
+          // 이미지 미리보기 업데이트
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            document.getElementById('employee-picture').src = e.target.result;
+          }
+          reader.readAsDataURL(file);
         }
       }
     }

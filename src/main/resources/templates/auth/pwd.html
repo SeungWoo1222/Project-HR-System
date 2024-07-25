@@ -9,7 +9,7 @@
 <div>
     <div>
         <h2>비밀번호 확인</h2>
-        <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitForm(event)">
+        <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitPassword(event)">
             <div class="form-group">
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" name="password"/>

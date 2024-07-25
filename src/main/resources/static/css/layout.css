@@ -246,3 +246,23 @@ body {
     pointer-events: none;
     color: gray !important;
 }
+
+/* Input File styles */
+.invisible-input-file {
+    display: none;
+}
+
+.input-file-btn{
+    font-size: 13px;
+    padding: 10px;
+    background-color: #cfedfc;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.input-file-btn:hover {
+    background-color: #18a8f1;
+    color: white;
+}

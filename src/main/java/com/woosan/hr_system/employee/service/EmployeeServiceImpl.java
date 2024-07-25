@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.auth.AuthService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.auth.CustomUserDetails;
@@ -30,6 +31,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthService authService;
 
     // 조회 관련 로직 start-point
     @Override // 모든 사원 정보 조회
@@ -92,15 +95,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeDAO.updateEmployee(employee);
     }
 
-    @Override // 사원 정보 일부 수정 (변경 가능한 column - password, name, birth, phone, email, address, detailed_address)
+    @Override // 사원 정보 일부 수정 (변경 가능한 column - password, name, phone, email, address, detailed_address)
     public void updateEmployeePartial(String employeeId, Map<String, Object> updates) {
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee != null) {
             if (updates.containsKey("name")) {
                 employee.setName((String)updates.get("name"));
-            }
-            if (updates.containsKey("birth")) {
-                employee.setBirth((String)updates.get("birth"));
             }
             if (updates.containsKey("phone")) {
                 employee.setPhone((String)updates.get("phone"));
@@ -115,8 +115,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.setDetailAddress((String)updates.get("detailed_address"));
             }
 
+            // 수정한 사원 아이디, 날짜 시간 기록
             employee.setLastModified(LocalDateTime.now());
-            // employee.setModifiedBy(세션에서 현재 계정 employee 아이디); > 스프링 세큐리티 작업 후 코드 수정
+            employee.setModifiedBy(authService.getAuthenticatedUser().getUsername());
 
             employeeDAO.updateEmployee(employee);
         }
