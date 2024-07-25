@@ -27,10 +27,9 @@ public class AuthService {
 
     // 비밀번호 검증 로직
     public String verifyPassword(String enteredPassword, String employeeId) {
-        String hashedPassword = passwordEncoder.encode(enteredPassword);
         if (employeeDAO.getPasswordCount(employeeId) >= 5) { // 비밀번호 카운트 초과
             return "exceed";
-        } else if (getAuthenticatedUser().getPassword().equals(hashedPassword)) { // 비밀번호 일치
+        } else if (passwordEncoder.matches(enteredPassword, employeeDAO.getEmployeeById(employeeId).getPassword())) { // 비밀번호 일치
             employeeDAO.removePasswordCount(employeeId);
             return "match";
         } else { // 비밀번호 불일치

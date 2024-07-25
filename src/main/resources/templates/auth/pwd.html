@@ -6,20 +6,14 @@
     <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
 </th:block>
 
-<th:block layout:fragment="script">
-    <script>
-    </script>
-</th:block>
-
 <div>
     <div>
         <h2>비밀번호 확인</h2>
-        <form id="passwordForm" onsubmit="submitForm(event)">
+        <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitForm(event)">
             <div class="form-group">
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" name="password"/>
-                <input type="hidden" id="employeeId" name="employeeId" th:value="${employeeId}"/>
-                <input type="hidden" id="url" name="url" th:value="${url}"/>
+                <input type="hidden" id="url" name="url" th:value="${redirectUrl}"/>
             </div>
             <div class="error-message" id="error-message"></div>
             <button type="submit" class="btn">확인</button>

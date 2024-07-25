@@ -52,21 +52,20 @@ public class AuthController {
     }
 
     @GetMapping("/auth/pwd") // 비밀번호 검증 페이지 이동
-    public String viewPasswordForm(@RequestParam("employeeId") String employeeId, @RequestParam("redirectUrl") String redirectUrl, Model model) {
-        model.addAttribute("employeeId", employeeId);
+    public String viewPasswordForm(@RequestParam("redirectUrl") String redirectUrl, Model model) {
         model.addAttribute("redirectUrl", redirectUrl);
         return "/auth/pwd";
     }
 
     @PostMapping("/auth/verifyPassword") // 비밀번호 인증 로직
-    public ResponseEntity<String> verifyPassword(@RequestParam String password, @RequestParam String url) {
+    public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         String result = authService.verifyPassword(password, employeeId);
         return switch (result) {
             case "match" -> ResponseEntity.ok(url + "/" + employeeId);
             case "mismatch" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + employeeDAO.getPasswordCount(employeeId) + " / 5 입니다.");
-            case "exceed" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과입니다. 관리자에게 문의해주세요.");
-            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 확인 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+            case "exceed" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 확인 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
         };
     }
 }

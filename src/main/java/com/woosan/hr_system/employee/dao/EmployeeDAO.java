@@ -69,7 +69,7 @@ public class EmployeeDAO implements SearchService<Employee> {
     }
 
     public int getPasswordCount(String employeeId) {  // 비밀번호 카운트 조회
-        return sqlSession.selectOne(NAMESPACE + "employeeId", employeeId);
+        return sqlSession.selectOne(NAMESPACE + "getPasswordCount", employeeId);
     }
 
     public void addPasswordCount(String employeeId) { // 비밀번호 +1 수정

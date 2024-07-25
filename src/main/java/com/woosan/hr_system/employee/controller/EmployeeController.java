@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.AuthService;
 import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.search.PageRequest;
@@ -34,6 +35,8 @@ public class EmployeeController {
 
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private AuthService authService;
 
     // 조회 관련 로직 start-point
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -66,6 +69,19 @@ public class EmployeeController {
         model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/detail";
+    }
+
+    @GetMapping("/myInfo") // 내 정보 조회
+    public String viewMyInfo(Model model) {
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "error/404";
+        }
+        String pictureUrl = s3Service.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("employee", employee);
+        return "employee/myInfo";
     }
     // 조회 관련 로직 end-point
 
@@ -131,6 +147,13 @@ public class EmployeeController {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
         return "employee/edit";
+    }
+
+    @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
+    public String editMyInfoForm(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        model.addAttribute("employee", employee);
+        return "employee/edit/myInfo";
     }
 
     @PostMapping("/update") // 사원 정보 전체 수정

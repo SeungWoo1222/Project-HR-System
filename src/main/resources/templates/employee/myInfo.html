@@ -7,6 +7,10 @@
     <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
 </th:block>
 
+<th:block layout:fragment="script">
+    <script th:src="@{/js/pwd.js}"/></script>
+</th:block>
+
 <div layout:fragment="~{content}">
     <div class="content">
         <img class="employee-picture" th:src="${pictureUrl}"/>
@@ -68,9 +72,7 @@
                 <td th:text="${employee.modifiedBy}">수정자</td>
             </tr>
         </table>
-        <button type="button" class="btn" th:employeeId="${employee.employeeId}"
-                onclick="openModal('/auth/pwd?employeeId=' + encodeURIComponent(this.getAttribute('employeeId'))
-                                    + '&redirectUrl=' + encodeURIComponent('/employee/edit/myInfo/' + this.getAttribute('employeeId')))">정보 수정</button>
+        <button type="button" class="btn" data-url="/employee/edit/myInfo/" onclick="openModal('/auth/pwd?redirectUrl='+ encodeURIComponent(this.getAttribute('data-url')))">정보 수정</button>
     </div>
 </div>
 </html>
