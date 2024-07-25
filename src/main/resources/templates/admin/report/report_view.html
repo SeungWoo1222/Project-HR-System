@@ -20,7 +20,7 @@
         <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
         <!-- 결재 상태 변경 기능 시작 -->
-        <form th:action="@{/admin/approve}" method="post">
+        <form th:action="@{/admin/request/approve}" method="post">
             <input type="hidden" name="reportId" th:value="${report.reportId}" />
             <div>
                 <label for="status">결재 상태:</label>
@@ -51,7 +51,7 @@
 <!--            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>-->
 <!--        </form>-->
 
-        <button type="button" onclick="navigateToMain()">목록으로</button>
+        <button onclick="closeModal()" >목록으로 </button>
     </div>
 </div>
 </html>

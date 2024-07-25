@@ -42,7 +42,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
-                            th:onclick="openModal('/admin/' + this.getAttribute('reportId'))">
+                            th:onclick="openModal('/admin/request/report/' + this.getAttribute('reportId'))">
                             <td th:text="${report.title}"></td>
                             <td th:text="${report.employeeId}"></td>
                             <td th:text="${report.status}"></td>
@@ -54,7 +54,7 @@
 
             <!-- 작성 요청 목록 -->
                 <h1>작성 요청 목록</h1>
-                <button onclick="location.href='/admin/write'">작성 요청하기</button>
+                <button onclick="location.href='/admin/request/write'">작성 요청하기</button>
                 <div class="list">
                     <table>
                         <thead>
@@ -67,7 +67,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
-                            th:onclick="openModal('/request/' + this.getAttribute('requestId'))">
+                            th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
                             <td th:text="${request.employeeId}"></td>
                             <td th:text="${request.reportId}"></td>
                             <td th:text="${request.formattedDueDate}"></td>
@@ -80,7 +80,7 @@
         <!-- 보고서 통계 -->
         <div style="display: flex; align-items: center; margin-top: 20px;">
             <h1 style="margin-right: 20px;">보고서 통계</h1>
-            <button th:onclick="openModal('/report/statistic')">통계 범위 설정</button>
+            <button th:onclick="openModal('/admin/request/statistic')">통계 범위 설정</button>
         </div>
         <!-- 구글 차트 통계 추가 -->
         <div id="columnchart_material" style="width: 800px; height: 500px;"></div>

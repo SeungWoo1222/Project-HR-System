@@ -10,12 +10,10 @@ import java.util.List;
 public interface RequestService {
     List<Request> getAllRequests();
     Request getRequestById(Long requestId);
-    List<Employee> getEmployees();
     List<Request> getMyRequests();
 
     void updateRequest(Request request);
     void deleteRequest(Long requestId);
     void createRequest(Request request);
 
-//    String getPositionIdByEmployeeId(String employeeId);
 }

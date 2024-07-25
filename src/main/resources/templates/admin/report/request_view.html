@@ -21,14 +21,14 @@
         <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
         <p th:text="'요청자 : ' + ${request.requesterId}"></p>
 
-        <a th:href="@{'/admin/edit?requestId=' + ${request.requestId}}">수정</a>
+        <a th:href="@{'/admin/request/edit?requestId=' + ${request.requestId}}">수정</a>
 
-        <form th:action="@{'/admin/delete/' + ${request.requestId}}" method="post" style="display:inline;">
+        <form th:action="@{'/admin/request/delete/' + ${request.requestId}}" method="post" style="display:inline;">
             <input type="hidden" name="_method" value="delete">
             <button type="submit" onclick="return confirm('정말 이 요청을 삭제하시겠습니까?');">삭제</button>
         </form>
 
-        <a th:href="@{/report/main}">목록으로</a>
+        <button onclick="closeModal()" >목록으로 </button>
     </div>
 </div>
 </html>

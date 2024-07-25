@@ -8,10 +8,8 @@ function toggleRejectionReason() {
     }
 }
 
-function navigateToEdit(reportId) {
-    window.location.href = '/report/edit?reportId=' + reportId;
-}
-
-function navigateToMain() {
-    window.location.href = '/report/main';
+    function toggleEmployeeNameField() {
+    const specificOption = document.getElementById('specificOption');
+    const employeeNameField = document.getElementById('employeeName');
+    employeeNameField.disabled = !specificOption.checked;
 }

@@ -57,10 +57,6 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getRequestById(requestId);
     }
 
-    @Override // 모든 임원 조회
-    public List<Employee> getEmployees() {
-        return requestDAO.getAllEmployees();
-    }
 
     @Override // 요청 수정
     public void updateRequest(Request request) {

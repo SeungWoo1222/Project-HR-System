@@ -2,6 +2,9 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -31,6 +34,9 @@ public class ReportController {
     private ReportService reportService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private EmployeeDAO employeeDAO;
+
     @Autowired
     private ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
 
@@ -93,11 +99,10 @@ public class ReportController {
         return "redirect:/report/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
     }
 
-
-
     @GetMapping("/write") // 보고서 작성 페이지 이동
     public String showCreateForm(Model model) {
-        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
         return "report/write";  // write.html로 연결
     }
 
@@ -133,8 +138,9 @@ public class ReportController {
 
     @GetMapping("/edit") // 수정 페이지 이동
     public String updateReport(@RequestParam("reportId") Long reportId, Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
         Report report = reportService.getReportById(reportId);
-        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
+        model.addAttribute("employees", employees); // employees 목록 추가
         model.addAttribute("report", report);
         return "report/edit";
     }

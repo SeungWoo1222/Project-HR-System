@@ -9,16 +9,37 @@
     </style>
 </th:block>
 
+<script th:src="@{/js/report.js}"></script>
+
 <div>
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-    <h1>보고서 통계 입력</h1>
-    <form action="#" th:action="@{/report/stats}" method="get">
+    <h1>보고서 범위 설정</h1>
+    <h2>기간 설정</h2>
+    <form action="#" th:action="@{/admin/request/stats}" method="get">
         <label for="startDate">시작 월:</label>
         <input type="month" id="startDate" name="startDate" required>
         <label for="endDate">종료 월:</label>
         <input type="month" id="endDate" name="endDate" required>
+
+        <h2>임원 설정</h2>
+        <div>
+            <label>
+                <input type="radio" name="searchOption" value="all" onclick="toggleEmployeeNameField()"> 임원 전체
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" id="specificOption" name="searchOption" value="specific"
+                       onclick="toggleEmployeeNameField()"> 조회 할 임원
+            </label>
+            <select id="employeeName" name="employeeName" multiple disabled>
+                <option th:each="employee : ${employees}" th:value="${employee.employeeId}"
+                        th:text="${employee.name}"></option>
+            </select>
+        </div>
+
         <button type="submit">통계 조회</button>
     </form>
-</div>
+
 </div>
 </html>

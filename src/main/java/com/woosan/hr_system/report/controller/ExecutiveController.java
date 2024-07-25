@@ -2,6 +2,8 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
@@ -22,12 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/admin/request")
+public class ExecutiveController {
     @Autowired
     private ReportService reportService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private EmployeeDAO employeeDAO;
     @Autowired
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
 
@@ -54,16 +58,19 @@ public class AdminController {
 
         return "admin/report/main"; // main.html 반환
     }
-    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
+    @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
     public String showStatisticPage(Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
         model.addAttribute("ReportStat", new Report());
+        model.addAttribute("employees", employees); // employees 목록 추가
         return "/admin/report/statistic";
     }
 
-    @GetMapping("/stats") // 통계 날짜 설정
+    @GetMapping("/stats") // 통계 날짜, 임원 설정
     public String getReportStats(@RequestParam(name = "startDate") String startDate,
                                  @RequestParam(name = "endDate") String endDate,
                                  Model model) {
+        // 날짜 설정
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // startDate와 endDate를 "yyyy-MM-dd" 형식으로 변환
@@ -77,14 +84,26 @@ public class AdminController {
 
         model.addAttribute("startDate", formattedStartDate);
         model.addAttribute("endDate", formattedEndDate);
-        return "redirect:/admin/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
+
+        // 임원 설정
+
+
+        return "redirect:/admin/request/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
+    }
+
+    @GetMapping("/{requestId}") // 특정 요청 조회
+    public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
+        Request request = requestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "admin/report/request_view";
     }
 
 
     @GetMapping("/edit") // 요청 수정 페이지 이동
     public String editRequest(@RequestParam(name = "requestId") Long requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
-        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
         model.addAttribute("request", request);
         return "/admin/report/request_edit";
     }
@@ -102,12 +121,13 @@ public class AdminController {
         request.setDueDate(dueDate);
 
         requestService.updateRequest(request);
-        return "redirect:/admin/main";
+        return "redirect:/admin/request/main";
     }
 
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
-        model.addAttribute("employees", requestService.getEmployees()); // employees 목록 추가
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
         return "admin/report/request_write";
     }
 
@@ -127,7 +147,7 @@ public class AdminController {
             requestService.createRequest(request);
 
             model.addAttribute("message", "보고서 작성 완료");
-            return "redirect:/admin/main";
+            return "redirect:/admin/request/main";
         } catch (DateTimeParseException e) {
             model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
             return "/admin/report/request_write";
@@ -137,10 +157,13 @@ public class AdminController {
     @DeleteMapping("/delete/{requestId}") // 요청 삭제
     public String deleteRequest(@PathVariable("requestId") Long id, RedirectAttributes redirectAttributes) {
         requestService.deleteRequest(id);
-        return "redirect:/admin/report/main";
+        return "redirect:/admin/request/main";
     }
 
-    @GetMapping("/{reportId}") // 특정 보고서 조회
+
+    // 보고서 맵핑
+
+    @GetMapping("/report/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
@@ -164,7 +187,7 @@ public class AdminController {
             report.setRejectReason(rejectionReason);
 
             reportService.updateApprovalStatus(report);
-            return "redirect:/admin/main";
+            return "redirect:/admin/request/main";
         } catch (Exception e) {
             return "error"; // 에러 메시지 표시
         }
