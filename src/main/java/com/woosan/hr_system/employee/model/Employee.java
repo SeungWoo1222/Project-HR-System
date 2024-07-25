@@ -22,6 +22,7 @@ public class Employee {
     private LocalDateTime lastModified;
     private String modifiedBy;
     private Resignation resignation;
+    private int passwordCount;
 
     // Getters and Setters
 
@@ -61,9 +62,7 @@ public class Employee {
         return residentRegistrationNumber;
     }
 
-    public void setResidentRegistrationNumber(String residentRegistrationNumber) {
-        this.residentRegistrationNumber = residentRegistrationNumber;
-    }
+    public void setResidentRegistrationNumber(String residentRegistrationNumber) { this.residentRegistrationNumber = residentRegistrationNumber; }
 
     public String getPhone() {
         return phone;
@@ -160,4 +159,8 @@ public class Employee {
     public Resignation getResignation() { return resignation; }
 
     public void setResignation(Resignation resignation) { this.resignation = resignation; }
+
+    public int getPasswordCount() { return passwordCount; }
+
+    public void setPasswordCount(int passwordCnt) { this.passwordCount = passwordCnt; }
 }

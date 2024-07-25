@@ -67,4 +67,17 @@ public class EmployeeDAO implements SearchService<Employee> {
     public void deleteEmployee(String employeeId) { // 사원 정보 삭제
         sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId);
     }
+
+    public int getPasswordCount(String employeeId) {  // 비밀번호 카운트 조회
+        return sqlSession.selectOne(NAMESPACE + "employeeId", employeeId);
+    }
+
+    public void addPasswordCount(String employeeId) { // 비밀번호 +1 수정
+        sqlSession.update(NAMESPACE + "addPasswordCount", employeeId);
+    }
+
+    public void removePasswordCount(String employeeId) { // 비밀번호 0으로 수정
+        sqlSession.update(NAMESPACE + "removePasswordCount", employeeId);
+    }
+
 }

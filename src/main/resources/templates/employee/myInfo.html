@@ -68,7 +68,9 @@
                 <td th:text="${employee.modifiedBy}">수정자</td>
             </tr>
         </table>
-        <button type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="window.location.href = '/employee/edit/myInfo/' + this.getAttribute('employeeId')">정보 수정</button>
+        <button type="button" class="btn" th:employeeId="${employee.employeeId}"
+                onclick="openModal('/auth/pwd?employeeId=' + encodeURIComponent(this.getAttribute('employeeId'))
+                                    + '&redirectUrl=' + encodeURIComponent('/employee/edit/myInfo/' + this.getAttribute('employeeId')))">정보 수정</button>
     </div>
 </div>
 </html>

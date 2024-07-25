@@ -55,15 +55,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
         return employee;
     }
-
-    @Override // 현재 로그인된 사원의 userDetails 조회 로직
-    public CustomUserDetails getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
-            return customUserDetails;
-        }
-        return null;
-    }
     // 조회 관련 로직 end-point
 
     // 등록 관련 로직 start-point
@@ -242,7 +233,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignation.setResignationDocuments(sb.toString());
 
         // 로그인된 사용자(처리 사원) 정보 등록
-        resignation.setProcessedBy(getAuthenticatedUser().getUsername());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            resignation.setProcessedBy(userDetails.getUsername());
+        }
 
         resignationDAO.insertResignation(resignation);
         return "success";

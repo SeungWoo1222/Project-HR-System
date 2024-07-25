@@ -21,6 +21,7 @@
         <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
+        <result property="passwordCount" column="password_count"/>
         <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
             <id property="employeeId" column="employee_id"/>
             <result property="resignationReason" column="resignation_reason"/>
@@ -45,29 +46,29 @@
 
     <!-- 사원 등록 -->
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by)
-        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by, password_count)
+        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy}, #{passwordCount})
     </insert>
 
     <!-- 사원 정보 수정 -->
     <update id="updateEmployee">
         UPDATE employees
         SET name=#{name},
-        password=#{password},
-        birth=#{birth},
-        resident_registration_number=#{residentRegistrationNumber},
-        phone=#{phone},
-        email=#{email},
-        address=#{address},
-        detail_address=#{detailAddress},
-        hire_date=#{hireDate},
-        status=#{status},
-        department_id=#{department},
-        position_id=#{position},
-        picture=#{picture},
-        remaining_leave=#{remainingLeave},
-        last_modified=#{lastModified},
-        modified_by=#{modifiedBy}
+            password=#{password},
+            birth=#{birth},
+            resident_registration_number=#{residentRegistrationNumber},
+            phone=#{phone},
+            email=#{email},
+            address=#{address},
+            detail_address=#{detailAddress},
+            hire_date=#{hireDate},
+            status=#{status},
+            department_id=#{department},
+            position_id=#{position},
+            picture=#{picture},
+            remaining_leave=#{remainingLeave},
+            last_modified=#{lastModified},
+            modified_by=#{modifiedBy}
         WHERE employee_id=#{employeeId}
     </update>
 
@@ -87,7 +88,7 @@
     <select id="getPreResignationEmployees" resultMap="EmployeeResultMap">
         SELECT *
         FROM employees
-        WHERE status IN ('퇴사 예정');
+        WHERE status IN ('퇴사 예정')
     </select>
 
     <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
@@ -96,16 +97,16 @@
         FROM employees e
                  LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
-          AND r.resignation_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH);
+          AND r.resignation_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH)
     </select>
 
     <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
     <select id="getPreDeletionEmployees" resultMap="EmployeeResultMap">
         SELECT e.*, r.resignation_date
         FROM employees e
-                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+        LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
-            AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH);
+        AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
     </select>
 
     <!-- 검색어에 해당하는 데이터 결과 조회 -->
@@ -114,21 +115,21 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 (
-                    employee_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    name LIKE CONCAT('%', #{keyword}, '%') OR
-                    birth LIKE CONCAT('%', #{keyword}, '%') OR
-                    resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
-                    phone LIKE CONCAT('%', #{keyword}, '%') OR
-                    email LIKE CONCAT('%', #{keyword}, '%') OR
-                    address LIKE CONCAT('%', #{keyword}, '%') OR
-                    detail_address LIKE CONCAT('%', #{keyword}, '%') OR
-                    hire_date LIKE CONCAT('%', #{keyword}, '%') OR
-                    status LIKE CONCAT('%', #{keyword}, '%') OR
-                    department_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    position_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
-                    last_modified LIKE CONCAT('%', #{keyword}, '%') OR
-                    modified_by LIKE CONCAT('%', #{keyword}, '%')
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
+                birth LIKE CONCAT('%', #{keyword}, '%') OR
+                resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                phone LIKE CONCAT('%', #{keyword}, '%') OR
+                email LIKE CONCAT('%', #{keyword}, '%') OR
+                address LIKE CONCAT('%', #{keyword}, '%') OR
+                detail_address LIKE CONCAT('%', #{keyword}, '%') OR
+                hire_date LIKE CONCAT('%', #{keyword}, '%') OR
+                status LIKE CONCAT('%', #{keyword}, '%') OR
+                department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
+                last_modified LIKE CONCAT('%', #{keyword}, '%') OR
+                modified_by LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>
@@ -142,23 +143,45 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 (
-                    employee_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    name LIKE CONCAT('%', #{keyword}, '%') OR
-                    birth LIKE CONCAT('%', #{keyword}, '%') OR
-                    resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
-                    phone LIKE CONCAT('%', #{keyword}, '%') OR
-                    email LIKE CONCAT('%', #{keyword}, '%') OR
-                    address LIKE CONCAT('%', #{keyword}, '%') OR
-                    detail_address LIKE CONCAT('%', #{keyword}, '%') OR
-                    hire_date LIKE CONCAT('%', #{keyword}, '%') OR
-                    status LIKE CONCAT('%', #{keyword}, '%') OR
-                    department_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    position_id LIKE CONCAT('%', #{keyword}, '%') OR
-                    remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
-                    last_modified LIKE CONCAT('%', #{keyword}, '%') OR
-                    modified_by LIKE CONCAT('%', #{keyword}, '%')
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
+                birth LIKE CONCAT('%', #{keyword}, '%') OR
+                resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                phone LIKE CONCAT('%', #{keyword}, '%') OR
+                email LIKE CONCAT('%', #{keyword}, '%') OR
+                address LIKE CONCAT('%', #{keyword}, '%') OR
+                detail_address LIKE CONCAT('%', #{keyword}, '%') OR
+                hire_date LIKE CONCAT('%', #{keyword}, '%') OR
+                status LIKE CONCAT('%', #{keyword}, '%') OR
+                department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                remaining_leave LIKE CONCAT('%', #{keyword}, '%') OR
+                last_modified LIKE CONCAT('%', #{keyword}, '%') OR
+                modified_by LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>
     </select>
+
+    <!-- 비밀번호 카운트 조회 -->
+    <select id="getPasswordCount" parameterType="String" resultType="int">
+        SELECT password_count
+        FROM employees
+        WHERE employee_id=#{employeeId}
+    </select>
+
+    <!-- 비밀번호 +1 수정 -->
+    <update id="addPasswordCount" parameterType="String">
+        UPDATE employees
+        SET password_count = password_count + 1
+        WHERE employee_id=#{employeeId}
+    </update>
+
+    <!-- 비밀번호 0으로 수정 -->
+    <update id="removePasswordCount" parameterType="String">
+        UPDATE employees
+        SET password_count = 0
+        WHERE employee_id=#{employeeId}
+    </update>
+
 </mapper>
