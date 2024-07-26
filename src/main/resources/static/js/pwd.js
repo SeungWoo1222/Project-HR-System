@@ -1,8 +1,3 @@
-// 비밀번호 입력창 자동 포커스
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('password').focus();
-});
-
 // 유효성 검사
 function validationPassword(event) {
     const password = document.getElementById('password').value;

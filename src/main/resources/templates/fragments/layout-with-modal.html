@@ -51,6 +51,15 @@
             .then(html => {
                 modalBody.innerHTML = html;
                 modal.style.display = "block";
+
+                // 모달 컨텐츠가 로드된 후 포커스 설정
+                const firstInput = modalBody.querySelector(".first-input");
+                if (firstInput) {
+                    firstInput.focus();
+                    console.log('Focus set on:', firstInput);
+                } else {
+                    console.error('First input field not found');
+                }
             });
     }
 
