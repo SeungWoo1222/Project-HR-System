@@ -43,7 +43,6 @@ public class EmployeeDAO implements SearchService<Employee> {
 
     // 부서를 이용한 특정 사원 정보 조회
     public List<Employee> getEmployeesByDepartment(String departmentId) {
-        System.out.println("DAO");
         return sqlSession.selectList(NAMESPACE + "getEmployeesByDepartment", departmentId);
     };
 

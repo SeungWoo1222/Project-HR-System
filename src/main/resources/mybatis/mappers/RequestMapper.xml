@@ -35,24 +35,20 @@
     </select>
 
 
-
     <!-- 요청 생성 -->
-    <insert id="createRequest" parameterType="com.woosan.hr_system.report.model.Request">
+    <insert id="createRequest" parameterType="list">
         INSERT INTO report_requests
-        (requester_id,
-         writer_id,
-         due_date,
-         request_note,
-         request_date)
-        SELECT
-            #{requesterId},
-            e.employee_id,
-            #{dueDate},
-            #{requestNote},
-            #{requestDate}
-        FROM employees e
---         나중에 바꾸자
-        WHERE e.name = #{writerId}
+        (requester_id, writer_id, due_date, request_note, request_date)
+        VALUES
+        <foreach collection="list" item="request" separator=",">
+            (
+            #{request.requesterId},
+            #{request.writerId},
+            #{request.dueDate},
+            #{request.requestNote},
+            #{request.requestDate}
+            )
+        </foreach>
     </insert>
 
     <!-- 요청 수정 -->
@@ -60,6 +56,13 @@
         UPDATE report_requests
         SET writer_id = #{writerId}, due_date = #{dueDate}, request_note = #{requestNote} ,modified_date = #{modifiedDate}
         WHERE request_id = #{requestId}
+    </update>
+
+    <!-- 보고서 결재처리 -->
+    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET status = #{status}, reject_reason = #{rejectReason}
+        WHERE report_id = #{reportId}
     </update>
 
     <!-- 요청 삭제 -->

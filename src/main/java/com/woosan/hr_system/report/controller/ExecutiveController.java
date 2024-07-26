@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Employee;
@@ -13,12 +14,15 @@ import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -43,33 +47,36 @@ public class ExecutiveController {
         return "admin/report/request_write";
     }
 
-    @GetMapping("/employee") // 부서 기반 임원 정보 조회
-    @ResponseBody
-    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
-        return employeeDAO.getEmployeesByDepartment(departmentId);
-    }
-
     @PostMapping("/write") // 요청 생성
-    public String createRequest(@RequestParam("writerId") String writerId,
+    public String createRequest(@RequestParam("writerId") List<String> writerIds,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
                                 @RequestParam("requestNote") String requestNote,
                                 Model model) {
         try {
-            // request 객체 설정
-            Request request = new Request();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                String requesterId = userDetails.getUsername();
 
-//            request.setEmployeeName(writerId);
-            request.setDueDate(dueDate);
-            request.setRequestNote(requestNote);
+                // 서비스 계층에 요청 전달
+                requestService.createRequest(writerIds, dueDate, requestNote, requesterId);
 
-            requestService.createRequest(request);
-
-            model.addAttribute("message", "보고서 작성 완료");
-            return "redirect:/admin/request/main";
+                model.addAttribute("message", "보고서 작성 완료");
+                return "redirect:/admin/request/main";
+            } else {
+                model.addAttribute("message", "로그인 정보가 없습니다.");
+                return "/admin/report/request_write";
+            }
         } catch (DateTimeParseException e) {
             model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
             return "/admin/report/request_write";
         }
+    }
+
+    @GetMapping("/employee") // 부서 기반 임원 정보 조회
+    @ResponseBody
+    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
+        return employeeDAO.getEmployeesByDepartment(departmentId);
     }
 
     @GetMapping("/main") // main 페이지 이동
@@ -77,14 +84,25 @@ public class ExecutiveController {
                               @RequestParam(name = "endDate", required = false) String endDate,
                               Model model) throws JsonProcessingException {
 
+        // 내가 결재할 보고서 목록 조회
         List<Report> reports = reportService.getPendingApprovalReports();
-        List<Request> requests = requestService.getMyRequests();
+
+        // 내 employee_id를 기반으로 요청자(requester_id) 설정
+        String requesterId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            requesterId = userDetails.getUsername();
+        }
+        List<Request> requests = requestService.getMyRequests(requesterId);
 
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
         // 보고서 통계
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
+
+        // View 관련 로직
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
         statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
         for (ReportStat stat : stats) {
@@ -95,6 +113,8 @@ public class ExecutiveController {
 
         return "admin/report/main"; // main.html 반환
     }
+
+
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
     public String showStatisticPage(Model model) {
         List<Employee> employees = employeeDAO.getAllEmployees();
@@ -150,14 +170,8 @@ public class ExecutiveController {
                                 @RequestParam("writerId") String writerId,
                                 @RequestParam("requestNote") String requestNote,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
-        //request 객체 설정
-        Request request = new Request();
-        request.setRequestId(requestId);
-        request.setWriterId(writerId);
-        request.setRequestNote(requestNote);
-        request.setDueDate(dueDate);
 
-        requestService.updateRequest(request);
+        requestService.updateRequest(requestId, writerId, requestNote, dueDate);
         return "redirect:/admin/request/main";
     }
 
@@ -170,7 +184,7 @@ public class ExecutiveController {
     }
 
 
-    // 보고서 맵핑
+    // 보고서 관련 맵핑 메소드들 ↓↓↓
 
     @GetMapping("/report/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
@@ -184,18 +198,12 @@ public class ExecutiveController {
         return "/admin/report/report_view";
     }
 
-    @PostMapping("/approve") // 결재 처리
+    @PostMapping("/approve") // 보고서 결재 처리
     public String approveReport(@RequestParam("reportId") Long reportId,
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {
-            // report 객체 설정
-            Report report = new Report();
-            report.setReportId(reportId);
-            report.setStatus(status);
-            report.setRejectReason(rejectionReason);
-
-            reportService.updateApprovalStatus(report);
+            requestService.updateApprovalStatus(reportId, status, rejectionReason);
             return "redirect:/admin/request/main";
         } catch (Exception e) {
             return "error"; // 에러 메시지 표시

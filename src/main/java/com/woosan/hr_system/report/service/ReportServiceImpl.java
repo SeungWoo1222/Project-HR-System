@@ -143,11 +143,6 @@ public class ReportServiceImpl implements ReportService {
         reportDAO.updateReport(report);
     }
 
-    @Override // 결재 처리
-    public void updateApprovalStatus(Report report) {
-        reportDAO.updateApprovalStatus(report);
-    }
-
 
     @Override // 보고서 삭제
     public void deleteReport(Long id) {

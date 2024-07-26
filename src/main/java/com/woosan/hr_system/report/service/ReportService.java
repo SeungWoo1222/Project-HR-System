@@ -24,7 +24,7 @@ public interface ReportService {
 
     // 보고서 수정 관련 메소드
     void updateReport(Report report);
-    void updateApprovalStatus(Report report);
+
 
     // 보고서 삭제
     void deleteReport(Long id);

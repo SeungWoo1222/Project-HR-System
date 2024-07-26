@@ -83,11 +83,6 @@ public class ReportDAO {
         sqlSession.update(NAMESPACE + ".updateReport", report);
     }
 
-    // 결재 처리
-    public void updateApprovalStatus(Report report) {
-        sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
-    }
-
     // 보고서 삭제
     public void deleteReport(Long id) {
         sqlSession.delete(NAMESPACE + ".deleteReport", id);

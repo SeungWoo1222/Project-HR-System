@@ -5,38 +5,72 @@
 
 <th:block layout:fragment="css">
   <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
-  <style>
-  </style>
 </th:block>
 
 <th:block layout:fragment="script">
   <script th:src="@{/js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
   <script>
-    function loadEmployees() {
-      var departmentId = $('#departmentId').val();
-      console.log(departmentId);
+    $(document).ready(function() {
+      // 초기에는 전체 선택 체크박스 숨기기
+      $('#selectAllContainer').hide();
 
-      $.ajax({
-        url: `/admin/request/employee`, // API 엔드포인트를 설정
-        method: 'GET',
-        data: { departmentId: departmentId },
-        success: function(data) {
-          const select = $('#writerId');
-          select.empty(); // 기존 옵션 초기화
-          select.append('<option value="" disabled selected>작성자를 선택하세요</option>');
-          data.forEach(employee => {
-            const option = $('<option></option>')
-                    .val(employee.employeeId) // value를 employeeId로 설정
-                    .text(employee.name);
-            select.append(option);
-          });
-        },
-        error: function(error) {
-          console.error('Error:', error);
-        }
+      // 부서 선택 시 직원 목록을 불러오는 함수
+      $('#departmentId').on('change', function() {
+        var departmentId = $(this).val();
+
+        $.ajax({
+          url: '/admin/request/employee', // API 엔드포인트를 설정
+          method: 'GET',
+          data: { departmentId: departmentId },
+          success: function(data) {
+            const select = $('#writerIdContainer');
+            select.empty(); // 기존 옵션 초기화
+            data.forEach(function(employee) {
+              const checkboxContainer = $('<div></div>');
+              const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerId" value="' + employee.employeeId + '" data-name="' + employee.name + '">');
+              const label = $('<label>' + employee.name + '</label>');
+              checkboxContainer.append(checkbox).append(label);
+              select.append(checkboxContainer);
+            });
+            $('#selectAllContainer').show(); // 부서 선택 후에 전체 선택 체크박스 보이기
+          },
+          error: function(error) {
+            console.error('Error:', error);
+          }
+        });
       });
-    }
+
+      // 모든 직원을 선택/해제하는 함수
+      $('#selectAllEmployeesCheckbox').on('change', function() {
+        const isChecked = $(this).prop('checked');
+        $('.writerIdCheckbox').prop('checked', isChecked);
+        addSelectedEmployees();
+      });
+
+      // 선택된 직원을 목록에 추가하는 함수
+      $('#writerIdContainer').on('change', '.writerIdCheckbox', function() {
+        addSelectedEmployees();
+      });
+
+      function addSelectedEmployees() {
+        const selectedContainer = $('#selectedEmployees');
+        selectedContainer.empty();
+        $('.writerIdCheckbox:checked').each(function() {
+          const id = $(this).val();
+          const name = $(this).data('name'); // data-name 속성에서 이름 가져오기
+          const employeeDiv = $('<div class="selected-employee" data-id="' + id + '"></div>');
+          employeeDiv.append('<span>' + name + '</span>');
+          const removeButton = $('<button type="button">x</button>');
+          removeButton.on('click', function() {
+            $(this).parent().remove();
+            $('#writerIdContainer input[value="' + id + '"]').prop('checked', false);
+          });
+          employeeDiv.append(removeButton);
+          selectedContainer.append(employeeDiv);
+        });
+      }
+    });
   </script>
 </th:block>
 
@@ -46,7 +80,7 @@
     <form method="post" action="/admin/request/write" enctype="multipart/form-data">
 
       <label for="departmentId">부서 선택:</label>
-      <select id="departmentId" name="departmentId" onchange="loadEmployees()" required>
+      <select id="departmentId" name="departmentId" required>
         <option value="" disabled selected>부서를 선택하세요</option>
         <option value="PR">생산</option>
         <option value="QC">품질 관리</option>
@@ -57,10 +91,18 @@
         <option value="RD">연구개발</option>
       </select><br>
 
-      <label for="writerId">보고서 작성자:</label>
-      <select id="writerId" name="employeeId" required>
-        <option value="" disabled selected>작성자를 선택하세요</option>
-      </select><br>
+      <div id="selectAllContainer">
+        <label>
+          <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+        </label><br>
+      </div>
+
+      <label for="writerIdContainer">보고서 작성자:</label>
+      <div id="writerIdContainer" required>
+        <!-- 직원 목록이 여기에 추가됩니다. -->
+      </div><br>
+
+      <div id="selectedEmployees" class="selected-employees"></div>
 
       <label for="dueDate">마감 기한:</label>
       <input type="date" id="dueDate" name="dueDate" required><br>

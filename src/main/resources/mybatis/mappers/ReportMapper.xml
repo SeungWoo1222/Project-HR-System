@@ -115,12 +115,7 @@
         WHERE report_id = #{reportId}
     </update>
 
-    <!-- 결재처리 -->
-    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET status = #{status}, reject_reason = #{rejectReason}
-        WHERE report_id = #{reportId}
-    </update>
+
 
     <!-- 보고서 삭제 -->
     <delete id="deleteReport" parameterType="long">
