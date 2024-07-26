@@ -17,7 +17,7 @@ public interface RequestService {
 
     // 보고서 결재 처리
     void updateApprovalStatus(Long reportId, String status, String rejectionReasont);
-    void updateRequest(Long requestId, String writerId, String requestNote, LocalDate dueDate);
+    void updateRequest(Long requestId, List<String> writerIds, String requestNote, LocalDate dueDate);
 
     void deleteRequest(Long requestId);
 

@@ -66,18 +66,43 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 요청 수정
-    public void updateRequest(Long requestId, String writerId, String requestNote, LocalDate dueDate) {
+    public void updateRequest(Long requestId, List<String> writerIds, String requestNote, LocalDate dueDate) {
+
         //request 객체 설정
-        Request request = new Request();
-        request.setRequestId(requestId);
-        request.setWriterId(writerId);
-        request.setRequestNote(requestNote);
-        request.setDueDate(dueDate);
-
         LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
-        request.setModifiedDate(modifiedDate);
+        List<Request> requests = new ArrayList<>();
 
-        requestDAO.updateRequest(request);
+        // 작성자가 한명인 경우 => 요청을 수정
+        if (writerIds.size() == 1) {
+            Request request = new Request();
+            request.setRequestId(requestId);
+            request.setWriterId(writerIds.get(0));
+            request.setRequestNote(requestNote);
+            request.setDueDate(dueDate);
+            request.setModifiedDate(modifiedDate);
+            requestDAO.updateRequest(request);
+        }
+        // 작성자가 여러명인 경우 => 요청 삭제 후 새로운 요청 생성
+        else if (writerIds.size() > 1) {
+            requestDAO.deleteRequest(requestId);
+            String requesterId = null;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                requesterId = userDetails.getUsername();
+            }
+
+            for (String writerId : writerIds) {
+                Request request = new Request();
+                request.setRequesterId(requesterId);
+                request.setWriterId(writerId);
+                request.setRequestNote(requestNote);
+                request.setDueDate(dueDate);
+                request.setRequestDate(modifiedDate);
+                requests.add(request);
+            }
+            requestDAO.createRequest(requests);
+        }
     }
 
     @Override // 요청 삭제

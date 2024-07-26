@@ -167,17 +167,17 @@ public class ExecutiveController {
 
     @PostMapping("/edit") // 요청 수정
     public String updateRequest(@RequestParam("requestId") Long requestId,
-                                @RequestParam("writerId") String writerId,
+                                @RequestParam("writerId") List<String> writerIds,
                                 @RequestParam("requestNote") String requestNote,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
 
-        requestService.updateRequest(requestId, writerId, requestNote, dueDate);
+        requestService.updateRequest(requestId, writerIds, requestNote, dueDate);
         return "redirect:/admin/request/main";
     }
 
 
 
-    @DeleteMapping("/delete/{requestId}") // 요청 삭제
+    @DeleteMapping("/delete/{requestId}") // 요청 삭제 => 같은 reportid로 다른이름으로 만들어진 보고서 삭제 시 구현방법 생각
     public String deleteRequest(@PathVariable("requestId") Long id, RedirectAttributes redirectAttributes) {
         requestService.deleteRequest(id);
         return "redirect:/admin/request/main";
