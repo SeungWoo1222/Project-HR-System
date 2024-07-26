@@ -10,6 +10,7 @@
 <th:block layout:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/daum-postcode-API.js}"></script>
+    // 파일 검증 기능 작동 확인 금요일에 js 로직 통합
     <script>
         // 파일 검증
         function validateFile(obj) {
@@ -58,7 +59,7 @@
                     사원 사진 : <span id="file-name" th:text="${employee.picture}"></span>
                     <label for="picture" class="input-file-btn">업로드</label>
                     <input type="file" id="picture" class="invisible-input-file" name="picture" onchange="validateFile(this)">
-                    <span>(10MB 이하)</span>
+                    <span>사진은 10MB까지 업로드 가능합니다.</span>
                 </div>
             </div>
             <table>
