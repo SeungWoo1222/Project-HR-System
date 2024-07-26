@@ -18,8 +18,7 @@ public interface EmployeeService {
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
     String insertEmployee(Employee employee);
-    void updateEmployee(Employee employee);
-    void updateEmployeePartial(String employeeId, Map<String, Object> updates);
+    String updateEmployee(Employee employee);
     String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsName);
     String deleteEmployee(String employeeId);
 }

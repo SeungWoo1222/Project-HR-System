@@ -9,6 +9,12 @@
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/pwd.js}"/></script>
+    <script th:src="@{/js/employee.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateDateTimeElements();
+        });
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -65,7 +71,7 @@
             </tr>
             <tr>
                 <th>마지막 수정일</th>
-                <td th:text="${employee.lastModified}">마지막 수정일</td>
+                <td th:text="${employee.lastModified}" class="dateTime">마지막 수정일</td>
             </tr>
             <tr>
                 <th>수정자</th>

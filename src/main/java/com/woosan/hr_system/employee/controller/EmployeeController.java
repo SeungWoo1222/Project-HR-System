@@ -22,12 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/employee")
 public class EmployeeController {
-
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
@@ -35,9 +33,9 @@ public class EmployeeController {
 
     @Autowired
     private S3Service s3Service;
+
     @Autowired
     private AuthService authService;
-
     // ============================================ 조회 관련 로직 start-point ============================================
     @GetMapping("/list") // 모든 사원 정보 조회
     public String getEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
@@ -87,8 +85,7 @@ public class EmployeeController {
 
     // ============================================ 등록 관련 로직 start-point ============================================
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동
-    public String viewEmployeeForm(Model model) {
-        model.addAttribute("employee", new Employee());
+    public String viewEmployeeForm() {
         return "employee/registration";
     }
 
@@ -158,16 +155,16 @@ public class EmployeeController {
         return "employee/edit/myInfo";
     }
 
-    @PostMapping("/update") // 사원 정보 전체 수정
-    public String updateEmployee(@ModelAttribute Employee employee) {
-        employeeService.updateEmployee(employee);
-        return "redirect:/employee/edit";
-    }
-
-    @PatchMapping(value = "/update/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 사원 정보 일부 수정
-    public String updateEmployeePartial(@PathVariable("employeeId") String employeeId, @RequestBody Map<String, Object> updates) {
-        employeeService.updateEmployeePartial(employeeId, updates);
-        return "redirect:/employee/edit";
+    @PutMapping("/update") // 사원 정보 수정
+    public ResponseEntity<String> updateEmployee(Employee employee) {
+        String result = employeeService.updateEmployee(employee);
+        return switch (result) {
+            case "success" -> ResponseEntity.ok("'" + employee.getEmployeeId() + "' 사원의 정보가 수정되었습니다.");
+            case "no_changes" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("사원 정보의 변경된 사항이 없습니다.");
+            case "error" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원의 정보에서 오류가 발생하였습니다.\n입력된 정보가 올바른지 확인하고 다시 시도해주세요.\n문제가 지속적으로 발생하면 관리자에게 문의해주세요.");
+            case "fail" -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("시스템 내부 오류로 인해 사원 정보 수정에 실패하였습니다.\n 잠시 후 다시 시도하거나 시스템 관리자에게 문의하세요.");
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사원 정보 수정 중 오류가 발생하였습니다.");
+        };
     }
     // ============================================= 수정 관련 로직 end-point =============================================
 
@@ -248,21 +245,15 @@ public class EmployeeController {
     }
 
     @PostMapping("/delete/{employeeId}") // 사원 영구 삭제 로직
-    @ResponseBody
     public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
         String message = employeeService.deleteEmployee(employeeId);
-        switch (message) {
-            case "success":
-                return ResponseEntity.ok("사원이 삭제되었습니다.");
-            case "null":
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사원을 찾을 수 없습니다.");
-            case "no_resignation":
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원의 퇴사 정보가 없습니다.");
-            case "not_expired":
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("퇴사 후 1년이 지나지 않았습니다.");
-            default:
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
-        }
+        return switch (message) {
+            case "success" -> ResponseEntity.ok("사원이 삭제되었습니다.");
+            case "null" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("사원을 찾을 수 없습니다.");
+            case "no_resignation" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원의 퇴사 정보가 없습니다.");
+            case "not_expired" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("퇴사 후 1년이 지나지 않았습니다.");
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
+        };
     }
     // ============================================= 퇴사 관련 로직 end-point =============================================
 }

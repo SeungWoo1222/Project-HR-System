@@ -54,7 +54,6 @@
     <update id="updateEmployee">
         UPDATE employees
         SET name=#{name},
-            password=#{password},
             birth=#{birth},
             resident_registration_number=#{residentRegistrationNumber},
             phone=#{phone},
@@ -65,7 +64,6 @@
             status=#{status},
             department_id=#{department},
             position_id=#{position},
-            picture=#{picture},
             remaining_leave=#{remainingLeave},
             last_modified=#{lastModified},
             modified_by=#{modifiedBy}

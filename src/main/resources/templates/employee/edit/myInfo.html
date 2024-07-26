@@ -12,46 +12,49 @@
     <script th:src="@{/js/daum-postcode-API.js}"></script>
     <script th:src="@{/js/employee.js}"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() { separateEmail(); });
+        document.addEventListener("DOMContentLoaded", function() {
+            separateEmail();
+            updateDateTimeElements();
+            updatePhoneNumberElement();
+            errorMessage = document.querySelector(".error-message");
+        });
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <form th:action="@{/employee/update/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data">
+        <!--   File form 분리해서 해당 관련 로직도 수정하고 추가해야함    -->
+        <form id="pictureFileForm" th:action="@{/employee/updatePicture}" method="post" enctype="multipart/form-data">
             <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
+            <p>사진은 10MB까지 업로드 가능합니다.</p>
+            <span id="file-name" th:text="${employee.picture}"></span>
+            <label for="picture" class="input-file-btn">사진 업로드</label>
+            <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+        </form>
+        <form th:action="@{/employee/update}" onsubmit="submitUpdateForm(event)">
             <table>
                 <tr>
-                    <th>사원 사진</th>
-                    <td>
-                        <p>사진은 10MB까지 업로드 가능합니다.</p>
-                        <span id="file-name" th:text="${employee.picture}"></span>
-                        <label for="picture" class="input-file-btn">파일 업로드</label>
-                        <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
-                    </td>
-                </tr>
-
-                <tr>
                     <th>사원 ID</th>
-                    <td th:text="${employee.employeeId}">
-                        <input type="hidden" name="employeeId" th:value="${employee.employeeId}" readonly/>
-                    </td>
+                    <td th:text="${employee.employeeId}"></td>
+                    <input type="hidden" id="employeeId" name="employeeId" th:value="${employee.employeeId}" readonly/>
                 </tr>
                 <tr>
                     <th>이름</th>
-                    <td><input type="text" name="name" th:value="${employee.name}" readonly/></td>
+                    <td th:text="${employee.name}"></td>
+                    <input type="hidden" id="name" name="name" th:value="${employee.name}" readonly/>
                 </tr>
                 <tr>
                     <th>주민등록번호</th>
-                    <td>
-                        <input type="text" name="fullResidentRegistrationNumber" th:value="${employee.birth} + '-' + ${employee.residentRegistrationNumber}" readonly/>
-                        <input type="hidden" name="birth" th:value="${employee.birth}" size="6"/>
-                        <input type="hidden" name="residentRegistrationNumber" th:value="${employee.residentRegistrationNumber}" size="7"/>
-                    </td>
+                    <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
+                    <input type="hidden" id="birth" name="birth" th:value="${employee.birth}" size="6" readonly/>
+                    <input type="hidden" id="residentRegistrationNumber" name="residentRegistrationNumber" th:value="${employee.residentRegistrationNumber}" size="7" readonly/>
                 </tr>
                 <tr>
                     <th>전화번호</th>
-                    <td><input type="text" name="phone" th:value="${employee.phone}"/></td>
+                    <td>
+                        <input type="text" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요." th:value="${employee.phone}">
+                        <input type="hidden" id="phone" name="phone">
+                    </td>
                 </tr>
                 <tr>
                     <th>이메일</th>
@@ -84,41 +87,51 @@
                     <td>
                         <input type="text" id="detailAddressInput" name="detailAddressInput" th:value="${employee.detailAddress}">
                         <input type="text" id="extraAddress" placeholder="참고항목" readonly>
-                        <input type="hidden" id="detailAddress" name="detailAddress">
+                        <input type="hidden" id="detailAddress" name="detailAddress" th:value="${employee.detailAddress}">
                     </td>
                 </tr>
                 <tr>
                     <th>부서</th>
-                    <td><input type="text" name="department" th:value="${employee.department}" readonly/></td>
+                    <td th:text="${employee.department}"></td>
+                    <input type="hidden" id="department" name="department" th:value="${employee.department}" readonly/>
                 </tr>
                 <tr>
                     <th>직급</th>
-                    <td><input type="text" name="position" th:value="${employee.position}" readonly/></td>
+                    <td th:text="${employee.employeeId}"></td>
+                    <input type="hidden" id="position" name="position" th:value="${employee.position}" readonly/>
                 </tr>
                 <tr>
                     <th>입사일</th>
-                    <td><input type="date" name="hireDate" th:value="${employee.hireDate}" readonly/></td>
+                    <td th:text="${employee.hireDate}"></td>
+                    <input type="hidden" id="hireDate" name="hireDate" th:value="${employee.hireDate}" readonly/>
                 </tr>
                 <tr>
                     <th>상태</th>
-                    <td><input type="text" name="status" th:value="${employee.status}" readonly/></td>
+                    <td th:text="${employee.status}"></td>
+                    <input type="hidden" id="status" name="status" th:value="${employee.status}" readonly/>
                 </tr>
                 <tr>
                     <th>남은 연차</th>
-                    <td><input type="number" name="remainingLeave" th:value="${employee.remainingLeave}" readonly/></td>
+                    <td th:text="${employee.remainingLeave}"></td>
+                    <input type="hidden" id="remainingLeave" name="remainingLeave" th:value="${employee.remainingLeave}" readonly/>
                 </tr>
                 <tr>
                     <th>마지막 수정일</th>
-                    <td><input type="text" name="lastModified" th:value="${employee.lastModified}" readonly/></td>
+                    <td th:if="${employee.lastModified} != null" th:text="${employee.lastModified}" class="dateTime"></td>
+                    <td th:unless="${employee.lastModified} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
+                    <input type="hidden" name="lastModified" th:value="${employee.lastModified}" readonly/>
                 </tr>
                 <tr>
                     <th>수정자</th>
-                    <td><input type="text" name="modifiedBy" th:value="${employee.modifiedBy}" readonly/></td>
+                    <td th:if="${employee.modifiedBy} != null" th:text="${employee.modifiedBy}"></td>
+                    <td th:unless="${employee.modifiedBy} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
+                    <input type="hidden" name="modifiedBy" th:value="${employee.modifiedBy}" readonly/>
                 </tr>
             </table>
-            <button type="submit" class="btn" onclick="submitEmployeePartial(event)">내 정보 수정</button>
+            <div class="error-message"></div>
+            <button type="submit" class="btn">내 정보 수정</button>
             <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/myInfo\''">수정 취소</button>
-            <button type="submit" class="btn" onclick="window.location.reload()">초기화</button>
+            <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
         </form>
     </div>
 </div>

@@ -1,6 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.auth.AuthService;
+import com.woosan.hr_system.employee.controller.EmployeeController;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.auth.CustomUserDetails;
@@ -8,7 +9,10 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +22,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeDAO employeeDAO;
@@ -31,10 +36,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private AuthService authService;
-
-    // 조회 관련 로직 start-point
+    // ============================================ 조회 관련 로직 start-point ============================================
     @Override // 모든 사원 정보 조회
     public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -58,9 +63,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
         return employee;
     }
-    // 조회 관련 로직 end-point
+    // ============================================= 조회 관련 로직 end-point =============================================
 
-    // 등록 관련 로직 start-point
+    // ============================================ 등록 관련 로직 start-point ============================================
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
         if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null) {
@@ -87,44 +92,75 @@ public class EmployeeServiceImpl implements EmployeeService {
             return "success";
         }
     }
-    // 등록 관련 로직 end-point
+    // ============================================= 등록 관련 로직 end-point =============================================
 
-    // 수정 관련 로직 start-point
+    // ============================================ 수정 관련 로직 start-point ============================================
     @Override // 사원 정보 수정
-    public void updateEmployee(Employee employee) {
-        employeeDAO.updateEmployee(employee);
-    }
+    public String updateEmployee(Employee employee) {
+        String CurrentEmployeeId = authService.getAuthenticatedUser().getUsername();
+        Employee originalEmployee = employeeDAO.getEmployeeById(CurrentEmployeeId);
 
-    @Override // 사원 정보 일부 수정 (변경 가능한 column - password, name, phone, email, address, detailed_address)
-    public void updateEmployeePartial(String employeeId, Map<String, Object> updates) {
-        Employee employee = employeeDAO.getEmployeeById(employeeId);
-        if (employee != null) {
-            if (updates.containsKey("name")) {
-                employee.setName((String)updates.get("name"));
-            }
-            if (updates.containsKey("phone")) {
-                employee.setPhone((String)updates.get("phone"));
-            }
-            if (updates.containsKey("email")) {
-                employee.setEmail((String)updates.get("email"));
-            }
-            if (updates.containsKey("address")) {
-                employee.setAddress((String)updates.get("address"));
-            }
-            if (updates.containsKey("detailed_address")) {
-                employee.setDetailAddress((String)updates.get("detailed_address"));
-            }
+        // 변경 사항 확인
+        boolean isModified = false;
+        if (!Objects.equals(originalEmployee.getName(), employee.getName())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getBirth(), employee.getBirth())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getResidentRegistrationNumber(), employee.getResidentRegistrationNumber())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getPhone(), employee.getPhone())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getEmail(), employee.getEmail())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getAddress(), employee.getAddress())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getDetailAddress(), employee.getDetailAddress())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getHireDate(), employee.getHireDate())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getStatus(), employee.getStatus())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getDepartment(), employee.getDepartment())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getPosition(), employee.getPosition())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getRemainingLeave(), employee.getRemainingLeave())) {
+            isModified = true;
+        }
 
-            // 수정한 사원 아이디, 날짜 시간 기록
+        // 변경 사항 X
+        if (!isModified) {
+            return "no_changes";
+        }
+
+        // 변경 사항 O
+        try {
+            employee.setModifiedBy(CurrentEmployeeId);
             employee.setLastModified(LocalDateTime.now());
-            employee.setModifiedBy(authService.getAuthenticatedUser().getUsername());
-
             employeeDAO.updateEmployee(employee);
+            return "success";
+        } catch (DataAccessException dae) {
+            logger.error("‼️사원 정보 수정 중 데이터베이스 오류 발생 : " + dae.getMessage(), dae);
+            return "error";
+        } catch (Exception e) {
+            logger.error("‼️사원 정보 수정 중 알 수 없는 오류 발생 : " + e.getMessage(), e);
+            return "fail";
         }
     }
-    // 수정 관련 로직 end-point
+    // ============================================ 수정 관련 로직 end-point ============================================
 
-    // 퇴사 관련 로직 start-point
+    // ============================================ 퇴사 관련 로직 start-point ============================================
     @Override // 퇴사 예정인 사원 정보 조회
     public List<Employee> getPreResignationEmployees() {
         List<Employee> employees = employeeDAO.getPreResignationEmployees();
@@ -268,5 +304,5 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
     }
-    // 퇴사 관련 로직 end-point
+    // ============================================= 퇴사 관련 로직 end-point =============================================
 }

@@ -4,7 +4,7 @@
       layout:decorate="~{fragments/layout :: layout(title='사원 등록')}">
 
 <th:block layout:fragment="css">
-  <!-- 필요한 CSS 추가 -->
+  <link rel="stylesheet" th:href="@{/css/employee.css}"/>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -12,119 +12,23 @@
   <script th:src="@{/js/daum-postcode-API.js}"></script>
   <script th:src="@{/js/employee.js}"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() { updateCustomField(); });
-  </script>
-  <script>
-    // 유효성 검사 로직
-    function validateForm(event) {
-      event.preventDefault();
-
-      var picture = document.getElementById('picture').files[0];
-      const name = document.getElementById("name").value.trim();
-      const birth = document.getElementById("birth").value.trim();
-      const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
-      const phoneInput = document.getElementById("phoneInput").value.trim();
-      const emailLocal = document.getElementById("emailLocal").value.trim();
-      const emailDomain = document.getElementById("emailDomain").value.trim();
-      const address = document.getElementById("address").value.trim();
-      const detailAddressInput = document.getElementById("detailAddressInput").value.trim();
-      const department = document.getElementById("department").value;
-      const position = document.getElementById("position").value;
-      const hireDate = document.getElementById("hireDate").value;
-
-      const errorMessage = document.querySelector(".error-message");
-      errorMessage.textContent = "";
-
-      if (!picture) {
-        errorMessage.textContent = "사진을 등록해주세요.";
-        return false;
-      }
-      if (name === "") {
-        errorMessage.textContent = "이름을 입력해주세요.";
-        return false;
-      }
-      if (birth === "" || birth.length !== 6 || !/^\d+$/.test(birth)) {
-        errorMessage.textContent = "유효한 생년월일(6자리 숫자)을 입력해주세요.";
-        return false;
-      }
-      if (residentRegistrationNumber === "" || residentRegistrationNumber.length !== 7 || !/^\d+$/.test(residentRegistrationNumber)) {
-        errorMessage.textContent = "유효한 주민번호 뒷자리(7자리 숫자)를 입력해주세요.";
-        return false;
-      }
-      if (phoneInput === "" || !/^\d{11}$/.test(phoneInput)) {
-        errorMessage.textContent = "'-'를 제외한 유효한 전화번호를 입력해주세요.";
-        return false;
-      }
-      if (emailLocal === "") {
-        errorMessage.textContent = "이메일을 입력해주세요.";
-        return false;
-      }
-      if (emailDomain === "") {
-        errorMessage.textContent = "이메일 도메인을 선택해주세요.";
-        return false;
-      }
-      if (address === "") {
-        errorMessage.textContent = "주소를 입력해주세요.";
-        return false;
-      }
-      if (detailAddressInput === "") {
-        errorMessage.textContent = "상세 주소를 입력해주세요.";
-        return false;
-      }
-      if (department === "") {
-        errorMessage.textContent = "부서를 선택해주세요.";
-        return false;
-      }
-      if (position === "") {
-        errorMessage.textContent = "직위를 선택해주세요.";
-        return false;
-      }
-      if (hireDate === "") {
-        errorMessage.textContent = "입사일을 선택해주세요.";
-        return false;
-      }
-
-      combineEmail();
-      combineDetailAddress();
-      formatPhoneNumber();
-
-      // AJAX 요청
-      const form = event.target;
-      const formData = new FormData(form);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', form.action, true);
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            alert(xhr.responseText);
-            window.location = "/employee/list";
-          } else if (xhr.status === 404) {
-            alert(xhr.responseText);
-          } else if (xhr.status === 400) {
-            alert('파일이 비어있습니다.\n파일을 확인 후 재업로드해주세요.');
-          } else if (xhr.status === 500) {
-            alert('파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.');
-          } else {
-            alert('사원 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-            window.location.reload();
-          }
-        }
-      };
-      xhr.send(formData);
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+      updateCustomField();
+      errorMessage = document.querySelector(".error-message");
+    });
   </script>
 </th:block>
 
 <div layout:fragment="~{content}">
   <div class="content">
     <h2>사원 등록</h2>
-    <form th:action="@{/employee/registration}" method="post" onsubmit="validateForm(event)" enctype="multipart/form-data">
+    <form th:action="@{/employee/registration}" onsubmit="submitInsertForm(event)" enctype="multipart/form-data">
       <div class="form-group">
-        <label for="picture">사원 사진 (10MB 이하)</label>
-        <input type="file" id="picture" name="picture" onchange="validateImage(this)">
+        <img id="employee-picture" class="employee-picture"/><br>
+        <p>사진은 10MB까지 업로드 가능합니다.</p>
+        <span id="file-name" th:text="${employee.picture}"></span>
+        <label for="picture" class="input-file-btn">사진 업로드</label>
+        <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
       </div>
       <div class="form-group">
         <label for="name">이름</label>
@@ -140,7 +44,7 @@
       </div>
       <div class="form-group">
         <label for="phone">전화번호</label>
-        <input type="text" class="phoneInput" id="phoneInput" name="phoneInput" maxlength="11" placeholder="01012345678">
+        <input type="text" class="phoneInput" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요.">
         <input type="hidden" id="phone" name="phone">
       </div>
       <div class="form-group">
