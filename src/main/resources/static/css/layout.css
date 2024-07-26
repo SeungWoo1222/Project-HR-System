@@ -248,11 +248,8 @@ body {
 }
 
 /* Input File styles */
-.invisible-input-file {
-    display: none;
-}
-
 .input-file-btn{
+    width : 280px;
     font-size: 13px;
     padding: 10px;
     background-color: #cfedfc;
@@ -265,4 +262,9 @@ body {
 .input-file-btn:hover {
     background-color: #18a8f1;
     color: white;
+}
+
+/* Hidden Styles */
+.hidden {
+    display: none;
 }

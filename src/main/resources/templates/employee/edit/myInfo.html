@@ -4,65 +4,33 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='내 정보 수정')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
 </th:block>
 
 <th:block layout:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/daum-postcode-API.js}"></script>
-    // 파일 검증 기능 작동 확인 금요일에 js 로직 통합
+    <script th:src="@{/js/employee.js}"></script>
     <script>
-        // 파일 검증
-        function validateFile(obj) {
-            const files = obj.files;
-            if (files.length > 0) {
-                const file = files[0];
-
-                if (obj) {
-                    // 파일 크기 확인
-                    if (file.size > 10 * 1024 * 1024) {
-                        alert("파일 크기는 10MB를 초과할 수 없습니다.");
-                        obj.value = ""
-                        return false;
-
-                    }
-
-                    // 파일 형식 확인
-                    const fileTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp', 'image/heif', 'image/heif'];
-                    if (!fileTypes.includes(file.type)) {
-                        alert("파일 형식이 맞지 않습니다.");
-                        obj.value = ""
-                        return false;
-                    }
-
-                    // 파일명 업데이트
-                    document.getElementById('file-name').textContent = file.name;
-
-                    // 이미지 미리보기 업데이트
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('employee-picture').src = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
+        document.addEventListener("DOMContentLoaded", function() { separateEmail(); });
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <form th:action="@{/employee/update}" method="post">
-            <div>
-                <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
-                <div>
-                    사원 사진 : <span id="file-name" th:text="${employee.picture}"></span>
-                    <label for="picture" class="input-file-btn">업로드</label>
-                    <input type="file" id="picture" class="invisible-input-file" name="picture" onchange="validateFile(this)">
-                    <span>사진은 10MB까지 업로드 가능합니다.</span>
-                </div>
-            </div>
+        <form th:action="@{/employee/update/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data">
+            <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
             <table>
+                <tr>
+                    <th>사원 사진</th>
+                    <td>
+                        <p>사진은 10MB까지 업로드 가능합니다.</p>
+                        <span id="file-name" th:text="${employee.picture}"></span>
+                        <label for="picture" class="input-file-btn">파일 업로드</label>
+                        <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+                    </td>
+                </tr>
+
                 <tr>
                     <th>사원 ID</th>
                     <td th:text="${employee.employeeId}">
@@ -75,7 +43,8 @@
                 </tr>
                 <tr>
                     <th>주민등록번호</th>
-                    <td><input type="text" name="fullResidentRegistrationNumber" th:value="${employee.birth} + '-' + ${employee.residentRegistrationNumber}" readonly/>
+                    <td>
+                        <input type="text" name="fullResidentRegistrationNumber" th:value="${employee.birth} + '-' + ${employee.residentRegistrationNumber}" readonly/>
                         <input type="hidden" name="birth" th:value="${employee.birth}" size="6"/>
                         <input type="hidden" name="residentRegistrationNumber" th:value="${employee.residentRegistrationNumber}" size="7"/>
                     </td>
@@ -86,7 +55,22 @@
                 </tr>
                 <tr>
                     <th>이메일</th>
-                    <td><input type="email" name="email" th:value="${employee.email}"/></td>
+                    <td>
+                        <input type="text" id="emailLocal" name="emailLocal"/>
+                        @
+                        <input type="text" id="customEmailDomain" name="customEmailDomain" class="hidden">
+                        <select id="emailDomain" name="emailDomain" onchange="updateCustomField()">
+                            <option value="custom">직접입력</option>
+                            <option value="naver.com">naver.com</option>
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="icloud.com">icloud.com</option>
+                            <option value="outlook.com">outlook.com</option>
+                            <option value="nate.com">nate.com</option>
+                            <option value="daum.net">daum.net</option>
+                            <option value="yahoo.com">yahoo.com</option>
+                        </select>
+                        <input type="hidden" id="email" name="email" th:value="${employee.email}"/>
+                    </td>
                 </tr>
                 <tr>
                     <th>주소</th>
@@ -132,10 +116,11 @@
                     <td><input type="text" name="modifiedBy" th:value="${employee.modifiedBy}" readonly/></td>
                 </tr>
             </table>
-            <button type="submit" class="btn" onclick="">내 정보 수정</button>
+            <button type="submit" class="btn" onclick="submitEmployeePartial(event)">내 정보 수정</button>
             <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/myInfo\''">수정 취소</button>
             <button type="submit" class="btn" onclick="window.location.reload()">초기화</button>
         </form>
     </div>
 </div>
+
 </html>

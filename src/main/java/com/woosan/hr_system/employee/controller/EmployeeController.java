@@ -38,7 +38,7 @@ public class EmployeeController {
     @Autowired
     private AuthService authService;
 
-    // 조회 관련 로직 start-point
+    // ============================================ 조회 관련 로직 start-point ============================================
     @GetMapping("/list") // 모든 사원 정보 조회
     public String getEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "size", defaultValue = "10") int size,
@@ -83,9 +83,9 @@ public class EmployeeController {
         model.addAttribute("employee", employee);
         return "employee/myInfo";
     }
-    // 조회 관련 로직 end-point
+    // ============================================= 조회 관련 로직 end-point =============================================
 
-    // 등록 관련 로직 start-point
+    // ============================================ 등록 관련 로직 start-point ============================================
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동
     public String viewEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
@@ -139,9 +139,9 @@ public class EmployeeController {
         }
         return ResponseEntity.ok( "'" + employee.getName() + "' 사원이 신규 사원으로 등록되었습니다.");
     }
-    // 등록 관련 로직 end-point
+    // ============================================= 등록 관련 로직 end-point =============================================
 
-    // 수정 관련 로직 start-point
+    // ============================================ 수정 관련 로직 start-point ============================================
     @GetMapping("/edit/{employeeId}") // 사원 정보 수정 페이지 이동
     public String editEmployeeForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
@@ -164,14 +164,14 @@ public class EmployeeController {
         return "redirect:/employee/edit";
     }
 
-    @PatchMapping("/{employeeId}") // 사원 정보 일부 수정
+    @PatchMapping(value = "/update/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 사원 정보 일부 수정
     public String updateEmployeePartial(@PathVariable("employeeId") String employeeId, @RequestBody Map<String, Object> updates) {
         employeeService.updateEmployeePartial(employeeId, updates);
         return "redirect:/employee/edit";
     }
-    // 수정 관련 로직 end-point
+    // ============================================= 수정 관련 로직 end-point =============================================
 
-    // 퇴사 관련 로직 start-point
+    // ============================================ 퇴사 관련 로직 start-point ============================================
     @GetMapping("/resignation") // 사원 퇴사 관리 페이지 이동
     public String viewResignationManagement(Model model) {
         List<Employee> preResignationEmployees = employeeService.getPreResignationEmployees();
@@ -264,5 +264,5 @@ public class EmployeeController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
         }
     }
-    // 퇴사 관련 로직 end-point
+    // ============================================= 퇴사 관련 로직 end-point =============================================
 }
