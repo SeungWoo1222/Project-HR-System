@@ -13,12 +13,12 @@
 
 <div>
     <div>
-        <h1 th:text="${report.title}">제목</h1>
-        <p th:text="'내용: ' + ${report.content}">내용</p>
-        <p th:text="'업무 처리 날짜: ' + ${report.completeDate}">업무 처리 날짜</p>
-        <p th:text="'작성일: ' + ${report.createdDate}">작성일</p>
-        <p th:text="'결재자: ' + ${report.approverId}">결재자</p>
-        <p th:text="'결재 상태: ' + ${report.status}">결재 상태</p>
+        <h1>보고서</h1>
+        <p th:text="'제목 : ' + ${report.title}">제목</p>
+        <p th:text="'내용 : ' + ${report.content}">내용</p>
+        <p th:text="'업무 처리 날짜 : ' + ${report.completeDate}">업무 처리 날짜</p>
+        <p th:text="'결재 상태 : ' + ${report.status}">결재 상태</p>
+        <p th:text="'작성일 : ' + ${report.createdDate}">작성일</p>
         <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
         <!-- 결재 상태 변경 기능 시작 -->

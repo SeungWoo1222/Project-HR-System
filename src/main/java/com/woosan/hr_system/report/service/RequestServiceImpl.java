@@ -22,19 +22,25 @@ public class RequestServiceImpl implements RequestService {
     private RequestDAO requestDAO;
 
     @Override // 요청 생성
-    public void createRequest(List<String> writerIds, LocalDate dueDate, String requestNote, String requesterId) {
-        List<Request> requests = new ArrayList<>();
-        LocalDateTime requestDate = LocalDateTime.now(); // 현재 기준 생성 시간 설정
+    public void createRequest(List<String> writerIds, List<String> writerNames, LocalDate dueDate, String requestNote, String requesterId) {
 
-        for (String writerId : writerIds) {
+        LocalDateTime requestDate = LocalDateTime.now(); // 현재 기준 생성 시간 설정
+        List<Request> requests = new ArrayList<>();
+
+        // requests 객체 설정
+        for (int i = 0; i < writerIds.size(); i++) {
             Request request = new Request();
             request.setRequesterId(requesterId);
-            request.setWriterId(writerId);
+            request.setWriterId(writerIds.get(i));
+            request.setWriterName(writerNames.get(i));
             request.setDueDate(dueDate);
             request.setRequestNote(requestNote);
             request.setRequestDate(requestDate);
             requests.add(request);
+            System.out.println("name : " + writerNames.get(i));
+            System.out.println("id : " + writerIds.get(i));
         }
+
         requestDAO.createRequest(requests);
     }
 
@@ -43,7 +49,7 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getAllRequests();
     }
 
-    @Override // 내가 작성한 요청 조회
+    @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
     public List<Request> getMyRequests(String requesterId) {
         return requestDAO.getMyRequests(requesterId);
     }
@@ -66,7 +72,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 요청 수정
-    public void updateRequest(Long requestId, List<String> writerIds, String requestNote, LocalDate dueDate) {
+    public void updateRequest(Long requestId, List<String> writerIds, List<String> writerNames, String requestNote, LocalDate dueDate) {
 
         //request 객체 설정
         LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
@@ -92,10 +98,11 @@ public class RequestServiceImpl implements RequestService {
                 requesterId = userDetails.getUsername();
             }
 
-            for (String writerId : writerIds) {
+            for (int i = 0; i < writerIds.size(); i++) {
                 Request request = new Request();
                 request.setRequesterId(requesterId);
-                request.setWriterId(writerId);
+                request.setWriterId(writerIds.get(i));
+                request.setWriterName(writerNames.get(i));
                 request.setRequestNote(requestNote);
                 request.setDueDate(dueDate);
                 request.setRequestDate(modifiedDate);

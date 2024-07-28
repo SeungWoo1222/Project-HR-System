@@ -60,7 +60,7 @@
                         <thead>
                         <tr>
                             <th>작성자</th>
-                            <th>작성 유무</th>
+                            <th>작성된 보고서</th>
                             <th>마감 일자</th>
                             <th>요청 일자</th>
                         </tr>
@@ -68,7 +68,7 @@
                         <tbody>
                         <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
                             th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
-                            <td th:text="${request.writerId}"></td>
+                            <td th:text="${request.writerName}"></td>
                             <td th:text="${request.reportId}"></td>
                             <td th:text="${request.formattedDueDate}"></td>
                             <td th:text="${request.formattedRequestDate}"></td>

@@ -28,9 +28,10 @@
             select.empty(); // 기존 옵션 초기화
             data.forEach(function(employee) {
               const checkboxContainer = $('<div></div>');
-              const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerId" value="' + employee.employeeId + '" data-name="' + employee.name + '">');
+              const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerId" value="' + employee.employeeId + '">');
+              const nameInput = $('<input type="hidden" class="writerNameInput" name="writerName" value="' + employee.name + '">');
               const label = $('<label>' + employee.name + '</label>');
-              checkboxContainer.append(checkbox).append(label);
+              checkboxContainer.append(checkbox).append(label).append(nameInput);
               select.append(checkboxContainer);
             });
             $('#selectAllContainer').show(); // 부서 선택 후에 전체 선택 체크박스 보이기
@@ -58,7 +59,7 @@
         selectedContainer.empty();
         $('.writerIdCheckbox:checked').each(function() {
           const id = $(this).val();
-          const name = $(this).data('name'); // data-name 속성에서 이름 가져오기
+          const name = $(this).siblings('.writerNameInput').val(); // name을 가져오기
           const employeeDiv = $('<div class="selected-employee" data-id="' + id + '"></div>');
           employeeDiv.append('<span>' + name + '</span>');
           const removeButton = $('<button type="button">x</button>');
@@ -70,6 +71,15 @@
           selectedContainer.append(employeeDiv);
         });
       }
+
+      // 폼 제출 시 체크되지 않은 writerName 필드 제거
+      $('form').on('submit', function(event) {
+        $('.writerIdCheckbox').each(function() {
+          if (!$(this).is(':checked')) {
+            $(this).siblings('.writerNameInput').remove();
+          }
+        });
+      });
     });
   </script>
 </th:block>

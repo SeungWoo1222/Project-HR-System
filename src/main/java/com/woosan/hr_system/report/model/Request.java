@@ -8,6 +8,7 @@ public class Request {
     private Long reportId;
     private String requesterId;
     private String writerId;
+    private String writerName;
     private LocalDateTime requestDate;
     private LocalDateTime modifiedDate;
     private LocalDate dueDate;
@@ -49,6 +50,14 @@ public class Request {
 
     public void setWriterId(String writerId) {
         this.writerId = writerId;
+    }
+
+    public String getWriterName() {
+        return writerName;
+    }
+
+    public void setWriterName(String writerName) {
+        this.writerName = writerName;
     }
 
     public LocalDateTime getRequestDate() {

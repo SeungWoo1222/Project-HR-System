@@ -49,17 +49,18 @@ public class ExecutiveController {
 
     @PostMapping("/write") // 요청 생성
     public String createRequest(@RequestParam("writerId") List<String> writerIds,
+                                @RequestParam("writerName") List<String> writerNames,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
                                 @RequestParam("requestNote") String requestNote,
                                 Model model) {
+        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
                 String requesterId = userDetails.getUsername();
 
-                // 서비스 계층에 요청 전달
-                requestService.createRequest(writerIds, dueDate, requestNote, requesterId);
+                requestService.createRequest(writerIds, writerNames ,dueDate, requestNote, requesterId);
 
                 model.addAttribute("message", "보고서 작성 완료");
                 return "redirect:/admin/request/main";
@@ -87,7 +88,7 @@ public class ExecutiveController {
         // 내가 결재할 보고서 목록 조회
         List<Report> reports = reportService.getPendingApprovalReports();
 
-        // 내 employee_id를 기반으로 요청자(requester_id) 설정
+        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         String requesterId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -127,7 +128,7 @@ public class ExecutiveController {
     public String getReportStats(@RequestParam(name = "startDate") String startDate,
                                  @RequestParam(name = "endDate") String endDate,
                                  Model model) {
-        // 날짜 설정
+        // db 데이터 타입과 날짜 타입을 맞춰줌
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // startDate와 endDate를 "yyyy-MM-dd" 형식으로 변환
@@ -168,10 +169,11 @@ public class ExecutiveController {
     @PostMapping("/edit") // 요청 수정
     public String updateRequest(@RequestParam("requestId") Long requestId,
                                 @RequestParam("writerId") List<String> writerIds,
+                                @RequestParam("writerName") List<String> writerNames,
                                 @RequestParam("requestNote") String requestNote,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
 
-        requestService.updateRequest(requestId, writerIds, requestNote, dueDate);
+        requestService.updateRequest(requestId, writerIds, writerNames, requestNote, dueDate);
         return "redirect:/admin/request/main";
     }
 

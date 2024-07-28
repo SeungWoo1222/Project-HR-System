@@ -36,7 +36,7 @@
             complete_date AS completeDate,
             created_date AS createdDate,
             modified_date AS modifiedDate,
-            approver_id AS approverId,
+--             approver_id AS approverId,
             status,
             reject_reason AS rejectReason
         FROM reports
