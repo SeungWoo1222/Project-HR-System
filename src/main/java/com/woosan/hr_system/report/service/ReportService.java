@@ -19,7 +19,7 @@ public interface ReportService {
     List<Report> getPendingApprovalReports(); // 결재할 보고서 목록 조회
 
     // 생성 관련 메소드
-    void createReport(Report report, MultipartFile file) throws IOException;
+    void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String employeeId);
     List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
 
     // 보고서 수정 관련 메소드

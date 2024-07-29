@@ -5,6 +5,7 @@ import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.report.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,31 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private ReportDAO reportDAO;
+    @Override // 보고서 생성
+    public void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String employeeId) {
+        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
+        List<Report> reports = new ArrayList<>();
+
+        for (int i = 0; i < approverIds.size(); i++) {
+            Report report = new Report();
+            report.setTitle(title);
+            report.setContent(content);
+            report.setApproverId(approverIds.get(i));
+            report.setApproverName(approverNames.get(i));
+            report.setCompleteDate(completeDate);
+            report.setEmployeeId(employeeId);
+            report.setCreatedDate(createdDate);
+            report.setStatus("미처리"); // 기본 결재 상태 설정
+
+            reports.add(report);
+            // 파일 업로드
+//            if (!file.isEmpty()) {
+//                reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
+//            }
+        }
+
+        reportDAO.createReport(reports);
+    }
 
     @Override // 모든 보고서 조회
     public List<Report> getAllReports() {
@@ -75,26 +101,7 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
-    @Override // 보고서 생성
-    public void createReport(Report report, MultipartFile file) throws IOException {
-        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-        report.setCreatedDate(createdDate);
-        report.setStatus("미처리"); // 기본 결재 상태 설정
 
-        // 현재 로그인 한 사용자 employeeId를 보고서 작성자(employee_id)로 설정
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            report.setEmployeeId(userDetails.getUsername());
-        }
-
-        reportDAO.createReport(report);
-
-        // 파일 업로드
-        if (!file.isEmpty()) {
-            reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
-        }
-    }
 
     @Override // 파일 업로드
     public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {

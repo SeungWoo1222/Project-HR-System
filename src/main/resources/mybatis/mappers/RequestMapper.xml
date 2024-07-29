@@ -5,6 +5,23 @@
 
 <mapper namespace="com.woosan.hr_system.report.dao.RequestDAO">
 
+    <!-- 요청 생성 -->
+    <insert id="createRequest" parameterType="list">
+        INSERT INTO report_requests
+        (requester_id, writer_id, writer_name, due_date, request_note, request_date)
+        VALUES
+        <foreach collection="list" item="request" separator=",">
+            (
+            #{request.requesterId},
+            #{request.writerId},
+            #{request.writerName},
+            #{request.dueDate},
+            #{request.requestNote},
+            #{request.requestDate}
+            )
+        </foreach>
+    </insert>
+
     <!-- 모든 요청 조회 -->
     <select id="getAllRequests" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
@@ -34,22 +51,7 @@
     </select>
 
 
-    <!-- 요청 생성 -->
-    <insert id="createRequest" parameterType="list">
-        INSERT INTO report_requests
-        (requester_id, writer_id, writer_name, due_date, request_note, request_date)
-        VALUES
-        <foreach collection="list" item="request" separator=",">
-            (
-            #{request.requesterId},
-            #{request.writerId},
-            #{request.writerName},
-            #{request.dueDate},
-            #{request.requestNote},
-            #{request.requestDate}
-            )
-        </foreach>
-    </insert>
+
 
     <!-- 요청 수정 -->
     <update id="updateRequest" parameterType="com.woosan.hr_system.report.model.Request">

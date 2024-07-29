@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.dao;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.report.model.Request;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,11 @@ public class ReportDAO {
     @Autowired
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportDAO";
+
+    // 보고서 생성
+    public void createReport(List<Report> reports) {
+        sqlSession.insert(NAMESPACE + ".createReport", reports);
+    }
 
     // 보고서 전체 조회
     public List<Report> getAllReports() {
@@ -53,10 +59,6 @@ public class ReportDAO {
         return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
     }
 
-    // 보고서 생성
-    public void createReport(Report report) {
-        sqlSession.insert(NAMESPACE + ".createReport", report);
-    }
 
     // 파일 DB 정보 생성
     public void insertFileMetadata(FileMetadata fileMetadata) {

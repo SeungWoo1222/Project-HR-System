@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
@@ -12,6 +13,8 @@ import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +39,36 @@ public class ReportController {
     private RequestService requestService;
     @Autowired
     private EmployeeDAO employeeDAO;
-
     @Autowired
-    private ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
+    private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 반환용
+
+
+    @GetMapping("/write") // 보고서 생성 페이지 이동
+    public String showCreatePage(Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
+        return "report/write";
+    }
+
+    @PostMapping("/write") // 보고서 생성
+    public String createReport(@RequestParam("title") String title,
+                               @RequestParam("content") String content,
+                               @RequestParam("writerId") List<String> approverIds,
+                               @RequestParam("writerName") List<String> approverNames,
+                               @RequestParam("completeDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate completeDate,
+                               @RequestParam("file") MultipartFile file,
+                               Model model) {
+        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String employeeId = userDetails.getUsername();
+            reportService.createReport(title, content, approverIds, approverNames, completeDate, file, employeeId);
+        }
+
+        model.addAttribute("message", "보고서 작성 완료");
+        return "redirect:/report/main";
+    }
 
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
@@ -99,42 +129,6 @@ public class ReportController {
         return "redirect:/report/main?startDate=" + formattedStartDate + "&endDate=" + formattedEndDate;
     }
 
-    @GetMapping("/write") // 보고서 작성 페이지 이동
-    public String showCreateForm(Model model) {
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("employees", employees); // employees 목록 추가
-        return "report/write";  // write.html로 연결
-    }
-
-    @PostMapping("/write") // 보고서 생성
-    public String createReport(@RequestParam("title") String title,
-                               @RequestParam("content") String content,
-                               @RequestParam("approverId") String approverId,
-                               @RequestParam("completeDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate completeDate,
-                               @RequestParam("file") MultipartFile file,
-                               Model model) {
-        try {
-            // report 객체 설정
-            Report report = new Report();
-            report.setTitle(title);
-            report.setContent(content);
-            report.setApproverId(approverId);
-            report.setCompleteDate(completeDate);
-
-
-            reportService.createReport(report, file);
-
-            model.addAttribute("message", "보고서 작성 완료");
-            return "redirect:/report/main";
-        } catch (DateTimeParseException e) {
-            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
-            return "report/write";
-        } catch (IOException e) {
-            model.addAttribute("message", "파일 업로드 실패");
-            e.printStackTrace();
-            return "report/write";
-        }
-    }
 
     @GetMapping("/edit") // 수정 페이지 이동
     public String updateReport(@RequestParam("reportId") Long reportId, Model model) {

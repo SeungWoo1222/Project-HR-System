@@ -5,6 +5,24 @@
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
 
+    <!-- 보고서 생성 -->
+    <insert id="createReport" parameterType="list">
+        INSERT INTO reports
+        (title, content, approver_id, approver_name, complete_date, employee_id, created_date, status)
+        VALUES
+        <foreach collection="list" item="report" separator=",">
+            (
+            #{report.title},
+            #{report.content},
+            #{report.approverId},
+            #{report.approverName},
+            #{report.completeDate},
+            #{report.employeeId},
+            #{report.createdDate},
+            #{report.status}
+            )
+        </foreach>
+    </insert>
     <!-- 모든 보고서 조회 -->
     <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
@@ -69,27 +87,6 @@
         FROM report_files
         WHERE file_id = #{fileId}
     </select>
-
-    <!-- 보고서 생성 -->
-    <insert id="createReport" parameterType="com.woosan.hr_system.report.model.Report">
-        INSERT INTO reports (
-            employee_id,
-            title,
-            content,
-            created_date,
-            complete_date,
-            approver_id,
-            status
-        ) VALUES (
-                     #{employeeId},
-                     #{title},
-                     #{content},
-                     #{createdDate},
-                     #{completeDate},
-                     #{approverId},
-                     #{status}
-                 )
-    </insert>
 
     <!-- 파일 DB 정보 생성 -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">

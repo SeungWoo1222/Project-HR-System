@@ -7,6 +7,7 @@ public class Report {
     private Long reportId;
     private String employeeId;
     private String approverId;
+    private String approverName;
     private Long fileId;
     private String title;
     private String content;
@@ -16,7 +17,8 @@ public class Report {
     private String rejectReason;
     private LocalDate completeDate;
 
-    private String formattedCreatedDate; // main.html에 yy-mm-dd로 반환하는 변수
+    // main.html에 (yy-mm-dd-time)이 아닌 yy-mm-dd로 보여주기 위한 변수
+    private String formattedCreatedDate;
 
 
     // Getters and Setters
@@ -74,6 +76,14 @@ public class Report {
 
     public void setApproverId(String approverId) {
         this.approverId = approverId;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
     }
 
     public String getStatus() {
