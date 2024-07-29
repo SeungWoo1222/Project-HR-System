@@ -38,13 +38,13 @@ public class PasswordDAO {
         return sqlSession.selectOne(NAMESPACE + "getPasswordCount", employeeId);
     }
 
-    // 비밀번호 카운트 +1 수정
-    public void addPasswordCount(String employeeId) {
-        sqlSession.update(NAMESPACE + "addPasswordCount", employeeId);
+    // 비밀번호 카운트 1 증가
+    public void incrementPasswordCount(String employeeId) {
+        sqlSession.update(NAMESPACE + "incrementPasswordCount", employeeId);
     }
 
-    // 비밀번호 카운트 0으로 수정
-    public void removePasswordCount(String employeeId) {
-        sqlSession.update(NAMESPACE + "removePasswordCount", employeeId);
+    // 비밀번호 카운트 초기화
+    public void resetPasswordCount(String employeeId) {
+        sqlSession.update(NAMESPACE + "resetPasswordCount", employeeId);
     }
 }

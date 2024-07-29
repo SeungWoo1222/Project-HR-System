@@ -8,6 +8,7 @@ public class Password {
     private int passwordCount;
     private LocalDateTime lastModified;
     private String modifiedBy;
+    private int strength;
 
     public String getEmployeeId() { return employeeId; }
 
@@ -17,9 +18,7 @@ public class Password {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public void setPassword(String password) { this.password = password; }
 
     public int getPasswordCount() { return passwordCount; }
 
@@ -40,4 +39,8 @@ public class Password {
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
+
+    public int getStrength() { return strength; }
+
+    public void setStrength(int strength) { this.strength = strength; }
 }
