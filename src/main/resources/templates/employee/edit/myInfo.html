@@ -24,7 +24,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <!--   File form 분리해서 해당 관련 로직도 수정하고 추가해야함    -->
-        <form id="pictureFileForm" th:action="@{/employee/updatePicture}" method="post" enctype="multipart/form-data">
+        <form id="fileForm" th:action="@{/employee/updatePicture}" enctype="multipart/form-data">
             <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
             <p>사진은 10MB까지 업로드 가능합니다.</p>
             <span id="file-name" th:text="${employee.picture}"></span>

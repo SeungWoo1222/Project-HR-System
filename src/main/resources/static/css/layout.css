@@ -118,7 +118,7 @@ body {
 }
 
 /* Submenu styles */
-.active {
+.active a {
     background-color: #A1DBF9 !important;
     border-radius: 4px;
 }

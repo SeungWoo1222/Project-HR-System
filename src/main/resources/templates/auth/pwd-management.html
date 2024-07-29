@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='비밀번호 관리)}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/pwd.js}"/></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div>
+            <h3>현재 비밀번호 강도</h3>
+            <div></div>
+        </div>
+        <div>
+            <h3>마지막 비밀번호 변경 날짜</h3>
+            <p><span></span> : 다음 변경일자까지 <span></span>일 남았습니다.</p>
+        </div>
+        <button type="button" class="btn" th:onclick="openModal('/auth/pwd-change')">비밀번호 변경</button>
+    </div>
+</div>
+</html>
