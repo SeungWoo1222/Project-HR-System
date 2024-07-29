@@ -18,6 +18,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
     @Override // 보고서 생성
-    public void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String employeeId) {
+    public void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String writerId) {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
         List<Report> reports = new ArrayList<>();
 
@@ -41,7 +42,7 @@ public class ReportServiceImpl implements ReportService {
             report.setApproverId(approverIds.get(i));
             report.setApproverName(approverNames.get(i));
             report.setCompleteDate(completeDate);
-            report.setEmployeeId(employeeId);
+            report.setWriterId(writerId);
             report.setCreatedDate(createdDate);
             report.setStatus("미처리"); // 기본 결재 상태 설정
 
@@ -71,34 +72,54 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String startDate, String endDate) {
+    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd) {
 
         // 기본 통계 데이터를 최근 1개월로 조회
-        if (startDate == null && endDate == null) {
+        if (statisticStart == null && statisticEnd == null) {
             LocalDate end = LocalDate.now();
             LocalDate start = end.minusMonths(1);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            startDate = start.format(formatter);
-            endDate = end.format(formatter);
+            statisticStart = start.format(formatter);
+            statisticEnd = end.format(formatter);
         }
 
-        return reportDAO.getReportStats(startDate, endDate);
+        return reportDAO.getReportStats(statisticStart, statisticEnd);
     }
 
-    @Override // 결재할 보고서 조회
-    public List<Report> getPendingApprovalReports() {
-        // admin에서 보고서 조회할 경우
-        // 로그인한 계정 기준 employee_id를 approvalId로 설정 -> Mapper에서 결재목록을 반환해줌
-        String approvalId = null;
+//    @Override // 이번 달 결재할 보고서 조회
+//    public List<Report> getPendingApprovalReports(String approverId) {
+//        // 현재 연월 가져오기
+//        YearMonth currentYearMonth = YearMonth.now();
+//
+//        // 현재 연월을 사용하여 DAO 호출
+//        return reportDAO.getPendingApprovalReports(approverId, currentYearMonth, currentYearMonth);
+//    }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            approvalId = userDetails.getUsername();
+    @Override // 날짜범위 내 결재할 보고서 조회
+    public List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd) {
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (approvalStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(approvalStart, formatter);
         }
 
-        return reportDAO.getPendingApprovalReports(approvalId);
+        if (approvalEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(approvalEnd, formatter);
+        }
 
+        // 파싱된 날짜를 DAO로 전달하여 호출
+        return reportDAO.getPendingApprovalReports(approverId, startYearMonth, endYearMonth);
     }
 
 

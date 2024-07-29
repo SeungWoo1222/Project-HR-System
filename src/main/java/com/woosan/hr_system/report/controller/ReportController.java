@@ -62,8 +62,8 @@ public class ReportController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String employeeId = userDetails.getUsername();
-            reportService.createReport(title, content, approverIds, approverNames, completeDate, file, employeeId);
+            String writerId = userDetails.getUsername();
+            reportService.createReport(title, content, approverIds, approverNames, completeDate, file, writerId);
         }
 
         model.addAttribute("message", "보고서 작성 완료");

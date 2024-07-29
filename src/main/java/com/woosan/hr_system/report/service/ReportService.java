@@ -16,10 +16,11 @@ public interface ReportService {
     List<Report> getAllReports(); // 모든 리포트 조회
     Report getReportById(Long reportId); // 특정 리포트 조회
     FileMetadata getReportFileById(Long fileId); // 파일 조회
-    List<Report> getPendingApprovalReports(); // 결재할 보고서 목록 조회
+//    List<Report> getPendingApprovalReports(String approverId); // 이번 달 결재할 보고서 목록 조회
+    List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd); // 날짜 범위 내 결재할 보고서 목록 조회
 
     // 생성 관련 메소드
-    void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String employeeId);
+    void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String writerId);
     List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
 
     // 보고서 수정 관련 메소드
@@ -29,6 +30,6 @@ public interface ReportService {
     // 보고서 삭제
     void deleteReport(Long id);
 
-    List<ReportStat> getReportStats(String startDate, String endDate);
+    List<ReportStat> getReportStats(String statisticStart, String statisticEnd);
 
 }

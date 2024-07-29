@@ -26,7 +26,7 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/employee/register", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/employee/registration", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 일반 사원 권한
 //                                .requestMatchers("/").hasAnyRole("사원", "대리", "과장")

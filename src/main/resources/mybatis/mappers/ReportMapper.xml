@@ -8,7 +8,7 @@
     <!-- 보고서 생성 -->
     <insert id="createReport" parameterType="list">
         INSERT INTO reports
-        (title, content, approver_id, approver_name, complete_date, employee_id, created_date, status)
+        (title, content, approver_id, approver_name, complete_date, writer_id, created_date, status)
         VALUES
         <foreach collection="list" item="report" separator=",">
             (
@@ -17,29 +17,34 @@
             #{report.approverId},
             #{report.approverName},
             #{report.completeDate},
-            #{report.employeeId},
+            #{report.writerId},
             #{report.createdDate},
             #{report.status}
             )
         </foreach>
     </insert>
+
     <!-- 모든 보고서 조회 -->
-    <select id="getAllReports" resultType="com.woosan.hr_system.report.model.Report">
+    <select id="getAllReports" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
-            report_id AS reportId,
-            employee_id AS employeeId,
-            title,
-            content,
-            DATE_FORMAT(created_date, '%y-%m-%d') AS formattedCreatedDate,
-            modified_date AS modifiedDate,
-            approver_id AS approverId,
-            status,
-            reject_reason AS rejectReason
-        FROM reports
---      approverId가 정의된 경우 -> 내 결재 목록 반환, 아닌 경우, 기본 report 조회
+        r.report_id AS reportId,
+        r.writer_id AS writerId,
+        e.name AS employeeName,
+        r.title,
+        r.content,
+        DATE_FORMAT(r.created_date, '%Y-%m-%d') AS formattedCreatedDate,
+        r.modified_date AS modifiedDate,
+        r.approver_id AS approverId,
+        r.status,
+        r.reject_reason AS rejectReason
+        FROM reports r
+        JOIN employees e ON r.writer_id = e.employee_id
         <where>
             <if test="approverId != null">
-                approver_id = #{approverId}
+                r.approver_id = #{approverId}
+            </if>
+            <if test="startYearMonth != null and endYearMonth != null">
+                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
             </if>
         </where>
     </select>
@@ -48,7 +53,7 @@
     <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
-            employee_id AS employeeId,
+            writer_id AS writerId,
             title,
             content,
             complete_date AS completeDate,
@@ -69,7 +74,7 @@
             SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
             SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
         FROM reports
-        WHERE complete_date BETWEEN #{startDate} AND #{endDate}
+        WHERE complete_date BETWEEN #{statisticStart} AND #{statisticEnd}
         GROUP BY month
     </select>
 

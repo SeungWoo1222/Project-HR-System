@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,19 +45,21 @@ public class ReportDAO {
     }
 
     // 결재할 보고서 조회
-    public List<Report> getPendingApprovalReports(String approverId) {
+    public List<Report> getPendingApprovalReports(String approverId, YearMonth startYearMonth, YearMonth endYearMonth) {
         // approverId 설정(Mapper에서 approverId의 유무를 가리기 위함)
         Map<String, Object> params = new HashMap<>();
         params.put("approverId", approverId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
 
-        return sqlSession.selectList(NAMESPACE + ".getAllReports");
+        return sqlSession.selectList(NAMESPACE + ".getAllReports", params);
     }
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String startDate, String endDate) {
+    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd) {
         Map<String, Object> params = new HashMap<>();
-        params.put("startDate", startDate);
-        params.put("endDate", endDate);
+        params.put("startDate", statisticStart);
+        params.put("endDate", statisticEnd);
         return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
     }
 

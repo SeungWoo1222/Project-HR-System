@@ -31,6 +31,7 @@
     <div class="content">
         <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
                 <h1>내 결재 목록</h1>
+                <button th:onclick="openModal('/admin/request/approvalDatePage')" >날짜 범위 설정</button>
                     <table class="list">
                         <thead>
                         <tr>
@@ -44,7 +45,7 @@
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
                             th:onclick="openModal('/admin/request/report/' + this.getAttribute('reportId'))">
                             <td th:text="${report.title}"></td>
-                            <td th:text="${report.employeeId}"></td>
+                            <td th:text="${report.employeeName}"></td>
                             <td th:text="${report.status}"></td>
                             <td th:text="${report.formattedCreatedDate}"></td>
                         </tr>
@@ -59,7 +60,7 @@
                     <table>
                         <thead>
                         <tr>
-                            <th>작성자</th>
+                            <th>보고서 작성자</th>
                             <th>작성된 보고서</th>
                             <th>마감 일자</th>
                             <th>요청 일자</th>

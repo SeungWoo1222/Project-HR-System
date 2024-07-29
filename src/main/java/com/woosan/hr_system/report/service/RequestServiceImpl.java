@@ -37,8 +37,6 @@ public class RequestServiceImpl implements RequestService {
             request.setRequestNote(requestNote);
             request.setRequestDate(requestDate);
             requests.add(request);
-            System.out.println("name : " + writerNames.get(i));
-            System.out.println("id : " + writerIds.get(i));
         }
 
         requestDAO.createRequest(requests);

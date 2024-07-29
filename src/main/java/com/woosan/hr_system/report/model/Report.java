@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class Report {
     private Long reportId;
-    private String employeeId;
+    private String writerId;
     private String approverId;
     private String approverName;
     private Long fileId;
@@ -20,6 +20,9 @@ public class Report {
     // main.html에 (yy-mm-dd-time)이 아닌 yy-mm-dd로 보여주기 위한 변수
     private String formattedCreatedDate;
 
+    // 결재할 보고서에 작성자 이름 조회 위한 변수
+    private String employeeName;
+
 
     // Getters and Setters
     public Long getReportId() {
@@ -30,12 +33,12 @@ public class Report {
         this.reportId = reportId;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public String getWriterId() {
+        return writerId;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public void setWriterId(String writerId) {
+        this.writerId = writerId;
     }
 
     public String getTitle() {
@@ -124,5 +127,13 @@ public class Report {
 
     public void setFormattedCreatedDate(String formattedCreatedDate) {
         this.formattedCreatedDate = formattedCreatedDate;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
     }
 }
