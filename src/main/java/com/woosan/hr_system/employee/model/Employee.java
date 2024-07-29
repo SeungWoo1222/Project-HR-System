@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 public class Employee {
     private String employeeId;
-    private String password;
     private String name;
     private String birth;
     private String residentRegistrationNumber;
@@ -22,9 +21,6 @@ public class Employee {
     private LocalDateTime lastModified;
     private String modifiedBy;
     private Resignation resignation;
-    private int passwordCount;
-
-    // Getters and Setters
 
     public String getEmployeeId() {
         return employeeId;
@@ -32,14 +28,6 @@ public class Employee {
 
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -159,8 +147,4 @@ public class Employee {
     public Resignation getResignation() { return resignation; }
 
     public void setResignation(Resignation resignation) { this.resignation = resignation; }
-
-    public int getPasswordCount() { return passwordCount; }
-
-    public void setPasswordCount(int passwordCnt) { this.passwordCount = passwordCnt; }
 }

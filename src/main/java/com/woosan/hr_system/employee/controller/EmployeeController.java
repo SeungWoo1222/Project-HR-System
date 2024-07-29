@@ -1,6 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
-import com.woosan.hr_system.auth.AuthService;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.search.PageRequest;

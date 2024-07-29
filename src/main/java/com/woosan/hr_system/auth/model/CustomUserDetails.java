@@ -1,4 +1,4 @@
-package com.woosan.hr_system.auth;
+package com.woosan.hr_system.auth.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,21 +1,21 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.auth.AuthService;
+import com.woosan.hr_system.auth.model.CustomUserDetails;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.controller.EmployeeController;
-import com.woosan.hr_system.search.PageRequest;
-import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,9 +33,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private ResignationDAO resignationDAO;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private AuthService authService;
@@ -76,10 +73,16 @@ public class EmployeeServiceImpl implements EmployeeService {
             String BB = employee.getHireDate().format(formatter).substring(2, 4);
             int currentYearEmpolyeesCount = employeeDAO.countEmployeesByCurrentYear();
             String CCC = String.format("%03d", currentYearEmpolyeesCount + 1);
-            employee.setEmployeeId(employee.getDepartment() + BB + CCC);
+            String employeeId = employee.getDepartment() + BB + CCC;
+
+            // 사원 번호 중복 체크
+            if (employeeDAO.existsById(employeeId)) {
+                throw new DuplicateKeyException("이미 존재하는 사원 아이디입니다. : " + employeeId);
+            }
+            employee.setEmployeeId(employeeId);
 
             // 첫 비밀번호 생년월일로 설정
-            employee.setPassword(passwordEncoder.encode(employee.getBirth()));
+            authService.insertFirstPassword(employeeId, employee.getBirth());
 
             // 재직 상태 설정
             employee.setStatus("재직");

@@ -5,7 +5,6 @@
 <mapper namespace="com.woosan.hr_system.employee.dao.EmployeeDAO">
     <resultMap id="EmployeeResultMap" type="com.woosan.hr_system.employee.model.Employee">
         <id property="employeeId" column="employee_id"/>
-        <result property="password" column="password"/>
         <result property="name" column="name"/>
         <result property="birth" column="birth"/>
         <result property="residentRegistrationNumber" column="resident_registration_number"/>
@@ -21,7 +20,6 @@
         <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
-        <result property="passwordCount" column="password_count"/>
         <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
             <id property="employeeId" column="employee_id"/>
             <result property="resignationReason" column="resignation_reason"/>
@@ -44,10 +42,17 @@
         SELECT * FROM employees WHERE employee_id = #{employeeId}
     </select>
 
+    <!-- 사원 번호 중복 조회 -->
+    <select id="existsById" parameterType="String" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM employees
+        WHERE employee_id = #{employeeId}
+    </select>
+
     <!-- 사원 등록 -->
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, password, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by, password_count)
-        VALUES (#{employeeId}, #{password}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy}, #{passwordCount})
+        INSERT INTO employees (employee_id, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by)
+        VALUES (#{employeeId}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
     </insert>
 
     <!-- 사원 정보 수정 -->
@@ -160,26 +165,5 @@
             </if>
         </where>
     </select>
-
-    <!-- 비밀번호 카운트 조회 -->
-    <select id="getPasswordCount" parameterType="String" resultType="int">
-        SELECT password_count
-        FROM employees
-        WHERE employee_id=#{employeeId}
-    </select>
-
-    <!-- 비밀번호 +1 수정 -->
-    <update id="addPasswordCount" parameterType="String">
-        UPDATE employees
-        SET password_count = password_count + 1
-        WHERE employee_id=#{employeeId}
-    </update>
-
-    <!-- 비밀번호 0으로 수정 -->
-    <update id="removePasswordCount" parameterType="String">
-        UPDATE employees
-        SET password_count = 0
-        WHERE employee_id=#{employeeId}
-    </update>
 
 </mapper>

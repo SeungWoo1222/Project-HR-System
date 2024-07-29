@@ -1,22 +1,16 @@
-package com.woosan.hr_system.auth;
+package com.woosan.hr_system.auth.controller;
 
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.security.Principal;
 
 @Controller
 public class AuthController {
@@ -25,10 +19,7 @@ public class AuthController {
     private AuthService authService;
 
     @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private EmployeeDAO employeeDAO;
+    private PasswordDAO passwordDAO;
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -63,7 +54,7 @@ public class AuthController {
         String result = authService.verifyPassword(password, employeeId);
         return switch (result) {
             case "match" -> ResponseEntity.ok(url + employeeId);
-            case "mismatch" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + employeeDAO.getPasswordCount(employeeId) + " / 5 입니다.");
+            case "mismatch" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + passwordDAO.getPasswordCount(employeeId) + " / 5 입니다.");
             case "exceed" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 확인 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
         };
