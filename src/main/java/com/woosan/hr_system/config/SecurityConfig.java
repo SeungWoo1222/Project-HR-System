@@ -1,5 +1,6 @@
 package com.woosan.hr_system.config;
 
+import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
 import com.woosan.hr_system.auth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/auth/login") // 사용자 정의 로그인 페이지 경로
+                                .failureHandler(customAuthenticationFailureHandler()) // 커스텀 실패 핸들러 설정
                                 .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트될 경로
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
                 )
@@ -76,11 +78,13 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
+    @Bean
+    public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
 }

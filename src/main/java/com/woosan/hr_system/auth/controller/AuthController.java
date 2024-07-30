@@ -32,14 +32,18 @@ public class AuthController {
     }
 
     @GetMapping("/auth/login") // 로그인 페이지 이동
-    public String login() {
+    public String login(@RequestParam(value = "error", required = false) String error,
+                        @RequestParam(value = "message", required = false) String message,
+                        Model model) {
+        model.addAttribute("error", error);
+        model.addAttribute("message", message);
         return "/auth/login";
     }
 
-    @PostMapping("/auth/login") // 로그인 인증 로직
-    public String loginProcess() {
-        return "/home";
-    }
+//    @PostMapping("/auth/login") // 로그인 인증 로직
+//    public String loginProcess() {
+//        return "/home";
+//    }
 
     @GetMapping("/auth/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
