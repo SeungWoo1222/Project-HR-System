@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -77,12 +78,12 @@ public class AuthService {
         // 비밀번호 패턴 검증
         if (!validatePassword(newPassword)) return "invalid";
 
-        updatePassword(newPassword, employeeId, strength);
+        updatePassword(employeeId, newPassword, strength);
         return "success";
     }
 
     // 비밀번호 변경 로직
-    public void updatePassword(String newPassword, String employeeId, int strength) {
+    public void updatePassword(String employeeId, String newPassword, int strength) {
         Password pwd = passwordDAO.selectPassword(employeeId);
         if (pwd == null) {
             throw new IllegalArgumentException("Password record not found for employeeId: " + employeeId);
@@ -97,5 +98,21 @@ public class AuthService {
     // 비밀번호 패턴 검증 로직
     private boolean validatePassword(String password) {
         return password.matches(PASSWORD_PATTERN);
+    }
+
+    // 비밀번호 만료 여부 확인 로직
+    public String isPasswordChangeRequired() {
+        LocalDateTime lastModifiedDateTime = passwordDAO.selectPassword(getAuthenticatedUser().getUsername()).getLastModified();
+
+        // 첫 비밀번호 변경 확인
+        if (lastModifiedDateTime == null) return "FirstChangeRequired";
+
+        // 비밀번호 변경 후 3개월이 지났는지 확인
+        LocalDate lastModifiedDate = lastModifiedDateTime.toLocalDate();
+        LocalDate now = LocalDate.now();
+        if (now.isAfter(lastModifiedDate.plusMonths(3))) {
+            return "ChangeRequired";
+        }
+        return "NoChangeRequired";
     }
 }

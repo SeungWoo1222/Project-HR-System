@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='홈')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='홈')}">
 
-<th:block layout:fragment="css">
+<th:block layout:fragment="css"></th:block>
+
+<th:block layout:fragment="script">
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script th:src="@{/js/pwd.js}"/></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const message = document.getElementById('message').value;
+
+            if (message === 'FirstChangeRequired') {
+                openModal('/auth/pwd-change?message=FirstChangeRequired');
+            } else if (message === 'ChangeRequired') {
+                openModal('/auth/pwd-change?message=ChangeRequired');
+            }
+        });
+    </script>
 </th:block>
 
     <div layout:fragment="~{content}">
         <div class="content">
+            <input id="message" type="hidden" th:value="${message}">
         </div>
     </div>
 </html>

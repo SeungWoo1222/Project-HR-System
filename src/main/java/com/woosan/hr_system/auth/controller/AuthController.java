@@ -28,7 +28,13 @@ public class AuthController {
 
     @GetMapping("/home")
     public String home(Model model) {
-        return "home";
+        String result = authService.isPasswordChangeRequired();
+        switch (result) {
+            case "FirstChangeRequired" -> model.addAttribute("message", "FirstChangeRequired");
+            case "ChangeRequired" -> model.addAttribute("message", "ChangeRequired");
+            default -> model.addAttribute("message", "NoChangeRequired");
+        }
+        return "/home";
     }
 
     @GetMapping("/auth/login") // 로그인 페이지 이동
@@ -39,11 +45,6 @@ public class AuthController {
         model.addAttribute("message", message);
         return "/auth/login";
     }
-
-//    @PostMapping("/auth/login") // 로그인 인증 로직
-//    public String loginProcess() {
-//        return "/home";
-//    }
 
     @GetMapping("/auth/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
@@ -82,7 +83,8 @@ public class AuthController {
     }
 
     @GetMapping("/auth/pwd-change") // 비밀번호 변경 페이지 이동
-    public String viewPasswordChangeForm() {
+    public String viewPasswordChangeForm(@RequestParam(value = "message", required = false) String message, Model model) {
+        if (message != null) model.addAttribute("message", message);
         return "/auth/pwd-change";
     }
 

@@ -52,8 +52,10 @@ function validatePassword(password) {
 // 새로운 비밀번호 강도 확인 로직
 function checkPasswordStrength() {
     const newPasswordInput = document.getElementById('new-password');
-    const passwordStrength = document.getElementById('password-strength');
     const newPassword = newPasswordInput.value;
+
+    const passwordStrength = document.getElementById('show-strength');
+    const passwordStrengthInput = document.getElementById('strength');
 
     // zxcvbn을 사용하여 비밀번호 강도 측정
     const result = zxcvbn(newPassword);
@@ -63,7 +65,7 @@ function checkPasswordStrength() {
     passwordStrength.textContent = `${strength[result.score]}`
 
     // 강도 점수 입력
-    passwordStrengthHidden.value = result.score;
+    passwordStrengthInput.value = result.score;
 }
 
 // 새로운 비밀번호 확인 함수

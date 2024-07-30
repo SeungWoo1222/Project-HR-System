@@ -4,9 +4,25 @@
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+    <style>
+        .password-change-message {
+            color: #18a8f1;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </th:block>
 
 <div>
+    <div th:if="${message} == 'FirstChangeRequired'">
+        <p class="password-change-message">입사를 축하합니다!<br>
+            현재 비밀번호는 생년월일로 설정되어 있습니다.<br>
+            안전한 비밀번호로 변경해 주세요.</p>
+    </div>
+    <div th:if="${message} == 'ChangeRequired'">
+        <p class="password-change-message">비밀번호를 변경한 지 3개월이 지났습니다.<br>
+            안전한 계정 관리를 위해 비밀번호를 변경해 주세요.</p>
+    </div>
     <div>
         <form th:action="@{/auth/changePassword}"  onsubmit="summitUpdatePassword(event)">
             <div class="form-group">
@@ -17,8 +33,8 @@
                 <label for="new-password">새로운 비밀번호</label>
                 <input type="password" id="new-password" name="new-password" onchange="checkNewPassword()"/>
                 <span>비밀번호는 8~20자 사이여야 하며, 대문자, 소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.</span>
-                <div>비밀번호 강도 : <span id="password-strength"></span></div>
-                <input type="hidden" name="password-strength"/>
+                <div>비밀번호 강도 : <span id="show-strength"></span></div>
+                <input type="hidden" id="strength" name="strength"/>
             </div>
             <div class="form-group">
                 <label for="confirm-password">비밀번호 확인</label>
