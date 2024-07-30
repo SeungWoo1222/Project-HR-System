@@ -16,10 +16,11 @@
 
 <div>
     <div>
-        <h1 th:text="'작성자 : ' + ${request.writerId}"></h1>
-        <p th:text="'내용 : ' + ${request.requestNote}"></p>
+        <h1>보고서 작성 요청 </h1>
+        <p th:text="'보고서 작성자 : ' + ${request.writerName}"></p>
+        <p th:text="'요청 사항 : ' + ${request.requestNote}"></p>
         <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
-        <p th:text="'요청자 : ' + ${request.requesterId}"></p>
+        <p th:text="'요청 일자 : ' + ${request.requestDate}"></p>
 
         <a th:href="@{'/admin/request/edit?requestId=' + ${request.requestId}}">수정</a>
 

@@ -3,7 +3,12 @@ package com.woosan.hr_system.report.dao;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
+
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -30,8 +35,13 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 조회
-    public List<Request> getMyRequests(String requesterId) {
-        return sqlSession.selectList(NAMESPACE + ".getAllRequests", requesterId);
+    public List<Request> getMyRequests(String requesterId, YearMonth startYearMonth, YearMonth endYearMonth) {
+        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
+        Map<String, Object> params = new HashMap<>();
+        params.put("requesterId", requesterId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        return sqlSession.selectList(NAMESPACE + ".getAllRequests", params);
     }
 
     // 모든 사원 조회

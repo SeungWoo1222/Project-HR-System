@@ -70,38 +70,38 @@ public class ReportController {
         return "redirect:/report/main";
     }
 
-    @GetMapping("/main") // main 페이지 이동
-    public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
-                              @RequestParam(name = "endDate", required = false) String endDate,
-                              Model model) throws JsonProcessingException {
-        // 보고서, 요청 list 생성
-        // yy-mm-dd 반환 받을 객체 설정
-        Report report = new Report();
-        report.setFormattedCreatedDate(null);
-
-        Request request = new Request();
-        request.setFormattedRequestDate(null);
-        request.setFormattedDueDate(null);
-
-        List<Report> reports = reportService.getAllReports();
-        List<Request> requests = requestService.getAllRequests();
-
-        model.addAttribute("reports", reports);
-        model.addAttribute("requests", requests);
-
-        // 보고서 통계
-        List<ReportStat> stats = reportService.getReportStats(startDate, endDate);
-
-        List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
-        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
-        for (ReportStat stat : stats) {
-            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
-        }
-        String statsJson = objectMapper.writeValueAsString(statsArray);
-        model.addAttribute("statsJson", statsJson);
-
-        return "report/main"; // main.html 반환
-    }
+//    @GetMapping("/main") // main 페이지 이동
+//    public String getMainPage(@RequestParam(name = "startDate", required = false) String startDate,
+//                              @RequestParam(name = "endDate", required = false) String endDate,
+//                              Model model) throws JsonProcessingException {
+//        // 보고서, 요청 list 생성
+//        // yy-mm-dd 반환 받을 객체 설정
+//        Report report = new Report();
+//        report.setFormattedCreatedDate(null);
+//
+//        Request request = new Request();
+//        request.setFormattedRequestDate(null);
+//        request.setFormattedDueDate(null);
+//
+//        List<Report> reports = reportService.getAllReports();
+//        List<Request> requests = requestService.getAllRequests();
+//
+//        model.addAttribute("reports", reports);
+//        model.addAttribute("requests", requests);
+//
+//        // 보고서 통계
+//        List<ReportStat> stats = reportService.getReportStats(startDate, endDate,);
+//
+//        List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
+//        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
+//        for (ReportStat stat : stats) {
+//            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
+//        }
+//        String statsJson = objectMapper.writeValueAsString(statsArray);
+//        model.addAttribute("statsJson", statsJson);
+//
+//        return "report/main"; // main.html 반환
+//    }
 
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
     public String showStatisticPage(Model model) {
@@ -159,9 +159,9 @@ public class ReportController {
     }
 
     @DeleteMapping("/delete/{reportId}") // 보고서 삭제
-    public String deleteReport(@PathVariable("reportId") Long id,
+    public String deleteReport(@RequestParam("reportId") Long reportId,
                                RedirectAttributes redirectAttributes) {
-        reportService.deleteReport(id);
+        reportService.deleteReport(reportId);
         return "redirect:/report/main";
     }
 }

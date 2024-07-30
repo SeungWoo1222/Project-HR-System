@@ -2,9 +2,7 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woosan.hr_system.auth.CustomUserDetails;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
@@ -12,25 +10,25 @@ import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/request")
 public class ExecutiveController {
+
     @Autowired
     private ReportService reportService;
     @Autowired
@@ -47,78 +45,63 @@ public class ExecutiveController {
         return "admin/report/request_write";
     }
 
-    @PostMapping("/write") // 요청 생성
+    // 요청 생성
+    @PostMapping("/write")
     public String createRequest(@RequestParam("writerId") List<String> writerIds,
                                 @RequestParam("writerName") List<String> writerNames,
                                 @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
                                 @RequestParam("requestNote") String requestNote,
                                 Model model) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                String requesterId = userDetails.getUsername();
-
-                requestService.createRequest(writerIds, writerNames ,dueDate, requestNote, requesterId);
-
-                model.addAttribute("message", "보고서 작성 완료");
-                return "redirect:/admin/request/main";
-            } else {
-                model.addAttribute("message", "로그인 정보가 없습니다.");
-                return "/admin/report/request_write";
-            }
-        } catch (DateTimeParseException e) {
-            model.addAttribute("message", "날짜 형식이 잘못되었습니다.");
-            return "/admin/report/request_write";
-        }
+        String requesterId = UserIdHelper.getCurrentUserId();
+        requestService.createRequest(writerIds, writerNames, dueDate, requestNote, requesterId);
+        model.addAttribute("message", "보고서 작성 완료");
+        return "redirect:/admin/request/main";
     }
 
-    @GetMapping("/employee") // 부서 기반 임원 정보 조회
-    @ResponseBody
-    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
-        return employeeDAO.getEmployeesByDepartment(departmentId);
-    }
-
-    @GetMapping("/main") // main 페이지
-    public String getMainPage(@RequestParam(name = "statisticStart", required = false) String statisticStart,
-                              @RequestParam(name = "statisticEnd", required = false) String statisticEnd,
-                              @RequestParam(name = "approvalStart", required = false) String approvalStart,
-                              @RequestParam(name = "approvalEnd", required = false) String approvalEnd,
-                              Model model) throws JsonProcessingException {
-
+    // main 페이지
+    @GetMapping("/main")
+    public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
 
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
-        String approverId = null;
-        String requesterId = null;
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            approverId = userDetails.getUsername();
-            requesterId = userDetails.getUsername();
-        }
+        String approverId = UserIdHelper.getCurrentUserId();
+        String requesterId = UserIdHelper.getCurrentUserId();
 
         // 내가 결재할 보고서 목록 조회
+        String approvalStart = (String) session.getAttribute("approvalStart");
+        String approvalEnd = (String) session.getAttribute("approvalEnd");
         List<Report> reports = reportService.getPendingApprovalReports(approverId, approvalStart, approvalEnd);
-        // 내가 쓴 요청 목록 조회
-        List<Request> requests = requestService.getMyRequests(requesterId);
 
-        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-//            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//            requesterId = userDetails.getUsername();
-//        }
+        // 내가 쓴 요청 목록 조회
+        String requestStart = (String) session.getAttribute("requestStart");
+        String requestEnd = (String) session.getAttribute("requestEnd");
+        List<Request> requests = requestService.getMyRequests(requesterId, requestStart ,requestEnd);
+
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
         // 보고서 통계
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd);
+        String statisticStart = (String) session.getAttribute("statisticStart");
+        String statisticEnd = (String) session.getAttribute("statisticEnd");
+        List<String> writerIds = (List<String>) session.getAttribute("writerIds");
+        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
+
+        // 선택된 임원 목록 조회
+        List<Employee> selectedWriters = new ArrayList<>();
+        if (writerIds != null && !writerIds.isEmpty()) {
+            for (String writerId : writerIds) {
+                Employee employee = employeeDAO.getEmployeeById(writerId);
+                selectedWriters.add(employee);
+            }
+            model.addAttribute("selectedWriters", selectedWriters);
+            model.addAttribute("allWritersSelected", false);
+        } else {
+            model.addAttribute("allWritersSelected", true);
+        }
 
         // 통계 View 관련 로직
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
-        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서 수", "완료된 보고서 수", "미완료된 보고서 수"});
+        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재 된 보고서", "결재 대기인 보고서"});
         for (ReportStat stat : stats) {
             statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
         }
@@ -126,6 +109,12 @@ public class ExecutiveController {
         model.addAttribute("statsJson", statsJson);
 
         return "admin/report/main"; // main.html 반환
+    }
+
+    @GetMapping("/employee") // 부서 기반 임원 정보 조회
+    @ResponseBody
+    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
+        return employeeDAO.getEmployeesByDepartment(departmentId);
     }
 
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
@@ -139,54 +128,75 @@ public class ExecutiveController {
     @GetMapping("/stats") // 통계 날짜, 임원 설정
     public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
                                  @RequestParam(name = "statisticEnd") String statisticEnd,
-                                 Model model) {
-        // db 데이터 타입과 날짜 타입을 맞춰줌
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                 @RequestParam(required = false, name = "writerId") List<String> writerIds,
+                                 HttpSession session) {
 
-        // startDate와 endDate를 "yyyy-MM-dd" 형식으로 변환
-        // 그 후 마지막날에 1달을 더하고 1일을 다시 뺌 (달마다 마지막 일수가 다름)
-        // (ex endDate = 2024-08-01, +1Month -> 2024-09-01, -1minusDays -> 2024-08-30
-        LocalDate start = LocalDate.parse(statisticStart + "-01");
-        LocalDate end = LocalDate.parse(statisticEnd + "-01").plusMonths(1).minusDays(1);
-
-        String formattedStartDate = start.format(formatter);
-        String formattedEndDate = end.format(formatter);
-
-        model.addAttribute("statisticStart", formattedStartDate);
-        model.addAttribute("statisticEnd", formattedEndDate);
+        // 날짜 설정
+        session.setAttribute("statisticStart", statisticStart);
+        session.setAttribute("statisticEnd", statisticEnd);
 
         // 임원 설정
+        session.setAttribute("writerIds", writerIds);
 
-
-        return "redirect:/admin/request/main?statisticStart=" + formattedStartDate + "&statisticEnd=" + formattedEndDate;
+        return "redirect:/admin/request/main";
     }
 
+    // 통계 - 선택된 임원 목록 중 삭제될 시 실행
+    @PostMapping("/updateStats")
+    @ResponseBody
+    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> writerIds) throws JsonProcessingException {
+        String statisticStart = (String) session.getAttribute("statisticStart");
+        String statisticEnd = (String) session.getAttribute("statisticEnd");
+
+        // 통계 데이터 조회
+        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
+        return prepareStatsResponse(stats);
+    }
+
+    // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
+    private Map<String, Object> prepareStatsResponse(List<ReportStat> stats) throws JsonProcessingException {
+        List<Object[]> statsArray = new ArrayList<>();
+        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재 된 보고서", "결재 대기인 보고서"});
+        for (ReportStat stat : stats) {
+            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
+        }
+        String statsJson = objectMapper.writeValueAsString(statsArray);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("statsJson", statsJson);
+        return response;
+    }
+
+    // 내 결재 목록 날짜 범위설정 페이지 이동
     @GetMapping("/approvalDatePage")
-    public String showStatisticPage() {
-        return "/admin/report/approvalDate";
+    public String showApprovalDatePage() {
+        return "/admin/report/report_approval_date";
     }
 
-    @GetMapping("/approvalDate") // 내 결재 목록 조회 + 날짜 범위 설정
+    // 내 결재 목록 조회 + 날짜 범위 설정
+    @GetMapping("/approvalDate")
     public String setApprovalListDateRange(@RequestParam(name = "approvalStart") String approvalStart,
                                            @RequestParam(name = "approvalEnd") String approvalEnd,
-                                           Model model) {
-        String approverId = null;
+                                           HttpSession session) {
+        session.setAttribute("approvalStart", approvalStart);
+        session.setAttribute("approvalEnd", approvalEnd);
+        return "redirect:/admin/request/main";
+    }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            approverId = userDetails.getUsername();
-        }
+    // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
+    @GetMapping("/requestDatePage")
+    public String showRequestDatePage() {
+        return "/admin/report/request_date";
+    }
 
-        try {
-            List<Report> reports = reportService.getPendingApprovalReports(approverId, approvalStart, approvalEnd);
-            model.addAttribute("reports", reports);
-        } catch (DateTimeParseException e) {
-            model.addAttribute("error", "Invalid date format. Please use 'yyyy-MM'.");
-        }
-
-        return "redirect:/admin/request/main?approvalStart=" + approvalStart + "&approvalEnd=" + approvalEnd;
-
+    // 내 결재 목록 조회 + 날짜 범위 설정
+    @GetMapping("/requestDate")
+    public String setRequestListDateRange(@RequestParam(name = "requestStart") String requestStart,
+                                          @RequestParam(name = "requestEnd") String requestEnd,
+                                          HttpSession session) {
+        session.setAttribute("requestStart", requestStart);
+        session.setAttribute("requestEnd", requestEnd);
+        return "redirect:/admin/request/main";
     }
 
     @GetMapping("/{requestId}") // 특정 요청 조회
@@ -251,5 +261,6 @@ public class ExecutiveController {
             return "error"; // 에러 메시지 표시
         }
     }
+
 
 }

@@ -9,7 +9,11 @@
     </style>
 </th:block>
 
-<script th:src="@{/js/report.js}"></script>
+<th:block layout:fragment="script">
+    <!-- jQuery 추가 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/report.js}"></script>
+</th:block>
 
 <div>
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
@@ -17,29 +21,38 @@
     <h2>기간 설정</h2>
     <form action="#" th:action="@{/admin/request/stats}" method="get">
         <label for="statisticStart">시작 월:</label>
-        <input type="month" id="statisticStart" name="startDate" required>
+        <input type="month" id="statisticStart" name="statisticStart" required>
         <label for="statisticEnd">종료 월:</label>
-        <input type="month" id="statisticEnd" name="endDate" required>
+        <input type="month" id="statisticEnd" name="statisticEnd" required>
 
         <h2>임원 설정</h2>
         <div>
-            <label>
-                <input type="radio" name="searchOption" value="all" onclick="toggleEmployeeNameField()"> 임원 전체
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="radio" id="specificOption" name="searchOption" value="specific"
-                       onclick="toggleEmployeeNameField()"> 조회 할 임원
-            </label>
-            <select id="employeeName" name="employeeName" multiple disabled>
-                <option th:each="employee : ${employees}" th:value="${employee.employeeId}"
-                        th:text="${employee.name}"></option>
-            </select>
-        </div>
+            <label for="departmentId">부서 선택:</label>
+            <select id="departmentId" name="departmentId">
+                <option value="" disabled selected>부서를 선택하세요</option>
+                <option value="PR">생산</option>
+                <option value="QC">품질 관리</option>
+                <option value="SA">영업</option>
+                <option value="MK">마케팅</option>
+                <option value="FI">재무</option>
+                <option value="HR">인사</option>
+                <option value="RD">연구개발</option>
+            </select><br>
 
-        <button type="submit">통계 조회</button>
+            <div id="selectAllContainer">
+                <label>
+                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+                </label><br>
+            </div>
+
+            <label for="writerIdContainer">보고서 작성자</label>
+            <div id="writerIdContainer">
+                <!-- 직원 목록이 여기에 추가됩니다. -->
+            </div><br>
+
+            <div id="selectedEmployees" class="selected-employees"></div>
+            <button type="submit">조회</button>
+        </div>
     </form>
-
 </div>
 </html>

@@ -17,7 +17,7 @@ public interface RequestService {
     // 특정 요청 조회
     Request getRequestById(Long requestId);
     // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
-    List<Request> getMyRequests(String requesterId);
+    List<Request> getMyRequests(String requesterId, String requestStart , String requestEnd);
 
     // 보고서 결재 처리
     void updateApprovalStatus(Long reportId, String status, String rejectionReasont);

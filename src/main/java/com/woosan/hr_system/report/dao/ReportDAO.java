@@ -46,7 +46,7 @@ public class ReportDAO {
 
     // 결재할 보고서 조회
     public List<Report> getPendingApprovalReports(String approverId, YearMonth startYearMonth, YearMonth endYearMonth) {
-        // approverId 설정(Mapper에서 approverId의 유무를 가리기 위함)
+        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
         Map<String, Object> params = new HashMap<>();
         params.put("approverId", approverId);
         params.put("startYearMonth", startYearMonth);
@@ -56,10 +56,15 @@ public class ReportDAO {
     }
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd) {
+    public List<ReportStat> getReportStats(YearMonth startYearMonth, YearMonth endYearMonth, List<String> writerIds) {
         Map<String, Object> params = new HashMap<>();
-        params.put("startDate", statisticStart);
-        params.put("endDate", statisticEnd);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        if (writerIds != null && !writerIds.isEmpty()) {
+            params.put("writerIds", writerIds);
+        } else {
+            params.put("writerIds", null);  // writerIds가 null이면 임원 전체 선택
+        }
         return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
     }
 

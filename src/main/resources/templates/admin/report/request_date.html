@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        /* 여기에 CSS를 입력 */
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+
+<div>
+    <h1>작성 요청 목록 날짜 범위설정</h1>
+    <form action="#" th:action="@{/admin/request/requestDate}" method="get">
+        <label for="requestStart">시작 월:</label>
+        <input type="month" id="requestStart" name="requestStart" required>
+        <label for="requestEnd">종료 월:</label>
+        <input type="month" id="requestEnd" name="requestEnd" required>
+        <button type="submit">조회</button>
+    </form>
+</div>
+
+</html>

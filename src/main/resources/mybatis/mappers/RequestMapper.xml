@@ -32,10 +32,14 @@
         DATE_FORMAT(due_date, '%y-%m-%d') AS formattedDueDate,
         DATE_FORMAT(request_date, '%y-%m-%d') AS formattedRequestDate
         FROM report_requests
-        -- getMyRequests(로그인한 계정 Id 기반 요청 리스트 조회)메소드로 조회 했다면 requesterId가 정의 돼있음 -> 내 requester_id에 맞는 요청을 조회해옴
+        -- getMyRequests(로그인한 계정 Id 기반 요청 리스트 조회)메소드로 조회 했다면 requesterId가 정의 돼있음
+        -- -> 내 requester_id에 맞는 요청을 조회해옴
         <where>
             <if test="requesterId != null">
                 requester_id = #{requesterId}
+            </if>
+            <if test="startYearMonth != null and endYearMonth != null">
+                AND DATE_FORMAT(request_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
             </if>
         </where>
     </select>
@@ -43,15 +47,13 @@
     <!-- 특정 요청 조회 -->
     <select id="getRequestById" parameterType="long" resultType="com.woosan.hr_system.report.model.Request">
         SELECT request_id   AS requestId,
-               writer_id    AS writerId,
+               writer_name    AS writerName,
                due_date     AS dueDate,
-               request_note AS requestNote
+               request_note AS requestNote,
+               request_date AS requestDate
         FROM report_requests
         WHERE request_id = #{requestId}
     </select>
-
-
-
 
     <!-- 요청 수정 -->
     <update id="updateRequest" parameterType="com.woosan.hr_system.report.model.Request">

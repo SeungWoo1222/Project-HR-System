@@ -72,28 +72,31 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd) {
+    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIds) {
 
-        // 기본 통계 데이터를 최근 1개월로 조회
-        if (statisticStart == null && statisticEnd == null) {
-            LocalDate end = LocalDate.now();
-            LocalDate start = end.minusMonths(1);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            statisticStart = start.format(formatter);
-            statisticEnd = end.format(formatter);
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (statisticStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(statisticStart, formatter);
         }
 
-        return reportDAO.getReportStats(statisticStart, statisticEnd);
-    }
+        if (statisticEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(statisticEnd, formatter);
+        }
 
-//    @Override // 이번 달 결재할 보고서 조회
-//    public List<Report> getPendingApprovalReports(String approverId) {
-//        // 현재 연월 가져오기
-//        YearMonth currentYearMonth = YearMonth.now();
-//
-//        // 현재 연월을 사용하여 DAO 호출
-//        return reportDAO.getPendingApprovalReports(approverId, currentYearMonth, currentYearMonth);
-//    }
+        return reportDAO.getReportStats(startYearMonth, endYearMonth, writerIds);
+    }
 
     @Override // 날짜범위 내 결재할 보고서 조회
     public List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd) {

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +50,28 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
-    public List<Request> getMyRequests(String requesterId) {
-        return requestDAO.getMyRequests(requesterId);
+    public List<Request> getMyRequests(String requesterId, String requestStart , String requestEnd) {
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (requestStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(requestStart, formatter);
+        }
+
+        if (requestEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(requestEnd, formatter);
+        }
+        return requestDAO.getMyRequests(requesterId, startYearMonth, endYearMonth);
     }
 
     @Override // 특정 요청 조회
