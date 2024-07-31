@@ -101,12 +101,12 @@
                     <input type="hidden" id="position" name="position" th:value="${employee.position}" readonly/>
                 </tr>
                 <tr>
-                    <th>입사일</th>
+                    <th>입사 날짜</th>
                     <td th:text="${employee.hireDate}"></td>
                     <input type="hidden" id="hireDate" name="hireDate" th:value="${employee.hireDate}" readonly/>
                 </tr>
                 <tr>
-                    <th>상태</th>
+                    <th>재직 상태</th>
                     <td th:text="${employee.status}"></td>
                     <input type="hidden" id="status" name="status" th:value="${employee.status}" readonly/>
                 </tr>
@@ -116,16 +116,16 @@
                     <input type="hidden" id="remainingLeave" name="remainingLeave" th:value="${employee.remainingLeave}" readonly/>
                 </tr>
                 <tr>
-                    <th>마지막 수정일</th>
-                    <td th:if="${employee.lastModified} != null" th:text="${employee.lastModified}" class="dateTime"></td>
-                    <td th:unless="${employee.lastModified} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
-                    <input type="hidden" name="lastModified" th:value="${employee.lastModified}" readonly/>
-                </tr>
-                <tr>
-                    <th>수정자</th>
+                    <th>사원 정보 수정자</th>
                     <td th:if="${employee.modifiedBy} != null" th:text="${employee.modifiedBy}"></td>
                     <td th:unless="${employee.modifiedBy} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
                     <input type="hidden" name="modifiedBy" th:value="${employee.modifiedBy}" readonly/>
+                </tr>
+                <tr>
+                    <th>사원 정보 수정일시</th>
+                    <td th:if="${employee.lastModified} != null" th:text="${employee.lastModified}" class="dateTime"></td>
+                    <td th:unless="${employee.lastModified} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
+                    <input type="hidden" name="lastModified" th:value="${employee.lastModified}" readonly/>
                 </tr>
             </table>
             <div class="error-message"></div>
