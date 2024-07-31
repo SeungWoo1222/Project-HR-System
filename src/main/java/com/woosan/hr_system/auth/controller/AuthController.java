@@ -52,9 +52,10 @@ public class AuthController {
         return "redirect:/auth/login";
     }
 
-//    @GetMapping("/auth/expired") // 세션 만료시
-//    public String expireSession() {
-//    }
+    @GetMapping("/auth/session-expired") // 세션 만료시 페이지 이동
+    public String expireSession() {
+        return "/auth/session-expired";
+    }
 
     @GetMapping("/auth/pwd") // 비밀번호 검증 페이지 이동
     public String viewPasswordForm(@RequestParam("redirectUrl") String redirectUrl, Model model) {
