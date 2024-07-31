@@ -1,5 +1,7 @@
 package com.woosan.hr_system.employee.model;
 
+import com.woosan.hr_system.auth.model.Password;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -21,6 +23,8 @@ public class Employee {
     private LocalDateTime lastModified;
     private String modifiedBy;
     private Resignation resignation;
+
+    private Password password;
 
     public String getEmployeeId() {
         return employeeId;
@@ -147,4 +151,8 @@ public class Employee {
     public Resignation getResignation() { return resignation; }
 
     public void setResignation(Resignation resignation) { this.resignation = resignation; }
+
+    public Password getPassword() { return password; }
+
+    public void setPassword(Password password) { this.password = password; }
 }

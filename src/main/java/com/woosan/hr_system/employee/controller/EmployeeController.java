@@ -59,7 +59,7 @@ public class EmployeeController {
 
     @GetMapping("/{employeeId}") // 사원 정보 상세 조회
     public String getEmployee(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
+        Employee employee = employeeService.getEmployeeWithAdditionalInfo(employeeId);
         if (employee == null) {
             return "error/404";
         }
@@ -231,26 +231,13 @@ public class EmployeeController {
         return ResponseEntity.ok("'" + employeeId + "' 사원이 퇴사 처리되었습니다.");
     }
 
-
-    @GetMapping("/resignation-detail/{employeeId}") // 사원 정보 상세 조회 페이지 이동 (퇴사 정보 포함)
-    public String viewResignedEmployee(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeWithResignation(employeeId);
-        if (employee == null) {
-            return "error/employee-error";
-        }
-        String pictureUrl = s3Service.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
-        return "employee/resignation-detail";
-    }
-
-    @PostMapping("/delete/{employeeId}") // 사원 영구 삭제 로직
+    @DeleteMapping("/delete/{employeeId}") // 사원 영구 삭제 로직
     public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
         String message = employeeService.deleteEmployee(employeeId);
         return switch (message) {
             case "success" -> ResponseEntity.ok("사원이 삭제되었습니다.");
-            case "null" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("사원을 찾을 수 없습니다.");
-            case "no_resignation" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원의 퇴사 정보가 없습니다.");
+            case "null" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사원을 찾을 수 없습니다.");
+            case "no_resignation" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 사원의 퇴사 정보가 없습니다.");
             case "not_expired" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("퇴사 후 1년이 지나지 않았습니다.");
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
         };

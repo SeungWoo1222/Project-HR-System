@@ -1,6 +1,8 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
+import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.controller.EmployeeController;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
@@ -36,6 +38,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private PasswordDAO passwordDAO;
+
     // ============================================ 조회 관련 로직 start-point ============================================
     @Override // 모든 사원 정보 조회
     public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
@@ -51,13 +56,23 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeDAO.getEmployeeById(employeeId);
     }
 
-    @Override // id를 이용한 특정 사원 정보 조회 (Resignation 정보 포함)
-    public Employee getEmployeeWithResignation(String employeeId) {
+    @Override // id를 이용한 특정 사원 정보 조회 (Resignation, Password 정보 포함)
+    public Employee getEmployeeWithAdditionalInfo(String employeeId) {
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
             return null;
         }
-        employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
+
+        Password password = passwordDAO.selectPassword(employeeId);
+        if (password != null) {
+            employee.setPassword(password);
+        }
+
+        Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+        if (resignation != null) {
+            employee.setResignation(resignation);
+        }
+
         return employee;
     }
     // ============================================= 조회 관련 로직 end-point =============================================

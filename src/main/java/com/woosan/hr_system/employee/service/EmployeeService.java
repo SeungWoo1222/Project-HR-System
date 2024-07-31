@@ -10,7 +10,7 @@ import java.util.List;
 public interface EmployeeService {
     PageResult<Employee> searchEmployees(PageRequest pageRequest);
     Employee getEmployeeById(String employeeId);
-    Employee getEmployeeWithResignation(String employeeId);
+    Employee getEmployeeWithAdditionalInfo(String employeeId);
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
