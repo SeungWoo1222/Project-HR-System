@@ -30,6 +30,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private ReportDAO reportDAO;
+
     @Override // 보고서 생성
     public void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String writerId) {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
@@ -173,7 +174,6 @@ public class ReportServiceImpl implements ReportService {
 
         reportDAO.updateReport(report);
     }
-
 
     @Override // 보고서 삭제
     public void deleteReport(Long id) {

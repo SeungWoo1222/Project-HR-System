@@ -108,6 +108,7 @@ public class RequestServiceImpl implements RequestService {
             request.setModifiedDate(modifiedDate);
             requestDAO.updateRequest(request);
         }
+
         // 작성자가 여러명인 경우 => 요청 삭제 후 새로운 요청 생성
         else if (writerIds.size() > 1) {
             requestDAO.deleteRequest(requestId);
@@ -134,8 +135,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 삭제
     public void deleteRequest(Long requestId) {
+        requestDAO.insertRequestIntoSharedTrash(requestId);
         requestDAO.deleteRequest(requestId);
     }
+
 }
 
 

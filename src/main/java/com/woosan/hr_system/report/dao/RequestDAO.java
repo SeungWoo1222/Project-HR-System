@@ -64,6 +64,11 @@ public class RequestDAO {
         sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
     }
 
+    // shared_trash(휴지통)에 삭제 데이터들 삽입
+    public void insertRequestIntoSharedTrash(Long requestId) {
+        sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
+    }
+
 
 
 

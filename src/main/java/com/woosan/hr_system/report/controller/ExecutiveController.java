@@ -227,11 +227,9 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
-
-
-    @DeleteMapping("/delete/{requestId}") // 요청 삭제 => 같은 reportid로 다른이름으로 만들어진 보고서 삭제 시 구현방법 생각
-    public String deleteRequest(@PathVariable("requestId") Long id, RedirectAttributes redirectAttributes) {
-        requestService.deleteRequest(id);
+    @DeleteMapping("/delete/{requestId}") // 요청 삭제
+    public String deleteRequest(@PathVariable("requestId") Long requestId) {
+        requestService.deleteRequest(requestId);
         return "redirect:/admin/request/main";
     }
 
