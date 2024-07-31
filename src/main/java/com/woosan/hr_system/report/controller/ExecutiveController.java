@@ -229,7 +229,20 @@ public class ExecutiveController {
 
     @DeleteMapping("/delete/{requestId}") // 요청 삭제
     public String deleteRequest(@PathVariable("requestId") Long requestId) {
-        requestService.deleteRequest(requestId);
+        // 요청 삭제 권한이 있는지 확인
+
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = UserIdHelper.getCurrentUserId();
+
+        // 요청 ID로 요청 조회
+        Request request = requestService.getRequestById(requestId);
+
+        // 현재 로그인한 사용자와 requester_id 비교
+        if (request != null && request.getRequesterId().equals(currentId)) {
+            requestService.deleteRequest(requestId);
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
         return "redirect:/admin/request/main";
     }
 

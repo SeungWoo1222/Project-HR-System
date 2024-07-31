@@ -50,7 +50,8 @@
                writer_name    AS writerName,
                due_date     AS dueDate,
                request_note AS requestNote,
-               request_date AS requestDate
+               request_date AS requestDate,
+               requester_id AS requesterId -- 요청 삭제 시 로그인한 id와 requesterId가 일치하는 지(삭제권한) 확인 용
         FROM report_requests
         WHERE request_id = #{requestId}
     </select>

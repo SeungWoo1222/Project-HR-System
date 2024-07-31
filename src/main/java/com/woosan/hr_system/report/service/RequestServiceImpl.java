@@ -135,8 +135,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 삭제
     public void deleteRequest(Long requestId) {
-        requestDAO.insertRequestIntoSharedTrash(requestId);
         requestDAO.deleteRequest(requestId);
+
+        // shared_trash 테이블에 삭제될 데이터들 삽입
+        requestDAO.insertRequestIntoSharedTrash(requestId);
     }
 
 }
@@ -152,32 +154,4 @@ public class RequestServiceImpl implements RequestService {
 
 
 
-
-
-
-
-//    @Override // 작성 요청 생성
-//    public void createReportRequest(ReportRequest request) {
-//        reportRequestDAO.createReportRequest(request);
-//    }
-//
-//    @Override // 보고서 기반 작성 요청 조회
-//    public ReportRequest getReportRequestById(int requestId) {
-//        return reportRequestDAO.getReportRequestById(requestId);
-//    }
-//
-//    @Override // 작성 요청 수정
-//    public void updateReportRequest(ReportRequest request) {
-//        reportRequestDAO.updateReportRequest(request);
-//    }
-//
-//    @Override // 특정 작성 요청 삭제
-//    public void deleteReportRequest(int requestId) {
-//        reportRequestDAO.deleteReportRequest(requestId);
-//    }
-//
-//    @Override // 사원 기반 보고서 조회
-//    public List<ReportRequest> getReportRequestsByEmployeeId(String employeeId) {
-//        return reportRequestDAO.getReportRequestsByEmployeeId(employeeId);
-//    }
 
