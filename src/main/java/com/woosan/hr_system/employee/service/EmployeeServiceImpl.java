@@ -38,6 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private AuthService authService;
+
     @Autowired
     private PasswordDAO passwordDAO;
 
@@ -156,6 +157,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!Objects.equals(originalEmployee.getRemainingLeave(), employee.getRemainingLeave())) {
             isModified = true;
         }
+        if (!Objects.equals(originalEmployee.getPicture(), employee.getPicture())) {
+            isModified = true;
+        }
 
         // 변경 사항 X
         if (!isModified) {
@@ -212,7 +216,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsNames) {
+    public String resignEmployee(String employeeId, Resignation resignation, String resignationDocumentsName) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -221,10 +225,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus("퇴사");
         employeeDAO.updateEmployee(employee);
 
-        Resignation resignation = new Resignation();
-
         // 퇴사 사유 분류
-        switch (resignationReason) {
+        switch (resignation.getResignationReason()) {
             case "1":
                 resignation.setResignationReason("1. 자진퇴사");
                 break;
@@ -240,7 +242,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         // 퇴사 코드 분류
-        switch (codeNumber) {
+        switch (resignation.getCodeNumber()) {
             case "11":
                 resignation.setCodeNumber("11. 개인사정으로 인한 자진퇴사");
                 break;
@@ -273,19 +275,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 퇴사 테이블에 나머지 정보 등록
         resignation.setEmployeeId(employeeId);
-        resignation.setSpecificReason(specificReason);
-        resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
-
-        // 파일 정보 등록
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < resignationDocumentsNames.size(); i++) {
-            sb.append(resignationDocumentsNames.get(i));
-            if (i != resignationDocumentsNames.size() - 1) {
-                sb.append(" / ");
-            }
-        }
-        resignation.setResignationDocuments(sb.toString());
+        resignation.setResignationDocuments(resignationDocumentsName);
 
         // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -23,15 +23,14 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <!--   File form 분리해서 해당 관련 로직도 수정하고 추가해야함    -->
-        <form id="fileForm" th:action="@{/employee/updatePicture}" enctype="multipart/form-data">
-            <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
-            <p>사진은 10MB까지 업로드 가능합니다.</p>
-            <span id="file-name" th:text="${employee.picture}"></span>
-            <label for="picture" class="input-file-btn">사진 업로드</label>
-            <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
-        </form>
-        <form th:action="@{/employee/update}" onsubmit="submitUpdateForm(event)">
+        <form th:action="@{/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
+            <div id="file-area">
+                <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
+                <p>사진은 10MB까지 업로드 가능합니다.</p>
+                <span id="file-name" th:text="${employee.picture}"></span>
+                <label for="picture" class="input-file-btn">사진 업로드</label>
+                <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+            </div>
             <table>
                 <tr>
                     <th>사원 ID</th>

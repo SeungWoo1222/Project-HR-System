@@ -28,21 +28,6 @@ public class S3Service {
 
     private String bucketName = "haruharu-hrsystem-bucket";
 
-    public String checkFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            return "empty";
-        }
-
-        try {
-            String fileName = uploadFile(file);
-            return fileName;
-        } catch (IOException e) {
-            logger.debug("‼️File Upload Error : {} ‼️", e.getMessage(), e);
-            e.printStackTrace();
-            return "fail";
-        }
-    }
-
     public String uploadFile(MultipartFile file) throws IOException {
         File convertedFile = convertMultiPartToFile(file);
         String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
@@ -58,11 +43,6 @@ public class S3Service {
             fos.write(file.getBytes());
         }
         return convFile;
-    }
-
-    public String getUrl(String fileName) {
-        String prefix = "https://haruharu-hrsystem-bucket.s3.amazonaws.com/";
-        return prefix + fileName;
     }
 
     public byte[] downloadFile(String keyName) {

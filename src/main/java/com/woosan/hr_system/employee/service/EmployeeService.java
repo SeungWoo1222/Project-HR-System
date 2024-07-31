@@ -1,10 +1,10 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.employee.model.Employee;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface EmployeeService {
@@ -16,6 +16,6 @@ public interface EmployeeService {
     List<Employee> getPreDeletionEmployees();
     String insertEmployee(Employee employee);
     String updateEmployee(Employee employee);
-    String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsName);
+    String resignEmployee(String employeeId, Resignation resignation, String resignationDocumentsName);
     String deleteEmployee(String employeeId);
 }

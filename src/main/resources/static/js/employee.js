@@ -9,11 +9,6 @@ let filesArr = [];
 function validateForm(event) {
     event.preventDefault();
 
-    var picture = document.getElementById('picture').files[0];
-    if (picture) {
-
-    }
-
     const name = document.getElementById("name").value.trim();
     const birth = document.getElementById("birth").value.trim();
     const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
@@ -24,12 +19,13 @@ function validateForm(event) {
     const detailAddressInput = document.getElementById("detailAddressInput").value.trim();
     const department = document.getElementById("department").value;
     const position = document.getElementById("position").value;
-    const hireDate = document.getElementById("hireDate").value;
 
+    const hireDate = document.getElementById("hireDate").value;
     if (errorMessage) {
         errorMessage.textContent = "";
     } else {
         console.error("Error message element not found.");
+
     }
 
     if (name === "") {
@@ -118,14 +114,13 @@ function handleFormSubmit(event) {
     event.preventDefault();
 
     const form = event.target.closest('form');
-    const formData = new FormData(form);
     const actionUrl = form.action;
 
-    for (var pair of formData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-    }
+    // for (var pair of form.entries()) {
+    //     console.log(pair[0] + ': ' + pair[1]);
+    // }
 
-    return { formData, actionUrl };
+    return { form, actionUrl };
 }
 // =================================================== 유효성 검사 ========================================================
 
@@ -133,12 +128,32 @@ function handleFormSubmit(event) {
 // AJAX POST 요청 - 사원 등록
 function submitInsertForm(event) {
     // 유효성 검사 실행
-    if (!validateForm(event)) {
-        return;
-    }
+    if (!validateForm(event)) { return; }
 
     // form 제출 처리
-    const { formData, actionUrl } = handleFormSubmit(event);
+    const { form, actionUrl } = handleFormSubmit(event);
+    const formData = new FormData();
+
+    // FormData 객체에 employee 필드를 추가
+    const employee = {
+        name: form.name.value,
+        birth: form.birth.value,
+        residentRegistrationNumber: form.residentRegistrationNumber.value,
+        phone: form.phone.value,
+        email: form.email.value,
+        address: form.address.value,
+        detailAddress: form.detailAddress.value,
+        department: form.department.value,
+        position: form.position.value,
+        hireDate: form.hireDate.value
+    };
+    formData.append("employee", new Blob([JSON.stringify(employee)], { type: "application/json" }));
+
+    // FormData 객체에 picture 필드를 추가
+    const picture = form.picture.files[0];
+    if (picture) {
+        formData.append("picture", picture);
+    }
 
     // 데이터를 서버로 전송
     fetch(actionUrl, {
@@ -176,12 +191,37 @@ function submitInsertForm(event) {
 // AJAX PUT 요청
 function submitUpdateForm(event) {
     // 유효성 검사 실행
-    if (!validateForm(event)) {
-        return;
-    }
+    if (!validateForm(event)) { return; }
 
     // form 제출 처리
-    const { formData, actionUrl } = handleFormSubmit(event);
+    const { form, actionUrl } = handleFormSubmit(event);
+    const formData = new FormData();
+
+    // FormData 객체에 employee 필드를 추가
+    const employee = {
+        employeeId: form.employeeId.value,
+        name: form.name.value,
+        birth: form.birth.value,
+        residentRegistrationNumber: form.residentRegistrationNumber.value,
+        phone: form.phone.value,
+        email: form.email.value,
+        address: form.address.value,
+        detailAddress: form.detailAddress.value,
+        status: form.status.value,
+        department: form.department.value,
+        position: form.position.value,
+        hireDate: form.hireDate.value,
+        remainingLeave: form.remainingLeave.value,
+        modifiedBy: form.modifiedBy.value,
+        lastModified: form.lastModified.value
+    };
+    formData.append("employee", new Blob([JSON.stringify(employee)], { type: "application/json" }));
+
+    // FormData 객체에 picture 필드를 추가
+    const picture = form.picture.files[0];
+    if (picture) {
+        formData.append("picture", picture);
+    }
 
     // 데이터를 서버로 전송
     fetch(actionUrl, {
@@ -220,10 +260,21 @@ function submitResignationForm(event) {
     }
 
     // form 제출 처리
-    const { formData, actionUrl } = handleFormSubmit(event);;
+    const { form, actionUrl } = handleFormSubmit(event);
+    const formData = new FormData();
 
+    // FormData 객체에 resignation 필드를 추가
+    const resignation = {
+        resignationDate: form.resignationDate.value,
+        resignationReason: form.resignationReason.value,
+        codeNumber: form.codeNumber.value,
+        specificReason: form.specificReason.value
+    };
+    formData.append("resignation", new Blob([JSON.stringify(resignation)], { type: "application/json" }));
+
+    // FormData 객체에 resignationDocuments 필드를 추가
     for (let i = 0; i < filesArr.length; i++) {
-        // 삭제되지 않은 파일만 폼데이터에 담기
+        // 삭제되지 않은 파일만 폼 데이터에 담기
         if (!filesArr[i].is_delete) {
             formData.append("resignationDocuments", filesArr[i]);
         }
