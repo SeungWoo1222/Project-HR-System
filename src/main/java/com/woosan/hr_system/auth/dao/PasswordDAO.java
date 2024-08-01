@@ -14,9 +14,7 @@ public class PasswordDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.auth.mapper.PasswordMapper.";
 
     // 비밀번호 조회
-    public Password selectPassword(String employeeId) {
-        return sqlSession.selectOne(NAMESPACE + "selectPassword", employeeId);
-    }
+    public Password selectPassword(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectPassword", employeeId); }
 
     // 비밀번호 등록
     public void insertPassword(Password password) {
@@ -34,17 +32,11 @@ public class PasswordDAO {
     }
 
     // 비밀번호 카운트 조회
-    public int getPasswordCount(String employeeId) {
-        return sqlSession.selectOne(NAMESPACE + "getPasswordCount", employeeId);
-    }
+    public int getPasswordCount(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getPasswordCount", employeeId); }
 
     // 비밀번호 카운트 1 증가
-    public void incrementPasswordCount(String employeeId) {
-        sqlSession.update(NAMESPACE + "incrementPasswordCount", employeeId);
-    }
+    public void incrementPasswordCount(String employeeId) { sqlSession.update(NAMESPACE + "incrementPasswordCount", employeeId); }
 
     // 비밀번호 카운트 초기화
-    public void resetPasswordCount(String employeeId) {
-        sqlSession.update(NAMESPACE + "resetPasswordCount", employeeId);
-    }
+    public void resetPasswordCount(String employeeId) { sqlSession.update(NAMESPACE + "resetPasswordCount", employeeId); }
 }

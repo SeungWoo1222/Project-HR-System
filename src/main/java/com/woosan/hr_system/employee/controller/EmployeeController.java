@@ -7,8 +7,7 @@ import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.upload.FileService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/employee")
 public class EmployeeController {
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeService employeeService;
@@ -42,8 +41,6 @@ public class EmployeeController {
                                Model model) {
 
         // 매개변수 값 로그에 출력
-        logger.debug("‼️Page: {}, Size: {}, Keyword: {} ‼️", page, size, keyword);
-
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
 
@@ -90,9 +87,6 @@ public class EmployeeController {
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 신규 사원 등록
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
                                                    @RequestPart("picture") MultipartFile picture) {
-        // 파일 도착 확인
-        logger.debug("‼️Received picture - File name: {}, Size: {}, Content Type: {} ‼️", picture.getOriginalFilename(), picture.getSize(), picture.getContentType());
-
         // 파일 체크 후 DB에 저장할 파일명 반환
         String pictureName;
         try {

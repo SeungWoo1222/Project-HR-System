@@ -4,15 +4,13 @@ import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
-import com.woosan.hr_system.employee.controller.EmployeeController;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -26,9 +24,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeDAO employeeDAO;
@@ -173,10 +171,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeDAO.updateEmployee(employee);
             return "success";
         } catch (DataAccessException dae) {
-            logger.error("‼️사원 정보 수정 중 데이터베이스 오류 발생 : " + dae.getMessage(), dae);
+            log.error("‼️사원 정보 수정 중 데이터베이스 오류 발생 : " + dae.getMessage(), dae);
             return "error";
         } catch (Exception e) {
-            logger.error("‼️사원 정보 수정 중 알 수 없는 오류 발생 : " + e.getMessage(), e);
+            log.error("‼️사원 정보 수정 중 알 수 없는 오류 발생 : " + e.getMessage(), e);
             return "fail";
         }
     }

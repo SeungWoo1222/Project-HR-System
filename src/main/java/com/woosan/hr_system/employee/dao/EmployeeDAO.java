@@ -1,6 +1,5 @@
 package com.woosan.hr_system.employee.dao;
 
-import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.search.SearchService;
 import com.woosan.hr_system.employee.model.Employee;
 import org.apache.ibatis.session.SqlSession;
@@ -23,6 +22,47 @@ public class EmployeeDAO implements SearchService<Employee> {
         return sqlSession.selectList(NAMESPACE + "getAllEmployees");
     }
 
+    // 사원 정보 조회
+    public Employee getEmployeeById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId); }
+
+    // 사원 정보 등록 - 입사 처리
+    public void insertEmployee(Employee employee) { // 사원 정보 등록
+        sqlSession.insert(NAMESPACE + "insertEmployee", employee);
+    }
+
+    // 사원 정보 수정
+    public void updateEmployee(Employee employee) { // 사원 정보 수정
+        sqlSession.update(NAMESPACE + "updateEmployee", employee);
+    }
+
+    // 사원 정보 삭제 - 퇴사 후 12개월 지난 사원 정보
+    public void deleteEmployee(String employeeId) { // 사원 정보 삭제
+        sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId);
+    }
+
+    // 사원 번호 중복 조회
+    public boolean existsById(String employeeId) { // 사원 번호 중복 조회
+        return sqlSession.selectOne(NAMESPACE + "existsById", employeeId);
+    }
+
+    // 부서를 이용한 특정 사원 정보 조회
+    public List<Employee> getEmployeesByDepartment(String departmentId) { return sqlSession.selectList(NAMESPACE + "getEmployeesByDepartment", departmentId); };
+
+    // 퇴사 예정인 사원 정보 조회
+    public List<Employee> getPreResignationEmployees() { return sqlSession.selectList(NAMESPACE + "getPreResignationEmployees"); };
+
+    // 퇴사 사원 정보 조회
+    public List<Employee> getResignedEmployees() { // 퇴사 후 2개월 이내의 사원 정보 조회
+        return sqlSession.selectList(NAMESPACE + "getResignedEmployees");
+    };
+
+    // 퇴사 후 12개월이 지난 사원 정보 조회
+    public List<Employee> getPreDeletionEmployees() { return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees"); };
+
+    // 이번 년도 입사한 사람의 수 조회
+    public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
+
+
     @Override // 검색과 페이징 로직
     public List<Employee> search(String keyword, int pageSize, int offset) {
         HashMap<String, Object> params = new HashMap<>();
@@ -36,48 +76,4 @@ public class EmployeeDAO implements SearchService<Employee> {
     public int count(String keyword) {
         return sqlSession.selectOne(NAMESPACE + "count", keyword);
     }
-
-    public Employee getEmployeeById(String employeeId) { //
-        return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId);
-    }
-
-
-    public boolean existsById(String employeeId) { // 사원 번호 중복 조회
-        return sqlSession.selectOne(NAMESPACE + "existsById", employeeId);
-    }
-
-    // 부서를 이용한 특정 사원 정보 조회
-    public List<Employee> getEmployeesByDepartment(String departmentId) {
-        return sqlSession.selectList(NAMESPACE + "getEmployeesByDepartment", departmentId);
-    };
-
-
-    public List<Employee> getPreResignationEmployees() { // 퇴사 예정인 사원 정보 조회
-        return sqlSession.selectList(NAMESPACE + "getPreResignationEmployees");
-    };
-
-    public List<Employee> getResignedEmployees() { // 퇴사 후 2개월 이내의 사원 정보 조회
-        return sqlSession.selectList(NAMESPACE + "getResignedEmployees");
-    };
-
-    public List<Employee> getPreDeletionEmployees() { // 퇴사 후 12개월이 지난 사원 정보 조회
-        return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees");
-    };
-
-    public void insertEmployee(Employee employee) { // 사원 정보 등록
-        sqlSession.insert(NAMESPACE + "insertEmployee", employee);
-    }
-
-    public void updateEmployee(Employee employee) { // 사원 정보 수정
-        sqlSession.update(NAMESPACE + "updateEmployee", employee);
-    }
-
-    public int countEmployeesByCurrentYear() { // 이번 년도 입사한 사람의 수 조회
-        return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear");
-    };
-
-    public void deleteEmployee(String employeeId) { // 사원 정보 삭제
-        sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId);
-    }
-
 }
