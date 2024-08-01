@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.dao;
 
+import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.search.SearchService;
 import com.woosan.hr_system.employee.model.Employee;
 import org.apache.ibatis.session.SqlSession;
@@ -40,9 +41,16 @@ public class EmployeeDAO implements SearchService<Employee> {
         return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId);
     }
 
+
     public boolean existsById(String employeeId) { // 사원 번호 중복 조회
         return sqlSession.selectOne(NAMESPACE + "existsById", employeeId);
     }
+
+    // 부서를 이용한 특정 사원 정보 조회
+    public List<Employee> getEmployeesByDepartment(String departmentId) {
+        return sqlSession.selectList(NAMESPACE + "getEmployeesByDepartment", departmentId);
+    };
+
 
     public List<Employee> getPreResignationEmployees() { // 퇴사 예정인 사원 정보 조회
         return sqlSession.selectList(NAMESPACE + "getPreResignationEmployees");

@@ -1,35 +1,44 @@
 package com.woosan.hr_system.report.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Report {
-    private int reportId;
-    private String employeeId;
+    private Long reportId;
+    private String writerId;
+    private String approverId;
+    private String approverName;
+    private Long fileId;
     private String title;
     private String content;
-    private Timestamp createdDate;
-    private Timestamp modifiedDate;
-    private String approverId;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private String status;
     private String rejectReason;
-    private Timestamp completeDate;
-    private String filePath;
+    private LocalDate completeDate;
+
+    // main.html에 (yy-mm-dd-time)이 아닌 yy-mm-dd로 보여주기 위한 변수
+    private String formattedCreatedDate;
+
+    // 결재할 보고서에 작성자 이름 조회 위한 변수
+    private String employeeName;
+
 
     // Getters and Setters
-    public int getReportId() {
+    public Long getReportId() {
         return reportId;
     }
 
-    public void setReportId(int reportId) {
+    public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public String getWriterId() {
+        return writerId;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public void setWriterId(String writerId) {
+        this.writerId = writerId;
     }
 
     public String getTitle() {
@@ -48,19 +57,19 @@ public class Report {
         this.content = content;
     }
 
-    public Timestamp getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Timestamp createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Timestamp getModifiedDate() {
+    public LocalDateTime getModifiedDate() {
         return modifiedDate;
     }
 
-    public void setModifiedDate(Timestamp modifiedDate) {
+    public void setModifiedDate(LocalDateTime modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 
@@ -70,6 +79,14 @@ public class Report {
 
     public void setApproverId(String approverId) {
         this.approverId = approverId;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
     }
 
     public String getStatus() {
@@ -88,19 +105,35 @@ public class Report {
         this.rejectReason = rejectReason;
     }
 
-    public Timestamp getCompleteDate() {
+    public LocalDate getCompleteDate() {
         return completeDate;
     }
 
-    public void setCompleteDate(Timestamp completeDate) {
+    public void setCompleteDate(LocalDate completeDate) {
         this.completeDate = completeDate;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public Long getFileId() {
+        return fileId;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileId(Long filePath) {
+        this.fileId = filePath;
+    }
+
+    public String getFormattedCreatedDate() {
+        return formattedCreatedDate;
+    }
+
+    public void setFormattedCreatedDate(String formattedCreatedDate) {
+        this.formattedCreatedDate = formattedCreatedDate;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
     }
 }

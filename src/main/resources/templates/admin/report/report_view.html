@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        /* 여기에 CSS를 입력 */
+    </style>
+</th:block>
+
+
+<div>
+    <div>
+        <h1>보고서</h1>
+        <p th:text="'제목 : ' + ${report.title}">제목</p>
+        <p th:text="'내용 : ' + ${report.content}">내용</p>
+        <p th:text="'업무 처리 날짜 : ' + ${report.completeDate}">업무 처리 날짜</p>
+        <p th:text="'결재 상태 : ' + ${report.status}">결재 상태</p>
+        <p th:text="'작성일 : ' + ${report.createdDate}">작성일</p>
+        <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
+
+        <!-- 결재 상태 변경 기능 시작 -->
+        <form th:action="@{/admin/request/approve}" method="post">
+            <input type="hidden" name="reportId" th:value="${report.reportId}" />
+            <div>
+                <label for="status">결재 상태:</label>
+                <select id="status" name="status" onchange="toggleRejectionReason()">
+                    <option value="승인">승인</option>
+                    <option value="거절">거절</option>
+                </select>
+                <button type="submit">결재 상태 변경</button>
+            </div>
+            <div id="rejectionReasonContainer" style="display: none;">
+                <label for="rejectionReason">거절 사유:</label>
+                <textarea id="rejectionReason" name="rejectionReason" ></textarea>
+            </div>
+        </form>
+        <!-- 결재 상태 변경 기능 끝 -->
+
+        <div th:if="${reportFile != null}">
+            <p>
+                첨부 파일:
+                <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
+            </p>
+        </div>
+<!--        <button type="button" th:onclick="'navigateToEdit(' + ${report.reportId} + ')'">수정</button>-->
+
+<!--        <form th:action="@{'/report/delete/' + ${report.reportId}}" method="post" style="display:inline;">-->
+<!--            <input type="hidden" name="_method" value="delete">-->
+<!--            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>-->
+<!--        </form>-->
+
+        <button onclick="closeModal()" >목록으로 </button>
+    </div>
+</div>
+</html>

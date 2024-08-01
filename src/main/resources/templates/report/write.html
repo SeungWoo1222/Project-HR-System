@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <style>
+        /* 파일 업로드 관련 스타일 */
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .file-item button {
+            background: none;
+            border: none;
+            color: red;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        /* 파일 입력 버튼 스타일 */
+        #file {
+            display: none;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 2px 3px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+        }
+        .custom-file-upload:hover {
+            background-color: #ddd;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/example.js}"></script> <!-- 외부 JS도 요렇게 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
+    <script>
+        $(document).ready(function() {
+            // 초기에는 전체 선택 체크박스 숨기기
+            $('#selectAllContainer').hide();
+
+            // 부서 선택 시 직원 목록을 불러오는 함수
+            $('#departmentId').on('change', function() {
+                var departmentId = $(this).val();
+
+                $.ajax({
+                    url: '/admin/request/employee', // API 엔드포인트를 설정
+                    method: 'GET',
+                    data: { departmentId: departmentId },
+                    success: function(data) {
+                        const select = $('#writerIdContainer');
+                        select.empty(); // 기존 옵션 초기화
+                        data.forEach(function(employee) {
+                            const checkboxContainer = $('<div></div>');
+                            const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerId" value="' + employee.employeeId + '">');
+                            const nameInput = $('<input type="hidden" class="writerNameInput" name="writerName" value="' + employee.name + '">');
+                            const label = $('<label>' + employee.name + '</label>');
+                            checkboxContainer.append(checkbox).append(label).append(nameInput);
+                            select.append(checkboxContainer);
+                        });
+                        $('#selectAllContainer').show(); // 부서 선택 후에 전체 선택 체크박스 보이기
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+            // 모든 직원을 선택/해제하는 함수
+            $('#selectAllEmployeesCheckbox').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                $('.writerIdCheckbox').prop('checked', isChecked);
+                addSelectedEmployees();
+            });
+
+            // 선택된 직원을 목록에 추가하는 함수
+            $('#writerIdContainer').on('change', '.writerIdCheckbox', function() {
+                addSelectedEmployees();
+            });
+
+            function addSelectedEmployees() {
+                const selectedContainer = $('#selectedEmployees');
+                selectedContainer.empty();
+                $('.writerIdCheckbox:checked').each(function() {
+                    const id = $(this).val();
+                    const name = $(this).siblings('.writerNameInput').val(); // name을 가져오기
+                    const employeeDiv = $('<div class="selected-employee" data-id="' + id + '"></div>');
+                    employeeDiv.append('<span>' + name + '</span>');
+                    const removeButton = $('<button type="button">x</button>');
+                    removeButton.on('click', function() {
+                        $(this).parent().remove();
+                        $('#writerIdContainer input[value="' + id + '"]').prop('checked', false);
+                    });
+                    employeeDiv.append(removeButton);
+                    selectedContainer.append(employeeDiv);
+                });
+            }
+
+            // 폼 제출 시 체크되지 않은 writerName 필드 제거
+            $('form').on('submit', function(event) {
+                $('.writerIdCheckbox').each(function() {
+                    if (!$(this).is(':checked')) {
+                        $(this).siblings('.writerNameInput').remove();
+                    }
+                });
+            });
+        });
+
+
+        // 파일 관련 js메소드
+        document.addEventListener('DOMContentLoaded', function () {
+            // 파일 아이템 삭제
+            window.removeFileItem = function (index) {
+                var fileList = document.getElementById('file-list');
+                fileList.removeChild(fileList.children[index]);
+
+                // 삭제 후 남은 아이템들의 버튼 인덱스를 재설정
+                for (var i = 0; i < fileList.children.length; i++) {
+                    var button = fileList.children[i].querySelector('button');
+                    button.setAttribute('onclick', 'removeFileItem(' + i + ')');
+                }
+            };
+
+            // 파일 아이템 추가
+            function addFileItem(file) {
+                var fileList = document.getElementById('file-list');
+                var fileItem = document.createElement('li');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = '<span class="file-name">' + file.name + '</span>' +
+                    ' <button type="button" onclick="removeFileItem(' + fileList.children.length + ')">x</button>';
+                fileList.appendChild(fileItem);
+            }
+
+            // 파일 입력 요소에 이벤트 리스너 추가
+            document.getElementById('file').addEventListener('change', function (event) {
+                var files = event.target.files;
+                var fileList = document.getElementById('file-list');
+                fileList.innerHTML = '';  // 기존 파일 목록 초기화
+                for (var i = 0; i < files.length; i++) {
+                    addFileItem(files[i]);
+                }
+            });
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <h1>보고서 작성</h1>
+        <form method="post" action="/report/write" enctype="multipart/form-data">
+            <label for="title">제목:</label>
+            <input type="text" id="title" name="title" required><br>
+
+            <label for="content">내용:</label>
+            <textarea id="content" name="content" rows="10" required></textarea><br>
+
+            <label for="departmentId">부서 선택:</label>
+            <select id="departmentId" name="departmentId" required>
+                <option value="" disabled selected>부서를 선택하세요</option>
+                <option value="PR">생산</option>
+                <option value="QC">품질 관리</option>
+                <option value="SA">영업</option>
+                <option value="MK">마케팅</option>
+                <option value="FI">재무</option>
+                <option value="HR">인사</option>
+                <option value="RD">연구개발</option>
+            </select><br>
+
+            <div id="selectAllContainer">
+                <label>
+                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+                </label><br>
+            </div>
+
+            <label for="writerIdContainer">결재자</label>
+            <div id="writerIdContainer" required>
+                <!-- 직원 목록이 여기에 추가됩니다. -->
+            </div><br>
+
+            <div id="selectedEmployees" class="selected-employees"></div>
+
+            <label for="completeDate">업무 완료 날짜:</label>
+            <input type="date" id="completeDate" name="completeDate" required><br>
+
+            <label>파일 첨부:</label>
+            <label for="file" class="custom-file-upload">파일 선택</label> <!-- 사용자 정의 파일 업로드 버튼 -->
+            <input type="file" id="file" name="file" multiple><br> <!-- 파일 입력 요소를 숨깁니다 -->
+            <ul id="file-list" class="file-list"></ul>
+
+            <button type="submit">제출하기</button>
+        </form>
+    </div>
+</div>
+</html>
