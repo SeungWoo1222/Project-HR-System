@@ -25,7 +25,6 @@ function validateForm(event) {
         errorMessage.textContent = "";
     } else {
         console.error("Error message element not found.");
-
     }
 
     if (name === "") {
@@ -318,7 +317,7 @@ function submitDeleteRequest(event) {
 
     var confirmMessage = '\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?';
 
-    let actionUrl = '/employee/delete/' + employeeId;
+    let actionUrl = '/api/employee/delete/' + employeeId;
 
     if (confirm(confirmMessage)) {
         fetch(actionUrl, {

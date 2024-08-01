@@ -65,7 +65,7 @@
 
         <div>
             <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" onsubmit="submitResignationForm(event)" enctype="multipart/form-data">
+            <form th:action="@{/api/employee/resign/{employeeId}(employeeId=${employee.employeeId})}" onsubmit="submitResignationForm(event)" enctype="multipart/form-data">
                 <div class="file-area">
                     <label for="resignationDocuments">첨부 파일 (최대 3개, 각 10MB 이하)</label>
                     <input type="file" id="resignationDocuments" name="resignationDocuments" onchange="addFile(this)" multiple/>

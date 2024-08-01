@@ -23,7 +23,7 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <form th:action="@{/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
+        <form th:action="@{/api/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
             <div id="file-area">
                 <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
                 <p>사진은 10MB까지 업로드 가능합니다.</p>
