@@ -85,7 +85,7 @@
         <!-- 보고서 통계 -->
         <div>
             <h1>보고서 통계</h1>
-            <button onclick="location.href='/admin/request/statistic'">통계 범위 설정</button>
+            <button th:onclick="openModal('/admin/request/statistic')">통계 범위 설정</button>
             <div>
                 <h2>선택된 임원 목록</h2>
                 <ul th:if="${allWritersSelected}">
