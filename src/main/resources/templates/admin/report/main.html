@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/report.js}"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages': ['bar']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            // hidden-stats 요소에서 데이터를 읽어와서 파싱
+            var stats = JSON.parse(document.getElementById('hidden-stats').textContent);
+            var data = google.visualization.arrayToDataTable(stats);
+
+            var options = {};
+
+            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
+    </script>
+
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
+        <h1>내 결재 목록</h1>
+        <button th:onclick="openModal('/admin/request/approvalDatePage')" >날짜 범위 설정</button>
+        <table class="list">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>결재 상태</th>
+                <th>작성일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
+                th:onclick="openModal('/admin/request/report/' + this.getAttribute('reportId'))">
+                <td th:text="${report.title}"></td>
+                <td th:text="${report.employeeName}"></td>
+                <td th:text="${report.status}"></td>
+                <td th:text="${report.formattedCreatedDate}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <!-- 작성 요청 목록 -->
+        <h1>작성 요청 목록</h1>
+        <button th:onclick="openModal('/admin/request/requestDatePage')" >날짜 범위 설정</button>
+        <button onclick="location.href='/admin/request/write'">작성 요청하기</button>
+        <div class="list">
+            <table>
+                <thead>
+                <tr>
+                    <th>보고서 작성자</th>
+                    <th>작성된 보고서</th>
+                    <th>마감 일자</th>
+                    <th>요청 일자</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
+                    th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
+                    <td th:text="${request.writerName}"></td>
+                    <td th:text="${request.reportId}"></td>
+                    <td th:text="${request.formattedDueDate}"></td>
+                    <td th:text="${request.formattedRequestDate}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 보고서 통계 -->
+        <div>
+            <h1>보고서 통계</h1>
+            <button onclick="location.href='/admin/request/statistic'">통계 범위 설정</button>
+            <div>
+                <h2>선택된 임원 목록</h2>
+                <ul th:if="${allWritersSelected}">
+                    <li>모든 임원</li>
+                </ul>
+                <ul th:unless="${allWritersSelected}" id="selected-writers-list">
+                    <li th:each="writer : ${selectedWriters}">
+                        <span th:text="${writer.name}"></span>
+                        <button type="button" onclick="removeWriter('${writer.id}')">x</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <!-- 구글 차트 통계 추가 -->
+        <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+
+        <!-- 숨겨진 요소에 통계 데이터를 JSON 형식으로 저장 -->
+        <div id="hidden-stats" th:text="${statsJson}" style="display:none;"></div>
+    </div>
+</div>
+</div>
+</div>
+</html>

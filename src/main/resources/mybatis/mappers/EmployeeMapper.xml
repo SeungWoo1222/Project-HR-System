@@ -38,9 +38,19 @@
         SELECT * FROM employees
     </select>
 
+
     <!-- id를 이용한 특정 사원 정보 조회 -->
     <select id="getEmployeeById" resultMap="EmployeeResultMap">
         SELECT * FROM employees WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 부서를 이용한 특정 사원 정보 조회 -->
+    <select id="getEmployeesByDepartment" parameterType="String" resultType="com.woosan.hr_system.report.model.Request">
+        SELECT
+            employee_id AS employeeId,
+            name AS name
+        FROM employees
+        WHERE department_id = #{departmentId}
     </select>
 
     <!-- 사원 등록 -->

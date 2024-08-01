@@ -26,12 +26,12 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/employee/register", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/employee/registration", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 일반 사원 권한
-                                .requestMatchers("/").hasAnyRole("사원", "대리", "과장")
+//                                .requestMatchers("/").hasAnyRole("사원", "대리", "과장")
                                 // 관리자 권한
-                                .requestMatchers("/admin").hasAnyRole("차장", "부장", "사장")
+                                .requestMatchers("/admin/**").hasAnyRole("차장", "부장", "사장")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용

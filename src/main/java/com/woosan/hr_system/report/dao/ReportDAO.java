@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.dao;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.report.model.Request;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,11 @@ public class ReportDAO {
     @Autowired
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportDAO";
+
+    // 보고서 생성
+    public void createReport(List<Report> reports) {
+        sqlSession.insert(NAMESPACE + ".createReport", reports);
+    }
 
     // 보고서 전체 조회
     public List<Report> getAllReports() {
@@ -36,10 +44,30 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + ".getReportFileById", fileId);
     }
 
-    // 보고서 생성
-    public void createReport(Report report) {
-        sqlSession.insert(NAMESPACE + ".createReport", report);
+    // 결재할 보고서 조회
+    public List<Report> getPendingApprovalReports(String approverId, YearMonth startYearMonth, YearMonth endYearMonth) {
+        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
+        Map<String, Object> params = new HashMap<>();
+        params.put("approverId", approverId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+
+        return sqlSession.selectList(NAMESPACE + ".getAllReports", params);
     }
+
+    // 보고서 통계 조회
+    public List<ReportStat> getReportStats(YearMonth startYearMonth, YearMonth endYearMonth, List<String> writerIds) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        if (writerIds != null && !writerIds.isEmpty()) {
+            params.put("writerIds", writerIds);
+        } else {
+            params.put("writerIds", null);  // writerIds가 null이면 임원 전체 선택
+        }
+        return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
+    }
+
 
     // 파일 DB 정보 생성
     public void insertFileMetadata(FileMetadata fileMetadata) {
@@ -66,11 +94,6 @@ public class ReportDAO {
         sqlSession.update(NAMESPACE + ".updateReport", report);
     }
 
-    // 결재 처리
-    public void updateApprovalStatus(Report report) {
-        sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
-    }
-
     // 보고서 삭제
     public void deleteReport(Long id) {
         sqlSession.delete(NAMESPACE + ".deleteReport", id);
@@ -81,13 +104,6 @@ public class ReportDAO {
         sqlSession.delete(NAMESPACE + ".deleteFileMetadataByReportId", reportId);
     }
 
-    // 통계
-    public List<ReportStat> getReportStats(String startDate, String endDate) {
-        System.out.println("DAO");
-        Map<String, Object> params = new HashMap<>();
-        params.put("startDate", startDate);
-        params.put("endDate", endDate);
-        return sqlSession.selectList(NAMESPACE + ".getReportStats", params);
-    }
+
 
 }

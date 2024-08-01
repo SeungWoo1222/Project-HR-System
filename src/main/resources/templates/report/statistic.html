@@ -1,34 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='통계 날짜 설정 페이지')}">
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
     <style>
         /*// 여기에 CSS를 입력*/
     </style>
 </th:block>
 
-<th:block layout:fragment="script">
-    <script th:src="@{example.js}"></script> <!-- 외부 JS도 요렇게 -->
-    <script>
-        // 여기에 JS 코드를 입력
-    </script>
-</th:block>
-
-<div layout:fragment="~{content}">
-    <div class="content">
-        <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-        <h1>보고서 통계 입력</h1>
-        <form action="#" th:action="@{/report/stats}" method="get">
-            <label for="startDate">시작 월:</label>
-            <input type="month" id="startDate" name="startDate" required>
-            <label for="endDate">종료 월:</label>
-            <input type="month" id="endDate" name="endDate" required>
-            <button type="submit">통계 조회</button>
-        </form>
-
-    </div>
+<div>
+    <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
+    <h1>보고서 범위 입력</h1>
+    <form action="#" th:action="@{/report/stats}" method="get">
+        <label for="startDate">시작 월:</label>
+        <input type="month" id="startDate" name="startDate" required>
+        <label for="endDate">종료 월:</label>
+        <input type="month" id="endDate" name="endDate" required>
+        <button type="submit">통계 조회</button>
+    </form>
+</div>
 </div>
 </html>

@@ -7,6 +7,10 @@
     <link rel="stylesheet" th:href="@{css/layout.css}">
     <style>
         /* 여기에 CSS를 입력 */
+        label, input, textarea, button {
+            display: block;
+            margin: 10px 0;
+        }
     </style>
 </th:block>
 
@@ -28,6 +32,12 @@
 
             <label for="content">내용:</label>
             <textarea id="content" name="content" th:text="${report.content}"></textarea>
+
+            <label for="approverId">결재자:</label>
+            <input list="employeeNames" id="approverId" name="approverId" required>
+            <datalist id="employeeNames">
+                <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
+            </datalist>
 
             <label for="completeDate">업무 처리 날짜:</label>
             <input type="date" id="completeDate" name="completeDate" th:value="${report.completeDate}">

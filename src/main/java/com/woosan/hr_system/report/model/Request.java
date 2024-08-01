@@ -7,11 +7,24 @@ public class Request {
     private Long requestId;
     private Long reportId;
     private String requesterId;
-    private String employeeId;
+    private String writerId;
+    private String writerName;
     private LocalDateTime requestDate;
     private LocalDateTime modifiedDate;
     private LocalDate dueDate;
     private String requestNote;
+
+    private String employeeId;
+    private String name;
+    private String departmentId;
+
+    // main.html에 yy-mm-dd로 반환하는 변수
+    private String formattedDueDate;
+    private String formattedRequestDate;
+
+
+
+
 
 
     // Getters and Setters
@@ -31,12 +44,20 @@ public class Request {
         this.requesterId = requesterId;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public String getWriterId() {
+        return writerId;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public void setWriterId(String writerId) {
+        this.writerId = writerId;
+    }
+
+    public String getWriterName() {
+        return writerName;
+    }
+
+    public void setWriterName(String writerName) {
+        this.writerName = writerName;
     }
 
     public LocalDateTime getRequestDate() {
@@ -78,4 +99,46 @@ public class Request {
     public void setReportId(Long reportId) {
         this.reportId = reportId;
     }
+
+    public String getFormattedRequestDate() {
+        return formattedRequestDate;
+    }
+
+    public void setFormattedRequestDate(String formattedrequestDate) {
+        this.formattedRequestDate = formattedrequestDate;
+    }
+
+    public String getFormattedDueDate() {
+        return formattedDueDate;
+    }
+
+    public void setFormattedDueDate(String formattedDueDate) {
+        this.formattedDueDate = formattedDueDate;
+    }
+
+    public String getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
 }

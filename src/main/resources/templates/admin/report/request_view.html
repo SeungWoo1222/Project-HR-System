@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        /* 여기에 CSS를 입력 */
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    </script>
+</th:block>
+
+<div>
+    <div>
+        <h1>보고서 작성 요청 </h1>
+        <p th:text="'보고서 작성자 : ' + ${request.writerName}"></p>
+        <p th:text="'요청 사항 : ' + ${request.requestNote}"></p>
+        <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
+        <p th:text="'요청 일자 : ' + ${request.requestDate}"></p>
+
+        <a th:href="@{'/admin/request/edit?requestId=' + ${request.requestId}}">수정</a>
+
+        <form th:action="@{'/admin/request/delete/' + ${request.requestId}}" method="post" style="display:inline;">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" onclick="return confirm('정말 이 요청을 삭제하시겠습니까?');">삭제</button>
+        </form>
+
+        <button onclick="closeModal()" >목록으로 </button>
+    </div>
+</div>
+</html>
