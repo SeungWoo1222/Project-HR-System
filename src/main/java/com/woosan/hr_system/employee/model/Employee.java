@@ -1,11 +1,12 @@
 package com.woosan.hr_system.employee.model;
 
+import com.woosan.hr_system.auth.model.Password;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Employee {
     private String employeeId;
-    private String password;
     private String name;
     private String birth;
     private String residentRegistrationNumber;
@@ -23,7 +24,7 @@ public class Employee {
     private String modifiedBy;
     private Resignation resignation;
 
-    // Getters and Setters
+    private Password password;
 
     public String getEmployeeId() {
         return employeeId;
@@ -31,14 +32,6 @@ public class Employee {
 
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -61,9 +54,7 @@ public class Employee {
         return residentRegistrationNumber;
     }
 
-    public void setResidentRegistrationNumber(String residentRegistrationNumber) {
-        this.residentRegistrationNumber = residentRegistrationNumber;
-    }
+    public void setResidentRegistrationNumber(String residentRegistrationNumber) { this.residentRegistrationNumber = residentRegistrationNumber; }
 
     public String getPhone() {
         return phone;
@@ -160,4 +151,8 @@ public class Employee {
     public Resignation getResignation() { return resignation; }
 
     public void setResignation(Resignation resignation) { this.resignation = resignation; }
+
+    public Password getPassword() { return password; }
+
+    public void setPassword(Password password) { this.password = password; }
 }

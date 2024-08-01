@@ -3,8 +3,10 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee-management.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
 </th:block>
+
+<th:block layout:fragment="script"></th:block>
 
 <div>
     <div>
@@ -12,59 +14,109 @@
         <table>
             <tr>
                 <th>사원 ID</th>
-                <td th:text="${employee.employeeId}">사원 ID</td>
+                <td th:text="${employee.employeeId}"></td>
             </tr>
             <tr>
                 <th>이름</th>
-                <td th:text="${employee.name}">이름</td>
+                <td th:text="${employee.name}"></td>
             </tr>
             <tr>
                 <th>주민등록번호</th>
-                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}">주민등록번호</td>
+                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
             </tr>
             <tr>
                 <th>전화번호</th>
-                <td th:text="${employee.phone}">전화번호</td>
+                <td th:text="${employee.phone}"></td>
             </tr>
             <tr>
                 <th>이메일</th>
-                <td th:text="${employee.email}">이메일</td>
+                <td th:text="${employee.email}"></td>
             </tr>
             <tr>
                 <th>주소</th>
-                <td th:text="${employee.address}">주소</td>
+                <td th:text="${employee.address}"></td>
             </tr>
             <tr>
                 <th>상세 주소</th>
-                <td th:text="${employee.detailAddress}">상세 주소</td>
+                <td th:text="${employee.detailAddress}"></td>
             </tr>
             <tr>
                 <th>부서</th>
-                <td th:text="${employee.department.name}">부서</td>
+                <td th:text="${employee.department.name}"></td>
             </tr>
             <tr>
                 <th>직급</th>
-                <td th:text="${employee.position.name}">직급</td>
+                <td th:text="${employee.position.name}"></td>
             </tr>
             <tr>
-                <th>입사일</th>
-                <td th:text="${#temporals.format(employee.hireDate, 'yyyy-MM-dd')}">입사일</td>
+                <th>입사 날짜</th>
+                <td th:text="${employee.hireDate}"></td>
             </tr>
             <tr>
-                <th>상태</th>
-                <td th:text="${employee.status}">상태</td>
+                <th>재직 상태</th>
+                <td th:text="${employee.status}"></td>
             </tr>
             <tr>
                 <th>남은 연차</th>
-                <td th:text="${employee.remainingLeave}">남은 연차</td>
+                <td th:text="${employee.remainingLeave}"></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>사원 정보 수정자</th>
+                <td th:text="${employee.modifiedBy}"></td>
             </tr>
             <tr>
-                <th>마지막 수정일</th>
-                <td th:text="${#dates.format(employee.lastModified, 'yyyy-MM-dd HH:mm:ss')}">마지막 수정일</td>
+                <th>사원 정보 수정일시</th>
+                <td th:text="${employee.lastModified}" class="dateTime"></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>비밀번호</th>
+                <td th:text="${employee.password?.password}"></td>
             </tr>
             <tr>
-                <th>수정자</th>
-                <td th:text="${employee.modifiedBy}">수정자</td>
+                <th>비밀번호 강도</th>
+                <td th:text="${employee.password?.strength}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 오류 횟수</th>
+                <td th:text="${employee.password?.passwordCount}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 수정자</th>
+                <td th:text="${employee.password?.modifiedBy}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 수정일시</th>
+                <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>퇴사일</th>
+                <td th:text="${employee.resignation?.resignationDate}"></td>
+            </tr>
+            <tr>
+                <th>퇴사 사유</th>
+                <td th:text="${employee.resignation?.getResignationReason()}"></td>
+            </tr>
+            <tr>
+                <th>퇴사 코드</th>
+                <td th:text="${employee.resignation?.codeNumber}"></td>
+            </tr>
+            <tr>
+                <th>구체적 사유</th>
+                <td th:text="${employee.resignation?.specificReason}"></td>
+            </tr>
+            <tr>
+                <th>퇴사 처리한 사원 ID</th>
+                <td th:text="${employee.resignation?.getProcessedBy()}"></td>
+            </tr>
+            <tr>
+                <th>퇴사 처리 일시</th>
+                <td th:text="${employee.resignation?.getProcessedDate()}" class="dateTime"></td>
             </tr>
         </table>
     </div>

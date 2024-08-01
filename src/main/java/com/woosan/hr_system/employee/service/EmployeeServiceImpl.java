@@ -1,26 +1,34 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.search.PageRequest;
-import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.auth.CustomUserDetails;
+import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.model.CustomUserDetails;
+import com.woosan.hr_system.auth.model.Password;
+import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.controller.EmployeeController;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeDAO employeeDAO;
@@ -29,9 +37,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     private ResignationDAO resignationDAO;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthService authService;
 
-    // 조회 관련 로직 start-point
+    @Autowired
+    private PasswordDAO passwordDAO;
+
+    // ============================================ 조회 관련 로직 start-point ============================================
     @Override // 모든 사원 정보 조회
     public PageResult<Employee> searchEmployees(PageRequest pageRequest) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -46,18 +57,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeDAO.getEmployeeById(employeeId);
     }
 
-    @Override // id를 이용한 특정 사원 정보 조회 (Resignation 정보 포함)
-    public Employee getEmployeeWithResignation(String employeeId) {
+    @Override // id를 이용한 특정 사원 정보 조회 (Resignation, Password 정보 포함)
+    public Employee getEmployeeWithAdditionalInfo(String employeeId) {
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
             return null;
         }
-        employee.setResignation(resignationDAO.getResignedEmployee(employee.getEmployeeId()));
+
+        Password password = passwordDAO.selectPassword(employeeId);
+        if (password != null) {
+            employee.setPassword(password);
+        }
+
+        Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+        if (resignation != null) {
+            employee.setResignation(resignation);
+        }
+
         return employee;
     }
-    // 조회 관련 로직 end-point
+    // ============================================= 조회 관련 로직 end-point =============================================
 
-    // 등록 관련 로직 start-point
+    // ============================================ 등록 관련 로직 start-point ============================================
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
         if (employee.getName() == null || employee.getPhone() == null || employee.getEmail() == null || employee.getAddress() == null || employee.getDetailAddress() == null || employee.getDepartment() == null || employee.getPosition() == null || employee.getHireDate() == null) {
@@ -68,10 +89,16 @@ public class EmployeeServiceImpl implements EmployeeService {
             String BB = employee.getHireDate().format(formatter).substring(2, 4);
             int currentYearEmpolyeesCount = employeeDAO.countEmployeesByCurrentYear();
             String CCC = String.format("%03d", currentYearEmpolyeesCount + 1);
-            employee.setEmployeeId(employee.getDepartment() + BB + CCC);
+            String employeeId = employee.getDepartment() + BB + CCC;
+
+            // 사원 번호 중복 체크
+            if (employeeDAO.existsById(employeeId)) {
+                throw new DuplicateKeyException("이미 존재하는 사원 아이디입니다. : " + employeeId);
+            }
+            employee.setEmployeeId(employeeId);
 
             // 첫 비밀번호 생년월일로 설정
-            employee.setPassword(passwordEncoder.encode(employee.getBirth()));
+            authService.insertFirstPassword(employeeId, employee.getBirth());
 
             // 재직 상태 설정
             employee.setStatus("재직");
@@ -84,46 +111,78 @@ public class EmployeeServiceImpl implements EmployeeService {
             return "success";
         }
     }
-    // 등록 관련 로직 end-point
+    // ============================================= 등록 관련 로직 end-point =============================================
 
-    // 수정 관련 로직 start-point
+    // ============================================ 수정 관련 로직 start-point ============================================
     @Override // 사원 정보 수정
-    public void updateEmployee(Employee employee) {
-        employeeDAO.updateEmployee(employee);
-    }
+    public String updateEmployee(Employee employee) {
+        String CurrentEmployeeId = authService.getAuthenticatedUser().getUsername();
+        Employee originalEmployee = employeeDAO.getEmployeeById(CurrentEmployeeId);
 
-    @Override // 사원 정보 일부 수정 (변경 가능한 column - password, name, birth, phone, email, address, detailed_address)
-    public void updateEmployeePartial(String employeeId, Map<String, Object> updates) {
-        Employee employee = employeeDAO.getEmployeeById(employeeId);
-        if (employee != null) {
-            if (updates.containsKey("name")) {
-                employee.setName((String)updates.get("name"));
-            }
-            if (updates.containsKey("birth")) {
-                employee.setBirth((String)updates.get("birth"));
-            }
-            if (updates.containsKey("phone")) {
-                employee.setPhone((String)updates.get("phone"));
-            }
-            if (updates.containsKey("email")) {
-                employee.setEmail((String)updates.get("email"));
-            }
-            if (updates.containsKey("address")) {
-                employee.setAddress((String)updates.get("address"));
-            }
-            if (updates.containsKey("detailed_address")) {
-                employee.setDetailAddress((String)updates.get("detailed_address"));
-            }
+        // 변경 사항 확인
+        boolean isModified = false;
+        if (!Objects.equals(originalEmployee.getName(), employee.getName())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getBirth(), employee.getBirth())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getResidentRegistrationNumber(), employee.getResidentRegistrationNumber())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getPhone(), employee.getPhone())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getEmail(), employee.getEmail())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getAddress(), employee.getAddress())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getDetailAddress(), employee.getDetailAddress())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getHireDate(), employee.getHireDate())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getStatus(), employee.getStatus())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getDepartment(), employee.getDepartment())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getPosition(), employee.getPosition())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getRemainingLeave(), employee.getRemainingLeave())) {
+            isModified = true;
+        }
+        if (!Objects.equals(originalEmployee.getPicture(), employee.getPicture())) {
+            isModified = true;
+        }
 
+        // 변경 사항 X
+        if (!isModified) {
+            return "no_changes";
+        }
+
+        // 변경 사항 O
+        try {
+            employee.setModifiedBy(CurrentEmployeeId);
             employee.setLastModified(LocalDateTime.now());
-            // employee.setModifiedBy(세션에서 현재 계정 employee 아이디); > 스프링 세큐리티 작업 후 코드 수정
-
             employeeDAO.updateEmployee(employee);
+            return "success";
+        } catch (DataAccessException dae) {
+            logger.error("‼️사원 정보 수정 중 데이터베이스 오류 발생 : " + dae.getMessage(), dae);
+            return "error";
+        } catch (Exception e) {
+            logger.error("‼️사원 정보 수정 중 알 수 없는 오류 발생 : " + e.getMessage(), e);
+            return "fail";
         }
     }
-    // 수정 관련 로직 end-point
+    // ============================================ 수정 관련 로직 end-point ============================================
 
-    // 퇴사 관련 로직 start-point
+    // ============================================ 퇴사 관련 로직 start-point ============================================
     @Override // 퇴사 예정인 사원 정보 조회
     public List<Employee> getPreResignationEmployees() {
         List<Employee> employees = employeeDAO.getPreResignationEmployees();
@@ -157,7 +216,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, String resignationReason, String codeNumber, String specificReason, LocalDate resignationDate, List<String> resignationDocumentsNames) {
+    public String resignEmployee(String employeeId, Resignation resignation, String resignationDocumentsName) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -166,10 +225,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus("퇴사");
         employeeDAO.updateEmployee(employee);
 
-        Resignation resignation = new Resignation();
-
         // 퇴사 사유 분류
-        switch (resignationReason) {
+        switch (resignation.getResignationReason()) {
             case "1":
                 resignation.setResignationReason("1. 자진퇴사");
                 break;
@@ -185,7 +242,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         // 퇴사 코드 분류
-        switch (codeNumber) {
+        switch (resignation.getCodeNumber()) {
             case "11":
                 resignation.setCodeNumber("11. 개인사정으로 인한 자진퇴사");
                 break;
@@ -218,19 +275,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 퇴사 테이블에 나머지 정보 등록
         resignation.setEmployeeId(employeeId);
-        resignation.setSpecificReason(specificReason);
-        resignation.setResignationDate(resignationDate);
         resignation.setProcessedDate(LocalDateTime.now());
-
-        // 파일 정보 등록
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < resignationDocumentsNames.size(); i++) {
-            sb.append(resignationDocumentsNames.get(i));
-            if (i != resignationDocumentsNames.size() - 1) {
-                sb.append(" / ");
-            }
-        }
-        resignation.setResignationDocuments(sb.toString());
+        resignation.setResignationDocuments(resignationDocumentsName);
 
         // 로그인된 사용자(처리 사원) 정보 등록
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -267,5 +313,5 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
     }
-    // 퇴사 관련 로직 end-point
+    // ============================================= 퇴사 관련 로직 end-point =============================================
 }

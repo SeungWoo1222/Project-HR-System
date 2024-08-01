@@ -1,10 +1,11 @@
 package com.woosan.hr_system.config;
 
-import com.woosan.hr_system.auth.CustomUserDetailsService;
+import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
+import com.woosan.hr_system.auth.service.CustomAuthenticationSuccessHandler;
+import com.woosan.hr_system.auth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -26,12 +27,13 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/employee/registration", "/auth/login", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/employee/registration", "/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
 
-                                // 일반 사원 권한
-//                                .requestMatchers("/").hasAnyRole("사원", "대리", "과장")
                                 // 관리자 권한
                                 .requestMatchers("/admin/**").hasAnyRole("차장", "부장", "사장")
+
+                                // 일반 사원 권한
+                                .requestMatchers("/**").hasAnyRole("사원", "대리", "과장", "차장", "부장", "사장")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
@@ -41,7 +43,8 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/auth/login") // 사용자 정의 로그인 페이지 경로
-                                .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트될 경로
+                                .successHandler(customAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 설정
+                                .failureHandler(customAuthenticationFailureHandler()) // 커스텀 실패 핸들러 설정
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
                 )
 
@@ -60,9 +63,11 @@ public class SecurityConfig {
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)// 필요 시 세션 생성
                                 .sessionFixation().migrateSession() // 세션 고정 보호 설정
+                                .invalidSessionUrl("/auth/session-expired") // 세션이 유효하지 않을 때 리다이렉트할 URL
                                 .maximumSessions(1) // 하나의 세션만 허용
                                 .maxSessionsPreventsLogin(true)
-                                .expiredUrl("/auth/expired") // 세션 만료 시 리다이렉트할 URL
+                                .expiredUrl("/auth/session-expired")  // 세션 만료 시 리다이렉트할 URL
+
                 )
 
                 // CSRF 보호 설정
@@ -77,11 +82,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
 
 }
