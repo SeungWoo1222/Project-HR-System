@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.FileMetadata;
@@ -16,10 +17,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +36,8 @@ public class ExecutiveController {
     private EmployeeDAO employeeDAO;
     @Autowired
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
@@ -53,7 +54,7 @@ public class ExecutiveController {
                                 @RequestParam("requestNote") String requestNote,
                                 Model model) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        String requesterId = UserIdHelper.getCurrentUserId();
+        String requesterId = authService.getAuthenticatedUser().getUsername();
         requestService.createRequest(writerIds, writerNames, dueDate, requestNote, requesterId);
         model.addAttribute("message", "보고서 작성 완료");
         return "redirect:/admin/request/main";
@@ -64,18 +65,19 @@ public class ExecutiveController {
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
 
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
-        String approverId = UserIdHelper.getCurrentUserId();
-        String requesterId = UserIdHelper.getCurrentUserId();
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+//        String approverId = employeeId;
+//        String requesterId = employeeId;
 
         // 내가 결재할 보고서 목록 조회
         String approvalStart = (String) session.getAttribute("approvalStart");
         String approvalEnd = (String) session.getAttribute("approvalEnd");
-        List<Report> reports = reportService.getPendingApprovalReports(approverId, approvalStart, approvalEnd);
+        List<Report> reports = reportService.getPendingApprovalReports(employeeId, approvalStart, approvalEnd);
 
         // 내가 쓴 요청 목록 조회
         String requestStart = (String) session.getAttribute("requestStart");
         String requestEnd = (String) session.getAttribute("requestEnd");
-        List<Request> requests = requestService.getMyRequests(requesterId, requestStart ,requestEnd);
+        List<Request> requests = requestService.getMyRequests(employeeId, requestStart ,requestEnd);
 
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
@@ -232,7 +234,7 @@ public class ExecutiveController {
         // 요청 삭제 권한이 있는지 확인
 
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = UserIdHelper.getCurrentUserId();
+        String currentId = authService.getAuthenticatedUser().getUsername();
 
         // 요청 ID로 요청 조회
         Request request = requestService.getRequestById(requestId);
