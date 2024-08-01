@@ -24,7 +24,10 @@ $(document).ready(function() {
 
     // 부서 선택 시 직원 목록을 불러오는 함수
     $('#departmentId').on('change', function() {
+        console.log("실행됨");
+
         var departmentId = $(this).val();
+        console.log("departmentId : " + departmentId);
 
         $.ajax({
             url: '/admin/request/employee', // API 엔드포인트를 설정
@@ -44,7 +47,7 @@ $(document).ready(function() {
                 $('#selectAllContainer').show(); // 부서 선택 후에 전체 선택 체크박스 보이기
             },
             error: function(error) {
-                console.error('Error:', error);
+                console.error('Error:', error);h
             }
         });
     });

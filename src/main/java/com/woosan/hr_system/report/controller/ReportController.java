@@ -1,33 +1,22 @@
 package com.woosan.hr_system.report.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woosan.hr_system.auth.CustomUserDetails;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.report.model.Report;
-import com.woosan.hr_system.report.model.ReportStat;
-import com.woosan.hr_system.report.model.Request;
-import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.report.service.ReportService;
+import com.woosan.hr_system.report.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.woosan.hr_system.report.model.FileMetadata;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -41,6 +30,8 @@ public class ReportController {
     private EmployeeDAO employeeDAO;
     @Autowired
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 반환용
+    @Autowired
+    private AuthService authService;
 
 
     @GetMapping("/write") // 보고서 생성 페이지 이동
@@ -59,12 +50,9 @@ public class ReportController {
                                @RequestParam("file") MultipartFile file,
                                Model model) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String writerId = userDetails.getUsername();
-            reportService.createReport(title, content, approverIds, approverNames, completeDate, file, writerId);
-        }
+        String writerId = authService.getAuthenticatedUser().getUsername();
+        reportService.createReport(title, content, approverIds, approverNames, completeDate, file, writerId);
+
 
         model.addAttribute("message", "보고서 작성 완료");
         return "redirect:/report/main";

@@ -1,13 +1,10 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.auth.CustomUserDetails;
-import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +19,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private RequestDAO requestDAO;
+    @Autowired
+    private AuthService authService;
 
     @Override // 요청 생성
     public void createRequest(List<String> writerIds, List<String> writerNames, LocalDate dueDate, String requestNote, String requesterId) {
@@ -113,11 +112,7 @@ public class RequestServiceImpl implements RequestService {
         else if (writerIds.size() > 1) {
             requestDAO.deleteRequest(requestId);
             String requesterId = null;
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                requesterId = userDetails.getUsername();
-            }
+            requesterId = authService.getAuthenticatedUser().getUsername();
 
             for (int i = 0; i < writerIds.size(); i++) {
                 Request request = new Request();
