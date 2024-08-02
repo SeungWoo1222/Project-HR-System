@@ -114,7 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ============================================ 수정 관련 로직 start-point ============================================
     @Override // 사원 정보 수정
     public String updateEmployee(Employee employee) {
-        String CurrentEmployeeId = authService.getAuthenticatedUser().getUsername();
+        String CurrentEmployeeId = employee.getEmployeeId();
         Employee originalEmployee = employeeDAO.getEmployeeById(CurrentEmployeeId);
 
         // 변경 사항 확인

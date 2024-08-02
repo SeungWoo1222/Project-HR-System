@@ -120,11 +120,11 @@
             </tr>
         </table>
         <div>
-<!--            <button type="button" th:onclick="'window.location.href=\'/employee/edit/detail/' + ${employee.employeeId} + '\''">사원 정보 수정</button>-->
-            <button>퇴사 정보 수정</button>
-            <button>재직 상태 수정</button>
-            <button>부서 이동</button>
-            <button>계정 잠금</button><button>계정 잠금 해제</button>
+            <button type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editEmployee(this)">사원 정보 수정</button>
+            <button class="btn">퇴사 정보 수정</button>
+            <button class="btn" >재직 상태 수정</button>
+            <button class="btn">부서 이동</button>
+            <button class="btn">계정 잠금</button><button class="btn">계정 잠금 해제</button>
         </div>
     </div>
 </div>

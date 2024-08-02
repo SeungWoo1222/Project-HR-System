@@ -31,15 +31,10 @@ public class EmployeeApiController {
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
                                                    @RequestPart("picture") MultipartFile picture) {
         // 파일 체크 후 DB에 저장할 파일명 반환
-        String pictureName;
-        try {
-            pictureName = fileService.checkFile(picture);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        ResponseEntity<String> validationResponse = validateFileAndGetFileName(employee, picture);
+        if (validationResponse != null) {
+            return validationResponse;
         }
-        employee.setPicture(pictureName);
 
         // 사원 등록
         String message = employeeService.insertEmployee(employee);
@@ -55,15 +50,10 @@ public class EmployeeApiController {
                                                  @RequestPart(value = "picture", required = false) MultipartFile picture) {
         // 파일 체크 후 DB에 저장할 파일명 반환
         if (picture != null) {
-            String pictureName;
-            try {
-                pictureName = fileService.checkFile(picture);
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            ResponseEntity<String> validationResponse = validateFileAndGetFileName(employee, picture);
+            if (validationResponse != null) {
+                return validationResponse;
             }
-            employee.setPicture(pictureName);
         }
 
         // 사원 정보 수정
@@ -75,6 +65,21 @@ public class EmployeeApiController {
             case "fail" -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("시스템 내부 오류로 인해 사원 정보 수정에 실패하였습니다.\n 잠시 후 다시 시도하거나 시스템 관리자에게 문의하세요.");
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사원 정보 수정 중 오류가 발생하였습니다.");
         };
+    }
+
+    // 파일 체크 후 DB에 저장할 파일명 반환하는 메소드
+    private ResponseEntity<String> validateFileAndGetFileName(Employee employee, MultipartFile picture) {
+        String pictureName;
+        try {
+            pictureName = fileService.checkFile(picture);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
+        employee.setPicture(pictureName);
+        return null;
     }
 
     // 사원 퇴사 처리

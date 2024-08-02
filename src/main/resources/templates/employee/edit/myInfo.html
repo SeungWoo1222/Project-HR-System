@@ -30,6 +30,7 @@
                 <span id="file-name" th:text="${employee.picture}"></span>
                 <label for="picture" class="input-file-btn">사진 업로드</label>
                 <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+                <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">
             </div>
             <table>
                 <tr>
@@ -129,7 +130,7 @@
             </table>
             <div class="error-message"></div>
             <div class="btn-area">
-                <button type="submit" class="btn">내 정보 수정</button>
+                <button type="submit" class="btn" data-url="/employee/myInfo">내 정보 수정</button>
                 <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/myInfo\''">수정 취소</button>
                 <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
             </div>

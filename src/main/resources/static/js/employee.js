@@ -198,21 +198,22 @@ function submitUpdateForm(event) {
 
     // FormData 객체에 employee 필드를 추가
     const employee = {
-        employeeId: form.employeeId.value,
-        name: form.name.value,
-        birth: form.birth.value,
-        residentRegistrationNumber: form.residentRegistrationNumber.value,
-        phone: form.phone.value,
-        email: form.email.value,
-        address: form.address.value,
-        detailAddress: form.detailAddress.value,
-        status: form.status.value,
-        department: form.department.value,
-        position: form.position.value,
-        hireDate: form.hireDate.value,
-        remainingLeave: form.remainingLeave.value,
-        modifiedBy: form.modifiedBy.value,
-        lastModified: form.lastModified.value
+            employeeId: form.employeeId.value,
+            name: form.name.value,
+            birth: form.birth.value,
+            residentRegistrationNumber: form.residentRegistrationNumber.value,
+            phone: form.phone.value,
+            email: form.email.value,
+            address: form.address.value,
+            detailAddress: form.detailAddress.value,
+            status: form.status.value,
+            department: form.department.value,
+            position: form.position.value,
+            hireDate: form.hireDate.value,
+            remainingLeave: form.remainingLeave.value,
+            modifiedBy: form.modifiedBy.value,
+            lastModified: form.lastModified.value,
+            picture: form['original-picture'].value
     };
     formData.append("employee", new Blob([JSON.stringify(employee)], { type: "application/json" }));
 
@@ -221,6 +222,11 @@ function submitUpdateForm(event) {
     if (picture) {
         formData.append("picture", picture);
     }
+
+    // 수정 성공 후 이동할 URL
+    const submitButton = document.querySelector('button[type="submit"]');
+    const dataUrl = submitButton.getAttribute('data-url');
+    console.log('Submit Button Data URL:', dataUrl);
 
     // 데이터를 서버로 전송
     fetch(actionUrl, {
@@ -235,7 +241,7 @@ function submitUpdateForm(event) {
             console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text); // 성공 메시지 알림
-                window.location.href = "/employee/myInfo";
+                window.location.href = dataUrl;
             } else if (response.status === 404) {
                 alert(response.text); // 404 오류 메세지 알림
                 window.location.reload();

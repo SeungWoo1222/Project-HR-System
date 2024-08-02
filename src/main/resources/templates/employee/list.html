@@ -13,6 +13,12 @@
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/employee.js}"></script>
+    <script>
+        function editEmployee(button) {
+            var employeeId = button.getAttribute('employeeId');
+            window.location.href = '/employee/edit/detail/' + employeeId;
+        }
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
