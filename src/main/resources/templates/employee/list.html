@@ -18,6 +18,11 @@
             var employeeId = button.getAttribute('employeeId');
             window.location.href = '/employee/edit/detail/' + employeeId;
         }
+
+        function editResignedEmployee(button) {
+            var employeeId = button.getAttribute('employeeId');
+            window.location.href = '/employee/edit/resignation/' + employeeId;
+        }
     </script>
 </th:block>
 

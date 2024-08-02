@@ -472,6 +472,29 @@ function updateCodeNumber() {
         codeNumber.innerHTML += '<option value="42">42. 이중고용</option>';
     }
 }
+
+// 퇴사 사유와 퇴사 코드 input 값으로 변환하는 함수
+function changeCodeNumberAndResignationReason() {
+    const resignationReason = document.getElementById("original-resignationReason").textContent;
+    const codeNumber = document.getElementById("original-codeNumber").textContent;
+
+    const formatedResignationReason = formatCodeNumberAndResignationReason(resignationReason);
+    const formatedCodeNumber = formatCodeNumberAndResignationReason(codeNumber);
+
+    document.getElementById("resignationReason").value = formatedResignationReason;
+    updateCodeNumber();
+    document.getElementById("codeNumber").value = formatedCodeNumber;
+
+}
+
+// .을 기준으로 앞에만 추출하는 함수
+function formatCodeNumberAndResignationReason(text) {
+    const index = text.indexOf('.');
+    if (index !== -1) {
+        return text.substring(0, index).trim();
+    }
+    return text.trim();
+}
 // ==================================================== 각종 함수 ========================================================
 
 //=================================================== File 관련 함수 =====================================================

@@ -63,14 +63,9 @@ public class EmployeeViewController {
         if (employee == null) {
             return "error/404";
         }
-        // 비밀번호 정보
-        Password password = passwordDAO.selectPassword(employeeId);
-        employee.setPassword(password);
-        // 퇴사 정보
-        if (employee.getStatus().equals("퇴사")) {
-            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
-            employee.setResignation(resignation);
-        }
+        // 비밀번호 정보와 퇴사 정보 설정
+        populateEmployeeDetails(employee);
+
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
@@ -99,23 +94,6 @@ public class EmployeeViewController {
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
-    @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
-    public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        // 비밀번호 정보
-        Password password = passwordDAO.selectPassword(employeeId);
-        employee.setPassword(password);
-        // 퇴사 정보
-        if (employee.getStatus().equals("퇴사")) {
-            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
-            employee.setResignation(resignation);
-        }
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
-        return "employee/edit/detail";
-    }
-
     @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
     public String viewMyInfoEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
@@ -123,6 +101,34 @@ public class EmployeeViewController {
         model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
         return "employee/edit/myInfo";
+    }
+
+    @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
+    public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        // 비밀번호 정보와 퇴사 정보 설정
+        populateEmployeeDetails(employee);
+
+        String pictureUrl = fileService.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("employee", employee);
+        return "employee/edit/detail";
+    }
+
+    @GetMapping("/edit/resignation/{employeeId}") // 사원 퇴사 정보 수정 페이지 이동
+    public String viewResignedEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
+        log.info("Entering viewEmployee with employeeId: {}", employeeId);
+
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        // 비밀번호 정보와 퇴사 정보 설정
+        populateEmployeeDetails(employee);
+
+        String pictureUrl = fileService.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("employee", employee);
+        return "employee/edit/resignation";
     }
     // ============================================= 수정 관련 로직 end-point =============================================
 
@@ -150,4 +156,20 @@ public class EmployeeViewController {
         return "employee/resignation-form";
     }
     // ============================================= 퇴사 관련 로직 end-point =============================================
+
+    // ================================================== 기타 로직 ======================================================
+    // 비밀번호 정보와 퇴사 정보 설정하는 메소드
+    private void populateEmployeeDetails(Employee employee) {
+        String employeeId = employee.getEmployeeId();
+
+        // 비밀번호 정보 조회 및 설정
+        Password password = passwordDAO.selectPassword(employeeId);
+        employee.setPassword(password);
+
+        // 퇴사 정보 조회 및 설정
+        if (employee.getStatus().equals("퇴사")) {
+            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+            employee.setResignation(resignation);
+        }
+    }
 }
