@@ -1,7 +1,11 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -30,6 +34,10 @@ public class EmployeeViewController {
 
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ResignationDAO resignationDAO;
+    @Autowired
+    private PasswordDAO passwordDAO;
 
     // ============================================ 조회 관련 로직 start-point ============================================
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -54,6 +62,14 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeWithAdditionalInfo(employeeId);
         if (employee == null) {
             return "error/404";
+        }
+        // 비밀번호 정보
+        Password password = passwordDAO.selectPassword(employeeId);
+        employee.setPassword(password);
+        // 퇴사 정보
+        if (employee.getStatus().equals("퇴사")) {
+            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+            employee.setResignation(resignation);
         }
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
@@ -83,11 +99,21 @@ public class EmployeeViewController {
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
-    @GetMapping("/edit/{employeeId}") // 사원 정보 수정 페이지 이동
+    @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
+        // 비밀번호 정보
+        Password password = passwordDAO.selectPassword(employeeId);
+        employee.setPassword(password);
+        // 퇴사 정보
+        if (employee.getStatus().equals("퇴사")) {
+            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+            employee.setResignation(resignation);
+        }
+        String pictureUrl = fileService.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
         model.addAttribute("employee", employee);
-        return "employee/edit";
+        return "employee/edit/detail";
     }
 
     @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동

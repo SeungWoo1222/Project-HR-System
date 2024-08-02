@@ -128,9 +128,11 @@
                 </tr>
             </table>
             <div class="error-message"></div>
-            <button type="submit" class="btn">내 정보 수정</button>
-            <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/myInfo\''">수정 취소</button>
-            <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
+            <div class="btn-area">
+                <button type="submit" class="btn">내 정보 수정</button>
+                <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/myInfo\''">수정 취소</button>
+                <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
+            </div>
         </form>
     </div>
 </div>
