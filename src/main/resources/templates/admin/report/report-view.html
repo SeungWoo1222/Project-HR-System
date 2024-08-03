@@ -2,12 +2,14 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
+
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/layout.css}">
     <style>
         /* 여기에 CSS를 입력 */
     </style>
 </th:block>
+
 
 
 <div>
@@ -17,7 +19,7 @@
         <p th:text="'내용 : ' + ${report.content}">내용</p>
         <p th:text="'업무 처리 날짜 : ' + ${report.completeDate}">업무 처리 날짜</p>
         <p th:text="'결재 상태 : ' + ${report.status}">결재 상태</p>
-        <p th:text="'작성일 : ' + ${report.createdDate}">작성일</p>
+        <p th:text="'작성일 : ' + ${report.createdDate}" class="dateTime">작성일</p>
         <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
         <!-- 결재 상태 변경 기능 시작 -->

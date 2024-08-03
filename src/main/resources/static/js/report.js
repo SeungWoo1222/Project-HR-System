@@ -11,21 +11,8 @@ function toggleRejectionReason() {
     }
 }
 
-//     function toggleEmployeeNameField() {
-//     const specificOption = document.getElementById('specificOption');
-//     const employeeNameField = document.getElementById('employeeName');
-//     employeeNameField.disabled = !specificOption.checked;
-// }
-
-// 초기 설정 함수 호출
-
-function setEventHandlers() {
-    // 폼 제출 시 체크되지 않은 writerName 필드 제거
-    $('form').on('submit', removeUncheckedWriterNames);
-}
-
+// 부서 선택 시, 그 부서에 속한 임원들 데이터를 받아옴
 function loadEmployeesByDepartment() {
-
     var departmentId = $('#departmentId').val();
 
     $.ajax({
@@ -46,48 +33,56 @@ function loadEmployeesByDepartment() {
     });
 }
 
+// 부서에 속한 임원들 선택지 생성
 function populateEmployeeList(data) {
     const select = $('#writerIdContainer');
     select.empty(); // 기존 옵션 초기화
     data.forEach(function(employee) {
         const checkboxContainer = $('<div></div>');
-        const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerId" value="' + employee.employeeId + '">');
-        const nameInput = $('<input type="hidden" class="writerNameInput" name="writerName" value="' + employee.name + '">');
+        const checkbox = $('<input type="checkbox" class="writerIdCheckbox" name="writerIdList" value="' + employee.employeeId + '">');
         const label = $('<label>' + employee.name + '</label>');
-        checkboxContainer.append(checkbox).append(label).append(nameInput);
+        checkboxContainer.append(checkbox).append(label);
         select.append(checkboxContainer);
+    });
+
+    // 체크박스에 이벤트 리스너 추가
+    $('.writerIdCheckbox').on('change', function() {
+        updateSelectedEmployees();
     });
 }
 
+// 전체선택 체크박스 생성
 function toggleSelectAllEmployees() {
     const isChecked = $('#selectAllEmployeesCheckbox').prop('checked');
     $('.writerIdCheckbox').prop('checked', isChecked);
-    addSelectedEmployees();
+    updateSelectedEmployees();
 }
 
-function addSelectedEmployees() {
+// 선택된 임원들을 업데이트
+function updateSelectedEmployees() {
     const selectedContainer = $('#selectedEmployees');
-    selectedContainer.empty();
+    selectedContainer.empty(); // 이전에 추가된 필드 제거
+
+    // 선택된 임원들의 ID와 이름을 추가
     $('.writerIdCheckbox:checked').each(function() {
         const id = $(this).val();
-        const name = $(this).siblings('.writerNameInput').val(); // name을 가져오기
+        const name = $(this).siblings('label').text();
+
+        // 선택된 직원의 ID와 이름을 포함하는 숨겨진 필드를 폼에 추가
+        const hiddenNameInput = $('<input type="hidden" name="writerNameList" value="' + name + '">');
+        selectedContainer.append(hiddenNameInput);
+
+        // 사용자에게 선택된 임원 표시
         const employeeDiv = $('<div class="selected-employee" data-id="' + id + '"></div>');
         employeeDiv.append('<span>' + name + '</span>');
         const removeButton = $('<button type="button">x</button>');
         removeButton.on('click', function() {
             $(this).parent().remove();
             $('#writerIdContainer input[value="' + id + '"]').prop('checked', false);
+            updateSelectedEmployees(); // 선택 사항 업데이트
         });
         employeeDiv.append(removeButton);
         selectedContainer.append(employeeDiv);
-    });
-}
-
-function removeUncheckedWriterNames(event) {
-    $('.writerIdCheckbox').each(function() {
-        if (!$(this).is(':checked')) {
-            $(this).siblings('.writerNameInput').remove();
-        }
     });
 }
 

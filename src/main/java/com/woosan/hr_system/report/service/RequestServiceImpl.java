@@ -4,15 +4,22 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -23,24 +30,21 @@ public class RequestServiceImpl implements RequestService {
     private AuthService authService;
 
     @Override // 요청 생성
-    public void createRequest(List<String> writerIds, List<String> writerNames, LocalDate dueDate, String requestNote, String requesterId) {
+    public void createRequest(Request request) {
+        LocalDateTime requestDate = LocalDateTime.now();
 
-        LocalDateTime requestDate = LocalDateTime.now(); // 현재 기준 생성 시간 설정
-        List<Request> requests = new ArrayList<>();
+        for (int i = 0; i < request.getWriterIdList().size(); i++) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("requesterId", request.getRequesterId());
+            params.put("writerId", request.getWriterIdList().get(i));
+            params.put("writerName", request.getWriterNameList().get(i));
+            params.put("dueDate", request.getDueDate());
+            params.put("requestNote", request.getRequestNote());
+            params.put("requestDate", requestDate);
 
-        // requests 객체 설정
-        for (int i = 0; i < writerIds.size(); i++) {
-            Request request = new Request();
-            request.setRequesterId(requesterId);
-            request.setWriterId(writerIds.get(i));
-            request.setWriterName(writerNames.get(i));
-            request.setDueDate(dueDate);
-            request.setRequestNote(requestNote);
-            request.setRequestDate(requestDate);
-            requests.add(request);
+            requestDAO.createRequest(params);
         }
 
-        requestDAO.createRequest(requests);
     }
 
     @Override // 모든 요청 조회
@@ -91,40 +95,23 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 요청 수정
-    public void updateRequest(Long requestId, List<String> writerIds, List<String> writerNames, String requestNote, LocalDate dueDate) {
-
+    public void updateRequest(Request request) {
+        System.out.println("서비스 : " + request.getRequestNote());
         //request 객체 설정
         LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
-        List<Request> requests = new ArrayList<>();
 
-        // 작성자가 한명인 경우 => 요청을 수정
-        if (writerIds.size() == 1) {
-            Request request = new Request();
-            request.setRequestId(requestId);
-            request.setWriterId(writerIds.get(0));
-            request.setRequestNote(requestNote);
-            request.setDueDate(dueDate);
-            request.setModifiedDate(modifiedDate);
-            requestDAO.updateRequest(request);
-        }
+        for (int i = 0; i < request.getWriterIdList().size(); i++) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("requestId", request.getRequestId());
+            params.put("writerId", request.getWriterIdList().get(i));
+            params.put("writerName", request.getWriterNameList().get(i));
+            params.put("dueDate", request.getDueDate());
+            params.put("requestNote", request.getRequestNote());
+            params.put("modifiedDate", modifiedDate);
 
-        // 작성자가 여러명인 경우 => 요청 삭제 후 새로운 요청 생성
-        else if (writerIds.size() > 1) {
-            requestDAO.deleteRequest(requestId);
-            String requesterId = null;
-            requesterId = authService.getAuthenticatedUser().getUsername();
+            System.out.println("Params: " + params);
 
-            for (int i = 0; i < writerIds.size(); i++) {
-                Request request = new Request();
-                request.setRequesterId(requesterId);
-                request.setWriterId(writerIds.get(i));
-                request.setWriterName(writerNames.get(i));
-                request.setRequestNote(requestNote);
-                request.setDueDate(dueDate);
-                request.setRequestDate(modifiedDate);
-                requests.add(request);
-            }
-            requestDAO.createRequest(requests);
+            requestDAO.updateRequest(params);
         }
     }
 
@@ -137,16 +124,3 @@ public class RequestServiceImpl implements RequestService {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

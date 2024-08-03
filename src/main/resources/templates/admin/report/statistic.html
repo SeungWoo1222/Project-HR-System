@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+<!--    <link rel="stylesheet" th:href="@{/css/layout.css}"> &lt;!&ndash; 외부 CSS는 이렇게 &ndash;&gt;-->
     <style>
         /*// 여기에 CSS를 입력*/
     </style>
@@ -19,7 +19,7 @@
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
     <h1>보고서 범위 설정</h1>
     <h2>기간 설정</h2>
-    <form action="#" th:action="@{/admin/request/stats}" method="get">
+    <form th:action="@{/admin/request/stats}" method="get">
         <label for="statisticStart">시작 월:</label>
         <input type="month" id="statisticStart" name="statisticStart" required>
         <label for="statisticEnd">종료 월:</label>

@@ -20,7 +20,7 @@
         <p th:text="'보고서 작성자 : ' + ${request.writerName}"></p>
         <p th:text="'요청 사항 : ' + ${request.requestNote}"></p>
         <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
-        <p th:text="'요청 일자 : ' + ${request.requestDate}"></p>
+        <p th:text="'요청 일자 : ' + ${request.requestDate} " class="dateTime" ></p>
 
         <a th:href="@{'/admin/request/edit?requestId=' + ${request.requestId}}">수정</a>
 

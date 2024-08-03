@@ -8,9 +8,17 @@
 </th:block>
 
 <th:block layout:fragment="script">
+    <script th:src="@{/js/employee.js}"></script>
+    <script> // time에 T를 없앰
+        document.addEventListener("DOMContentLoaded", function () {
+            updateDateTimeElements();
+        });
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
 
+    <!-- 구글 통계 API -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages': ['bar']});
@@ -34,7 +42,7 @@
     <div class="content">
         <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
         <h1>내 결재 목록</h1>
-        <button th:onclick="openModal('/admin/request/approvalDatePage')" >날짜 범위 설정</button>
+        <button th:onclick="openModal('/admin/request/approvalDatePage')">날짜 범위 설정</button>
         <table class="list">
             <thead>
             <tr>
@@ -58,8 +66,8 @@
 
         <!-- 작성 요청 목록 -->
         <h1>작성 요청 목록</h1>
-        <button th:onclick="openModal('/admin/request/requestDatePage')" >날짜 범위 설정</button>
-        <button onclick="location.href='/admin/request/write'">작성 요청하기</button>
+        <button th:onclick="openModal('/admin/request/requestDatePage')">날짜 범위 설정</button>
+        <button th:onclick="openModal('/admin/request/write')">작성 요청하기</button>
         <div class="list">
             <table>
                 <thead>
@@ -100,14 +108,11 @@
             </div>
         </div>
 
-
         <!-- 구글 차트 통계 추가 -->
         <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
 
         <!-- 숨겨진 요소에 통계 데이터를 JSON 형식으로 저장 -->
         <div id="hidden-stats" th:text="${statsJson}" style="display:none;"></div>
     </div>
-</div>
-</div>
 </div>
 </html>

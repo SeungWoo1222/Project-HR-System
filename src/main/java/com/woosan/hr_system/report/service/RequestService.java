@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface RequestService {
     // 요청 생성
-    void createRequest(List<String> writerIds, List<String> writerNames, LocalDate dueDate, String requestNote, String requesterId);
+    void createRequest(Request request);
 
     // 모든 요청 조회
     List<Request> getAllRequests();
@@ -22,7 +22,7 @@ public interface RequestService {
     // 보고서 결재 처리
     void updateApprovalStatus(Long reportId, String status, String rejectionReasont);
     // 요청 수정
-    void updateRequest(Long requestId, List<String> writerIds, List<String> writerNames, String requestNote, LocalDate dueDate);
+    void updateRequest(Request request);
 
     // 요청 삭제
     void deleteRequest(Long requestId);

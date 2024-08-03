@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Request {
     private Long requestId;
@@ -18,6 +19,10 @@ public class Request {
     private String name;
     private String departmentId;
 
+    // 보고서작성, 요청 등 임원 선택에서 여러 임원을 받아오기 위한 변수
+    private List<String> writerNameList;
+    private List<String> writerIdList;
+
     // main.html에 yy-mm-dd로 반환하는 변수
     private String formattedDueDate;
     private String formattedRequestDate;
@@ -26,7 +31,7 @@ public class Request {
 
 
 
-
+    // method
     // Getters and Setters
     public Long getRequestId() {
         return requestId;
@@ -140,5 +145,19 @@ public class Request {
         this.name = name;
     }
 
+    public List<String> getWriterIdList() {
+        return writerIdList;
+    }
 
+    public void setWriterIdList(List<String> writerIdList) {
+        this.writerIdList = writerIdList;
+    }
+
+    public List<String> getWriterNameList() {
+        return writerNameList;
+    }
+
+    public void setWriterNameList(List<String> writerNameList) {
+        this.writerNameList = writerNameList;
+    }
 }

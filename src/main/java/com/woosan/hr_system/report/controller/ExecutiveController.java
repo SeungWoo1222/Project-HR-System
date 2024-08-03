@@ -39,24 +39,22 @@ public class ExecutiveController {
     @Autowired
     private AuthService authService;
 
+
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
         List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("request", new Request());
         model.addAttribute("employees", employees); // employees 목록 추가
-        return "admin/report/request_write";
+        return "admin/report/request-write";
     }
 
     // 요청 생성
     @PostMapping("/write")
-    public String createRequest(@RequestParam("writerId") List<String> writerIds,
-                                @RequestParam("writerName") List<String> writerNames,
-                                @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
-                                @RequestParam("requestNote") String requestNote,
-                                Model model) {
+    public String createRequest(@ModelAttribute Request request) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         String requesterId = authService.getAuthenticatedUser().getUsername();
-        requestService.createRequest(writerIds, writerNames, dueDate, requestNote, requesterId);
-        model.addAttribute("message", "보고서 작성 완료");
+        request.setRequesterId(requesterId);
+        requestService.createRequest(request);
         return "redirect:/admin/request/main";
     }
 
@@ -66,8 +64,6 @@ public class ExecutiveController {
 
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
         String employeeId = authService.getAuthenticatedUser().getUsername();
-//        String approverId = employeeId;
-//        String requesterId = employeeId;
 
         // 내가 결재할 보고서 목록 조회
         String approvalStart = (String) session.getAttribute("approvalStart");
@@ -122,7 +118,6 @@ public class ExecutiveController {
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
     public String showStatisticPage(Model model) {
         List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("ReportStat", new Report());
         model.addAttribute("employees", employees); // employees 목록 추가
         return "/admin/report/statistic";
     }
@@ -172,7 +167,7 @@ public class ExecutiveController {
     // 내 결재 목록 날짜 범위설정 페이지 이동
     @GetMapping("/approvalDatePage")
     public String showApprovalDatePage() {
-        return "/admin/report/report_approval_date";
+        return "admin/report/report-approval-date";
     }
 
     // 내 결재 목록 조회 + 날짜 범위 설정
@@ -188,7 +183,7 @@ public class ExecutiveController {
     // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
     @GetMapping("/requestDatePage")
     public String showRequestDatePage() {
-        return "/admin/report/request_date";
+        return "admin/report/request-date";
     }
 
     // 내 결재 목록 조회 + 날짜 범위 설정
@@ -205,7 +200,7 @@ public class ExecutiveController {
     public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
-        return "admin/report/request_view";
+        return "admin/report/request-view";
     }
 
 
@@ -215,17 +210,35 @@ public class ExecutiveController {
         List<Employee> employees = employeeDAO.getAllEmployees();
         model.addAttribute("employees", employees); // employees 목록 추가
         model.addAttribute("request", request);
-        return "/admin/report/request_edit";
+
+        model.addAttribute("updateRequest", new Request());
+        return "admin/report/request-edit";
     }
 
     @PostMapping("/edit") // 요청 수정
-    public String updateRequest(@RequestParam("requestId") Long requestId,
-                                @RequestParam("writerId") List<String> writerIds,
-                                @RequestParam("writerName") List<String> writerNames,
-                                @RequestParam("requestNote") String requestNote,
-                                @RequestParam("dueDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate) {
+    public String updateRequest(@ModelAttribute Request request) {
+        System.out.println(request.getRequestNote());
+        // 요청 수정 권한이 있는지 확인
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = authService.getAuthenticatedUser().getUsername();
 
-        requestService.updateRequest(requestId, writerIds, writerNames, requestNote, dueDate);
+        // 요청 ID로 요청 조회
+        Request requestForCheck = requestService.getRequestById(request.getRequestId());
+
+        // 현재 로그인한 사용자와 requester_id 비교
+        if (requestForCheck != null && requestForCheck.getRequesterId().equals(currentId)) {
+            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
+            if (request.getWriterIdList().size() > 1) {
+                requestService.deleteRequest(request.getRequestId());
+                request.setRequesterId(currentId);
+                requestService.createRequest(request);
+            } else {
+                requestService.updateRequest(request);
+            }
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
+
         return "redirect:/admin/request/main";
     }
 
@@ -260,7 +273,7 @@ public class ExecutiveController {
             FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
             model.addAttribute("reportFile", reportFile);
         }
-        return "/admin/report/report_view";
+        return "admin/report/report-view";
     }
 
     @PostMapping("/approve") // 보고서 결재 처리

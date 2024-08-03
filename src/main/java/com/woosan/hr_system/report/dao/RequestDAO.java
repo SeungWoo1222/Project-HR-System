@@ -4,6 +4,8 @@ import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +22,8 @@ public class RequestDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.RequestDAO";
 
     // 요청 생성
-    public void createRequest(List<Request> requests) {
-        sqlSession.insert(NAMESPACE + ".createRequest", requests);
+    public void createRequest(Map<String, Object> params) {
+        sqlSession.insert(NAMESPACE + ".createRequest", params);
     }
 
     // 요청 전체 조회
@@ -44,14 +46,9 @@ public class RequestDAO {
         return sqlSession.selectList(NAMESPACE + ".getAllRequests", params);
     }
 
-    // 모든 사원 조회
-    public List<Employee> getAllEmployees() {
-        return sqlSession.selectList(NAMESPACE + ".getAllEmployees");
-    }
-
     // 요청 수정
-    public void updateRequest(Request request) {
-        sqlSession.update(NAMESPACE + ".updateRequest", request);
+    public void updateRequest(Map<String, Object> params) {
+        sqlSession.update(NAMESPACE + ".updateRequest", params);
     }
 
     // 보고서 결재 처리
