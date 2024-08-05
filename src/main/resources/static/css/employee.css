@@ -2,3 +2,20 @@
     width : 280px;
     height: 360px;
 }
+
+.file-area .file-list .filebox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.file-area .file-list .filebox p {
+    font-size: 14px;
+    margin: 0;
+    display: inline-block;
+}
+
+.file-area .file-list .delete .delete-btn {
+    margin-left: 10px;
+    cursor: pointer;
+}

@@ -2,6 +2,7 @@
 let errorMessage;
 let fileNo = 0;
 let filesArr = [];
+let registeredFilesArr = [];
 // ==================================================== 전역변수 =========================================================
 
 // =================================================== 유효성 검사 ========================================================
@@ -315,6 +316,80 @@ function submitResignationForm(event) {
         });
 }
 
+// AJAX PUT 요청 - 퇴사 수정
+function submitUpdateResignationForm(event) {
+    // 유효성 검사 실행
+    if (!validateResignationForm(event)) {
+        return;
+    }
+
+    // form 제출 처리
+    const { form, actionUrl } = handleFormSubmit(event);
+    const formData = new FormData();
+
+    // FormData 객체에 registeredResignationDocuments 필드를 추가
+    let registeredResignationDocuments = '';
+    for (let i = 0; i < registeredFilesArr.length; i++) {
+        // 삭제되지 않은 파일만 폼 데이터에 담기
+        if (registeredFilesArr[i] !== "") {
+            registeredResignationDocuments += registeredFilesArr[i];
+            if (i < registeredFilesArr.length - 1) registeredResignationDocuments += ' / ';
+        }
+    }
+
+    // FormData 객체에 resignation 필드를 추가
+    const resignation = {
+        resignationDate: form.resignationDate.value,
+        resignationReason: form.resignationReason.value,
+        codeNumber: form.codeNumber.value,
+        specificReason: form.specificReason.value,
+        resignationDocuments: registeredResignationDocuments
+    };
+    formData.append("resignation", new Blob([JSON.stringify(resignation)], { type: "application/json" }));
+
+    // FormData 객체에 resignationDocuments 필드를 추가
+    for (let i = 0; i < filesArr.length; i++) {
+        // 삭제되지 않은 파일만 폼 데이터에 담기
+        if (!filesArr[i].is_delete) {
+            formData.append("resignationDocuments", filesArr[i]);
+        }
+    }
+
+    // FormData에 담긴 데이터 콘솔에 출력
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ':', pair[1]);
+    }
+
+    // 데이터를 서버로 전송
+    fetch(actionUrl, {
+        method: 'PUT',
+        body: formData
+    })
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            console.log('서버 응답 데이터 :', response.text);
+            if (response.status === 200) {
+                alert(response.text); // 성공 메시지 알림
+                window.location.reload();
+            } else if (response.status === 404) {
+                alert(response.text); // 404 오류 메세지 알림
+            } else if (response.status === 400) {
+                alert(response.text); // 400 오류 메시지 알림
+            } else if (response.status === 500) {
+                alert(response.text); // 500 오류 메시지 알림
+            } else {
+                alert('퇴사 정보 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
+            }
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        });
+}
+
 // AJAX DELETE 요청
 function submitDeleteRequest(event) {
     let button = event.target;
@@ -495,6 +570,37 @@ function formatCodeNumberAndResignationReason(text) {
     }
     return text.trim();
 }
+
+// 기존 퇴사 관련 문서 초기화하는 함수
+function initializeResignationDocuments() {
+    // null 확인 후 null이면 리턴
+    const registeredDocumentsElement = document.getElementById('registeredDocuments');
+    if (!registeredDocumentsElement) { // 요소 자체 확인
+        return;
+    }
+    const registeredDocument = registeredDocumentsElement.value;
+    if (!registeredDocument) { // 입력값이 비었는지 확인
+        return;
+    }
+
+    // 기존 문서 배열에 담고 공백 제거
+    const registeredDocumentList = registeredDocument.split("/");
+    registeredDocumentList.forEach((item, index, array) => {
+        array[index] = item.trim();
+    });
+
+    // 목록에 기존 문서 추가
+    for (let i = 0; i < registeredDocumentList.length; i++) {
+        let htmlData = '';
+        htmlData += '<div id="file' + fileNo + '" class="filebox">';
+        htmlData += '   <p class="name">' + registeredDocumentList[i] + '</p>';
+        htmlData += '   <a class="delete" onclick="deleteRegisteredFile(' + fileNo + ');"><img src="/images/icons/delete.png" class="delete-btn" alt="delete-btn" width="20"/></a>';
+        htmlData += '</div>';
+        document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);
+        registeredFilesArr[fileNo] = registeredDocumentList[i];
+        fileNo++;
+    }
+}
 // ==================================================== 각종 함수 ========================================================
 
 //=================================================== File 관련 함수 =====================================================
@@ -557,7 +663,7 @@ function addFile(obj){
             let htmlData = '';
             htmlData += '<div id="file' + fileNo + '" class="filebox">';
             htmlData += '   <p class="name">' + file.name + '</p>';
-            htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><i class="far fa-minus-square"></i></a>';
+            htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><img src="/images/icons/delete.png" class="delete-btn" alt="delete-btn" width="20"/></a>';
             htmlData += '</div>';
             document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);
             fileNo++;
@@ -589,8 +695,22 @@ function validateFile(obj){
 
 // 첨부파일 삭제
 function deleteFile(num) {
+    // UI에서 파일을 삭제
     document.querySelector("#file" + num).remove();
+    // 'filesArr' 배열에서 해당 파일 객체의 'is_delete' 속성 설정
     filesArr[num].is_delete = true;
+
+}
+
+// 기존 첨부파일 삭제
+function deleteRegisteredFile(num) {
+    // UI에서 파일을 삭제
+    document.querySelector("#file" + num).remove();
+    // 'registeredFilesArr[num]' 배열에서 해당 배열 값 ""로 초기화
+    registeredFilesArr[num] = "";
+    for (var i = 0; i < registeredFilesArr.length; i++) {
+        console.log(registeredFilesArr[i]);
+    }
 }
 //=================================================== File 관련 함수 =====================================================
 

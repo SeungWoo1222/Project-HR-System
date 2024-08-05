@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.auth.dao.PasswordDAO;
-import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
@@ -14,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -47,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> employees = employeeDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset);
         int total = employeeDAO.count(pageRequest.getKeyword());
 
-        return new PageResult<>(employees, (int) Math.ceil((double)total / pageRequest.getSize()), total, pageRequest.getPage());
+        return new PageResult<>(employees, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // id를 이용한 특정 사원 정보 조회
@@ -214,7 +211,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, Resignation resignation, String resignationDocumentsName) {
+    public String resignEmployee(String employeeId, Resignation resignation) {
         // 재직 상태 - 퇴사 처리
         Employee employee = employeeDAO.getEmployeeById(employeeId);
         if (employee == null) {
@@ -223,6 +220,132 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus("퇴사");
         employeeDAO.updateEmployee(employee);
 
+        // 퇴사 사유와 코드 분류
+        classifyReason(resignation);
+        classifyCodeNumber(resignation);
+
+        // employeeId 설정
+        resignation.setEmployeeId(employeeId);
+
+        // 로그인된 사용자(처리 사원) 정보와 일시 설정
+        resignation.setProcessedDate(LocalDateTime.now());
+        resignation.setProcessedBy(authService.getAuthenticatedUser().getUsername());
+
+        resignationDAO.insertResignation(resignation);
+        return "success";
+    }
+
+    @Override // 사원 퇴사 정보 수정
+    public String updateResignationInfo(String employeeId, Resignation newResignation) {
+        Resignation originalResignation = resignationDAO.getResignedEmployee(employeeId);
+        // 사원 확인
+        checkResignationNull(originalResignation);
+
+        // 변경 사항 확인
+        if (!compareOriginalToNew(originalResignation, newResignation))
+            throw new IllegalArgumentException("사원의 퇴사 정보에 변경 사항이 없습니다.");
+
+        // 퇴사 사유와 코드 분류 후 입력
+        classifyReason(newResignation);
+        classifyCodeNumber(newResignation);
+
+        // employeeId 입력
+        newResignation.setEmployeeId(employeeId);
+
+        // 퇴사 정보 수정자와 일시 입력
+        newResignation.setProcessedDate(LocalDateTime.now());
+        newResignation.setProcessedBy(authService.getAuthenticatedUser().getUsername());
+
+        // 사원 퇴사 정보 수정
+        try {
+            resignationDAO.updateResignation(newResignation);
+            return null;
+        } catch (DataAccessException dae) {
+            throw new RuntimeException("데이터베이스 오류로 인해 퇴사 정보 수정에 실패하였습니다.", dae);
+        } catch (Exception e) {
+            throw new RuntimeException("사원 퇴사 정보 수정 중 오류가 발생하였습니다.", e);
+        }
+    }
+
+    @Override // 새로운 문서 이름과 기존 문서 이름 합치는 메소드
+    public void updateResignationDocuments(Resignation resignation, String registeredResignationDocuments) {
+        StringBuilder sb = new StringBuilder();
+
+        // 새로 등록한 문서 확인 후 sb에 입력
+        String resignationDocuments = resignation.getResignationDocuments();
+        if (resignationDocuments != null) sb.append(resignationDocuments);
+
+        // 기존 등록한 문서 확인 후 sb에 입력
+        if (registeredResignationDocuments != null) sb.append(registeredResignationDocuments);
+
+        resignation.setResignationDocuments(sb.toString());
+    }
+
+    @Override // 사원 정보 삭제
+    public String deleteEmployee(String employeeId) {
+        Employee employee = employeeDAO.getEmployeeById(employeeId);
+        if (employee == null) {
+            return "null"; // 사원 정보 없음
+        } else {
+            employee.setResignation(resignationDAO.getResignedEmployee(employeeId));
+            if (employee.getResignation() == null) {
+                return "null_resignation"; // 퇴사 정보 없음
+            }
+
+            LocalDate resignationDate = employee.getResignation().getResignationDate(); // 퇴사일자
+            LocalDate oneYearLater = resignationDate.plusDays(365); // 퇴사일자 1년 경과일
+            LocalDate now = LocalDate.now();
+
+            if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
+                employeeDAO.deleteEmployee(employeeId);
+                resignationDAO.deleteResignation(employeeId);
+                return "success"; // 1년이 지남 (삭제 가능)
+            } else {
+                return "not_expired"; // 1년이 지나지 않음
+            }
+        }
+    }
+    // ============================================= 퇴사 관련 로직 end-point =============================================
+
+    // ============================================== 기타 로직 start-point ==============================================
+    // 사원 정보 Null 확인하는 메소드
+    private void checkEmployeeNull(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("해당 사원을 찾을 수 없습니다.");
+        }
+    }
+
+    // 사원 퇴사 정보 Null 확인하는 메소드
+    private void checkResignationNull(Resignation resignation) {
+        if (resignation == null) {
+            throw new IllegalArgumentException("해당 사원의 퇴사 정보를 찾을 수 없습니다.");
+        }
+    }
+
+    // 사원 새로운 퇴사 정보와 기존 퇴사정보 비교하는 메소드
+    private boolean compareOriginalToNew(Resignation Original, Resignation New) {
+        // 변경 사항 확인
+        boolean isModified = false;
+        if (!Objects.equals(Original.getResignationDate(), New.getResignationDate())) {
+            isModified = true;
+        }
+        if (!Objects.equals(Original.getResignationReason(), New.getResignationReason())) {
+            isModified = true;
+        }
+        if (!Objects.equals(Original.getCodeNumber(), New.getCodeNumber())) {
+            isModified = true;
+        }
+        if (!Objects.equals(Original.getSpecificReason(), New.getSpecificReason())) {
+            isModified = true;
+        }
+        if (!Objects.equals(Original.getResignationDocuments(), New.getResignationDocuments())) {
+            isModified = true;
+        }
+        return isModified;
+    }
+
+    // 퇴사 사유 분류하는 메소드
+    private void classifyReason(Resignation resignation) {
         // 퇴사 사유 분류
         switch (resignation.getResignationReason()) {
             case "1":
@@ -237,8 +360,13 @@ public class EmployeeServiceImpl implements EmployeeService {
             case "4":
                 resignation.setResignationReason("4. 기타");
                 break;
+            default:
+                throw new IllegalArgumentException("잘못된 퇴사 사유입니다.");
         }
+    }
 
+    // 퇴사 코드 분류하는 메소드
+    private void classifyCodeNumber(Resignation resignation) {
         // 퇴사 코드 분류
         switch (resignation.getCodeNumber()) {
             case "11":
@@ -268,48 +396,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             case "42":
                 resignation.setCodeNumber("42. 이중고용");
                 break;
-
-        }
-
-        // 퇴사 테이블에 나머지 정보 등록
-        resignation.setEmployeeId(employeeId);
-        resignation.setProcessedDate(LocalDateTime.now());
-        resignation.setResignationDocuments(resignationDocumentsName);
-
-        // 로그인된 사용자(처리 사원) 정보 등록
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            resignation.setProcessedBy(userDetails.getUsername());
-        }
-
-        resignationDAO.insertResignation(resignation);
-        return "success";
-    }
-
-    @Override // 사원 정보 삭제
-    public String deleteEmployee(String employeeId) {
-        Employee employee = employeeDAO.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "null"; // 사원 정보 없음
-        } else {
-            employee.setResignation(resignationDAO.getResignedEmployee(employeeId));
-            if (employee.getResignation() == null) {
-                return "null_resignation"; // 퇴사 정보 없음
-            }
-
-            LocalDate resignationDate = employee.getResignation().getResignationDate(); // 퇴사일자
-            LocalDate oneYearLater = resignationDate.plusDays(365); // 퇴사일자 1년 경과일
-            LocalDate now = LocalDate.now();
-
-            if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
-                employeeDAO.deleteEmployee(employeeId);
-                resignationDAO.deleteResignation(employeeId);
-                return "success"; // 1년이 지남 (삭제 가능)
-            } else {
-                return "not_expired"; // 1년이 지나지 않음
-            }
+            default:
+                throw new IllegalArgumentException("잘못된 퇴사 코드입니다.");
         }
     }
-    // ============================================= 퇴사 관련 로직 end-point =============================================
 }

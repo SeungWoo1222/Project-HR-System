@@ -67,6 +67,7 @@ public class FileService {
         return sb.toString();
     }
 
+    // 사진의 주소를 반환하는 메소드
     public String getUrl(String fileName) {
         String prefix = "https://haruharu-hrsystem-bucket.s3.amazonaws.com/";
         return prefix + fileName;

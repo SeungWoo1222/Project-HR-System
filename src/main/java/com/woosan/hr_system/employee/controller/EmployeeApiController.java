@@ -1,6 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.employee.service.EmployeeService;
@@ -25,6 +26,8 @@ public class EmployeeApiController {
     private FileService fileService;
     @Autowired
     private EmployeeDAO employeeDAO;
+    @Autowired
+    private ResignationDAO resignationDAO;
 
     // 사원 신규 등록
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -67,7 +70,7 @@ public class EmployeeApiController {
         };
     }
 
-    // 파일 체크 후 DB에 저장할 파일명 반환하는 메소드
+    // 파일 체크 후 DB에 저장할 파일명 반환하는 메소드 - 사원 사진
     private ResponseEntity<String> validateFileAndGetFileName(Employee employee, MultipartFile picture) {
         String pictureName;
         try {
@@ -87,7 +90,49 @@ public class EmployeeApiController {
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                                  @RequestPart("resignation") Resignation resignation,
                                                  @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
-        // 파일 체크 후 DB에 저장할 파일명 반환
+        // 파일들 체크 후 DB에 저장할 파일명 반환
+        ResponseEntity<String> validationResponse = validateFilesAndGetFileName(resignation, resignationDocuments);
+        if (validationResponse != null) return validationResponse;
+
+        // 사원 퇴사 처리
+        String message = employeeService.resignEmployee(employeeId, resignation);
+        if (message.equals("null")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeDAO.getEmployeeById(employeeId).getName() + "' 사원을 찾을 수 없습니다.");
+        }
+        return ResponseEntity.ok("'" + employeeDAO.getEmployeeById(employeeId).getName() + "' 사원이 퇴사 처리되었습니다.");
+    }
+
+    // 사원 퇴사 정보 수정
+    @PutMapping(value = "/update/resignation/{employeeId}", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
+                                                        @RequestPart("resignation") Resignation resignation,
+                                                        @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
+        // 변경된 resignation에서 registeredResignationDocuments 추출
+        String registeredResignationDocuments = resignation.getResignationDocuments();
+        log.debug("잘 도착했슴돠! resignationDocuments: " + registeredResignationDocuments);
+
+        // 파일들 체크 후 DB에 저장할 파일명 반환
+        ResponseEntity<String> validationResponse = validateFilesAndGetFileName(resignation, resignationDocuments);
+        if (validationResponse != null) return validationResponse;
+
+        // 기존 파일과 새로운 파일 문자열 결합
+        if (resignation.getResignationDocuments() != null && registeredResignationDocuments != null)
+            employeeService.updateResignationDocuments(resignation, registeredResignationDocuments);
+
+        // 퇴사 정보 수정
+        try {
+            employeeService.updateResignationInfo(employeeId, resignation);
+            return ResponseEntity.ok("'" + employeeDAO.getEmployeeById(employeeId).getName() + "' 사원의 퇴사 정보가 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("퇴사 정보 수정 중 오류가 발생하였습니다.");
+        }
+    }
+
+
+    // 파일 체크들 후 DB에 저장할 파일명 반환 - 퇴사 문서
+    private ResponseEntity<String> validateFilesAndGetFileName(Resignation resignation, MultipartFile[] resignationDocuments) {
         String resignationDocumentsName = null;
         if (resignationDocuments != null) {
             try {
@@ -97,15 +142,9 @@ public class EmployeeApiController {
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
-            resignation.setResignationDocuments(resignationDocumentsName);
         }
-
-        // 사원 퇴사 처리
-        String message = employeeService.resignEmployee(employeeId, resignation, resignationDocumentsName);
-        if (message.equals("null")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("'" + employeeDAO.getEmployeeById(employeeId).getName() + "' 사원을 찾을 수 없습니다.");
-        }
-        return ResponseEntity.ok("'" + employeeDAO.getEmployeeById(employeeId).getName() + "' 사원이 퇴사 처리되었습니다.");
+        resignation.setResignationDocuments(resignationDocumentsName);
+        return null;
     }
 
     // 사원 영구 삭제

@@ -124,10 +124,11 @@ public class EmployeeViewController {
 
         // 비밀번호 정보와 퇴사 정보 설정
         populateEmployeeDetails(employee);
+        model.addAttribute("employee", employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
+
         return "employee/edit/resignation";
     }
     // ============================================= 수정 관련 로직 end-point =============================================

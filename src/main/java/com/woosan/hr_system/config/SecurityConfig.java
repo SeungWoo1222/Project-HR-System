@@ -47,7 +47,11 @@ public class SecurityConfig {
                                 .failureHandler(customAuthenticationFailureHandler()) // 커스텀 실패 핸들러 설정
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
                 )
-
+                // 새로운 방식의 HTTP Basic 인증 활성화
+                .httpBasic(httpBasic ->
+                        httpBasic
+                                .realmName("MyAppRealm") // 원하는 Realm 이름 설정
+                )
                 // 로그아웃 설정
                 .logout(logout ->
                         logout
