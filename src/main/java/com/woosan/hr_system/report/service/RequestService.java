@@ -13,7 +13,7 @@ public interface RequestService {
     void createRequest(Request request);
 
     // 모든 요청 조회
-    List<Request> getAllRequests();
+//    List<Request> getAllRequests();
     // 특정 요청 조회
     Request getRequestById(Long requestId);
     // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)

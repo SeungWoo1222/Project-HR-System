@@ -51,7 +51,7 @@
     </select>
 
     <!-- 부서를 이용한 특정 사원 정보 조회 -->
-    <select id="getEmployeesByDepartment" parameterType="String" resultType="com.woosan.hr_system.report.model.Request">
+    <select id="getEmployeesByDepartment" parameterType="String" resultType="com.woosan.hr_system.employee.model.Employee">
         SELECT
             employee_id AS employeeId,
             name AS name

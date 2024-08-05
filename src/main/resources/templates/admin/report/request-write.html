@@ -3,18 +3,16 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <!--  <link rel="stylesheet" th:href="@{/css/layout.css}"> &lt;!&ndash; 외부 CSS는 이렇게 &ndash;&gt;-->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
 </th:block>
 
 <th:block layout:fragment="script">
-    <!--  <script th:src="@{/js/example.js}"></script> &lt;!&ndash; 외부 JS도 요렇게 &ndash;&gt;-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
 </th:block>
 
 <h1>보고서 작성 요청</h1>
-<!--<form method="post" action="/admin/request/write" enctype="multipart/form-data">-->
-<form th:action="@{/admin/request/write}" method="post" th:object="${request}">
+<form id="requestForm" th:action="@{/admin/request/write}" method="post" th:object="${request}" onsubmit="updateFormFields()">
     <label for="departmentId">부서 선택:</label>
     <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
         <option value="" disabled selected>부서를 선택하세요</option>
@@ -27,7 +25,7 @@
         <option value="RD">연구개발</option>
     </select><br>
 
-    <div id="selectAllContainer">
+    <div id="selectAllContainer" style="display:none;">
         <label>
             <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
         </label><br>

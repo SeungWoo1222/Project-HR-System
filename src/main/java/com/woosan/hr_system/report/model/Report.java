@@ -17,11 +17,8 @@ public class Report {
     private String rejectReason;
     private LocalDate completeDate;
 
-    // main.html에 (yy-mm-dd-time)이 아닌 yy-mm-dd로 보여주기 위한 변수
-    private String formattedCreatedDate;
-
-    // 결재할 보고서에 작성자 이름 조회 위한 변수
-    private String employeeName;
+    // 결재할 보고서에 작성자 이름을 표기하기 위한 변수
+    private String writerName;
 
 
     // Getters and Setters
@@ -121,19 +118,11 @@ public class Report {
         this.fileId = filePath;
     }
 
-    public String getFormattedCreatedDate() {
-        return formattedCreatedDate;
+    public String getWriterName() {
+        return writerName;
     }
 
-    public void setFormattedCreatedDate(String formattedCreatedDate) {
-        this.formattedCreatedDate = formattedCreatedDate;
-    }
-
-    public String getEmployeeName() {
-        return employeeName;
-    }
-
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
+    public void setWriterName(String writerName) {
+        this.writerName = writerName;
     }
 }

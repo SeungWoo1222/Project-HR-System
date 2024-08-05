@@ -13,6 +13,8 @@ import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,13 +40,16 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private AuthService authService;
+    @Qualifier("forceAutoProxyCreatorToUseClassProxying")
+    @Autowired
+    private BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying;
 
 
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
-        List<Employee> employees = employeeDAO.getAllEmployees();
+        List<Employee> employee = employeeDAO.getAllEmployees();
         model.addAttribute("request", new Request());
-        model.addAttribute("employees", employees); // employees 목록 추가
+        model.addAttribute("employee", employee); // employees 목록 추가
         return "admin/report/request-write";
     }
 
@@ -107,12 +112,6 @@ public class ExecutiveController {
         model.addAttribute("statsJson", statsJson);
 
         return "admin/report/main"; // main.html 반환
-    }
-
-    @GetMapping("/employee") // 부서 기반 임원 정보 조회
-    @ResponseBody
-    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
-        return employeeDAO.getEmployeesByDepartment(departmentId);
     }
 
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
@@ -262,7 +261,7 @@ public class ExecutiveController {
     }
 
 
-    // 보고서 관련 맵핑 메소드들 ↓↓↓
+    // 요청 외에 맵핑 메소드들 ↓↓↓
 
     @GetMapping("/report/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
@@ -286,6 +285,24 @@ public class ExecutiveController {
         } catch (Exception e) {
             return "error"; // 에러 메시지 표시
         }
+    }
+
+    @GetMapping("/employee") // 부서 기반 임원 정보 조회
+    @ResponseBody
+    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
+        List<Employee> employees = employeeDAO.getEmployeesByDepartment(departmentId);
+        if (employees != null) {
+            for (Employee employee : employees) {
+                if (employee == null) {
+                    System.out.println("Employee is null");
+                } else {
+                    System.out.println(employee);
+                }
+            }
+        } else {
+            System.out.println("Employees list is null");
+        }
+        return employees;
     }
 
 

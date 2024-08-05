@@ -29,10 +29,10 @@
         SELECT
         r.report_id AS reportId,
         r.writer_id AS writerId,
-        e.name AS employeeName,
+        e.name AS writerName,
         r.title,
         r.content,
-        DATE_FORMAT(r.created_date, '%Y-%m-%d') AS formattedCreatedDate,
+        r.created_date AS createdDate,
         r.modified_date AS modifiedDate,
         r.approver_id AS approverId,
         r.status,

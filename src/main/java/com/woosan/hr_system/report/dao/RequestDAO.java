@@ -43,7 +43,7 @@ public class RequestDAO {
         params.put("requesterId", requesterId);
         params.put("startYearMonth", startYearMonth);
         params.put("endYearMonth", endYearMonth);
-        return sqlSession.selectList(NAMESPACE + ".getAllRequests", params);
+        return sqlSession.selectList(NAMESPACE + ".getMyRequests", params);
     }
 
     // 요청 수정

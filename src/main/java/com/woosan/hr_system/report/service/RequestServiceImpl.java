@@ -47,11 +47,6 @@ public class RequestServiceImpl implements RequestService {
 
     }
 
-    @Override // 모든 요청 조회
-    public List<Request> getAllRequests() {
-        return requestDAO.getAllRequests();
-    }
-
     @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
     public List<Request> getMyRequests(String requesterId, String requestStart , String requestEnd) {
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
