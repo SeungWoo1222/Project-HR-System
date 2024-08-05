@@ -23,6 +23,21 @@
             var employeeId = button.getAttribute('employeeId');
             window.location.href = '/employee/edit/resignation/' + employeeId;
         }
+
+        function unlockAccount(button) {
+            var employeeId = button.getAttribute('employeeId');
+            var employeeName = button.getAttribute('employeeName');
+            var confirmMessage = '\'' + employeeName + '\' 사원을 정말 잠금 해제하시겠습니까?';
+            confirm(confirmMessage);
+            window.location.href = '/employee/edit/resignation/' + employeeId;
+        }
+        function lockAccount(button) {
+            var employeeId = button.getAttribute('employeeId');
+            var employeeName = button.getAttribute('employeeName');
+            var confirmMessage = '\'' + employeeName + '\'의 계정을 정말 잠그겠습니까?';
+            confirm(confirmMessage);
+            window.location.href = '/employee/edit/resignation/' + employeeId;
+        }
     </script>
 </th:block>
 

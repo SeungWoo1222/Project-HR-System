@@ -124,7 +124,8 @@
             <button th:if="${employee.status} == '퇴사'" type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editResignedEmployee(this)">퇴사 정보 수정</button>
             <button class="btn">재직 상태 수정</button>
             <button class="btn">부서 이동</button>
-            <button class="btn">계정 잠금</button><button class="btn">계정 잠금 해제</button>
+            <button th:unless="${employee.password?.passwordCount == 5}" class="btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="lockAccount(this)">계정 잠금</button>
+            <button th:if="${employee.password?.passwordCount == 5}" class="btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="unlockAccount(this)">계정 잠금 해제</button>
         </div>
     </div>
 </div>
