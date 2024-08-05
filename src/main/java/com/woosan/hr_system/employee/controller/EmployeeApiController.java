@@ -107,17 +107,9 @@ public class EmployeeApiController {
     public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
                                                         @RequestPart("resignation") Resignation resignation,
                                                         @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
-        // 변경된 resignation에서 registeredResignationDocuments 추출
-        String registeredResignationDocuments = resignation.getResignationDocuments();
-        log.debug("잘 도착했슴돠! resignationDocuments: " + registeredResignationDocuments);
-
         // 파일들 체크 후 DB에 저장할 파일명 반환
         ResponseEntity<String> validationResponse = validateFilesAndGetFileName(resignation, resignationDocuments);
         if (validationResponse != null) return validationResponse;
-
-        // 기존 파일과 새로운 파일 문자열 결합
-        if (resignation.getResignationDocuments() != null && registeredResignationDocuments != null)
-            employeeService.updateResignationDocuments(resignation, registeredResignationDocuments);
 
         // 퇴사 정보 수정
         try {
@@ -130,20 +122,18 @@ public class EmployeeApiController {
         }
     }
 
-
     // 파일 체크들 후 DB에 저장할 파일명 반환 - 퇴사 문서
     private ResponseEntity<String> validateFilesAndGetFileName(Resignation resignation, MultipartFile[] resignationDocuments) {
-        String resignationDocumentsName = null;
         if (resignationDocuments != null) {
             try {
-                resignationDocumentsName = fileService.checkFiles(resignationDocuments);
+                String resignationDocumentsName = fileService.checkFiles(resignationDocuments);
+                employeeService.updateResignationDocuments(resignation, resignationDocumentsName);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
         }
-        resignation.setResignationDocuments(resignationDocumentsName);
         return null;
     }
 

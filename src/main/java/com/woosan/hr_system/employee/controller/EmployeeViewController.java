@@ -118,8 +118,6 @@ public class EmployeeViewController {
 
     @GetMapping("/edit/resignation/{employeeId}") // 사원 퇴사 정보 수정 페이지 이동
     public String viewResignedEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
-        log.info("Entering viewEmployee with employeeId: {}", employeeId);
-
         Employee employee = employeeService.getEmployeeById(employeeId);
 
         // 비밀번호 정보와 퇴사 정보 설정

@@ -241,13 +241,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 사원 확인
         checkResignationNull(originalResignation);
 
-        // 변경 사항 확인
-        if (!compareOriginalToNew(originalResignation, newResignation))
-            throw new IllegalArgumentException("사원의 퇴사 정보에 변경 사항이 없습니다.");
-
         // 퇴사 사유와 코드 분류 후 입력
         classifyReason(newResignation);
         classifyCodeNumber(newResignation);
+
+        // 변경 사항 확인
+        if (!compareOriginalToNew(originalResignation, newResignation)) {
+            throw new IllegalArgumentException("사원의 퇴사 정보에 변경 사항이 없습니다.");
+        }
 
         // employeeId 입력
         newResignation.setEmployeeId(employeeId);
@@ -267,18 +268,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    @Override // 새로운 문서 이름과 기존 문서 이름 합치는 메소드
-    public void updateResignationDocuments(Resignation resignation, String registeredResignationDocuments) {
-        StringBuilder sb = new StringBuilder();
-
-        // 새로 등록한 문서 확인 후 sb에 입력
-        String resignationDocuments = resignation.getResignationDocuments();
-        if (resignationDocuments != null) sb.append(resignationDocuments);
-
-        // 기존 등록한 문서 확인 후 sb에 입력
-        if (registeredResignationDocuments != null) sb.append(registeredResignationDocuments);
-
-        resignation.setResignationDocuments(sb.toString());
+    @Override // 기존 문서 이름 합치는 메소드
+    public void updateResignationDocuments(Resignation resignation, String newDocumentsName) {
+        String originalDocumentsName = resignation.getResignationDocuments();
+        // 새로 등록하거나 기존 파일이 없을 경우
+        if (originalDocumentsName == null) resignation.setResignationDocuments(newDocumentsName);
+        // 기존 파일이 있을 경우
+        else resignation.setResignationDocuments(originalDocumentsName + newDocumentsName);
     }
 
     @Override // 사원 정보 삭제

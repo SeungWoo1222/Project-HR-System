@@ -59,7 +59,7 @@ public class FileService {
             checkFileSize(files[i]);
             try {
                 sb.append(s3Service.uploadFile(files[i]));
-                if (i != files.length - 1) { sb.append(" / "); }
+                if (i != files.length - 1) { sb.append("/"); }
             } catch (Exception e) {
                 throw new IllegalStateException("파일 업로드 중 오류가 발생하였습니다.\n파일 확인 후 재업로드 또는 관리자에게 문의해주세요.", e);
             }

@@ -332,8 +332,7 @@ function submitUpdateResignationForm(event) {
     for (let i = 0; i < registeredFilesArr.length; i++) {
         // 삭제되지 않은 파일만 폼 데이터에 담기
         if (registeredFilesArr[i] !== "") {
-            registeredResignationDocuments += registeredFilesArr[i];
-            if (i < registeredFilesArr.length - 1) registeredResignationDocuments += ' / ';
+            registeredResignationDocuments += registeredFilesArr[i] + '/';
         }
     }
 
@@ -583,11 +582,10 @@ function initializeResignationDocuments() {
         return;
     }
 
-    // 기존 문서 배열에 담고 공백 제거
-    const registeredDocumentList = registeredDocument.split("/");
-    registeredDocumentList.forEach((item, index, array) => {
-        array[index] = item.trim();
-    });
+    // 기존 문서 배열에 담고 공백 제거 및 유효한 값만 필터링
+    const registeredDocumentList = registeredDocument.split("/")
+        .map(item => item.trim())
+        .filter(item => item); // 빈 문자열, null, undefined가 아닌 항목만 남김
 
     // 목록에 기존 문서 추가
     for (let i = 0; i < registeredDocumentList.length; i++) {
