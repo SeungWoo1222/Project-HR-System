@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -204,6 +206,25 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new RuntimeException("계정 잠금 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
         } catch (Exception e) {
             throw new RuntimeException("계정 잠금 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        }
+    }
+
+    @Override // 재직 상태 수정하는 메소드
+    public String updateStatus(String employeeId, String status) {
+        try {
+            log.info("도착하셨나요? employeeId: " + employeeId + " status: " + status);
+            Map<String, Object> params = new HashMap<>();
+            params.put("status", status);
+            params.put("lastModified", LocalDateTime.now());
+            params.put("modifiedBy", authService.getAuthenticatedUser().getUsername());
+            params.put("employeeId", employeeId);
+            employeeDAO.updateStatus(params);
+            String updatedStatus = employeeDAO.getEmployeeById(employeeId).getStatus();
+            return "'" + getEmployeeById(employeeId).getName() + "' 사원의 재직 상태가 '" + updatedStatus + "'으로 변경되었습니다.";
+        } catch (DataAccessException dae) {
+            throw new RuntimeException("재직 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        } catch (Exception e) {
+            throw new RuntimeException("재직 상태 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
         }
     }
     // ============================================ 수정 관련 로직 end-point ============================================

@@ -29,7 +29,7 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
-                                .requestMatchers("/admin/**").hasAnyRole("MANAGER")
+                                .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("MANAGER")
 
                                 // HR 부서 권한
                                 .requestMatchers("/employee/**", "/api/employee/**").hasAnyRole("HR")

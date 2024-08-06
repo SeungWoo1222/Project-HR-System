@@ -32,4 +32,25 @@ public class ErrorController {
     public String handleUnauthorized() {
         return "/error/401";
     }
+
+    // modal 오류 페이지
+    @RequestMapping("/modal/404")
+    public String handleNotFoundInModal() {
+        return "/error/modal/404";
+    }
+
+    @RequestMapping("/modal/500")
+    public String handleInternalServerErrorInModal() {
+        return "/error/modal/500";
+    }
+
+    @RequestMapping("/modal/403")
+    public String handleForbiddenInModal() {
+        return "/error/modal/403";
+    }
+
+    @RequestMapping("/modal/401")
+    public String handleUnauthorizedInModal() {
+        return "/error/modal/401";
+    }
 }

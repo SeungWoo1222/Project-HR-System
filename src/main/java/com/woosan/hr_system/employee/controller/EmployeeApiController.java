@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
-import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
@@ -26,8 +25,6 @@ public class EmployeeApiController {
     private FileService fileService;
     @Autowired
     private EmployeeDAO employeeDAO;
-    @Autowired
-    private AuthService authService;
 
     // 사원 신규 등록
     @RequireHRPermission
@@ -159,8 +156,8 @@ public class EmployeeApiController {
     @PatchMapping("/set/accountLock/{employeeId}")
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
         try {
-            String resultMessage = employeeService.setAccountLock(employeeId);
-            return ResponseEntity.ok(resultMessage);
+            String message = employeeService.setAccountLock(employeeId);
+            return ResponseEntity.ok(message);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

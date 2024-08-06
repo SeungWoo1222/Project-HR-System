@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+</th:block>
+
+<div>
+    <div>
+        <h3>'<span th:text="${name}"></span>' 사원의 재직상태 수정</h3>
+        <form th:action="@{/api/admin/employee/update/status/{employeeId}(employeeId=${employeeId})}" onsubmit="updateStatus(event)">
+            <select id="status" name="status">
+                <option value="재직" th:selected="${status == '재직'}">재직</option>
+                <option value="휴직" th:selected="${status == '휴직'}">휴직</option>
+                <option value="퇴사 예정" th:selected="${status == '퇴사 예정'}">퇴사 예정</option>
+            </select>
+            <button type="submit" class="btn">수정</button>
+        </form>
+    </div>
+</div>
+</html>

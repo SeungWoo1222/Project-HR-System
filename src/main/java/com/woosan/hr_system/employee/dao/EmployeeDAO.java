@@ -1,13 +1,14 @@
 package com.woosan.hr_system.employee.dao;
 
-import com.woosan.hr_system.search.SearchService;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.search.SearchService;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class EmployeeDAO implements SearchService<Employee> {
@@ -62,7 +63,6 @@ public class EmployeeDAO implements SearchService<Employee> {
     // 이번 년도 입사한 사람의 수 조회
     public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
 
-
     @Override // 검색과 페이징 로직
     public List<Employee> search(String keyword, int pageSize, int offset) {
         HashMap<String, Object> params = new HashMap<>();
@@ -75,5 +75,10 @@ public class EmployeeDAO implements SearchService<Employee> {
     @Override // 검색어에 해당하는 전체 데이터의 개수 세는 로직
     public int count(String keyword) {
         return sqlSession.selectOne(NAMESPACE + "count", keyword);
+    }
+
+    // 사원 재직 상태 수정
+    public void updateStatus(Map<String, Object> params) { // 사원 정보 수정
+        sqlSession.update(NAMESPACE + "updateStatus", params);
     }
 }

@@ -177,4 +177,12 @@
         </where>
     </select>
 
+    <update id="updateStatus" parameterType="map">
+        UPDATE employees
+        SET status = #{status},
+            last_modified = #{lastModified},
+            modified_by = #{modifiedBy}
+        WHERE employee_id = #{employeeId}
+    </update>
+
 </mapper>
