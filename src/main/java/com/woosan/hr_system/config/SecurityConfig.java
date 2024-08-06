@@ -2,8 +2,6 @@ package com.woosan.hr_system.config;
 
 import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
 import com.woosan.hr_system.auth.service.CustomAuthenticationSuccessHandler;
-import com.woosan.hr_system.auth.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,23 +15,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/employee/registration", "/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
-                                .requestMatchers("/admin/**").hasAnyRole("차장", "부장", "사장")
+                                .requestMatchers("/admin/**").hasAnyRole("MANAGER")
+
+                                // HR 부서 권한
+                                .requestMatchers("/employee/**", "/api/employee/**").hasAnyRole("HR")
 
                                 // 일반 사원 권한
-                                .requestMatchers("/**").hasAnyRole("사원", "대리", "과장", "차장", "부장", "사장")
+                                .requestMatchers("/**").hasAnyRole("STAFF", "MANAGER")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용

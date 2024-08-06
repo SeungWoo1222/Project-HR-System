@@ -145,4 +145,17 @@ public class EmployeeApiController {
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제하는 중 오류가 발생했습니다.");
         };
     }
+
+    // 계정 잠금 설정
+    @PutMapping("/set/accountLock/{employeeId}")
+    public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
+        try {
+            String resultMessage = employeeService.setAccountLock(employeeId);
+            return ResponseEntity.ok(resultMessage);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
 }

@@ -39,4 +39,7 @@ public class PasswordDAO {
 
     // 비밀번호 카운트 초기화
     public void resetPasswordCount(String employeeId) { sqlSession.update(NAMESPACE + "resetPasswordCount", employeeId); }
+
+    // 비밀번호 카운트 5으로 설정
+    public void maxOutPasswordCount(String employeeId) { sqlSession.update(NAMESPACE + "maxOutPasswordCount", employeeId); }
 }

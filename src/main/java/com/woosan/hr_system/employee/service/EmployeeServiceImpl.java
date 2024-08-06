@@ -187,6 +187,25 @@ public class EmployeeServiceImpl implements EmployeeService {
             return "fail";
         }
     }
+
+    @Override // 계정 잠금과 해제 수정하는 메소드
+    public String setAccountLock(String employeeId) {
+        int pwdCount = passwordDAO.getPasswordCount(employeeId);
+        try {
+            if (pwdCount == 5) { // 계정 잠금해제
+                passwordDAO.resetPasswordCount(employeeId);
+                return "사원의 계정이 잠금 해제되었습니다.";
+            }
+            else { // 계정 잠금
+                passwordDAO.maxOutPasswordCount(employeeId);
+                return "사원의 계정이 잠금 처리되었습니다.";
+            }
+        } catch (DataAccessException dae) {
+            throw new RuntimeException("계정 잠금 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        } catch (Exception e) {
+            throw new RuntimeException("계정 잠금 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        }
+    }
     // ============================================ 수정 관련 로직 end-point ============================================
 
     // ============================================ 퇴사 관련 로직 start-point ============================================

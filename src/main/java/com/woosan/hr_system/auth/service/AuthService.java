@@ -116,7 +116,7 @@ public class AuthService {
         return "NoChangeRequired";
     }
 
-    // 현재 로그인 계정의 사원 권한 확인하는 메소드
+    // 현재 로그인 계정의 관리자 직급 권한 확인하는 메소드
     public String verifyManagerPermission() {
         Collection<? extends GrantedAuthority> authorities = getAuthenticatedUser().getAuthorities();
 
@@ -133,4 +133,6 @@ public class AuthService {
         if (getAuthenticatedUser().getDepartment().equals(department)) return "error/403";
         return null;
     }
+
+
 }
