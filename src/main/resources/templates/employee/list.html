@@ -40,7 +40,7 @@
         function setAccountLock(confirmMessage, employeeId, employeeName) {
             if (confirm(confirmMessage)) {
                 fetch('/api/employee/set/accountLock/' + employeeId, {
-                    method: 'PUT'
+                    method: 'PATCH'
                 })
                     .then(response => {
                         return response.text().then(text => ({
