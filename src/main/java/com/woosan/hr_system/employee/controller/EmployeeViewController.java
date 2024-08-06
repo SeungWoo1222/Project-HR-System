@@ -1,11 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
-import com.woosan.hr_system.auth.dao.PasswordDAO;
-import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
-import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -28,16 +24,10 @@ public class EmployeeViewController {
 
     @Autowired
     private EmployeeService employeeService;
-
     @Autowired
     private AuthService authService;
-
     @Autowired
     private FileService fileService;
-    @Autowired
-    private ResignationDAO resignationDAO;
-    @Autowired
-    private PasswordDAO passwordDAO;
 
     // ============================================ 조회 관련 로직 start-point ============================================
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -64,7 +54,7 @@ public class EmployeeViewController {
             return "error/404";
         }
         // 비밀번호 정보와 퇴사 정보 설정
-        populateEmployeeDetails(employee);
+        employeeService.populateEmployeeDetails(employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
@@ -108,7 +98,7 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeById(employeeId);
 
         // 비밀번호 정보와 퇴사 정보 설정
-        populateEmployeeDetails(employee);
+        employeeService.populateEmployeeDetails(employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
@@ -121,7 +111,7 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeById(employeeId);
 
         // 비밀번호 정보와 퇴사 정보 설정
-        populateEmployeeDetails(employee);
+        employeeService.populateEmployeeDetails(employee);
         model.addAttribute("employee", employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
@@ -147,7 +137,7 @@ public class EmployeeViewController {
     public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         if (employee == null) {
-            return "error/employee-error";
+            return "error/404";
         }
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
@@ -157,18 +147,4 @@ public class EmployeeViewController {
     // ============================================= 퇴사 관련 로직 end-point =============================================
 
     // ================================================== 기타 로직 ======================================================
-    // 비밀번호 정보와 퇴사 정보 설정하는 메소드
-    private void populateEmployeeDetails(Employee employee) {
-        String employeeId = employee.getEmployeeId();
-
-        // 비밀번호 정보 조회 및 설정
-        Password password = passwordDAO.selectPassword(employeeId);
-        employee.setPassword(password);
-
-        // 퇴사 정보 조회 및 설정
-        if (employee.getStatus().equals("퇴사")) {
-            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
-            employee.setResignation(resignation);
-        }
-    }
 }

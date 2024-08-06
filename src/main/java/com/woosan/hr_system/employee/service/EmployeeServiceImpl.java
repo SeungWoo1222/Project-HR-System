@@ -27,15 +27,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeDAO employeeDAO;
-
     @Autowired
     private ResignationDAO resignationDAO;
-
-    @Autowired
-    private AuthService authService;
-
     @Autowired
     private PasswordDAO passwordDAO;
+    @Autowired
+    private AuthService authService;
 
     // ============================================ 조회 관련 로직 start-point ============================================
     @Override // 모든 사원 정보 조회
@@ -70,6 +67,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return employee;
+    }
+
+    @Override // 비밀번호 정보와 퇴사 정보 설정하는 메소드
+    public void populateEmployeeDetails(Employee employee) {
+        String employeeId = employee.getEmployeeId();
+
+        // 비밀번호 정보 조회 및 설정
+        Password password = passwordDAO.selectPassword(employeeId);
+        employee.setPassword(password);
+
+        // 퇴사 정보 조회 및 설정
+        if (employee.getStatus().equals("퇴사")) {
+            Resignation resignation = resignationDAO.getResignedEmployee(employeeId);
+            employee.setResignation(resignation);
+        }
     }
     // ============================================= 조회 관련 로직 end-point =============================================
 

@@ -11,6 +11,7 @@ public interface EmployeeService {
     PageResult<Employee> searchEmployees(PageRequest pageRequest);
     Employee getEmployeeById(String employeeId);
     Employee getEmployeeWithAdditionalInfo(String employeeId);
+    void populateEmployeeDetails(Employee employee);
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();

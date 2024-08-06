@@ -6,12 +6,14 @@ import com.woosan.hr_system.auth.model.Password;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Slf4j
 @Service
@@ -112,5 +114,23 @@ public class AuthService {
             return "ChangeRequired";
         }
         return "NoChangeRequired";
+    }
+
+    // 현재 로그인 계정의 사원 권한 확인하는 메소드
+    public String verifyManagerPermission() {
+        Collection<? extends GrantedAuthority> authorities = getAuthenticatedUser().getAuthorities();
+
+        // 관리자 권한 확인
+        boolean hasManagerRole = authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER"));
+
+        if (!hasManagerRole) return "error/403";
+        return null;
+    }
+
+    // 현재 로그인 계정의 부서 확인하는 메소드
+    public String verifyDepartment(String department) {
+        if (getAuthenticatedUser().getDepartment().equals(department)) return "error/403";
+        return null;
     }
 }

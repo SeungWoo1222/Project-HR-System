@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.employee.service.EmployeeService;
@@ -21,13 +20,10 @@ public class EmployeeApiController {
 
     @Autowired
     private EmployeeService employeeService;
-
     @Autowired
     private FileService fileService;
     @Autowired
     private EmployeeDAO employeeDAO;
-    @Autowired
-    private ResignationDAO resignationDAO;
 
     // 사원 신규 등록
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
