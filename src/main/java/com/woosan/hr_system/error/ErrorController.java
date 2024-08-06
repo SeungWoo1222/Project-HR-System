@@ -33,6 +33,12 @@ public class ErrorController {
         return "/error/401";
     }
 
+    @RequestMapping("/405")
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public String handleMethodNotAllowed() {
+        return "/error/405";
+    }
+
     // modal 오류 페이지
     @RequestMapping("/modal/404")
     public String handleNotFoundInModal() {
