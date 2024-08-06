@@ -8,13 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
@@ -23,18 +21,7 @@ public class AuthController {
     @Autowired
     private PasswordDAO passwordDAO;
 
-    @GetMapping("/home")
-    public String home(Model model) {
-        String result = authService.isPasswordChangeRequired();
-        switch (result) {
-            case "FirstChangeRequired" -> model.addAttribute("message", "FirstChangeRequired");
-            case "ChangeRequired" -> model.addAttribute("message", "ChangeRequired");
-            default -> model.addAttribute("message", "NoChangeRequired");
-        }
-        return "/home";
-    }
-
-    @GetMapping("/auth/login") // 로그인 페이지 이동
+    @GetMapping("/login") // 로그인 페이지 이동
     public String login(@RequestParam(value = "error", required = false) String error,
                         @RequestParam(value = "message", required = false) String message,
                         Model model) {
@@ -43,24 +30,24 @@ public class AuthController {
         return "/auth/login";
     }
 
-    @GetMapping("/auth/logout") // 로그아웃 로직
+    @GetMapping("/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다.");
         return "redirect:/auth/login";
     }
 
-    @GetMapping("/auth/session-expired") // 세션 만료시 페이지 이동
+    @GetMapping("/session-expired") // 세션 만료시 페이지 이동
     public String expireSession() {
         return "/auth/session-expired";
     }
 
-    @GetMapping("/auth/pwd") // 비밀번호 검증 페이지 이동
+    @GetMapping("/pwd") // 비밀번호 검증 페이지 이동
     public String viewPasswordForm(@RequestParam("redirectUrl") String redirectUrl, Model model) {
         model.addAttribute("redirectUrl", redirectUrl);
         return "/auth/pwd";
     }
 
-    @PostMapping("/auth/verifyPassword") // 비밀번호 인증 로직
+    @PostMapping("/verifyPassword") // 비밀번호 인증 로직
     public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
 
@@ -76,7 +63,7 @@ public class AuthController {
         return ResponseEntity.ok(url + employeeId);
     }
 
-    @GetMapping("/auth/pwd-management") // 비밀번호 관리 페이지 이동
+    @GetMapping("/pwd-management") // 비밀번호 관리 페이지 이동
     public String viewPasswordManagement(Model model) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         Password password = passwordDAO.selectPassword(employeeId);
@@ -84,13 +71,13 @@ public class AuthController {
         return "/auth/pwd-management";
     }
 
-    @GetMapping("/auth/pwd-change") // 비밀번호 변경 페이지 이동
+    @GetMapping("/pwd-change") // 비밀번호 변경 페이지 이동
     public String viewPasswordChangeForm(@RequestParam(value = "message", required = false) String message, Model model) {
         if (message != null) model.addAttribute("message", message);
         return "/auth/pwd-change";
     }
 
-    @PutMapping("/auth/changePassword") // 비밀번호 변경 로직
+    @PutMapping("/changePassword") // 비밀번호 변경 로직
     public ResponseEntity<String> updatePassword(@RequestParam("password") String password, @RequestParam("new-password") String newPassword, @RequestParam("strength") int strength) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
 

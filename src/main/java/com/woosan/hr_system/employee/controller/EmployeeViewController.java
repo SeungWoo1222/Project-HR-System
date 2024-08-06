@@ -1,6 +1,5 @@
 package com.woosan.hr_system.employee.controller;
 
-import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
@@ -24,8 +23,6 @@ public class EmployeeViewController {
 
     @Autowired
     private EmployeeService employeeService;
-    @Autowired
-    private AuthService authService;
     @Autowired
     private FileService fileService;
 
@@ -61,19 +58,6 @@ public class EmployeeViewController {
         model.addAttribute("employee", employee);
         return "employee/detail";
     }
-
-    @GetMapping("/myInfo") // 내 정보 조회
-    public String viewMyInfo(Model model) {
-        String employeeId = authService.getAuthenticatedUser().getUsername();
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
-        return "employee/myInfo";
-    }
     // ============================================= 조회 관련 로직 end-point =============================================
 
     // ============================================ 등록 관련 로직 start-point ============================================
@@ -84,15 +68,6 @@ public class EmployeeViewController {
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
-    @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
-    public String viewMyInfoEditForm(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
-        return "employee/edit/myInfo";
-    }
-
     @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);

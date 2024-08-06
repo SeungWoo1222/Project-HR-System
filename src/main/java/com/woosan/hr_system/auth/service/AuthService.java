@@ -5,6 +5,7 @@ import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -117,22 +118,21 @@ public class AuthService {
     }
 
     // 현재 로그인 계정의 관리자 직급 권한 확인하는 메소드
-    public String verifyManagerPermission() {
+    public void verifyManagerPermission() {
         Collection<? extends GrantedAuthority> authorities = getAuthenticatedUser().getAuthorities();
 
         // 관리자 권한 확인
         boolean hasManagerRole = authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER"));
 
-        if (!hasManagerRole) return "error/403";
-        return null;
+        if (!hasManagerRole) {
+            throw new AccessDeniedException("관리자 권한이 필요합니다.");
+        }
     }
 
     // 현재 로그인 계정의 부서 확인하는 메소드
-    public String verifyDepartment(String department) {
-        if (getAuthenticatedUser().getDepartment().equals(department)) return "error/403";
-        return null;
+    public void verifyDepartment(String department) {
+        if (!getAuthenticatedUser().getDepartment().equals(department))
+            throw new AccessDeniedException("접근 권한이 없는 부서입니다.");
     }
-
-
 }

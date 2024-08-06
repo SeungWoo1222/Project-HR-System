@@ -1,5 +1,7 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Resignation;
@@ -24,8 +26,11 @@ public class EmployeeApiController {
     private FileService fileService;
     @Autowired
     private EmployeeDAO employeeDAO;
+    @Autowired
+    private AuthService authService;
 
     // 사원 신규 등록
+    @RequireHRPermission
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
                                                    @RequestPart("picture") MultipartFile picture) {
@@ -82,6 +87,7 @@ public class EmployeeApiController {
     }
 
     // 사원 퇴사 처리
+    @RequireHRPermission
     @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                                  @RequestPart("resignation") Resignation resignation,
@@ -99,6 +105,7 @@ public class EmployeeApiController {
     }
 
     // 사원 퇴사 정보 수정
+    @RequireHRPermission
     @PutMapping(value = "/update/resignation/{employeeId}", consumes = "multipart/form-data")
     public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
                                                         @RequestPart("resignation") Resignation resignation,
@@ -134,6 +141,7 @@ public class EmployeeApiController {
     }
 
     // 사원 영구 삭제
+    @RequireHRPermission
     @DeleteMapping("/delete/{employeeId}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
         String message = employeeService.deleteEmployee(employeeId);
@@ -147,6 +155,7 @@ public class EmployeeApiController {
     }
 
     // 계정 잠금 설정
+    @RequireHRPermission
     @PutMapping("/set/accountLock/{employeeId}")
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
         try {
@@ -156,6 +165,4 @@ public class EmployeeApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-
 }

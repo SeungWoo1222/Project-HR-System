@@ -1,7 +1,9 @@
 package com.woosan.hr_system.config;
 
+import com.woosan.hr_system.auth.service.CustomAuthenticationEntryPoint;
 import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
 import com.woosan.hr_system.auth.service.CustomAuthenticationSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,13 +17,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
                                 .requestMatchers("/admin/**").hasAnyRole("MANAGER")
@@ -40,6 +45,7 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/auth/login") // 사용자 정의 로그인 페이지 경로
+                                .defaultSuccessUrl("/employee/list", true)
                                 .successHandler(customAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 설정
                                 .failureHandler(customAuthenticationFailureHandler()) // 커스텀 실패 핸들러 설정
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
@@ -78,6 +84,11 @@ public class SecurityConfig {
                 .headers(headers ->
                         headers
                                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // 동일 출처에서만 프레임 로딩 허용
+                )
+
+                // Authentication Entry Point 설정
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
 
         return http.build();
