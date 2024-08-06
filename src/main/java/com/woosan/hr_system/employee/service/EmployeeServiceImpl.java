@@ -267,7 +267,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 정보 수정
-    public String updateResignationInfo(String employeeId, Resignation newResignation) {
+    public void updateResignationInfo(String employeeId, Resignation newResignation) {
         Resignation originalResignation = resignationDAO.getResignedEmployee(employeeId);
         // 사원 확인
         checkResignationNull(originalResignation);
@@ -291,7 +291,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 사원 퇴사 정보 수정
         try {
             resignationDAO.updateResignation(newResignation);
-            return null;
         } catch (DataAccessException dae) {
             throw new RuntimeException("데이터베이스 오류로 인해 퇴사 정보 수정에 실패하였습니다.", dae);
         } catch (Exception e) {

@@ -15,7 +15,7 @@ public interface EmployeeService {
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
-    String updateResignationInfo(String employeeId, Resignation resignation);
+    void updateResignationInfo(String employeeId, Resignation resignation);
     void updateResignationDocuments(Resignation resignation, String newDocumentsName);
     String insertEmployee(Employee employee);
     String updateEmployee(Employee employee);
