@@ -19,7 +19,7 @@
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
     <h1>보고서 범위 설정</h1>
     <h2>기간 설정</h2>
-    <form th:action="@{/admin/request/stats}" method="get">
+    <form id="requestForm" th:action="@{/admin/request/stats}" method="get" onsubmit="updateFormFields()">
         <label for="statisticStart">시작 월:</label>
         <input type="month" id="statisticStart" name="statisticStart" required>
         <label for="statisticEnd">종료 월:</label>
@@ -28,7 +28,7 @@
         <h2>임원 설정</h2>
         <div>
             <label for="departmentId">부서 선택:</label>
-            <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()" >
+            <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
                 <option value="" disabled selected>부서를 선택하세요</option>
                 <option value="PR">생산</option>
                 <option value="QC">품질 관리</option>
@@ -39,12 +39,17 @@
                 <option value="RD">연구개발</option>
             </select><br>
 
-            <div id="selectAllContainer"></div>
+            <div id="selectAllContainer" style="display:none;">
+                <label>
+                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+                </label><br>
+            </div>
 
-            <label for="writerIdContainer" >보고서 작성자</label>
-            <div id="writerIdContainer" onchange="addSelectedEmployees()">
+            <label for="writerIdContainer">보고서 작성자</label>
+            <div id="writerIdContainer">
                 <!-- 직원 목록이 여기에 추가됩니다. -->
-            </div><br>
+            </div>
+            <br>
 
             <div id="selectedEmployees" class="selected-employees"></div>
             <button type="submit">조회</button>

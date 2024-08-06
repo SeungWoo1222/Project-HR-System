@@ -14,10 +14,17 @@ function toggleRejectionReason() {
 
 //========================================결재 상태 변경 =================================================================
 //========================================== 임원 선택 ==================================================================
+// 접속 URL기준으로 실행시킬 경우
+// document.addEventListener("DOMContentLoaded", function() {
+//     var currentUrl = window.location.pathname;
+//     if (currentUrl.includes('')) {
+//
+//     }
+// });
 
-let selectedEmployees; // 객체 선언
+selectedEmployees = {}; // 선택된 임원들 목록 초기화 - 다른 부서 임원을 고르기 위한 변수
 
-//  부서 선택 시, 임원 전체 선택 체크박스 선택 시 메소드 실행
+//  부서 선택, 임원 전체선택 메소드 정의
 function initEventListeners() {
     const departmentSelect = document.getElementById('departmentId');
     const selectAllCheckbox = document.getElementById('selectAllEmployeesCheckbox');
@@ -165,16 +172,30 @@ function updateFormFields() {
 //========================================== 통계 관련 메소드 ============================================================
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드
-function removeWriter(writerId) {
+function removeWriter(button) {
+    console.log('Removing writer with ID:', button);
+
     // 선택된 임원 목록에서 해당 임원 삭제
-    const writerElement = document.querySelector(`button[onclick="removeWriter('${writerId}')"]`).parentNode;
-    writerElement.remove();
+    var employeeId = button.getAttribute('data-employee-id');
+    console.log("Removing writer with employeeId:", employeeId);
+
+    // 부모 노드를 찾아서 삭제합니다.
+    var parentLi = button.parentNode;
+    parentLi.parentNode.removeChild(parentLi);
 
     // 선택된 임원 ID 목록 갱신
     const remainingWriterIds = [];
     document.querySelectorAll('#selected-writers-list li button').forEach(button => {
-        remainingWriterIds.push(button.getAttribute('onclick').match(/removeWriter\('(.+?)'\)/)[1]);
+        remainingWriterIds.push(button.getAttribute('data-employee-id'));
+        console.log(button.getAttribute('data-employee-id'));
     });
+
+    // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
+    if (remainingWriterIds.length === 0) {
+        var allMembersLi = document.createElement("li");
+        allMembersLi.innerHTML = "<span>모든 임원</span>";
+        ul.appendChild(allMembersLi);
+    }
 
     // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
     updateChartWithSelectedWriters(remainingWriterIds);
@@ -190,6 +211,7 @@ function updateChartWithSelectedWriters(writerIds) {
         success: function (response) {
             // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
             var stats = JSON.parse(response.statsJson);
+
             var data = google.visualization.arrayToDataTable(stats);
 
             var options = {};

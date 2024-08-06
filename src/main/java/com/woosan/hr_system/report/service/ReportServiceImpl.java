@@ -66,7 +66,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIds) {
+    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
 
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
@@ -89,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
             endYearMonth = YearMonth.parse(statisticEnd, formatter);
         }
 
-        return reportDAO.getReportStats(startYearMonth, endYearMonth, writerIds);
+        return reportDAO.getReportStats(startYearMonth, endYearMonth, writerIdList);
     }
 
     @Override // 날짜범위 내 결재할 보고서 조회
@@ -121,20 +121,20 @@ public class ReportServiceImpl implements ReportService {
 
 
 
-    @Override // 파일 업로드
-    public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {
-        List<FileMetadata> uploadedFiles = new ArrayList<>();
-        for (MultipartFile file : files) {
-            if (!file.isEmpty()) {
-                String originalFilename = file.getOriginalFilename();
-                String uuidFilename = UUID.randomUUID().toString();
-                String filePath = saveFile(file, uuidFilename);
-                FileMetadata fileMetadata = saveMetadata(reportId, originalFilename, uuidFilename, filePath, file.getSize());
-                uploadedFiles.add(fileMetadata);
-            }
-        }
-        return uploadedFiles;
-    }
+//    @Override // 파일 업로드
+//    public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {
+//        List<FileMetadata> uploadedFiles = new ArrayList<>();
+//        for (MultipartFile file : files) {
+//            if (!file.isEmpty()) {
+//                String originalFilename = file.getOriginalFilename();
+//                String uuidFilename = UUID.randomUUID().toString();
+//                String filePath = saveFile(file, uuidFilename);
+//                FileMetadata fileMetadata = saveMetadata(reportId, originalFilename, uuidFilename, filePath, file.getSize());
+//                uploadedFiles.add(fileMetadata);
+//            }
+//        }
+//        return uploadedFiles;
+//    }
 
     // 파일 변수 설정
     private String saveFile(MultipartFile file, String uuidFilename) throws IOException {

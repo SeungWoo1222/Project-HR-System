@@ -94,15 +94,21 @@
             <button th:onclick="openModal('/admin/request/statistic')">통계 범위 설정</button>
             <div>
                 <h2>선택된 임원 목록</h2>
-                <ul th:if="${allWritersSelected}">
-                    <li>모든 임원</li>
-                </ul>
-                <ul th:unless="${allWritersSelected}" id="selected-writers-list">
-                    <li th:each="writer : ${selectedWriters}">
-                        <span th:text="${writer.name}"></span>
-                        <button type="button" onclick="removeWriter('${writer.id}')">x</button>
-                    </li>
-                </ul>
+<!--                <ul th:if="${selectedWriters != null and !selectedWriters.isEmpty()}" id="selected-writers-list">-->
+<!--                    <li th:each="writer : ${selectedWriters}">-->
+<!--                        <span th:text="${writer.name}"></span>-->
+<!--                        <button type="button" th:data-employee-id="${writer.employeeId}" onclick="removeWriter(this)">x</button>-->
+<!--                    </li>-->
+<!--                </ul>-->
+                    <ul id="selected-writers-list">
+                        <li th:each="writer : ${selectedWriters}" th:if="${selectedWriters != null and !selectedWriters.isEmpty()}">
+                            <span th:text="${writer.name}"></span>
+                            <button type="button" th:data-employee-id="${writer.employeeId}" onclick="removeWriter(this)">x</button>
+                        </li>
+                        <li th:if="${selectedWriters == null or selectedWriters.isEmpty()}">
+                            <span>모든 임원</span>
+                        </li>
+                    </ul>
             </div>
         </div>
 

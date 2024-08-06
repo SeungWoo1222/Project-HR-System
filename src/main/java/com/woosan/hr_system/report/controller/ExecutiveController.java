@@ -44,25 +44,6 @@ public class ExecutiveController {
     @Autowired
     private BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying;
 
-
-    @GetMapping("/write") // 요청 생성 페이지 이동
-    public String showWritePage(Model model) {
-        List<Employee> employee = employeeDAO.getAllEmployees();
-        model.addAttribute("request", new Request());
-        model.addAttribute("employee", employee); // employees 목록 추가
-        return "admin/report/request-write";
-    }
-
-    // 요청 생성
-    @PostMapping("/write")
-    public String createRequest(@ModelAttribute Request request) {
-        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        String requesterId = authService.getAuthenticatedUser().getUsername();
-        request.setRequesterId(requesterId);
-        requestService.createRequest(request);
-        return "redirect:/admin/request/main";
-    }
-
     // main 페이지
     @GetMapping("/main")
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
@@ -86,20 +67,18 @@ public class ExecutiveController {
         // 보고서 통계
         String statisticStart = (String) session.getAttribute("statisticStart");
         String statisticEnd = (String) session.getAttribute("statisticEnd");
-        List<String> writerIds = (List<String>) session.getAttribute("writerIds");
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
+        List<String> writerIdList = (List<String>) session.getAttribute("writerIdList");
+
+        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIdList);
 
         // 선택된 임원 목록 조회
         List<Employee> selectedWriters = new ArrayList<>();
-        if (writerIds != null && !writerIds.isEmpty()) {
-            for (String writerId : writerIds) {
+        if (writerIdList != null && !writerIdList.isEmpty()) {
+            for (String writerId : writerIdList) {
                 Employee employee = employeeDAO.getEmployeeById(writerId);
                 selectedWriters.add(employee);
             }
             model.addAttribute("selectedWriters", selectedWriters);
-            model.addAttribute("allWritersSelected", false);
-        } else {
-            model.addAttribute("allWritersSelected", true);
         }
 
         // 통계 View 관련 로직
@@ -114,53 +93,22 @@ public class ExecutiveController {
         return "admin/report/main"; // main.html 반환
     }
 
-    @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
-    public String showStatisticPage(Model model) {
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("employees", employees); // employees 목록 추가
-        return "/admin/report/statistic";
+    @GetMapping("/write") // 요청 생성 페이지 이동
+    public String showWritePage(Model model) {
+        List<Employee> employee = employeeDAO.getAllEmployees();
+        model.addAttribute("request", new Request());
+        model.addAttribute("employee", employee); // employees 목록 추가
+        return "admin/report/request-write";
     }
 
-    @GetMapping("/stats") // 통계 날짜, 임원 설정
-    public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
-                                 @RequestParam(name = "statisticEnd") String statisticEnd,
-                                 @RequestParam(required = false, name = "writerId") List<String> writerIds,
-                                 HttpSession session) {
-
-        // 날짜 설정
-        session.setAttribute("statisticStart", statisticStart);
-        session.setAttribute("statisticEnd", statisticEnd);
-
-        // 임원 설정
-        session.setAttribute("writerIds", writerIds);
-
+    // 요청 생성
+    @PostMapping("/write")
+    public String createRequest(@ModelAttribute Request request) {
+        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
+        String requesterId = authService.getAuthenticatedUser().getUsername();
+        request.setRequesterId(requesterId);
+        requestService.createRequest(request);
         return "redirect:/admin/request/main";
-    }
-
-    // 통계 - 선택된 임원 목록 중 삭제될 시 실행
-    @PostMapping("/updateStats")
-    @ResponseBody
-    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> writerIds) throws JsonProcessingException {
-        String statisticStart = (String) session.getAttribute("statisticStart");
-        String statisticEnd = (String) session.getAttribute("statisticEnd");
-
-        // 통계 데이터 조회
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
-        return prepareStatsResponse(stats);
-    }
-
-    // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
-    private Map<String, Object> prepareStatsResponse(List<ReportStat> stats) throws JsonProcessingException {
-        List<Object[]> statsArray = new ArrayList<>();
-        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재 된 보고서", "결재 대기인 보고서"});
-        for (ReportStat stat : stats) {
-            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
-        }
-        String statsJson = objectMapper.writeValueAsString(statsArray);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("statsJson", statsJson);
-        return response;
     }
 
     // 내 결재 목록 날짜 범위설정 페이지 이동
@@ -260,8 +208,68 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
+//=====================================================통계 메소드들======================================================
 
-    // 요청 외에 맵핑 메소드들 ↓↓↓
+    @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
+    public String showStatisticPage(Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
+        return "/admin/report/statistic";
+    }
+
+    @GetMapping("/stats") // 통계 날짜, 임원 설정
+    public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
+                                 @RequestParam(name = "statisticEnd") String statisticEnd,
+                                 @RequestParam(required = false, name = "writerIdList") List<String> writerIdList,
+                                 HttpSession session) {
+
+        // 날짜 설정
+        session.setAttribute("statisticStart", statisticStart);
+        session.setAttribute("statisticEnd", statisticEnd);
+
+        // 임원 설정
+        session.setAttribute("writerIdList", writerIdList);
+
+        return "redirect:/admin/request/main";
+    }
+
+
+    // 통계 - 선택된 임원 목록 중 삭제될 시 실행
+    @PostMapping("/updateStats")
+    @ResponseBody
+    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> writerIds) throws JsonProcessingException {
+        String statisticStart = (String) session.getAttribute("statisticStart");
+        String statisticEnd = (String) session.getAttribute("statisticEnd");
+
+        // 삭제된 임원 외 임원들을 다시 session에 등록
+        session.setAttribute("writerIdList", writerIds);
+
+        if (writerIds.isEmpty()) {
+            session.removeAttribute("writerIdList");
+        }
+
+        // 통계 데이터 조회
+        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
+        return prepareStatsResponse(stats);
+    }
+
+    // 임원 삭제 후 main.html에 통계를 다시 갱신하는 매소드
+    private Map<String, Object> prepareStatsResponse(List<ReportStat> stats) throws JsonProcessingException {
+        List<Object[]> statsArray = new ArrayList<>();
+        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재 된 보고서", "결재 대기인 보고서"});
+        for (ReportStat stat : stats) {
+            statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
+        }
+        String statsJson = objectMapper.writeValueAsString(statsArray);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("statsJson", statsJson);
+        return response;
+    }
+
+//=====================================================통계 메소드들======================================================
+
+//====================================================기타 메소드들=======================================================
 
     @GetMapping("/report/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
@@ -304,6 +312,6 @@ public class ExecutiveController {
         }
         return employees;
     }
-
+//==============================================요청 외에 맵핑 메소드들====================================================
 
 }

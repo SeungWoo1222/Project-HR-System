@@ -56,12 +56,12 @@ public class ReportDAO {
     }
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(YearMonth startYearMonth, YearMonth endYearMonth, List<String> writerIds) {
+    public List<ReportStat> getReportStats(YearMonth startYearMonth, YearMonth endYearMonth, List<String> writerIdList) {
         Map<String, Object> params = new HashMap<>();
         params.put("startYearMonth", startYearMonth);
         params.put("endYearMonth", endYearMonth);
-        if (writerIds != null && !writerIds.isEmpty()) {
-            params.put("writerIds", writerIds);
+        if (writerIdList != null && !writerIdList.isEmpty()) {
+            params.put("writerIds", writerIdList);
         } else {
             params.put("writerIds", null);  // writerIds가 null이면 임원 전체 선택
         }
