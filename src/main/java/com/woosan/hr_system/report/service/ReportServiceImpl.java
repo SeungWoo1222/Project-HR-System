@@ -14,9 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -25,35 +23,85 @@ public class ReportServiceImpl implements ReportService {
     private ReportDAO reportDAO;
 
     @Override // 보고서 생성
-    public void createReport(String title, String content, List<String> approverIds, List<String> approverNames, LocalDate completeDate, MultipartFile file, String writerId) {
+    public void createReport(Report report) {
+//    public void createReport(Report report, MultipartFile file) {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-        List<Report> reports = new ArrayList<>();
+        report.setCreatedDate(createdDate);
+        report.setStatus("미처리"); // 결재상태 설정
 
-        for (int i = 0; i < approverIds.size(); i++) {
-            Report report = new Report();
-            report.setTitle(title);
-            report.setContent(content);
-            report.setApproverId(approverIds.get(i));
-            report.setApproverName(approverNames.get(i));
-            report.setCompleteDate(completeDate);
-            report.setWriterId(writerId);
-            report.setCreatedDate(createdDate);
-            report.setStatus("미처리"); // 기본 결재 상태 설정
+        for (int i = 0; i < report.getNameList().size(); i++) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("writerId", report.getWriterId());
+            params.put("approverId", report.getIdList().get(i));
+            params.put("approverName", report.getNameList().get(i));
+            params.put("title", report.getTitle());
+            params.put("content", report.getContent());
+            params.put("createdDate", report.getCreatedDate());
+            params.put("status", report.getStatus());
+            params.put("completeDate", report.getCompleteDate());
 
-            reports.add(report);
+//            reportDAO.createReport(params, file);
+            reportDAO.createReport(params);
+        }
+//            reports.add(report);
             // 파일 업로드
 //            if (!file.isEmpty()) {
 //                reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
 //            }
-        }
 
-        reportDAO.createReport(reports);
+
     }
 
     @Override // 모든 보고서 조회
-    public List<Report> getAllReports() {
-        return reportDAO.getAllReports();
+    public List<Report> getAllReports(String reportStart, String reportEnd, String employeeId) {
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (reportStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(reportStart, formatter);
+        }
+
+        if (reportEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(reportEnd, formatter);
+        }
+        return reportDAO.getAllReports(employeeId, startYearMonth, endYearMonth);
     }
+
+    @Override // 최근 5개 보고서 조회
+    public List<Report> getRecentReports(String reportStart, String reportEnd, String employeeId) {
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (reportStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(reportStart, formatter);
+        }
+//
+        if (reportEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(reportEnd, formatter);
+        }
+        return reportDAO.getRecentReports(employeeId, startYearMonth, endYearMonth);
+    }
+
 
     @Override // 특정 보고서 조회
     public Report getReportById(Long reportId) {

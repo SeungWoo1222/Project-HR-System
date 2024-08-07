@@ -1,4 +1,5 @@
 //========================================결재 상태 변경 =================================================================
+
 // 결재 상태 변경 시 "거절"을 선택한 경우 거절사유를 적는 칸이 생김
 function toggleRejectionReason() {
     var status = document.getElementById("status").value;
@@ -13,12 +14,13 @@ function toggleRejectionReason() {
 }
 
 //========================================결재 상태 변경 =================================================================
+
 //========================================== 임원 선택 ==================================================================
 // 접속 URL기준으로 실행시킬 경우
 // document.addEventListener("DOMContentLoaded", function() {
 //     var currentUrl = window.location.pathname;
-//     if (currentUrl.includes('')) {
-//
+//     if (currentUrl.includes('report/write')) {
+//         initEventListeners();
 //     }
 // });
 
@@ -108,11 +110,9 @@ function loadEmployeesByDepartment() {
 // 임원 전체 선택
 function toggleSelectAllEmployees() {
     const checkboxes = document.querySelectorAll('#writerIdContainer input[type="checkbox"]');
-    console.log("ok2");
     const isChecked = document.getElementById('selectAllEmployeesCheckbox').checked;
     checkboxes.forEach(checkbox => {
         checkbox.checked = isChecked;
-        // checkbox.checked = true;
         checkbox.dispatchEvent(new Event('change'));
     });
 }
@@ -154,7 +154,7 @@ function updateFormFields() {
     writerIdList.forEach(id => {
         let writerIdField = document.createElement('input');
         writerIdField.type = 'hidden';
-        writerIdField.name = 'writerIdList';
+        writerIdField.name = 'IdList';
         writerIdField.value = id;
         requestForm.appendChild(writerIdField);
     });
@@ -162,13 +162,14 @@ function updateFormFields() {
     writerNameList.forEach(name => {
         let writerNameField = document.createElement('input');
         writerNameField.type = 'hidden';
-        writerNameField.name = 'writerNameList';
+        writerNameField.name = 'nameList';
         writerNameField.value = name;
         requestForm.appendChild(writerNameField);
     });
 }
 
 //========================================== 임원 선택 ==================================================================
+
 //========================================== 통계 관련 메소드 ============================================================
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드
@@ -179,7 +180,7 @@ function removeWriter(button) {
     var employeeId = button.getAttribute('data-employee-id');
     console.log("Removing writer with employeeId:", employeeId);
 
-    // 부모 노드를 찾아서 삭제합니다.
+    // 부모 노드를 찾아서 삭제
     var parentLi = button.parentNode;
     parentLi.parentNode.removeChild(parentLi);
 

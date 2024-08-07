@@ -15,10 +15,12 @@ public class Request {
     private LocalDate dueDate;
     private String requestNote;
 
-    // 보고서작성, 요청 등 임원 선택에서 여러 임원을 받아오기 위한 변수
-    private List<String> writerNameList;
-    private List<String> writerIdList;
+    // 요청 작성 시 작성자 선택에서 여러 임원을 선택하기 위한 변수
+    private List<String> nameList;
+    private List<String> idList;
 
+    // 내게 온 요청 목록 조회 시
+    private String requesterName;
 
 
 
@@ -99,19 +101,27 @@ public class Request {
     }
 
 
-    public List<String> getWriterIdList() {
-        return writerIdList;
+    public List<String> getIdList() {
+        return idList;
     }
 
-    public void setWriterIdList(List<String> writerIdList) {
-        this.writerIdList = writerIdList;
+    public void setIdList(List<String> idList) {
+        this.idList = idList;
     }
 
-    public List<String> getWriterNameList() {
-        return writerNameList;
+    public List<String> getNameList() {
+        return nameList;
     }
 
-    public void setWriterNameList(List<String> writerNameList) {
-        this.writerNameList = writerNameList;
+    public void setNameList(List<String> nameList) {
+        this.nameList = nameList;
+    }
+
+    public String getRequesterName() {
+        return requesterName;
+    }
+
+    public void setRequesterName(String requesterName) {
+        this.requesterName = requesterName;
     }
 }

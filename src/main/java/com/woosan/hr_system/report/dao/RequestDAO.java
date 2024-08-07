@@ -37,10 +37,20 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 조회
-    public List<Request> getMyRequests(String requesterId, YearMonth startYearMonth, YearMonth endYearMonth) {
+    public List<Request> getMyRequests(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
         // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
         Map<String, Object> params = new HashMap<>();
-        params.put("requesterId", requesterId);
+        params.put("requesterId", employeeId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        return sqlSession.selectList(NAMESPACE + ".getMyRequests", params);
+    }
+
+    // 내게 온 요청 조회
+    public List<Request> getMyPendingRequests(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
+        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", employeeId);
         params.put("startYearMonth", startYearMonth);
         params.put("endYearMonth", endYearMonth);
         return sqlSession.selectList(NAMESPACE + ".getMyRequests", params);
@@ -65,37 +75,5 @@ public class RequestDAO {
     public void insertRequestIntoSharedTrash(Long requestId) {
         sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
     }
-
-
-
-
-
-
-
-
-
-
-//    // 작성 요청 생성
-//    public void createReportRequest(Request request) {
-//        sqlSession.insert(NAMESPACE + ".createReportRequest", request);
-//    }
-//    // 보고서 기반 작성 요청 조회
-//    public Request getReportRequestById(int requestId) {
-//        return sqlSession.selectOne(NAMESPACE + ".getReportRequestById", requestId);
-//    }
-//    // 작성 요청 수정
-//    public void updateReportRequest(Request request) {
-//        sqlSession.update(NAMESPACE + ".updateReportRequest", request);
-//    }
-//    // 특정 작성 요청 삭제
-//    public void deleteReportRequest(int requestId) {
-//        sqlSession.delete(NAMESPACE + ".deleteReportRequest", requestId);
-//    }
-//
-//    // 사원 기반 보고서 조회
-//    public List<Request> getReportRequestsByEmployeeId(String employeeId) {
-//        return sqlSession.selectList(NAMESPACE + ".getReportRequestsByEmployeeId", employeeId);
-//    }
-
 
 }

@@ -25,16 +25,21 @@
         SELECT
         request_id AS requestId,
         requester_id AS requesterId,
+        e.name AS requesterName,
         report_id AS reportId,
         writer_name AS writerName,
         due_date AS dueDate,
         request_date AS requestDate
-        FROM report_requests
+        FROM report_requests r
+        JOIN employees e ON r.requester_id = e.employee_id
         -- getMyRequests(로그인한 계정 Id 기반 요청 리스트 조회)메소드로 조회 했다면 requesterId가 정의 돼있음
         -- -> 내 requester_id에 맞는 요청을 조회해옴
         <where>
             <if test="requesterId != null">
                 requester_id = #{requesterId}
+            </if>
+            <if test="writerId != null">
+                writer_id = #{writerId}
             </if>
             <if test="startYearMonth != null and endYearMonth != null">
                 AND DATE_FORMAT(request_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}

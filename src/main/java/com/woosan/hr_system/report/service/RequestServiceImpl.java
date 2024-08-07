@@ -33,11 +33,11 @@ public class RequestServiceImpl implements RequestService {
     public void createRequest(Request request) {
         LocalDateTime requestDate = LocalDateTime.now();
 
-        for (int i = 0; i < request.getWriterIdList().size(); i++) {
+        for (int i = 0; i < request.getNameList().size(); i++) {
             Map<String, Object> params = new HashMap<>();
             params.put("requesterId", request.getRequesterId());
-            params.put("writerId", request.getWriterIdList().get(i));
-            params.put("writerName", request.getWriterNameList().get(i));
+            params.put("writerId", request.getIdList().get(i));
+            params.put("writerName", request.getNameList().get(i));
             params.put("dueDate", request.getDueDate());
             params.put("requestNote", request.getRequestNote());
             params.put("requestDate", requestDate);
@@ -48,7 +48,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
-    public List<Request> getMyRequests(String requesterId, String requestStart , String requestEnd) {
+    public List<Request> getMyRequests(String employeeId, String requestStart , String requestEnd) {
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         YearMonth startYearMonth;
@@ -69,7 +69,32 @@ public class RequestServiceImpl implements RequestService {
         } else {
             endYearMonth = YearMonth.parse(requestEnd, formatter);
         }
-        return requestDAO.getMyRequests(requesterId, startYearMonth, endYearMonth);
+        return requestDAO.getMyRequests(employeeId, startYearMonth, endYearMonth);
+    }
+
+    @Override  // 로그인한 계정 기준 내게 온 요청 리스트 조회(내게 온 요청 목록 조회)
+    public List<Request> getMyPendingRequests(String requestStart, String requestEnd, String employeeId) {
+        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth startYearMonth;
+        YearMonth endYearMonth;
+
+        // 현재 연월 가져오기
+        YearMonth currentYearMonth = YearMonth.now();
+
+        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
+        if (requestStart == null) {
+            startYearMonth = currentYearMonth;
+        } else {
+            startYearMonth = YearMonth.parse(requestStart, formatter);
+        }
+
+        if (requestEnd == null) {
+            endYearMonth = currentYearMonth;
+        } else {
+            endYearMonth = YearMonth.parse(requestEnd, formatter);
+        }
+        return requestDAO.getMyPendingRequests(employeeId, startYearMonth, endYearMonth);
     }
 
     @Override // 특정 요청 조회
@@ -95,16 +120,14 @@ public class RequestServiceImpl implements RequestService {
         //request 객체 설정
         LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
 
-        for (int i = 0; i < request.getWriterIdList().size(); i++) {
+        for (int i = 0; i < request.getIdList().size(); i++) {
             Map<String, Object> params = new HashMap<>();
             params.put("requestId", request.getRequestId());
-            params.put("writerId", request.getWriterIdList().get(i));
-            params.put("writerName", request.getWriterNameList().get(i));
+            params.put("writerId", request.getIdList().get(i));
+            params.put("writerName", request.getNameList().get(i));
             params.put("dueDate", request.getDueDate());
             params.put("requestNote", request.getRequestNote());
             params.put("modifiedDate", modifiedDate);
-
-            System.out.println("Params: " + params);
 
             requestDAO.updateRequest(params);
         }

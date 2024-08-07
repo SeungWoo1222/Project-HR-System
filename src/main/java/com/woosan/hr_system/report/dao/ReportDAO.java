@@ -25,13 +25,27 @@ public class ReportDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.ReportDAO";
 
     // 보고서 생성
-    public void createReport(List<Report> reports) {
-        sqlSession.insert(NAMESPACE + ".createReport", reports);
+//    public void createReport(Map<String, Object> params, MultipartFile file) {
+    public void createReport(Map<String, Object> params) {
+        sqlSession.insert(NAMESPACE + ".createReport", params);
     }
 
-    // 보고서 전체 조회
-    public List<Report> getAllReports() {
-        return sqlSession.selectList(NAMESPACE + ".getAllReports");
+    // 모든 보고서 조회
+    public List<Report> getAllReports(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", employeeId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        return sqlSession.selectList(NAMESPACE + ".getAllReports", params);
+    }
+
+    // 최근 보고서 5개 조회
+    public List<Report> getRecentReports(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", employeeId);
+        params.put("startYearMonth", startYearMonth);
+        params.put("endYearMonth", endYearMonth);
+        return sqlSession.selectList(NAMESPACE + ".getRecentReports", params);
     }
 
     // 특정 보고서 조회

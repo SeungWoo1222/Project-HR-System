@@ -6,37 +6,36 @@
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
 
     <!-- 보고서 생성 -->
-    <insert id="createReport" parameterType="list">
+    <insert id="createReport" parameterType="map">
         INSERT INTO reports
         (title, content, approver_id, approver_name, complete_date, writer_id, created_date, status)
         VALUES
-        <foreach collection="list" item="report" separator=",">
             (
-            #{report.title},
-            #{report.content},
-            #{report.approverId},
-            #{report.approverName},
-            #{report.completeDate},
-            #{report.writerId},
-            #{report.createdDate},
-            #{report.status}
+            #{title},
+            #{content},
+            #{approverId},
+            #{approverName},
+            #{completeDate},
+            #{writerId},
+            #{createdDate},
+            #{status}
             )
-        </foreach>
     </insert>
 
-    <!-- 모든 보고서 조회 -->
+    <!-- 모든 보고서 조회 (결재가필요한 보고서 조회, 내가 쓴 보고서 조회에 사용) -->
     <select id="getAllReports" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
         r.report_id AS reportId,
         r.writer_id AS writerId,
         e.name AS writerName,
         r.title,
-        r.content,
+        -- r.content,
         r.created_date AS createdDate,
-        r.modified_date AS modifiedDate,
+        -- r.modified_date AS modifiedDate,
         r.approver_id AS approverId,
-        r.status,
-        r.reject_reason AS rejectReason
+        r.approver_name AS approverName,
+        r.status
+        -- r.reject_reason AS rejectReason
         FROM reports r
         JOIN employees e ON r.writer_id = e.employee_id
         <where>
@@ -46,7 +45,25 @@
             <if test="startYearMonth != null and endYearMonth != null">
                 AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
             </if>
+            <if test="writerId != null">
+                AND r.writer_id = #{writerId}
+            </if>
         </where>
+    </select>
+
+    <!-- 최근 5개 보고서 조회 -->
+    <select id="getRecentReports" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+            report_id AS reportId,
+            writer_id AS writerId,
+            title,
+            created_date AS createdDate,
+            approver_name AS approverName,
+            status
+        FROM reports
+        ORDER BY
+            created_date  desc
+        LIMIT 5;
     </select>
 
     <!-- 특정 보고서 조회 -->

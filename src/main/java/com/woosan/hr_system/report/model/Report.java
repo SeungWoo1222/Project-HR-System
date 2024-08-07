@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Report {
     private Long reportId;
@@ -16,6 +17,10 @@ public class Report {
     private String status;
     private String rejectReason;
     private LocalDate completeDate;
+
+    // 보고서 작성 시 결재자 선택에서 여러 임원을 선택하기 위한 변수
+    private List<String> nameList;
+    private List<String> idList;
 
     // 결재할 보고서에 작성자 이름을 표기하기 위한 변수
     private String writerName;
@@ -125,4 +130,22 @@ public class Report {
     public void setWriterName(String writerName) {
         this.writerName = writerName;
     }
+
+
+    public List<String> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<String> idList) {
+        this.idList = idList;
+    }
+
+    public List<String> getNameList() {
+        return nameList;
+    }
+
+    public void setNameList(List<String> nameList) {
+        this.nameList = nameList;
+    }
+
 }

@@ -40,9 +40,9 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private AuthService authService;
-    @Qualifier("forceAutoProxyCreatorToUseClassProxying")
-    @Autowired
-    private BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying;
+//    @Qualifier("forceAutoProxyCreatorToUseClassProxying")
+//    @Autowired
+//    private BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying;
 
     // main 페이지
     @GetMapping("/main")
@@ -175,7 +175,7 @@ public class ExecutiveController {
         // 현재 로그인한 사용자와 requester_id 비교
         if (requestForCheck != null && requestForCheck.getRequesterId().equals(currentId)) {
             // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
-            if (request.getWriterIdList().size() > 1) {
+            if (request.getIdList().size() > 1) {
                 requestService.deleteRequest(request.getRequestId());
                 request.setRequesterId(currentId);
                 requestService.createRequest(request);
