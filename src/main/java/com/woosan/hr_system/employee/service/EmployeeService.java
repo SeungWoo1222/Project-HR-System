@@ -23,4 +23,5 @@ public interface EmployeeService {
     String deleteEmployee(String employeeId);
     String setAccountLock(String employeeId);
     String updateStatus(String employeeId, String status);
+    String promoteEmployee(String employeeId);
 }

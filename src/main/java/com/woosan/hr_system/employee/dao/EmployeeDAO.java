@@ -81,4 +81,7 @@ public class EmployeeDAO implements SearchService<Employee> {
     public void updateStatus(Map<String, Object> params) { // 사원 정보 수정
         sqlSession.update(NAMESPACE + "updateStatus", params);
     }
+
+    // 사원 직급 +1으로 수정 - 승진
+    public void updatePosition(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updatePosition",params); }
 }

@@ -26,4 +26,15 @@ public class EmployeeAdminApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    // 사원 승진 처리하는 메소드
+    @PatchMapping("/promote/{employeeId}")
+    public ResponseEntity<String> promoteEmployee(@PathVariable("employeeId") String employeeId) {
+        try {
+            String message = employeeService.promoteEmployee(employeeId);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

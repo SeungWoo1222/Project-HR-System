@@ -28,7 +28,7 @@ public enum Position {
         throw new IllegalArgumentException("Unknown rank: " + rank);
     }
 
-    // 사원의 이름을 이용해 해당하는 rank 값을 반환하는 메소드
+    // 직급 이름을 이용해 해당하는 rank 값을 반환하는 메소드
     public static int getRankByPositionName(String name) {
         for (Position position : Position.values()) {
             if (position.name().equals(name)) {

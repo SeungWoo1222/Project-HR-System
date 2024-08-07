@@ -6,6 +6,7 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -211,20 +212,48 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override // 재직 상태 수정하는 메소드
     public String updateStatus(String employeeId, String status) {
+        // 수정 정보들 Map에 담기
+        Map<String, Object> params = new HashMap<>();
+        params.put("status", status);
+        params.put("lastModified", LocalDateTime.now());
+        params.put("modifiedBy", authService.getAuthenticatedUser().getUsername());
+        params.put("employeeId", employeeId);
         try {
-            log.info("도착하셨나요? employeeId: " + employeeId + " status: " + status);
-            Map<String, Object> params = new HashMap<>();
-            params.put("status", status);
-            params.put("lastModified", LocalDateTime.now());
-            params.put("modifiedBy", authService.getAuthenticatedUser().getUsername());
-            params.put("employeeId", employeeId);
             employeeDAO.updateStatus(params);
             String updatedStatus = employeeDAO.getEmployeeById(employeeId).getStatus();
             return "'" + getEmployeeById(employeeId).getName() + "' 사원의 재직 상태가 '" + updatedStatus + "'으로 변경되었습니다.";
         } catch (DataAccessException dae) {
             throw new RuntimeException("재직 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
         } catch (Exception e) {
-            throw new RuntimeException("재직 상태 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
+            throw new RuntimeException("재직 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        }
+    }
+
+    @Override // 사원 직급 승진시키는 메소드
+    public String promoteEmployee(String employeeId) {
+        // 현재 랭크 가져온 뒤 부장과 사장인지 확인
+        int positionRank = Position.getRankByPositionName(employeeDAO.getEmployeeById(employeeId).getPosition().name());
+        if (positionRank >= 5) throw new IllegalArgumentException("더 이상 승진할 수 없습니다.");
+
+        // 랭크 +1로 승진 처리
+        Position positionToBePromoted = Position.fromRank(positionRank + 1);
+        log.info("현재 직급의 랭크는 : {}", positionRank);
+        log.info("승진할 직급은 : {}", positionToBePromoted);
+
+        // 사원 번호와 승진할 직급 Map에 담기
+        Map<String, Object> params = new HashMap<>();
+        params.put("employeeId", employeeId);
+        params.put("positionId", positionToBePromoted);
+        try {
+            employeeDAO.updatePosition(params);
+            Position promotedPosition = employeeDAO.getEmployeeById(employeeId).getPosition();
+            return "'" + getEmployeeById(employeeId).getName() + "' 사원이 '" + promotedPosition + "'으로 승진하였습니다.";
+        } catch (DataAccessException dae) {
+            log.error("승진 처리 중 DB 오류가 발생했습니다 : {}", dae.getMessage(), dae);
+            throw new RuntimeException("승진 처리 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
+        } catch (Exception e) {
+            log.error("승진 처리 중 오류가 발생했습니다 : {}", e.getMessage(), e);
+            throw new RuntimeException("승진 처리 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
         }
     }
     // ============================================ 수정 관련 로직 end-point ============================================
