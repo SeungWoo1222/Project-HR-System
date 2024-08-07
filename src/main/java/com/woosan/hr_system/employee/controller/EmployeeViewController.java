@@ -46,16 +46,12 @@ public class EmployeeViewController {
 
     @GetMapping("/{employeeId}") // 사원 정보 상세 조회
     public String viewEmployee(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeWithAdditionalInfo(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
-        // 비밀번호 정보와 퇴사 정보 설정
-        employeeService.populateEmployeeDetails(employee);
+        // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
+        model.addAttribute("employee", employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
         return "employee/detail";
     }
     // ============================================= 조회 관련 로직 end-point =============================================
@@ -70,28 +66,23 @@ public class EmployeeViewController {
     // ============================================ 수정 관련 로직 start-point ============================================
     @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-
-        // 비밀번호 정보와 퇴사 정보 설정
-        employeeService.populateEmployeeDetails(employee);
+        // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
+        model.addAttribute("employee", employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
         return "employee/edit/detail";
     }
 
     @GetMapping("/edit/resignation/{employeeId}") // 사원 퇴사 정보 수정 페이지 이동
     public String viewResignedEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-
-        // 비밀번호 정보와 퇴사 정보 설정
-        employeeService.populateEmployeeDetails(employee);
+        // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-
         return "employee/edit/resignation";
     }
     // ============================================= 수정 관련 로직 end-point =============================================
@@ -110,13 +101,12 @@ public class EmployeeViewController {
 
     @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
     public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
+        // 예외 처리된 기본 employee
         Employee employee = employeeService.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
+        model.addAttribute("employee", employee);
+
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
         return "employee/resignation-form";
     }
     // ============================================= 퇴사 관련 로직 end-point =============================================

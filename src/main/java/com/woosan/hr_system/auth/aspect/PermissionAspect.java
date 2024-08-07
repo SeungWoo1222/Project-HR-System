@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class PermissionAspect {
-
+public class PermissionAspect { // 권한 관리를 위한 AOP Aspect
     @Autowired
     private AuthService authService;
 
