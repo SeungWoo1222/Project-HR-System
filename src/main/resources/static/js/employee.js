@@ -390,14 +390,15 @@ function submitUpdateResignationForm(event) {
 }
 
 // AJAX DELETE 요청
-function submitDeleteRequest(event) {
+function submitDelete(event) {
+    event.stopPropagation();
     let button = event.target;
     let employeeId = button.getAttribute('employeeId');
     let employeeName = button.getAttribute('employeeName');
 
     var confirmMessage = '\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?';
 
-    let actionUrl = '/api/employee/delete/' + employeeId;
+    let actionUrl = '/api/admin/employee/delete/' + employeeId;
 
     if (confirm(confirmMessage)) {
         fetch(actionUrl, {
@@ -418,6 +419,8 @@ function submitDeleteRequest(event) {
                     alert(response.text); // 400 오류 메시지 알림
                 } else if (response.status === 500) {
                     alert(response.text); // 500 오류 메시지 알림
+                } else if (response.status === 403) {
+                    openModal("/error/modal/403");
                 } else {
                     alert('사원 삭제 처리 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
                 }

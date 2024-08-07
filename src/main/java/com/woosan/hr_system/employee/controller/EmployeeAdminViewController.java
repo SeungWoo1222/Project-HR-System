@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ public class EmployeeAdminViewController {
     private EmployeeService employeeService;
 
     // 재직 상태 수정
+    @RequireHRPermission
     @GetMapping("/edit/status/{employeeId}")
     public String employeeStatus(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);

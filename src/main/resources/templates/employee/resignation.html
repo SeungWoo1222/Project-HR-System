@@ -107,7 +107,7 @@
                 <td th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
                 <td th:text="${employee.resignation?.specificReason}">구체적 사유</td>
                 <td>
-                    <button type="button" class="delete-btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="submitDeleteRequest(event)">삭제하기</button>
+                    <button type="button" class="delete-btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="submitDelete(event)">삭제하기</button>
                 </td>
             </tr>
             </tbody>
