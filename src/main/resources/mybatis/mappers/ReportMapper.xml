@@ -66,6 +66,54 @@
         LIMIT 5;
     </select>
 
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+        report_id AS reportId,
+        writer_id AS writerId,
+        title,
+        created_date AS createdDate,
+        approver_name AS approverName,
+        status
+        FROM reports
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY created_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM reports
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
     <!-- 특정 보고서 조회 -->
     <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT

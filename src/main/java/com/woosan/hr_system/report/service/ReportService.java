@@ -1,6 +1,8 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import com.woosan.hr_system.report.model.Report;
@@ -15,6 +17,7 @@ public interface ReportService {
     // 조회 관련 메소드
     List<Report> getAllReports(String reportStart, String reportEnd, String employeeId); // 모든 리포트 조회
     List<Report> getRecentReports(String reportStart, String reportEnd, String employeeId); // 모든 리포트 조회
+    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType);
     Report getReportById(Long reportId); // 특정 리포트 조회
     FileMetadata getReportFileById(Long fileId); // 파일 조회
     List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd); // 날짜 범위 내 결재할 보고서 목록 조회

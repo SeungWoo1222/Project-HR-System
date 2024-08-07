@@ -1,9 +1,12 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +52,6 @@ public class ReportServiceImpl implements ReportService {
 //                reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
 //            }
 
-
     }
 
     @Override // 모든 보고서 조회
@@ -93,7 +95,7 @@ public class ReportServiceImpl implements ReportService {
         } else {
             startYearMonth = YearMonth.parse(reportStart, formatter);
         }
-//
+
         if (reportEnd == null) {
             endYearMonth = currentYearMonth;
         } else {
@@ -102,6 +104,16 @@ public class ReportServiceImpl implements ReportService {
         return reportDAO.getRecentReports(employeeId, startYearMonth, endYearMonth);
     }
 
+    @Override
+    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Report> reports = reportDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType);
+        int total = reportDAO.count(pageRequest.getKeyword(), searchType);
+
+        System.out.println(total);
+
+        return new PageResult<>(reports, (int) Math.ceil((double)total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
 
     @Override // 특정 보고서 조회
     public Report getReportById(Long reportId) {

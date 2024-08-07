@@ -57,7 +57,7 @@
                     <td th:text="${report.title}"></td>
                     <td th:text="${report.approverName}"></td>
                     <td th:text="${report.status}"></td>
-                    <td th:text="${report.createdDate}"></td>
+                    <td th:text="${report.createdDate}" class="dateTime"></td>
                 </tr>
                 </tbody>
             </table>
@@ -82,7 +82,7 @@
                         th:onclick="openModal('/request/' + this.getAttribute('requestId'))">
                         <td th:text="${request.requesterName}"></td>
                         <td th:text="${request.dueDate}"></td>
-                        <td th:text="${request.requestDate}"></td>
+                        <td th:text="${request.requestDate}" class="dateTime"></td>
                     </tr>
                     </tbody>
                 </table>

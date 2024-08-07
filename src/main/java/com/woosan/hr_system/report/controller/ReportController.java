@@ -10,6 +10,8 @@ import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -77,17 +79,27 @@ public class ReportController {
         return "report/main"; // main.html 반환
     }
 
-    @GetMapping("/list") // 보고서 리스트 페이지 이동
-    public String showReportList(HttpSession session,
+    @GetMapping("/list") // 보고서 리스트 페이지
+    public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                  Model model) {
+        System.out.println("keyword: " + keyword);
+        System.out.println("searchType: " + searchType);
+
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String employeeId = authService.getAuthenticatedUser().getUsername();
+        String writerId = authService.getAuthenticatedUser().getUsername();
 
-        String reportStart = (String) session.getAttribute("staffReportStart");
-        String reportEnd = (String) session.getAttribute("staffReportEnd");
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Report> pageResult = reportService.searchReports(pageRequest, writerId, searchType);
 
-        List<Report> reports = reportService.getAllReports(reportStart, reportEnd, employeeId);
-        model.addAttribute("reports", reports);
+        model.addAttribute("reports", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
 
         return "report/report-list";
     }

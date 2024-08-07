@@ -1,9 +1,11 @@
 package com.woosan.hr_system.report.dao;
 
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
+import com.woosan.hr_system.search.PageResult;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -46,6 +48,26 @@ public class ReportDAO {
         params.put("startYearMonth", startYearMonth);
         params.put("endYearMonth", endYearMonth);
         return sqlSession.selectList(NAMESPACE + ".getRecentReports", params);
+    }
+
+    // 검색과 페이징 로직
+    public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("pageSize", pageSize);
+        params.put("offset", offset);
+        params.put("writerId", writerId);
+        params.put("searchType", searchType);
+
+        return sqlSession.selectList(NAMESPACE + ".search", params);
+    }
+
+    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    public int count(String keyword, int searchType) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("searchType", searchType);
+        return sqlSession.selectOne(NAMESPACE + ".count", params);
     }
 
     // 특정 보고서 조회
