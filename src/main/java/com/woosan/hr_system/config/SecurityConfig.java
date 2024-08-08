@@ -31,9 +31,6 @@ public class SecurityConfig {
                                 // 관리자 권한
                                 .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("MANAGER")
 
-                                // HR 부서 권한
-                                .requestMatchers("/employee/**", "/api/employee/**").hasAnyRole("HR")
-
                                 // 일반 사원 권한
                                 .requestMatchers("/**").hasAnyRole("STAFF", "MANAGER")
 

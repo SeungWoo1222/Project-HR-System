@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
@@ -27,6 +28,7 @@ public class EmployeeViewController {
     private FileService fileService;
 
     // ============================================ 조회 관련 로직 start-point ============================================
+    @RequireHRPermission
     @GetMapping("/list") // 모든 사원 정보 조회
     public String viewEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "size", defaultValue = "10") int size,
@@ -43,7 +45,7 @@ public class EmployeeViewController {
         model.addAttribute("keyword", keyword);
         return "employee/list";
     }
-
+    @RequireHRPermission
     @GetMapping("/{employeeId}") // 사원 정보 상세 조회
     public String viewEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
@@ -57,6 +59,7 @@ public class EmployeeViewController {
     // ============================================= 조회 관련 로직 end-point =============================================
 
     // ============================================ 등록 관련 로직 start-point ============================================
+    @RequireHRPermission
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동
     public String viewEmployeeForm() {
         return "employee/registration";
@@ -64,6 +67,7 @@ public class EmployeeViewController {
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
+    @RequireHRPermission
     @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
@@ -75,6 +79,7 @@ public class EmployeeViewController {
         return "employee/edit/detail";
     }
 
+    @RequireHRPermission
     @GetMapping("/edit/resignation/{employeeId}") // 사원 퇴사 정보 수정 페이지 이동
     public String viewResignedEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
@@ -88,6 +93,7 @@ public class EmployeeViewController {
     // ============================================= 수정 관련 로직 end-point =============================================
 
     // ============================================ 퇴사 관련 로직 start-point ============================================
+    @RequireHRPermission
     @GetMapping("/resignation") // 사원 퇴사 관리 페이지 이동
     public String viewResignationManagement(Model model) {
         List<Employee> preResignationEmployees = employeeService.getPreResignationEmployees();
@@ -99,6 +105,7 @@ public class EmployeeViewController {
         return "/employee/resignation";
     }
 
+    @RequireHRPermission
     @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
     public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 기본 employee

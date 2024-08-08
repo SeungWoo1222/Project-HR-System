@@ -1,5 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
+import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class EmployeeAdminApiController {
     private EmployeeService employeeService;
 
     // 재직 상태 수정하는 메소드
-//    @RequireHRPermission
+    @RequireHRPermission
     @PatchMapping("/update/status/{employeeId}")
     public ResponseEntity<String> updateEmployeeStatus(@PathVariable("employeeId") String employeeId,
                                                        @RequestParam("status") String status) {
@@ -23,14 +24,14 @@ public class EmployeeAdminApiController {
     }
 
     // 사원 승진 처리하는 메소드
-//    @RequireHRPermission
+    @RequireHRPermission
     @PatchMapping("/promote/{employeeId}")
     public ResponseEntity<String> promoteEmployee(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(employeeService.promoteEmployee(employeeId));
     }
 
     // 사원 영구 삭제
-//    @RequireHRPermission
+    @RequireHRPermission
     @DeleteMapping("/delete/{employeeId}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(employeeService.deleteEmployee(employeeId));
