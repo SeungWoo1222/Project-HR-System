@@ -32,14 +32,12 @@ function initEventListeners() {
     const selectAllCheckbox = document.getElementById('selectAllEmployeesCheckbox');
 
     if (departmentSelect) {
-        console.log("departmentSelect ok");
         departmentSelect.addEventListener('change', loadEmployeesByDepartment);
     } else {
         console.log("departmentSelect is null");
     }
 
     if (selectAllCheckbox) {
-        console.log("selectAllCheckbox ok");
         selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
     } else {
         console.log("selectAllEmployeesCheckbox is null");
@@ -58,8 +56,8 @@ function loadEmployeesByDepartment() {
             return response.json();
         })
         .then(employees => {
-            const writerIdContainer = document.getElementById('writerIdContainer');
-            writerIdContainer.innerHTML = '';
+            const idContainer = document.getElementById('idContainer');
+            idContainer.innerHTML = '';
 
             employees.forEach(employee => {
                 if (employee === null) {
@@ -70,8 +68,8 @@ function loadEmployeesByDepartment() {
                     const checkboxContainer = document.createElement('div');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.className = 'writerIdCheckbox';
-                    checkbox.name = 'writerId';
+                    checkbox.className = 'idCheckbox';
+                    checkbox.name = 'id';
                     checkbox.value = employee.employeeId;
                     checkbox.dataset.name = employee.name;
 
@@ -84,8 +82,8 @@ function loadEmployeesByDepartment() {
 
                     const nameInput = document.createElement('input');
                     nameInput.type = 'hidden';
-                    nameInput.className = 'writerNameInput';
-                    nameInput.name = 'writerName';
+                    nameInput.className = 'nameInput';
+                    nameInput.name = 'name';
                     nameInput.value = employee.name;
 
                     const label = document.createElement('label');
@@ -94,7 +92,7 @@ function loadEmployeesByDepartment() {
                     checkboxContainer.appendChild(checkbox);
                     checkboxContainer.appendChild(label);
                     checkboxContainer.appendChild(nameInput);
-                    writerIdContainer.appendChild(checkboxContainer);
+                    idContainer.appendChild(checkboxContainer);
                 }
             });
 
@@ -109,7 +107,7 @@ function loadEmployeesByDepartment() {
 
 // 임원 전체 선택
 function toggleSelectAllEmployees() {
-    const checkboxes = document.querySelectorAll('#writerIdContainer input[type="checkbox"]');
+    const checkboxes = document.querySelectorAll('#idContainer input[type="checkbox"]');
     const isChecked = document.getElementById('selectAllEmployeesCheckbox').checked;
     checkboxes.forEach(checkbox => {
         checkbox.checked = isChecked;
@@ -122,7 +120,7 @@ function updateSelectedEmployees() {
     const selectedEmployeesContainer = document.getElementById('selectedEmployees');
     selectedEmployeesContainer.innerHTML = '';
 
-    const selectedCheckboxes = document.querySelectorAll('#writerIdContainer input[type="checkbox"]:checked');
+    const selectedCheckboxes = document.querySelectorAll('#idContainer input[type="checkbox"]:checked');
     selectedCheckboxes.forEach(checkbox => {
         selectedEmployees[checkbox.value] = checkbox.dataset.name;
     });
@@ -136,7 +134,7 @@ function updateSelectedEmployees() {
         removeButton.textContent = 'x';
         removeButton.addEventListener('click', () => {
             delete selectedEmployees[id];
-            document.querySelector(`#writerIdContainer input[value="${id}"]`).checked = false;
+            document.querySelector(`#idContainer input[value="${id}"]`).checked = false;
             updateSelectedEmployees(); // 선택된 임원 목록 갱신
         });
         div.appendChild(removeButton);
@@ -145,26 +143,26 @@ function updateSelectedEmployees() {
 }
 
 function updateFormFields() {
-    const writerIdList = Object.keys(selectedEmployees);
-    const writerNameList = Object.values(selectedEmployees);
+    const idList = Object.keys(selectedEmployees);
+    const nameList = Object.values(selectedEmployees);
 
-    const requestForm = document.getElementById('requestForm');
+    const form = document.getElementById('form');
 
     // 최종 선택된 요소들의 필드만 생성
-    writerIdList.forEach(id => {
-        let writerIdField = document.createElement('input');
-        writerIdField.type = 'hidden';
-        writerIdField.name = 'IdList';
-        writerIdField.value = id;
-        requestForm.appendChild(writerIdField);
+    idList.forEach(id => {
+        let idField = document.createElement('input');
+        idField.type = 'hidden';
+        idField.name = 'idList';
+        idField.value = id;
+        form.appendChild(idField);
     });
 
-    writerNameList.forEach(name => {
-        let writerNameField = document.createElement('input');
-        writerNameField.type = 'hidden';
-        writerNameField.name = 'nameList';
-        writerNameField.value = name;
-        requestForm.appendChild(writerNameField);
+    nameList.forEach(name => {
+        let nameField = document.createElement('input');
+        nameField.type = 'hidden';
+        nameField.name = 'nameList';
+        nameField.value = name;
+        form.appendChild(nameField);
     });
 }
 
@@ -185,30 +183,31 @@ function removeWriter(button) {
     parentLi.parentNode.removeChild(parentLi);
 
     // 선택된 임원 ID 목록 갱신
-    const remainingWriterIds = [];
+    const remainingIds = [];
     document.querySelectorAll('#selected-writers-list li button').forEach(button => {
-        remainingWriterIds.push(button.getAttribute('data-employee-id'));
+        remainingIds.push(button.getAttribute('data-employee-id'));
         console.log(button.getAttribute('data-employee-id'));
     });
 
     // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
-    if (remainingWriterIds.length === 0) {
+    if (remainingIds.length === 0) {
+        var ul = document.getElementById('selected-writers-list');
         var allMembersLi = document.createElement("li");
         allMembersLi.innerHTML = "<span>모든 임원</span>";
         ul.appendChild(allMembersLi);
     }
 
     // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
-    updateChartWithSelectedWriters(remainingWriterIds);
+    updateChartWithSelectedWriters(remainingIds);
 }
 
 // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
-function updateChartWithSelectedWriters(writerIds) {
+function updateChartWithSelectedWriters(ids) {
     $.ajax({
         url: '/admin/request/updateStats',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(writerIds),
+        data: JSON.stringify(ids),
         success: function (response) {
             // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
             var stats = JSON.parse(response.statsJson);

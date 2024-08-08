@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='작성한 보고서 조회')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='작성 요청 조회')}">
 
 <th:block layout:fragment="css">
     <!--    <link rel="stylesheet" th:href="@{example.css}"> -->
@@ -22,11 +22,10 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h1>내가 쓴 보고서 목록</h1>
-        <button th:onclick="openModal('/report/reportDate')">날짜 검색</button>
-        <button onclick="location.href='/report/write'">보고서 작성하기</button>
+        <h1>내게 온 요청 목록</h1>
+        <button th:onclick="openModal('/report/requestDate')">날짜 검색</button>
         <div>
-            <form th:action="@{/report/list}" method="get" id="pageSizeForm">
+            <form th:action="@{/report/requestList}" method="get" id="pageSizeForm">
                 <input type="hidden" name="page" th:value="1"/>
                 <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
                     <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
@@ -36,12 +35,12 @@
                 <input type="hidden" name="keyword" th:value="${keyword}"/>
             </form>
 
-            <form th:action="@{/report/list}" method="get">
+            <form th:action="@{/report/requestList}" method="get">
                 <input type="hidden" name="page" value="1"/>
                 <input type="hidden" name="size" th:value="${pageSize}"/>
                 <select name="searchType">
                     <option th:value="1" th:text="'제목+내용'" th:selected="${searchType == 1}">제목+내용</option>
-                    <option th:value="2" th:text="'보고서 결재자'" th:selected="${searchType == 2}">보고서 결재자</option>
+                    <option th:value="2" th:text="'요청자'" th:selected="${searchType == 2}">요청자</option>
                 </select>
                 <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                 <button type="submit">검색</button>
@@ -50,31 +49,35 @@
         <table class="list">
             <thead>
             <tr>
-                <th>제목</th>
-                <th>결재자</th>
-                <th>결재 상태</th>
-                <th>작성일</th>
+                <th>작성한 보고서</th>
+                <th>요청자</th>
+                <th>마감 기한</th>
+                <th>요청 일자</th>
+                <th>요청 사항</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
-                th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
-                <td th:text="${report.title}"></td>
-                <td th:text="${report.approverName}"></td>
-                <td th:text="${report.status}"></td>
-                <td th:text="${report.createdDate}" class="dateTime"></td>
+            <tr th:each="request : ${requests}">
+                <td>
+                    <a th:if="${request.reportId != null}" th:href="@{/report/${request.reportId}}">조회</a>
+                    <a th:if="${request.reportId == null}" th:href="@{/report/writeFromRequest(requestId=${request.requestId})}">작성하기</a>
+                </td>
+                <td th:text="${request.requesterName}"></td>
+                <td th:text="${request.dueDate}"></td>
+                <td th:text="${request.requestDate}" class=dateTime></td>
+                <td th:text="${request.requestNote}"></td>
             </tr>
             </tbody>
         </table>
         <div class="pagination">
             <span th:if="${currentPage > 1}">
-                <a th:href="@{'/report/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                <a th:href="@{'/report/requestList?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&searchType=' + ${searchType} + '&keyword=' + ${keyword}}">
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
             <span th:if="${totalPages <= 5}">
                 <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                    <a th:href="@{'/report/requestList?page=' + ${i} + '&size=' + ${pageSize} + '&searchType=' + ${searchType} + '&keyword=' + ${keyword}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
             </span>
@@ -82,12 +85,12 @@
                 <span th:each="i : ${#numbers.sequence(
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                    <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                    <a th:href="@{'/report/requestList?page=' + ${i} + '&size=' + ${pageSize} + '&searchType=' + ${searchType} + '&keyword=' + ${keyword}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
                 </span>
             <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/report/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                <a th:href="@{'/report/requestList?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&searchType=' + ${searchType}  + '&keyword=' + ${keyword}}">
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>

@@ -20,7 +20,7 @@ public class RequestDAO {
     @Autowired
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.RequestDAO";
-
+    //===================================================CRUD 메소드=======================================================
     // 요청 생성
     public void createRequest(Map<String, Object> params) {
         sqlSession.insert(NAMESPACE + ".createRequest", params);
@@ -31,7 +31,7 @@ public class RequestDAO {
         return sqlSession.selectList(NAMESPACE + ".getAllRequests");
     }
 
-    // 특정 요청 조회
+    // 요청 세부 조회
     public Request getRequestById(Long requestId) {
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
     }
@@ -47,23 +47,14 @@ public class RequestDAO {
     }
 
     // 내게 온 요청 조회
-    public List<Request> getMyPendingRequests(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
-        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", employeeId);
-        params.put("startYearMonth", startYearMonth);
-        params.put("endYearMonth", endYearMonth);
-        return sqlSession.selectList(NAMESPACE + ".getMyRequests", params);
+    public List<Request> getMyPendingRequests(String writerId) {
+        return sqlSession.selectList(NAMESPACE + ".getRecentRequests", writerId);
     }
+
 
     // 요청 수정
     public void updateRequest(Map<String, Object> params) {
         sqlSession.update(NAMESPACE + ".updateRequest", params);
-    }
-
-    // 보고서 결재 처리
-    public void updateApprovalStatus(Report report) {
-        sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
     }
 
     // 요청 삭제
@@ -71,9 +62,43 @@ public class RequestDAO {
         sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
     }
 
+//===================================================CRUD 메소드=======================================================
+//===================================================그 외 메소드=======================================================
+
     // shared_trash(휴지통)에 삭제 데이터들 삽입
     public void insertRequestIntoSharedTrash(Long requestId) {
         sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
     }
 
+    // 검색과 페이징 로직
+    public List<Request> search(String keyword, int pageSize, int offset, String writerId, int searchType, String requestStart, String requestEnd) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("pageSize", pageSize);
+        params.put("offset", offset);
+        params.put("writerId", writerId);
+        params.put("searchType", searchType);
+        params.put("requestStart", requestStart);
+        params.put("requestEnd", requestEnd);
+
+        return sqlSession.selectList(NAMESPACE + ".search", params);
+    }
+
+    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    public int count(String keyword, String writerId, int searchType, String requestStart, String requestEnd) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("searchType", searchType);
+        params.put("writerId", writerId);
+        params.put("requestStart", requestStart);
+        params.put("requestEnd", requestEnd);
+        return sqlSession.selectOne(NAMESPACE + ".count", params);
+    }
+
+    // 보고서 결재 처리
+    public void updateApprovalStatus(Report report) {
+        sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
+    }
+
+//===================================================그 외 메소드=======================================================
 }

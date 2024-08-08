@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.report.dao.RequestDAO">
-
+<!--    ==================================================그 외 메소드=======================================================-->
     <!-- 요청 생성 -->
     <insert id="createRequest" parameterType="map">
         INSERT INTO report_requests
@@ -20,7 +20,7 @@
             )
     </insert>
 
-    <!-- 모든 요청 조회 -->
+    <!-- 내 요청 조회 -->
     <select id="getMyRequests" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
         request_id AS requestId,
@@ -38,16 +38,13 @@
             <if test="requesterId != null">
                 requester_id = #{requesterId}
             </if>
-            <if test="writerId != null">
-                writer_id = #{writerId}
-            </if>
             <if test="startYearMonth != null and endYearMonth != null">
                 AND DATE_FORMAT(request_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
             </if>
         </where>
     </select>
 
-    <!-- 특정 요청 조회 -->
+    <!-- 요청 세부 조회 -->
     <select id="getRequestById" parameterType="long" resultType="com.woosan.hr_system.report.model.Request">
         SELECT request_id   AS requestId,
                writer_id AS writerId,
@@ -72,13 +69,6 @@
             WHERE request_id = #{requestId}
     </update>
 
-    <!-- 보고서 결재처리 -->
-    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET status        = #{status},
-            reject_reason = #{rejectReason}
-        WHERE report_id = #{reportId}
-    </update>
 
     <!-- 요청 삭제 -->
     <delete id="deleteRequest" parameterType="long">
@@ -87,6 +77,9 @@
         WHERE request_id = #{requestId}
     </delete>
 
+
+<!--    ==================================================CRUD 메소드=======================================================-->
+<!--    ==================================================그 외 메소드=======================================================-->
     <!-- 삭제된 요청을 공통 휴지통에 데이터 삽입 -->
     <insert id="insertRequestIntoSharedTrash" parameterType="long">
         INSERT INTO shared_trash
@@ -98,4 +91,78 @@
         FROM report_requests
         WHERE request_id = #{requestId}
     </insert>
+
+    <!--(STAFF - 나에게 온 최근 5개 요청 조회-->
+    <select id="getRecentRequests" resultType="com.woosan.hr_system.report.model.Request">
+        SELECT
+            e.name AS requesterName,
+            r.due_date AS dueDate,
+            r.request_date AS requestDate
+        FROM report_requests r
+                 JOIN employees e ON r.requester_id = e.employee_id
+        WHERE writer_id = #{writerId} AND report_id IS NULL
+        ORDER BY request_date desc LIMIT 5;
+    </select>
+
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Request">
+        SELECT
+        r.request_id AS requestId,
+        e.name AS requesterName,
+        r.due_date AS dueDate,
+        r.request_date AS requestDate,
+        r.report_id AS reportId,
+        r.request_note AS requestNote
+        FROM report_requests r
+        JOIN employees e ON r.requester_id = e.employee_id
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                request_note LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="requestStart != null and requestEnd != null">
+                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            </if>
+        </where>
+        ORDER BY request_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(writer_id) FROM report_requests JOIN employees e ON requester_id = employee_id
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                request_note LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="requestStart != null and requestEnd != null">
+                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 보고서 결재처리 -->
+    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET status        = #{status},
+            reject_reason = #{rejectReason}
+        WHERE report_id = #{reportId}
+    </update>
+<!--    ==================================================그 외 메소드=======================================================-->
+
 </mapper>

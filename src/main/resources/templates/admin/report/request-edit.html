@@ -13,10 +13,10 @@
     <script th:src="@{/js/report.js}"></script>
     <script>
         $(document).ready(function() {
-            $('#editWriterButton').on('click', function() {
+            $('#editButton').on('click', function() {
                 $('#departmentIdContainer').show();
                 $('#selectAllContainer').show();
-                $('#writerIdContainer').show();
+                $('#idContainer').show();
                 $('#selectedEmployeesLabel').show();
 
                 initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
@@ -28,18 +28,16 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>요청 수정</h1>
-        <form id="requestForm" th:action="@{/admin/request/edit}" method="post" th:object="${request}" onsubmit="updateFormFields()">
+        <form id="form" th:action="@{/admin/request/edit}" method="post" th:object="${request}" onsubmit="updateFormFields()">
             <input type="hidden" name="requestId" th:value="${request.requestId}">
 
-            <label id="currentWriterLabel" for="writerIdContainer">현재 보고서 작성자</label>
+            <label id="currentLabel" for="idContainer">현재 보고서 작성자</label>
             <br>
-            <span id="currentWriter" th:text="${request.writerName}"></span>
-            <input type="hidden" name="writerNameList" th:value="${request.writerName}"/>
-            <input type="hidden" name="writerIdList" th:value="${request.writerId}"/>
-
+            <span id="current" th:text="${request.writerName}"></span>
+            <input type="hidden" name="NameList" th:value="${request.writerName}"/>
+            <input type="hidden" name="IdList" th:value="${request.writerId}"/>
             <br>
-
-            <button type="button" id="editWriterButton">작성자 수정</button>
+            <button type="button" id="editButton">작성자 수정</button>
             <br>
 
             <div id="departmentIdContainer" style="display: none;">
@@ -62,7 +60,7 @@
                 </label><br>
             </div>
 
-            <div id="writerIdContainer" style="display: none;">
+            <div id="idContainer" style="display: none;">
                 <!-- 직원 목록이 여기에 추가됩니다. -->
             </div>
             <br>

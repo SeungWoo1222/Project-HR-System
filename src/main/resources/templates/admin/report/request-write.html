@@ -12,7 +12,7 @@
 </th:block>
 
 <h1>보고서 작성 요청</h1>
-<form id="requestForm" th:action="@{/admin/request/write}" method="post" th:object="${request}" onsubmit="updateFormFields()">
+<form id="form" th:action="@{/admin/request/write}" method="post" th:object="${request}" onsubmit="updateFormFields()">
     <label for="departmentId">부서 선택:</label>
     <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
         <option value="" disabled selected>부서를 선택하세요</option>
@@ -31,8 +31,8 @@
         </label><br>
     </div>
 
-    <label for="writerIdContainer">보고서 작성자</label>
-    <div id="writerIdContainer">
+    <label for="idContainer">보고서 작성자</label>
+    <div id="idContainer">
         <!-- 직원 목록이 여기에 추가됩니다. -->
     </div>
     <br>

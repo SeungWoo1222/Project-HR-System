@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        /* 여기에 CSS를 입력 */
+    </style>
+</th:block>
+
+
+<div>
+    <div>
+        <h1>보고서</h1>
+        <p th:text="'제목 : ' + ${report.title}">제목</p>
+        <p th:text="'내용 : ' + ${report.content}">내용</p>
+        <p th:text="'업무 처리 날짜 : ' + ${report.completeDate}">업무 처리 날짜</p>
+        <p th:text="'결재자 : ' + ${report.approverName}">결재자</p>
+        <p th:text="'결재 상태 : ' + ${report.status}">결재 상태</p>
+        <p th:text="'작성일 : ' + ${report.createdDate}" class="dateTime">작성일</p>
+        <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
+
+
+        <div th:if="${reportFile != null}">
+            <p>
+                첨부 파일:
+                <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
+            </p>
+        </div>
+        <form th:action="@{'/report/edit'}" method="get" style="display:inline;">
+            <input type="hidden" name="reportId" th:value="${report.reportId}">
+            <button type="submit">수정</button>
+        </form>
+        <form th:action="@{'/report/delete/' + ${report.reportId}}" method="post" style="display:inline;">
+            <input type="hidden" name="_method" value="delete">
+            <input type="hidden" name="reportId" th:value="${report.reportId}">
+            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>
+        </form>
+
+        <button onclick="closeModal()">목록으로</button>
+    </div>
+</div>
+</html>

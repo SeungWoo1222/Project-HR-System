@@ -38,11 +38,9 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h1>내가 쓴 보고서 목록</h1>
-        <button th:onclick="openModal('/report/reportDate')">날짜 범위 설정</button>
-        <button onclick="location.href='/report/write'">보고서 작성하기</button>
+        <h1>최근 보고서 목록</h1>
         <div>
-            <table class="list">
+            <table >
                 <thead>
                 <tr>
                     <th>제목</th>
@@ -52,8 +50,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
-                    th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
+                <tr th:each="report : ${reports}" th:reportId="${report.reportId}">
                     <td th:text="${report.title}"></td>
                     <td th:text="${report.approverName}"></td>
                     <td th:text="${report.status}"></td>
@@ -66,8 +63,6 @@
         <!-- 작성 요청 목록 -->
         <div>
             <h1>내게 온 작성 요청 목록</h1>
-            <button th:onclick="openModal('/report/requestDate')">날짜 범위 설정</button>
-
             <div>
                 <table>
                     <thead>
@@ -78,8 +73,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
-                        th:onclick="openModal('/request/' + this.getAttribute('requestId'))">
+                    <tr th:each="request : ${requests}">
                         <td th:text="${request.requesterName}"></td>
                         <td th:text="${request.dueDate}"></td>
                         <td th:text="${request.requestDate}" class="dateTime"></td>
@@ -91,7 +85,7 @@
             <!-- 보고서 통계 -->
             <div>
                 <h1>보고서 통계</h1>
-                <button onclick="location.href='/report/statistic'">통계 날짜 설정</button>
+                <button th:onclick="openModal('/report/statistic')">날짜 설정</button>
             </div>
             <!-- 구글 차트 통계 추가 -->
             <div id="columnchart_material" style="width: 800px; height: 500px;"></div>

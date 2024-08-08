@@ -40,10 +40,7 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private AuthService authService;
-//    @Qualifier("forceAutoProxyCreatorToUseClassProxying")
-//    @Autowired
-//    private BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying;
-
+//=====================================================CRUD 메소드들======================================================
     // main 페이지
     @GetMapping("/main")
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
@@ -67,7 +64,7 @@ public class ExecutiveController {
         // 보고서 통계
         String statisticStart = (String) session.getAttribute("statisticStart");
         String statisticEnd = (String) session.getAttribute("statisticEnd");
-        List<String> writerIdList = (List<String>) session.getAttribute("writerIdList");
+        List<String> writerIdList = (List<String>) session.getAttribute("idList");
 
         List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIdList);
 
@@ -111,48 +108,27 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
-    // 내 결재 목록 날짜 범위설정 페이지 이동
-    @GetMapping("/approvalDatePage")
-    public String showApprovalDatePage() {
-        return "admin/report/report-approval-date";
-    }
-
-    // 내 결재 목록 조회 + 날짜 범위 설정
-    @GetMapping("/approvalDate")
-    public String setApprovalListDateRange(@RequestParam(name = "approvalStart") String approvalStart,
-                                           @RequestParam(name = "approvalEnd") String approvalEnd,
-                                           HttpSession session) {
-        session.setAttribute("approvalStart", approvalStart);
-        session.setAttribute("approvalEnd", approvalEnd);
-        return "redirect:/admin/request/main";
-    }
-
-    // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
-    @GetMapping("/requestDatePage")
-    public String showRequestDatePage() {
-        return "admin/report/request-date";
-    }
-
-    // 내 결재 목록 조회 + 날짜 범위 설정
-    @GetMapping("/requestDate")
-    public String setRequestListDateRange(@RequestParam(name = "requestStart") String requestStart,
-                                          @RequestParam(name = "requestEnd") String requestEnd,
-                                          HttpSession session) {
-        session.setAttribute("requestStart", requestStart);
-        session.setAttribute("requestEnd", requestEnd);
-        return "redirect:/admin/request/main";
-    }
-
-    @GetMapping("/{requestId}") // 특정 요청 조회
+    @GetMapping("/{requestId}") // 요청 세부 조회
     public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
         return "admin/report/request-view";
     }
 
+    @GetMapping("/report/{reportId}") // 특정 보고서 조회
+    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
+        model.addAttribute("report", report);
+
+        if (report.getFileId() != null) {
+            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
+            model.addAttribute("reportFile", reportFile);
+        }
+        return "admin/report/report-view";
+    }
 
     @GetMapping("/edit") // 요청 수정 페이지 이동
-    public String editRequest(@RequestParam(name = "requestId") Long requestId, Model model) {
+    public String showUpdateRequestPage(@RequestParam(name = "requestId") Long requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         List<Employee> employees = employeeDAO.getAllEmployees();
         model.addAttribute("employees", employees); // employees 목록 추가
@@ -164,7 +140,6 @@ public class ExecutiveController {
 
     @PostMapping("/edit") // 요청 수정
     public String updateRequest(@ModelAttribute Request request) {
-        System.out.println(request.getRequestNote());
         // 요청 수정 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         String currentId = authService.getAuthenticatedUser().getUsername();
@@ -207,7 +182,7 @@ public class ExecutiveController {
         }
         return "redirect:/admin/request/main";
     }
-
+//=====================================================CRUD 메소드들======================================================
 //=====================================================통계 메소드들======================================================
 
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
@@ -220,15 +195,17 @@ public class ExecutiveController {
     @GetMapping("/stats") // 통계 날짜, 임원 설정
     public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
                                  @RequestParam(name = "statisticEnd") String statisticEnd,
-                                 @RequestParam(required = false, name = "writerIdList") List<String> writerIdList,
+                                 @RequestParam(required = false, name = "idList") List<String> idList,
                                  HttpSession session) {
+
+        System.out.println("idList" + idList);
 
         // 날짜 설정
         session.setAttribute("statisticStart", statisticStart);
         session.setAttribute("statisticEnd", statisticEnd);
 
         // 임원 설정
-        session.setAttribute("writerIdList", writerIdList);
+        session.setAttribute("idList", idList);
 
         return "redirect:/admin/request/main";
     }
@@ -237,19 +214,19 @@ public class ExecutiveController {
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
     @PostMapping("/updateStats")
     @ResponseBody
-    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> writerIds) throws JsonProcessingException {
+    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> ids) throws JsonProcessingException {
         String statisticStart = (String) session.getAttribute("statisticStart");
         String statisticEnd = (String) session.getAttribute("statisticEnd");
 
         // 삭제된 임원 외 임원들을 다시 session에 등록
-        session.setAttribute("writerIdList", writerIds);
+        session.setAttribute("idList", ids);
 
-        if (writerIds.isEmpty()) {
-            session.removeAttribute("writerIdList");
+        if (ids.isEmpty()) {
+            session.removeAttribute("idList");
         }
 
         // 통계 데이터 조회
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIds);
+        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, ids);
         return prepareStatsResponse(stats);
     }
 
@@ -268,21 +245,7 @@ public class ExecutiveController {
     }
 
 //=====================================================통계 메소드들======================================================
-
-//====================================================기타 메소드들=======================================================
-
-    @GetMapping("/report/{reportId}") // 특정 보고서 조회
-    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
-        Report report = reportService.getReportById(reportId);
-        model.addAttribute("report", report);
-
-        if (report.getFileId() != null) {
-            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
-            model.addAttribute("reportFile", reportFile);
-        }
-        return "admin/report/report-view";
-    }
-
+//====================================================그 외 메소드들=======================================================
     @PostMapping("/approve") // 보고서 결재 처리
     public String approveReport(@RequestParam("reportId") Long reportId,
                                 @RequestParam("status") String status,
@@ -295,23 +258,44 @@ public class ExecutiveController {
         }
     }
 
+    // 내 결재 목록 날짜 범위설정 페이지 이동
+    @GetMapping("/approvalDatePage")
+    public String showApprovalDatePage() {
+        return "admin/report/report-approval-date";
+    }
+
+    // 내 결재 목록 조회 + 날짜 범위 설정
+    @GetMapping("/approvalDate")
+    public String setApprovalListDateRange(@RequestParam(name = "approvalStart") String approvalStart,
+                                           @RequestParam(name = "approvalEnd") String approvalEnd,
+                                           HttpSession session) {
+        session.setAttribute("approvalStart", approvalStart);
+        session.setAttribute("approvalEnd", approvalEnd);
+        return "redirect:/admin/request/main";
+    }
+
+    // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
+    @GetMapping("/requestDatePage")
+    public String showRequestDatePage() {
+        return "admin/report/request-date";
+    }
+
+    // 내 결재 목록 조회 + 날짜 범위 설정
+    @GetMapping("/requestDate")
+    public String setRequestListDateRange(@RequestParam(name = "requestStart") String requestStart,
+                                          @RequestParam(name = "requestEnd") String requestEnd,
+                                          HttpSession session) {
+        session.setAttribute("requestStart", requestStart);
+        session.setAttribute("requestEnd", requestEnd);
+        return "redirect:/admin/request/main";
+    }
+
     @GetMapping("/employee") // 부서 기반 임원 정보 조회
     @ResponseBody
     public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
         List<Employee> employees = employeeDAO.getEmployeesByDepartment(departmentId);
-        if (employees != null) {
-            for (Employee employee : employees) {
-                if (employee == null) {
-                    System.out.println("Employee is null");
-                } else {
-                    System.out.println(employee);
-                }
-            }
-        } else {
-            System.out.println("Employees list is null");
-        }
         return employees;
     }
-//==============================================요청 외에 맵핑 메소드들====================================================
+//===================================================그 외 메소드들=======================================================
 
 }

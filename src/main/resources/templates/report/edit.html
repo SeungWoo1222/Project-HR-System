@@ -4,43 +4,78 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서 수정')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{css/layout.css}">
-    <style>
-        /* 여기에 CSS를 입력 */
-        label, input, textarea, button {
-            display: block;
-            margin: 10px 0;
-        }
-    </style>
+<!--    <link rel="stylesheet" th:href="@{css/layout.css}">-->
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{js/example.js}"></script>
+<!--    <script th:src="@{js/example.js}"></script>-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/report.js}"></script>
     <script>
-        // 여기에 JS 코드를 입력
+        $(document).ready(function() {
+            $('#editButton').on('click', function() {
+                $('#departmentIdContainer').show();
+                $('#selectAllContainer').show();
+                $('#idContainer').show();
+                $('#selectedEmployeesLabel').show();
+
+                initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
+            });
+        });
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>보고서 수정</h1>
-        <form action="/report/edit" method="post">
+        <form id="form" th:action="@{/report/edit}" method="post" th:object="${report}" onsubmit="updateFormFields()">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
 
             <label for="title">제목:</label>
             <input type="text" id="title" name="title" th:value="${report.title}">
-
+            <br>
             <label for="content">내용:</label>
             <textarea id="content" name="content" th:text="${report.content}"></textarea>
+            <br>
+            <label id="currentLabel" for="idContainer">현재 보고서 결재자 : </label>
+            <span id="current" th:text="${report.approverName}"></span>
+            <input type="hidden" name="NameList" th:value="${report.approverName}"/>
+            <input type="hidden" name="IdList" th:value="${report.approverId}"/>
+            <button type="button" id="editButton">결재자 수정</button>
+            <br>
 
-            <label for="approverId">결재자:</label>
-            <input list="employeeNames" id="approverId" name="approverId" required>
-            <datalist id="employeeNames">
-                <option th:each="employee : ${employees}" th:value="${employee.name}"></option>
-            </datalist>
+            <div id="departmentIdContainer" style="display: none;">
+                <label for="departmentId">부서 선택:</label>
+                <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
+                    <option value="" disabled selected>부서를 선택하세요</option>
+                    <option value="PR">생산</option>
+                    <option value="QC">품질 관리</option>
+                    <option value="SA">영업</option>
+                    <option value="MK">마케팅</option>
+                    <option value="FI">재무</option>
+                    <option value="HR">인사</option>
+                    <option value="RD">연구개발</option>
+                </select><br>
+            </div>
+
+            <div id="selectAllContainer" style="display: none;">
+                <label>
+                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+                </label><br>
+            </div>
+
+            <div id="idContainer" style="display: none;">
+                <!-- 직원 목록이 여기에 추가됩니다. -->
+            </div>
+            <br>
+
+            <label id="selectedEmployeesLabel" style="display: none;">결재자 리스트</label>
+            <div id="selectedEmployees" class="selected-employees"></div>
+            <br>
 
             <label for="completeDate">업무 처리 날짜:</label>
             <input type="date" id="completeDate" name="completeDate" th:value="${report.completeDate}">
+            <br>
 
             <button type="submit">보고서 수정</button>
         </form>

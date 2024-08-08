@@ -19,7 +19,7 @@
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
     <h1>보고서 범위 설정</h1>
     <h2>기간 설정</h2>
-    <form id="requestForm" th:action="@{/admin/request/stats}" method="get" onsubmit="updateFormFields()">
+    <form id="form" th:action="@{/admin/request/stats}" method="get" onsubmit="updateFormFields()">
         <label for="statisticStart">시작 월:</label>
         <input type="month" id="statisticStart" name="statisticStart" required>
         <label for="statisticEnd">종료 월:</label>
@@ -45,8 +45,8 @@
                 </label><br>
             </div>
 
-            <label for="writerIdContainer">보고서 작성자</label>
-            <div id="writerIdContainer">
+            <label for="idContainer">보고서 작성자</label>
+            <div id="idContainer">
                 <!-- 직원 목록이 여기에 추가됩니다. -->
             </div>
             <br>
