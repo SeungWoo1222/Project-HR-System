@@ -11,13 +11,11 @@ import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
 import com.woosan.hr_system.exception.employee.NoChangesDetectedException;
-import com.woosan.hr_system.exception.employee.PasswordNotFoundException;
 import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +67,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private void verifyAndSetPasswordInfo(Employee employee) {
         String employeeId = employee.getEmployeeId();
         Password passwordInfo = passwordDAO.selectPassword(employeeId);
-        if (passwordInfo == null) throw new PasswordNotFoundException(employeeId);
+        authService.verifyNullPassword(passwordInfo, employeeId);
         employee.setPassword(passwordInfo);
     }
 
@@ -131,7 +129,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // ============================================ 등록 관련 로직 start-point ============================================
     @Override // 사원 정보 등록
-    public String insertEmployee(Employee employee) {
+    public void insertEmployee(Employee employee) {
         // 필수 필드를 검증
         List<Object> requiredFields = Arrays.asList(
                 employee.getName(),
@@ -144,7 +142,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.getHireDate()
         );
         boolean hasEmptyField = requiredFields.stream().anyMatch(Objects::isNull);
-        if (hasEmptyField) return "employeeEmpty";
+        if (hasEmptyField) {
+            throw new IllegalArgumentException("입력하신 정보가 잘못되었습니다.");
+        }
 
         //  Employee ID 생성 - 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -166,20 +166,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 기본 연차 11일 설정
         employee.setRemainingLeave(11);
 
+        // 사원 신규 등록
         employeeDAO.insertEmployee(employee);
-
-        return "success";
     }
 
     // 사원 번호 중복 체크하는 메소드
     private void verifyDuplicateId(String employeeId) {
         if (employeeDAO.existsById(employeeId)) {
-            throw new DuplicateKeyException("이미 존재하는 사원 아이디입니다. 사원 ID : " + employeeId);
+            throw new DuplicateKeyException("'" + employeeId + "'는 이미 존재하는 사원 아이디입니다.");
         }
     }
 
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, Resignation resignation) {
+    public void resignEmployee(String employeeId, Resignation resignation) {
         // 재직 상태 - 퇴사 처리
         Employee employee = findEmployeeById(employeeId);
         employee.setStatus("퇴사");
@@ -196,7 +195,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         setModificationInfoToResignation(resignation);
 
         resignationDAO.insertResignation(resignation);
-        return "success";
     }
 
     // 퇴사 사유와 설명을 매핑하는 맵 초기화
@@ -224,8 +222,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // 퇴사 사유 분류하는 메소드
     private void classifyReason(Resignation resignation) {
-        String codeNumber = resignation.getCodeNumber();
-        String description = reasonDescriptions.get(codeNumber);
+        String resignationReason = resignation.getResignationReason();
+        String description = reasonDescriptions.get(resignationReason);
         if (description == null) {
             throw new IllegalArgumentException("잘못된 퇴사 사유입니다.");
         }
@@ -245,7 +243,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // ============================================ 수정 관련 로직 start-point ============================================
     @Override // 사원 정보 수정
-    public String updateEmployee(Employee updatedEmployee) {
+    public void updateEmployee(Employee updatedEmployee) {
         String employeeId = updatedEmployee.getEmployeeId();
         Employee originalEmployee = employeeDAO.getEmployeeById(employeeId);
 
@@ -257,7 +255,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 사원 정보 수정 처리
         employeeDAO.updateEmployee(updatedEmployee);
-        return "success";
     }
 
     // Employee의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
@@ -287,6 +284,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setLastModified(info.getLastModified());
     }
 
+    @Override // 계정 잠금과 해제 수정하는 메소드
+    public String setAccountLock(String employeeId) {
+        int pwdCount = passwordDAO.getPasswordCount(employeeId);
+        if (pwdCount == 5) { // 계정 잠금해제
+            passwordDAO.resetPasswordCount(employeeId);
+            return "사원의 계정이 잠금 해제되었습니다.";
+        }
+        else { // 계정 잠금
+            passwordDAO.maxOutPasswordCount(employeeId);
+            return "사원의 계정이 잠금 처리되었습니다.";
+        }
+    }
+
     @Override // 재직 상태 수정하는 메소드
     public String updateStatus(String employeeId, String status) {
         // 수정 정보들 Map에 담기
@@ -295,27 +305,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         params.put("lastModified", LocalDateTime.now());
         params.put("modifiedBy", authService.getAuthenticatedUser().getUsername());
         params.put("employeeId", employeeId);
-        try {
-            employeeDAO.updateStatus(params);
-            String updatedStatus = employeeDAO.getEmployeeById(employeeId).getStatus();
-            return "'" + getEmployeeById(employeeId).getName() + "' 사원의 재직 상태가 '" + updatedStatus + "'으로 변경되었습니다.";
-        } catch (DataAccessException dae) {
-            throw new RuntimeException("재직 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        } catch (Exception e) {
-            throw new RuntimeException("재직 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        }
+
+        // 재직 상태 수정
+        employeeDAO.updateStatus(params);
+        String updatedStatus = employeeDAO.getEmployeeById(employeeId).getStatus();
+        return "'" + getEmployeeById(employeeId).getName() + "' 사원의 재직 상태가 '" + updatedStatus + "'으로 변경되었습니다.";
     }
 
     @Override // 직급 승진시키는 메소드
     public String promoteEmployee(String employeeId) {
-        // 현재 랭크 가져온 뒤 부장과 사장인지 확인
+        // 현재 직급 rank 가져온 뒤 부장과 사장인지 확인
         int positionRank = Position.getRankByPositionName(employeeDAO.getEmployeeById(employeeId).getPosition().name());
         if (positionRank >= 5) throw new IllegalArgumentException("해당 직급에서는 더 이상 승진할 수 없습니다.");
 
-        // 랭크 +1로 승진 처리
+        // 직급 +1
         Position positionToBePromoted = Position.fromRank(positionRank + 1);
-        log.info("현재 직급의 랭크는 : {}", positionRank);
-        log.info("승진할 직급은 : {}", positionToBePromoted);
 
         // 사원 번호와 승진할 직급 Map에 담기
         Map<String, Object> params = new HashMap<>();
@@ -323,36 +327,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         params.put("positionId", positionToBePromoted);
         params.put("lastModified", LocalDateTime.now());
         params.put("modifiedBy", authService.getAuthenticatedUser().getUsername());
-        try {
-            employeeDAO.updatePosition(params);
-            Position promotedPosition = employeeDAO.getEmployeeById(employeeId).getPosition();
-            return "'" + getEmployeeById(employeeId).getName() + "' 사원이 '" + promotedPosition + "'으로 승진하였습니다.";
-        } catch (DataAccessException dae) {
-            log.error("승진 처리 중 DB 오류가 발생했습니다 : {}", dae.getMessage(), dae);
-            throw new RuntimeException("승진 처리 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        } catch (Exception e) {
-            log.error("승진 처리 중 오류가 발생했습니다 : {}", e.getMessage(), e);
-            throw new RuntimeException("승진 처리 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        }
-    }
 
-    @Override // 계정 잠금과 해제 수정하는 메소드
-    public String setAccountLock(String employeeId) {
-        int pwdCount = passwordDAO.getPasswordCount(employeeId);
-        try {
-            if (pwdCount == 5) { // 계정 잠금해제
-                passwordDAO.resetPasswordCount(employeeId);
-                return "사원의 계정이 잠금 해제되었습니다.";
-            }
-            else { // 계정 잠금
-                passwordDAO.maxOutPasswordCount(employeeId);
-                return "사원의 계정이 잠금 처리되었습니다.";
-            }
-        } catch (DataAccessException dae) {
-            throw new RuntimeException("계정 잠금 상태 변경 중 데이터베이스 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        } catch (Exception e) {
-            throw new RuntimeException("계정 잠금 상태 변경 중 오류가 발생했습니다.\n관리자에게 문의하세요.");
-        }
+        // 사원 승진 처리
+        employeeDAO.updatePosition(params);
+        Position promotedPosition = employeeDAO.getEmployeeById(employeeId).getPosition();
+        return "'" + getEmployeeById(employeeId).getName() + "' 사원이 '" + promotedPosition + "'으로 승진하였습니다.";
     }
     // =========================================== 퇴사 수정 관련 로직 start-point ==========================================
     @Override // 사원 퇴사 정보 수정
@@ -375,13 +354,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         setModificationInfoToResignation(updatedResignation);
 
         // 사원 퇴사 정보 수정
-        try {
-            resignationDAO.updateResignation(updatedResignation);
-        } catch (DataAccessException dae) {
-            throw new RuntimeException("데이터베이스 오류로 인해 퇴사 정보 수정에 실패하였습니다.", dae);
-        } catch (Exception e) {
-            throw new RuntimeException("사원 퇴사 정보 수정 중 오류가 발생하였습니다.", e);
-        }
+        resignationDAO.updateResignation(updatedResignation);
     }
 
     // Resignation의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
@@ -412,9 +385,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
             employeeDAO.deleteEmployee(employeeId);
             resignationDAO.deleteResignation(employeeId);
-            return "success"; // 1년이 지남 (삭제 가능)
+            passwordDAO.deletePassword(employeeId);
+            return "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
         } else {
-            return "not_expired"; // 1년이 지나지 않음
+            throw new IllegalArgumentException("사원이 퇴사 후 1년이 지나지 않았습니다.");
         }
     }
     // =============================================== 삭제 로직 end-point ===============================================

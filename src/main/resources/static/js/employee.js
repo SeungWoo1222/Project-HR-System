@@ -372,7 +372,7 @@ function submitUpdateResignationForm(event) {
             console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text); // 성공 메시지 알림
-                window.location.reload();
+                window.location.href = '/employee/resignation';
             } else if (response.status === 404) {
                 alert(response.text); // 404 오류 메세지 알림
             } else if (response.status === 400) {
@@ -411,7 +411,7 @@ function submitDelete(event) {
             .then(response => {
                 console.log('서버 응답 데이터 :', response.text);
                 if (response.status === 200) {
-                    alert('\'' + employeeName + '\' ' + response.text); // 성공 메시지 알림
+                    alert(response.text); // 성공 메시지 알림
                     window.location.reload();
                 } else if (response.status === 404) {
                     alert(response.text); // 404 오류 메세지 알림

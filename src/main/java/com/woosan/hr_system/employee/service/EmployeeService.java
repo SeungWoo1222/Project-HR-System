@@ -17,14 +17,14 @@ public interface EmployeeService {
     List<Employee> getPreDeletionEmployees();
 
     // == 등록 ==
-    String insertEmployee(Employee employee);
-    String resignEmployee(String employeeId, Resignation resignation);
+    void insertEmployee(Employee employee);
+    void resignEmployee(String employeeId, Resignation resignation);
 
     // == 수정 ==
-    String updateEmployee(Employee employee);
+    void updateEmployee(Employee employee);
     String updateStatus(String employeeId, String status);
-    String promoteEmployee(String employeeId);
     String setAccountLock(String employeeId);
+    String promoteEmployee(String employeeId);
     void updateResignationInfo(String employeeId, Resignation resignation);
 
     // == 삭제 ==

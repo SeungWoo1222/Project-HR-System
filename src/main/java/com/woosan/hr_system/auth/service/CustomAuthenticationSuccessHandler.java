@@ -26,6 +26,5 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         passwordDAO.resetPasswordCount(employeeId);
 
         response.setStatus(HttpServletResponse.SC_OK);
-//        response.sendRedirect("/common/home");
     }
 }

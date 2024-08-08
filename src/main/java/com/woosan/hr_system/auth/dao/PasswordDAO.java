@@ -27,9 +27,7 @@ public class PasswordDAO {
     }
 
     // 비밀번호 삭제
-    public void deletePassword(String employeeId) {
-        sqlSession.delete(NAMESPACE + "deletePassword", employeeId);
-    }
+    public void deletePassword(String employeeId) { sqlSession.delete(NAMESPACE + "deletePassword", employeeId); }
 
     // 비밀번호 카운트 조회
     public int getPasswordCount(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getPasswordCount", employeeId); }

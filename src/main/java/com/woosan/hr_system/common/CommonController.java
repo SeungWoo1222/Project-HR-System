@@ -38,21 +38,20 @@ public class CommonController {
     public String viewMyInfo(Model model) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         Employee employee = employeeService.getEmployeeById(employeeId);
-        if (employee == null) {
-            return "error/404";
-        }
+        model.addAttribute("employee", employee);
+
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
         return "/common/myInfo";
     }
 
     @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
     public String viewMyInfoEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
+        model.addAttribute("employee", employee);
+
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        model.addAttribute("employee", employee);
         return "/common/edit/myInfo";
     }
 }
