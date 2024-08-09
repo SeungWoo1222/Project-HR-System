@@ -15,7 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -50,11 +51,20 @@ public class CustomUserDetailsService implements UserDetailsService {
             isAccountNonExpired = !resignationDate.isBefore(today);
         }
 
+        // 사용자 권한 설정
+        String position = employee.getPosition().name();
+        String authority = "STAFF";
+        if (position.equals("차장") || position.equals("부장")) authority = "MANAGER";
+        List<SimpleGrantedAuthority> authorities = Arrays.asList(
+            new SimpleGrantedAuthority("ROLE_" + authority),
+            new SimpleGrantedAuthority("ROLE_" + employee.getDepartment().name())
+        );
+
         return new CustomUserDetails(
                 employee.getEmployeeId(),
                 password.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + employee.getPosition().name())),
-                employee.getDepartment().name(),
+                authorities,
+                employee.getDepartment().name(), // 이미 권한에 설정해두어서 삭제해도 되지만 승우 코드와 프론트쪽에서 검사 때문에 일단 남겨둠
                 isAccountNonLocked,
                 isAccountNonExpired
         );

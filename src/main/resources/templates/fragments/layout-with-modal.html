@@ -47,7 +47,25 @@
 
         // 컨텐츠 로드
         fetch(contentUrl)
-            .then(response => response.text())
+            .then(response => {
+                if (response.status === 404) {
+                    return fetch('/error/modal/404').then(res => res.text());
+                }
+                if (response.status === 401) {
+                    return fetch('/error/modal/401').then(res => res.text());
+                }
+                if (response.status === 403) {
+                    return fetch('/error/modal/403').then(res => res.text());
+                }
+                if (response.status === 500) {
+                    return fetch('/error/modal/500').then(res => res.text());
+                }
+                if (!response.ok) { // 다른 HTTP 오류 처리
+                    throw new Error('서버 오류 발생: ' + response.status);
+                }
+                return response.text();
+            })
+            // .then(response => response.text())
             .then(html => {
                 modalBody.innerHTML = html;
                 modal.style.display = "block";
@@ -60,7 +78,6 @@
                 } else {
                     console.error('First input field not found');
                 }
-
                 updateDateTimeElements(); // DateTime T 제거
 
                 // 모달이 열리고 나서 추가 작업 실행

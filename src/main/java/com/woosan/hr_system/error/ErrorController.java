@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
+@RequestMapping("/error")
 public class ErrorController {
 
     @RequestMapping("/404")
@@ -30,5 +31,32 @@ public class ErrorController {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorized() {
         return "/error/401";
+    }
+
+    @RequestMapping("/405")
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public String handleMethodNotAllowed() {
+        return "/error/405";
+    }
+
+    // modal 오류 페이지
+    @RequestMapping("/modal/404")
+    public String handleNotFoundInModal() {
+        return "/error/modal/404";
+    }
+
+    @RequestMapping("/modal/500")
+    public String handleInternalServerErrorInModal() {
+        return "/error/modal/500";
+    }
+
+    @RequestMapping("/modal/403")
+    public String handleForbiddenInModal() {
+        return "/error/modal/403";
+    }
+
+    @RequestMapping("/modal/401")
+    public String handleUnauthorizedInModal() {
+        return "/error/modal/401";
     }
 }

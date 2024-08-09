@@ -1,8 +1,8 @@
 package com.woosan.hr_system.config;
 
+import com.woosan.hr_system.auth.service.CustomAuthenticationEntryPoint;
 import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
 import com.woosan.hr_system.auth.service.CustomAuthenticationSuccessHandler;
-import com.woosan.hr_system.auth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -27,13 +26,13 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
-                                .requestMatchers("/admin/**").hasAnyRole("차장", "부장", "사장")
+                                .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("MANAGER")
 
                                 // 일반 사원 권한
-                                .requestMatchers("/**").hasAnyRole("사원", "대리", "과장", "차장", "부장", "사장")
+                                .requestMatchers("/**").hasAnyRole("STAFF", "MANAGER")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                         //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
@@ -43,11 +42,16 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/auth/login") // 사용자 정의 로그인 페이지 경로
+                                .defaultSuccessUrl("/employee/list", true)
                                 .successHandler(customAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 설정
                                 .failureHandler(customAuthenticationFailureHandler()) // 커스텀 실패 핸들러 설정
                                 .permitAll() // 로그인 페이지는 인증 없이 접근 허용
                 )
-
+                // 새로운 방식의 HTTP Basic 인증 활성화
+                .httpBasic(httpBasic ->
+                        httpBasic
+                                .realmName("MyAppRealm") // 원하는 Realm 이름 설정
+                )
                 // 로그아웃 설정
                 .logout(logout ->
                         logout
@@ -77,6 +81,11 @@ public class SecurityConfig {
                 .headers(headers ->
                         headers
                                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // 동일 출처에서만 프레임 로딩 허용
+                )
+
+                // Authentication Entry Point 설정 - 401
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
 
         return http.build();

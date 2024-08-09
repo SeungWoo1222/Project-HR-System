@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/httpstatus-modal.css}">
+  </th:block>
+</head>
+
+<body>
+<div>
+    <div class="httpstatus-container">
+      <div class="logo-area">
+        <img th:src="@{/images/logo/otter-sad.png}" alt="Logo" class="logo-image">
+      </div>
+      <div class="text-area">
+        <h1>401 Error - Unauthorized</h1>
+        <p>죄송합니다. 인증이 필요합니다.</p>
+        <p>이 페이지에 접근하려면 로그인이 필요합니다.<br>로그인 후 다시 시도해 주세요.</p>
+      </div>
+    </div>
+</div>
+</body>
+</html>
