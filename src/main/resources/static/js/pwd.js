@@ -60,12 +60,13 @@ function checkPasswordStrength() {
     // zxcvbn을 사용하여 비밀번호 강도 측정
     const result = zxcvbn(newPassword);
 
-    // 강도 점수에 따른 메시지 표시
+    // // 강도 점수에 따른 메시지 표시
     const strength = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
     passwordStrength.textContent = `${strength[result.score]}`
 
     // 강도 점수 입력
     passwordStrengthInput.value = result.score;
+    console.log("나 실행됨!");
 }
 
 // 새로운 비밀번호 확인 함수

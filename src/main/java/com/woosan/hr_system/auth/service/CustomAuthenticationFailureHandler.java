@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
@@ -26,17 +27,19 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         String errorMessage;
         String employeeId = request.getParameter("username");
 
-        if (exception instanceof BadCredentialsException) {
-            if (employeeId != null) { passwordDAO.incrementPasswordCount(employeeId); }
+        if (exception instanceof UsernameNotFoundException) {
+            errorMessage = "아이디 또는 비밀번호가 맞지 않습니다.";
+        } else if (exception instanceof BadCredentialsException) {
+            passwordDAO.incrementPasswordCount(employeeId);
             errorMessage = "아이디 또는 비밀번호가 맞지 않습니다.";
         } else if (exception instanceof AuthenticationCredentialsNotFoundException) {
             errorMessage = "인증 요청이 거부되었습니다.";
         } else if (exception instanceof InternalAuthenticationServiceException) {
             errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다.";
         } else if (exception instanceof AccountExpiredException) {
-            errorMessage = "계정이 만료되었습니다.";
+            errorMessage = "해당 계정이 만료되었습니다.";
         } else if (exception instanceof LockedException) {
-            errorMessage = "계정이 잠겼습니다.";
+            errorMessage = "계정이 잠겼습니다. 자세한 사항은 관리자에게 문의해 주세요.";
         } else {
             errorMessage = "알 수 없는 오류로 로그인 요청을 처리할 수 없습니다.";
         }

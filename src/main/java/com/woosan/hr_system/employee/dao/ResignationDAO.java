@@ -15,22 +15,19 @@ public class ResignationDAO {
 
     private static final String NAMESPACE = "com.woosan.hr_system.employee.dao.ResignationDAO.";
 
-    public Resignation getResignedEmployee(String employeeId) { // id를 이용한 퇴사 사원 정보 조회
-        return sqlSession.selectOne(NAMESPACE + "getResignedEmployee" ,employeeId);
-    }
+    // 모든 퇴사 사원 정보 조회
+    public List<Resignation> getAllResignedEmployees() { return sqlSession.selectList(NAMESPACE + "getAllResignedEmployees"); }
 
-    public List<Resignation> getAllResignedEmployees() { // 모든 퇴사 사원 정보 조회
-        return sqlSession.selectList(NAMESPACE + "getAllResignedEmployees");
-    }
+    // 퇴사 사원 정보 조회
+    public Resignation getResignedEmployee(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getResignedEmployee" ,employeeId); }
 
-    public void insertResignation(Resignation resignation) { // 새로운 퇴사 사원 정보 삽입
-        sqlSession.insert(NAMESPACE + "insertResignation", resignation);
-    }
+    // 퇴사 사원 정보 등록
+    public void insertResignation(Resignation resignation) { sqlSession.insert(NAMESPACE + "insertResignation", resignation); }
 
-    public void updateResignation(Resignation resignation) { // 기존 퇴사 사원 정보 업데이트
-        sqlSession.update(NAMESPACE + "updateResignation", resignation);
-    }
+    // 퇴사 사원 정보 수정
+    public void updateResignation(Resignation resignation) { sqlSession.update(NAMESPACE + "updateResignation", resignation); }
 
+    // 퇴사 사원 정보 삭제 - 퇴사 후 12개월 지난 사원 정보
     public void deleteResignation(String employeeId) { // 퇴사 사원 정보 삭제
         sqlSession.delete(NAMESPACE + "deleteResignation", employeeId);
     }

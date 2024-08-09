@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='퇴사 정보 수정')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/employee.js}"></script>
+    <script th:src="@{/js/emloyee-detail-edit.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateDateTimeElements();
+            changeCodeNumberAndResignationReason();
+            initializeResignationDocuments();
+            errorMessage = document.querySelector(".error-message");
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <img class="employee-picture" th:src="${pictureUrl}"/>
+        <table>
+            <tr>
+                <th>사원 ID</th>
+                <td th:text="${employee.employeeId}"></td>
+            </tr>
+            <tr>
+                <th>이름</th>
+                <td th:text="${employee.name}"></td>
+            </tr>
+            <tr>
+                <th>주민등록번호</th>
+                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
+            </tr>
+            <tr>
+                <th>전화번호</th>
+                <td th:text="${employee.phone}"></td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td th:text="${employee.email}"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td th:text="${employee.address}"></td>
+            </tr>
+            <tr>
+                <th>상세 주소</th>
+                <td th:text="${employee.detailAddress}"></td>
+            </tr>
+            <tr>
+                <th>부서</th>
+                <td th:text="${employee.department.name}"></td>
+            </tr>
+            <tr>
+                <th>직급</th>
+                <td th:text="${employee.position.name}"></td>
+            </tr>
+            <tr>
+                <th>입사 날짜</th>
+                <td th:text="${employee.hireDate}"></td>
+            </tr>
+            <tr>
+                <th>재직 상태</th>
+                <td th:text="${employee.status}"></td>
+            </tr>
+            <tr>
+                <th>남은 연차</th>
+                <td th:text="${employee.remainingLeave}"></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>사원 정보 수정자</th>
+                <td th:text="${employee.modifiedBy}"></td>
+            </tr>
+            <tr>
+                <th>사원 정보 수정일시</th>
+                <td th:text="${employee.lastModified}" class="dateTime"></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>비밀번호</th>
+                <td th:text="${employee.password?.password}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 강도</th>
+                <td th:text="${employee.password?.strength}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 오류 횟수</th>
+                <td th:text="${employee.password?.passwordCount}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 수정자</th>
+                <td th:text="${employee.password?.modifiedBy}"></td>
+            </tr>
+            <tr>
+                <th>비밀번호 수정일시</th>
+                <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
+            </tr>
+        </table>
+        <form th:action="@{/api/employee/update/resignation/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data" onsubmit="submitUpdateResignationForm(event)">
+            <table th:if="${employee.status} == '퇴사'">
+                <div class="file-area">
+                    <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다..</p>
+                    <label for="resignationDocuments" class="input-file-btn">문서 업로드</label>
+                    <input type="file" id="resignationDocuments" class="hidden" name="resignationDocuments" onchange="addFile(this)" multiple/>
+                    <input type="hidden" id="registeredDocuments" th:value="${employee.resignation?.resignationDocuments}"/>
+                    <div class="file-list"></div>
+                </div>
+                <tr>
+                    <th>퇴사일</th>
+                    <td>
+                        <input type="date" id="resignationDate" name="resignationDate" th:value="${employee.resignation?.resignationDate}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>퇴사 사유</th>
+                    <td>
+                        <select id="resignationReason" name="resignationReason" onchange="updateCodeNumber()">
+                            <option value="">선택하세요</option>
+                            <option value="1">1. 자진퇴사</option>
+                            <option value="2">2. 권고사직</option>
+                            <option value="3">3. 정년 등 기간만료에 의한 이직</option>
+                            <option value="4">4. 기타</option>
+                        </select>
+                        <span id="original-resignationReason" class="hidden" th:text="${employee.resignation?.getResignationReason()}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>퇴사 코드</th>
+                    <td>
+                        <select id="codeNumber" name="codeNumber">
+                            <option value="">선택하세요</option>
+                        </select>
+                        <span id="original-codeNumber" class="hidden" th:text="${employee.resignation?.codeNumber}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>구체적 사유</th>
+                    <td>
+                        <textarea id="specificReason" name="specificReason" rows="2" cols="20" th:text="${employee.resignation?.specificReason}"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>퇴사 처리한 사원 ID</th>
+                    <td th:text="${employee.resignation?.getProcessedBy()}"></td>
+                </tr>
+                <tr>
+                    <th>퇴사 처리 일시</th>
+                    <td th:text="${employee.resignation?.getProcessedDate()}" class="dateTime"></td>
+                </tr>
+            </table>
+            <div id="error-message" class="error-message"></div>
+            <div class="btn-area">
+                <button type="submit" class="btn" data-url="/employee/list">퇴사 정보 수정</button>
+                <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/resignation\''">수정 취소</button>
+                <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

@@ -78,7 +78,7 @@
                 <td th:text="${employee.modifiedBy}">수정자</td>
             </tr>
         </table>
-        <button type="button" class="btn" data-url="/employee/edit/myInfo/" th:onclick="openModal('/auth/pwd?redirectUrl='+ encodeURIComponent(this.getAttribute('data-url')))">정보 수정</button>
+        <button type="button" class="btn" data-url="/common/edit/myInfo/" th:onclick="openModal('/auth/pwd?redirectUrl='+ encodeURIComponent(this.getAttribute('data-url')))">정보 수정</button>
     </div>
 </div>
 </html>

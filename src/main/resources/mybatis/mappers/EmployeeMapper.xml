@@ -177,4 +177,19 @@
         </where>
     </select>
 
+    <!-- 사원 재직 상태 수정 -->
+    <update id="updateStatus" parameterType="map">
+        UPDATE employees
+        SET status = #{status},
+            last_modified = #{lastModified},
+            modified_by = #{modifiedBy}
+        WHERE employee_id = #{employeeId}
+    </update>
+
+    <!-- 사원 승진 직급 수정 -->
+    <update id="updatePosition" parameterType="map">
+        UPDATE employees
+        SET position_id = #{positionId}
+        WHERE employee_id = #{employeeId}
+    </update>
 </mapper>
