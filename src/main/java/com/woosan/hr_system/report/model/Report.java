@@ -2,6 +2,7 @@ package com.woosan.hr_system.report.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Report {
     private Long reportId;
@@ -17,11 +18,12 @@ public class Report {
     private String rejectReason;
     private LocalDate completeDate;
 
-    // main.html에 (yy-mm-dd-time)이 아닌 yy-mm-dd로 보여주기 위한 변수
-    private String formattedCreatedDate;
+    // 보고서 작성 시 결재자 선택에서 여러 임원을 선택하기 위한 변수
+    private List<String> nameList;
+    private List<String> idList;
 
-    // 결재할 보고서에 작성자 이름 조회 위한 변수
-    private String employeeName;
+    // 결재할 보고서에 작성자 이름을 표기하기 위한 변수
+    private String writerName;
 
 
     // Getters and Setters
@@ -121,19 +123,29 @@ public class Report {
         this.fileId = filePath;
     }
 
-    public String getFormattedCreatedDate() {
-        return formattedCreatedDate;
+    public String getWriterName() {
+        return writerName;
     }
 
-    public void setFormattedCreatedDate(String formattedCreatedDate) {
-        this.formattedCreatedDate = formattedCreatedDate;
+    public void setWriterName(String writerName) {
+        this.writerName = writerName;
     }
 
-    public String getEmployeeName() {
-        return employeeName;
+
+    public List<String> getIdList() {
+        return idList;
     }
 
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
+    public void setIdList(List<String> idList) {
+        this.idList = idList;
     }
+
+    public List<String> getNameList() {
+        return nameList;
+    }
+
+    public void setNameList(List<String> nameList) {
+        this.nameList = nameList;
+    }
+
 }

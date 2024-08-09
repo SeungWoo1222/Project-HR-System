@@ -79,6 +79,11 @@
                     console.error('First input field not found');
                 }
                 updateDateTimeElements(); // DateTime T 제거
+
+                // 모달이 열리고 나서 추가 작업 실행
+                if (contentUrl.includes('/admin/request/write') || contentUrl.includes('/admin/request/statistic')) {
+                    initEventListeners();
+                }
             });
     }
 

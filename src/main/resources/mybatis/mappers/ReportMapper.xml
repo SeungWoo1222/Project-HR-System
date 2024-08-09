@@ -4,39 +4,38 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
-
+<!--============================================== CRUD SQL문 =======================================================-->
     <!-- 보고서 생성 -->
-    <insert id="createReport" parameterType="list">
+    <insert id="createReport" parameterType="map">
         INSERT INTO reports
         (title, content, approver_id, approver_name, complete_date, writer_id, created_date, status)
         VALUES
-        <foreach collection="list" item="report" separator=",">
             (
-            #{report.title},
-            #{report.content},
-            #{report.approverId},
-            #{report.approverName},
-            #{report.completeDate},
-            #{report.writerId},
-            #{report.createdDate},
-            #{report.status}
+            #{title},
+            #{content},
+            #{approverId},
+            #{approverName},
+            #{completeDate},
+            #{writerId},
+            #{createdDate},
+            #{status}
             )
-        </foreach>
     </insert>
 
-    <!-- 모든 보고서 조회 -->
+    <!-- 모든 보고서 조회 (결재가필요한 보고서 조회, 내가 쓴 보고서 조회에 사용) -->
     <select id="getAllReports" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
         r.report_id AS reportId,
         r.writer_id AS writerId,
-        e.name AS employeeName,
+        e.name AS writerName,
         r.title,
-        r.content,
-        DATE_FORMAT(r.created_date, '%Y-%m-%d') AS formattedCreatedDate,
-        r.modified_date AS modifiedDate,
+        -- r.content,
+        r.created_date AS createdDate,
+        -- r.modified_date AS modifiedDate,
         r.approver_id AS approverId,
-        r.status,
-        r.reject_reason AS rejectReason
+        r.approver_name AS approverName,
+        r.status
+        -- r.reject_reason AS rejectReason
         FROM reports r
         JOIN employees e ON r.writer_id = e.employee_id
         <where>
@@ -46,6 +45,9 @@
             <if test="startYearMonth != null and endYearMonth != null">
                 AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
             </if>
+            <if test="writerId != null">
+                AND r.writer_id = #{writerId}
+            </if>
         </where>
     </select>
 
@@ -54,51 +56,118 @@
         SELECT
             report_id AS reportId,
             writer_id AS writerId,
-            title,
-            content,
+            title AS title,
+            content AS content,
             complete_date AS completeDate,
             created_date AS createdDate,
             modified_date AS modifiedDate,
---             approver_id AS approverId,
-            status,
+            approver_name AS approverName,
+            status AS status,
             reject_reason AS rejectReason
         FROM reports
         WHERE report_id = #{reportId}
     </select>
 
-    <!-- 통계 조회 -->
-    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+    <!-- 보고서 수정 -->
+    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET title         = #{title},
+            content       = #{content},
+            approver_id   = #{approverId},
+            approver_name = #{approverName},
+            complete_date = #{completeDate},
+            modified_date = #{modifiedDate}
+        WHERE report_id = #{reportId}
+    </update>
+    <!-- 보고서 삭제 -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM reports WHERE report_id = #{reportId}
+    </delete>
+
+<!--============================================== CRUD SQL문 =======================================================-->
+<!--============================================== 그 외 SQL문 =======================================================-->
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
-            DATE_FORMAT(created_date, '%Y-%m') AS month,
-            COUNT(status) AS total,
-            SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
-            SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        report_id AS reportId,
+        writer_id AS writerId,
+        title,
+        created_date AS createdDate,
+        approver_name AS approverName,
+        status
         FROM reports
-        WHERE DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
-        <if test="writerIds != null and writerIds.size() > 0">
-            AND writer_id IN
-            <foreach item="writerId" collection="writerIds" open="(" separator="," close=")">
-                #{writerId}
-            </foreach>
-        </if>
-        GROUP BY month
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="reportStart != null and reportEnd != null">
+                AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            </if>
+        </where>
+        ORDER BY created_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 특정 파일 조회 -->
-    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(writer_id) FROM reports
+        <where>
+            writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="reportStart != null and reportEnd != null">
+                AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 삭제된 요청을 공통 휴지통에 데이터 삽입 -->
+    <insert id="insertReportIntoSharedTrash" parameterType="long">
+        INSERT INTO shared_trash
+        (original_table, original_id, deleted_date, created_date, deleted_by, content, approver_writer_id,
+         approver_writer_name, completion_due_date, title, file_id, modified_date, status, reject_reason)
         SELECT
-            file_id AS fileId,
+            'reports', report_id, NOW(), created_date, writer_id, content, approver_id,
+            approver_name, complete_date, title, file_id, modified_date, status, reject_reason
+        FROM reports
+        WHERE report_id = #{reportId}
+    </insert>
+
+    <!-- 최근 5개 보고서 조회 -->
+    <select id="getRecentReports" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
             report_id AS reportId,
-            cloud_server_file_url AS cloudServerFileUrl,
-            original_file_name AS originalFilename,
-            uuid_file_name AS uuidFilename,
-            size,
-            upload_date AS uploadDate
-
-        FROM report_files
-        WHERE file_id = #{fileId}
+            writer_id AS writerId,
+            title,
+            created_date AS createdDate,
+            approver_name AS approverName,
+            status
+        FROM reports
+        WHERE writer_id = #{writerId}
+        ORDER BY
+            created_date  desc
+            LIMIT 5;
     </select>
-
+<!--============================================== 검색, 페이징 관련 SQL문 =========================================-->
+<!--============================================== 파일 관련 SQL문 ====================================================-->
     <!-- 파일 DB 정보 생성 -->
     <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
         INSERT INTO report_files (
@@ -116,24 +185,45 @@
                  )
     </insert>
 
-    <!-- 보고서 수정 -->
-    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET title = #{title}, content = #{content}, approver_id = #{approverId}, complete_date = #{completeDate}, modified_date = #{modifiedDate}
-        WHERE report_id = #{reportId}
-    </update>
-
-
-
-    <!-- 보고서 삭제 -->
-    <delete id="deleteReport" parameterType="long">
-        DELETE FROM reports WHERE report_id = #{reportId}
-    </delete>
-
     <!-- 파일 삭제 -->
     <delete id="deleteFileMetadataByReportId" parameterType="long">
         DELETE FROM report_files WHERE report_id = #{reportId}
     </delete>
 
+    <!-- 특정 파일 조회 -->
+    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+        SELECT
+            file_id AS fileId,
+            report_id AS reportId,
+            cloud_server_file_url AS cloudServerFileUrl,
+            original_file_name AS originalFilename,
+            uuid_file_name AS uuidFilename,
+            size,
+            upload_date AS uploadDate
+
+        FROM report_files
+        WHERE file_id = #{fileId}
+    </select>
+<!--============================================== 파일 관련 SQL문 ====================================================-->
+<!--============================================== 통계 관련 SQL문 ====================================================-->
+
+    <!-- 통계 조회 -->
+    <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+        SELECT
+        DATE_FORMAT(created_date, '%Y-%m') AS month,
+        COUNT(status) AS total,
+        SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
+        SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        FROM reports
+        WHERE DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
+        <if test="writerIds != null and writerIds.size() > 0">
+            AND writer_id IN
+            <foreach item="writerId" collection="writerIds" open="(" separator="," close=")">
+                #{writerId}
+            </foreach>
+        </if>
+        GROUP BY month
+    </select>
+    <!--============================================== 통계 관련 SQL문 ====================================================-->
 
 </mapper>

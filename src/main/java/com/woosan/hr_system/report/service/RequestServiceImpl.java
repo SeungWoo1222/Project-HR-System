@@ -4,15 +4,23 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -22,34 +30,26 @@ public class RequestServiceImpl implements RequestService {
     @Autowired
     private AuthService authService;
 
+    //===================================================CRUD 메소드=======================================================
     @Override // 요청 생성
-    public void createRequest(List<String> writerIds, List<String> writerNames, LocalDate dueDate, String requestNote, String requesterId) {
+    public void createRequest(Request request) {
+        LocalDateTime requestDate = LocalDateTime.now();
 
-        LocalDateTime requestDate = LocalDateTime.now(); // 현재 기준 생성 시간 설정
-        List<Request> requests = new ArrayList<>();
+        for (int i = 0; i < request.getNameList().size(); i++) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("requesterId", request.getRequesterId());
+            params.put("writerId", request.getIdList().get(i));
+            params.put("writerName", request.getNameList().get(i));
+            params.put("dueDate", request.getDueDate());
+            params.put("requestNote", request.getRequestNote());
+            params.put("requestDate", requestDate);
 
-        // requests 객체 설정
-        for (int i = 0; i < writerIds.size(); i++) {
-            Request request = new Request();
-            request.setRequesterId(requesterId);
-            request.setWriterId(writerIds.get(i));
-            request.setWriterName(writerNames.get(i));
-            request.setDueDate(dueDate);
-            request.setRequestNote(requestNote);
-            request.setRequestDate(requestDate);
-            requests.add(request);
+            requestDAO.createRequest(params);
         }
-
-        requestDAO.createRequest(requests);
-    }
-
-    @Override // 모든 요청 조회
-    public List<Request> getAllRequests() {
-        return requestDAO.getAllRequests();
     }
 
     @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
-    public List<Request> getMyRequests(String requesterId, String requestStart , String requestEnd) {
+    public List<Request> getMyRequests(String employeeId, String requestStart, String requestEnd) {
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         YearMonth startYearMonth;
@@ -70,12 +70,52 @@ public class RequestServiceImpl implements RequestService {
         } else {
             endYearMonth = YearMonth.parse(requestEnd, formatter);
         }
-        return requestDAO.getMyRequests(requesterId, startYearMonth, endYearMonth);
+        return requestDAO.getMyRequests(employeeId, startYearMonth, endYearMonth);
     }
 
-    @Override // 특정 요청 조회
+    @Override  // 로그인한 계정 기준 내게 온 요청 리스트 조회(내게 온 요청 목록 조회)
+    public List<Request> getMyPendingRequests(String writerId) {
+        return requestDAO.getMyPendingRequests(writerId);
+    }
+
+    @Override // 요청 세부 조회
     public Request getRequestById(Long requestId) {
         return requestDAO.getRequestById(requestId);
+    }
+
+    @Override // 요청 수정
+    public void updateRequest(Request request) {
+        //request 객체 설정
+        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("requestId", request.getRequestId());
+        params.put("writerId", request.getIdList().get(0));
+        params.put("writerName", request.getNameList().get(0));
+        params.put("dueDate", request.getDueDate());
+        params.put("requestNote", request.getRequestNote());
+        params.put("modifiedDate", modifiedDate);
+
+        requestDAO.updateRequest(params);
+    }
+
+
+    @Override // 요청 삭제
+    public void deleteRequest(Long requestId) {
+        // shared_trash 테이블에 삭제될 데이터들 삽입
+        requestDAO.insertRequestIntoSharedTrash(requestId);
+        requestDAO.deleteRequest(requestId);
+    }
+
+//===================================================CRUD 메소드=======================================================
+//===================================================그 외 메소드=======================================================
+    @Override // 요청 검색
+    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
+        int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
+
+        return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
 
@@ -89,64 +129,6 @@ public class RequestServiceImpl implements RequestService {
 
         requestDAO.updateApprovalStatus(report);
     }
-
-    @Override // 요청 수정
-    public void updateRequest(Long requestId, List<String> writerIds, List<String> writerNames, String requestNote, LocalDate dueDate) {
-
-        //request 객체 설정
-        LocalDateTime modifiedDate = LocalDateTime.now(); //현재 기준 수정 시간 설정
-        List<Request> requests = new ArrayList<>();
-
-        // 작성자가 한명인 경우 => 요청을 수정
-        if (writerIds.size() == 1) {
-            Request request = new Request();
-            request.setRequestId(requestId);
-            request.setWriterId(writerIds.get(0));
-            request.setRequestNote(requestNote);
-            request.setDueDate(dueDate);
-            request.setModifiedDate(modifiedDate);
-            requestDAO.updateRequest(request);
-        }
-
-        // 작성자가 여러명인 경우 => 요청 삭제 후 새로운 요청 생성
-        else if (writerIds.size() > 1) {
-            requestDAO.deleteRequest(requestId);
-            String requesterId = null;
-            requesterId = authService.getAuthenticatedUser().getUsername();
-
-            for (int i = 0; i < writerIds.size(); i++) {
-                Request request = new Request();
-                request.setRequesterId(requesterId);
-                request.setWriterId(writerIds.get(i));
-                request.setWriterName(writerNames.get(i));
-                request.setRequestNote(requestNote);
-                request.setDueDate(dueDate);
-                request.setRequestDate(modifiedDate);
-                requests.add(request);
-            }
-            requestDAO.createRequest(requests);
-        }
-    }
-
-    @Override // 요청 삭제
-    public void deleteRequest(Long requestId) {
-        requestDAO.deleteRequest(requestId);
-
-        // shared_trash 테이블에 삭제될 데이터들 삽입
-        requestDAO.insertRequestIntoSharedTrash(requestId);
-    }
+//===================================================그 외 메소드=======================================================
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
