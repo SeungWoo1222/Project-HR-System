@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
-<!--============================================== CRUD SQL문 =======================================================-->
+<!--============================================== 생성 SQL문 =======================================================-->
     <!-- 보고서 생성 -->
     <insert id="createReport" parameterType="map">
         INSERT INTO reports
@@ -51,7 +51,7 @@
         </where>
     </select>
 
-    <!-- 특정 보고서 조회 -->
+    <!-- 보고서 세부 조회 -->
     <select id="getReportById" parameterType="long" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
             report_id AS reportId,
@@ -68,24 +68,9 @@
         WHERE report_id = #{reportId}
     </select>
 
-    <!-- 보고서 수정 -->
-    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET title         = #{title},
-            content       = #{content},
-            approver_id   = #{approverId},
-            approver_name = #{approverName},
-            complete_date = #{completeDate},
-            modified_date = #{modifiedDate}
-        WHERE report_id = #{reportId}
-    </update>
-    <!-- 보고서 삭제 -->
-    <delete id="deleteReport" parameterType="long">
-        DELETE FROM reports WHERE report_id = #{reportId}
-    </delete>
+<!--============================================== 생성 SQL문 =======================================================-->
+<!--============================================== 조회 SQL문 =======================================================-->
 
-<!--============================================== CRUD SQL문 =======================================================-->
-<!--============================================== 그 외 SQL문 =======================================================-->
     <!-- 검색어에 해당하는 데이터 결과 조회 -->
     <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
@@ -139,18 +124,6 @@
         </where>
     </select>
 
-    <!-- 삭제된 요청을 공통 휴지통에 데이터 삽입 -->
-    <insert id="insertReportIntoSharedTrash" parameterType="long">
-        INSERT INTO shared_trash
-        (original_table, original_id, deleted_date, created_date, deleted_by, content, approver_writer_id,
-         approver_writer_name, completion_due_date, title, file_id, modified_date, status, reject_reason)
-        SELECT
-            'reports', report_id, NOW(), created_date, writer_id, content, approver_id,
-            approver_name, complete_date, title, file_id, modified_date, status, reject_reason
-        FROM reports
-        WHERE report_id = #{reportId}
-    </insert>
-
     <!-- 최근 5개 보고서 조회 -->
     <select id="getRecentReports" resultType="com.woosan.hr_system.report.model.Report">
         SELECT
@@ -166,46 +139,6 @@
             created_date  desc
             LIMIT 5;
     </select>
-<!--============================================== 검색, 페이징 관련 SQL문 =========================================-->
-<!--============================================== 파일 관련 SQL문 ====================================================-->
-    <!-- 파일 DB 정보 생성 -->
-    <insert id="insertFileMetadata" parameterType="com.woosan.hr_system.report.model.FileMetadata">
-        INSERT INTO report_files (
-            cloud_server_file_url,
-            original_file_name,
-            uuid_file_name,
-            size,
-            upload_date
-        ) VALUES (
-                     #{cloudServerFileUrl},
-                     #{originalFilename},
-                     #{uuidFilename},
-                     #{size},
-                     #{uploadDate}
-                 )
-    </insert>
-
-    <!-- 파일 삭제 -->
-    <delete id="deleteFileMetadataByReportId" parameterType="long">
-        DELETE FROM report_files WHERE report_id = #{reportId}
-    </delete>
-
-    <!-- 특정 파일 조회 -->
-    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
-        SELECT
-            file_id AS fileId,
-            report_id AS reportId,
-            cloud_server_file_url AS cloudServerFileUrl,
-            original_file_name AS originalFilename,
-            uuid_file_name AS uuidFilename,
-            size,
-            upload_date AS uploadDate
-
-        FROM report_files
-        WHERE file_id = #{fileId}
-    </select>
-<!--============================================== 파일 관련 SQL문 ====================================================-->
-<!--============================================== 통계 관련 SQL문 ====================================================-->
 
     <!-- 통계 조회 -->
     <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
@@ -224,6 +157,77 @@
         </if>
         GROUP BY month
     </select>
-    <!--============================================== 통계 관련 SQL문 ====================================================-->
+<!--============================================== 조회 SQL문 =======================================================-->
+<!--============================================== 수정 SQL문 =======================================================-->
+
+    <!-- 보고서 수정 -->
+    <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET title         = #{title},
+            content       = #{content},
+            approver_id   = #{approverId},
+            approver_name = #{approverName},
+            complete_date = #{completeDate},
+            modified_date = #{modifiedDate}
+        WHERE report_id = #{reportId}
+    </update>
+
+<!--============================================== 수정 SQL문 =======================================================-->
+<!--============================================== 삭제 SQL문 =======================================================-->
+
+    <!-- 보고서 삭제 -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM reports WHERE report_id = #{reportId}
+    </delete>
+
+    <!-- 삭제된 요청을 공통 휴지통에 데이터 삽입 -->
+    <insert id="insertReportIntoSharedTrash" parameterType="long">
+        INSERT INTO shared_trash
+        (original_table, original_id, deleted_date, created_date, deleted_by, content, approver_writer_id,
+         approver_writer_name, completion_due_date, title, file_id, modified_date, status, reject_reason)
+        SELECT
+            'reports', report_id, NOW(), created_date, writer_id, content, approver_id,
+            approver_name, complete_date, title, file_id, modified_date, status, reject_reason
+        FROM reports
+        WHERE report_id = #{reportId}
+    </insert>
+
+<!--============================================== 삭제 SQL문 ====================================================-->
+
+<!--        &lt;!&ndash;파일 metaData 생성&ndash;&gt;-->
+<!--        <insert id="insertFile" parameterType="map">-->
+<!--            INSERT INTO files-->
+<!--            (original_filename, stored_filename, file_size, upload_date, uploaded_by, usage)-->
+<!--            VALUES-->
+<!--                (-->
+<!--                    #{originalFilename},-->
+<!--                    #{stotredFilename},-->
+<!--                    #{fileSize},-->
+<!--                    #{uploadDate},-->
+<!--                    #{uploadBy},-->
+<!--                    #{usage}-->
+<!--                )-->
+<!--        </insert>-->
+
+    <!-- 파일 삭제 -->
+    <delete id="deleteFileMetadataByReportId" parameterType="long">
+        DELETE FROM report_files WHERE file_id = #{fileid}
+    </delete>
+
+    <!-- 특정 파일 조회 -->
+    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
+        SELECT
+            file_id AS fileId,
+            cloud_server_file_url AS cloudServerFileUrl,
+            original_file_name AS originalFilename,
+            uuid_file_name AS uuidFilename,
+            size,
+            upload_date AS uploadDate
+
+        FROM report_files
+        WHERE file_id = #{fileId}
+    </select>
+
+
 
 </mapper>

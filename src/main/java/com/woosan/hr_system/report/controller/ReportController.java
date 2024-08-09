@@ -16,6 +16,7 @@ import com.woosan.hr_system.search.PageResult;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,7 @@ public class ReportController {
     private ObjectMapper objectMapper; // 통계 반환 후 view에 보내면서 JSON로 반환함
     @Autowired
     private AuthService authService;
-//=====================================================CRUD 메소드======================================================
+
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(HttpSession session,
                               Model model) throws JsonProcessingException {
@@ -76,6 +77,7 @@ public class ReportController {
         return "report/main"; // main.html 반환
     }
 
+//=====================================================생성 메소드======================================================
     @GetMapping("/write") // 보고서 생성 페이지 이동
     public String showCreatePage(Model model) {
         List<Employee> employees = employeeDAO.getAllEmployees();
@@ -84,14 +86,14 @@ public class ReportController {
         return "report/write";
     }
 
-    @PostMapping("/write") // 보고서 생성
-    public String createReport(@ModelAttribute Report report){
-//                               @RequestParam("file") MultipartFile file) {
+    // 보고서 생성
+    @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String createReport(@ModelAttribute Report report,
+                               @RequestParam("reportDocuments") List<MultipartFile> reportDocuments) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         String writerId = authService.getAuthenticatedUser().getUsername();
         report.setWriterId(writerId);
-//        reportService.createReport(report, file);
-        reportService.createReport(report);
+        reportService.createReport(report, reportDocuments);
 
         return "redirect:/report/list";
     }
@@ -119,6 +121,9 @@ public class ReportController {
         return "redirect:/report/list";
     }
 
+//=================================================생성 메소드============================================================
+//=================================================조회 메소드============================================================
+
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -131,61 +136,57 @@ public class ReportController {
         return "/report/report-view";
     }
 
-    @GetMapping("/edit") // 수정 페이지 이동
-    public String updateReport(@RequestParam("reportId") Long reportId, Model model) {
+    @GetMapping("/list") // 보고서 리스트 페이지
+    public String showReportList(HttpSession session,
+                                 @RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 Model model) {
+        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        String writerId = authService.getAuthenticatedUser().getUsername();
+        String reportStart = (String) session.getAttribute("staffReportStart");
+        String reportEnd = (String) session.getAttribute("staffReportEnd");
 
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        Report report = reportService.getReportById(reportId);
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Report> pageResult = reportService.searchReports(pageRequest, writerId, searchType, reportStart, reportEnd);
 
-        model.addAttribute("employees", employees); // employees 목록 추가
-        model.addAttribute("report", report);
-        return "report/edit";
+
+        model.addAttribute("reports", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+
+        return "report/report-list";
     }
 
-    @PostMapping("/edit") // 보고서 수정
-    public String updateReport(@ModelAttribute Report report) {
-        // 요청 수정 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
+    @GetMapping("/requestList") // 요청 리스트 페이지
+    public String showRequestList(HttpSession session,
+                                  @RequestParam(name = "page", defaultValue = "1") int page,
+                                  @RequestParam(name = "size", defaultValue = "10") int size,
+                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                  Model model) {
+        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        String writerId = authService.getAuthenticatedUser().getUsername();
+        String requestStart = (String) session.getAttribute("staffRequestStart");
+        String requestEnd = (String) session.getAttribute("staffRequestEnd");
 
-        // 요청 ID로 요청 조회
-        Report reportForCheck = reportService.getReportById(report.getReportId());
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, requestStart, requestEnd);
 
-        // 현재 로그인한 사용자와 requester_id 비교
-        if (reportForCheck != null && reportForCheck.getWriterId().equals(currentId)) {
-            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
-            if (report.getIdList().size() > 1) {
-                reportService.deleteReport(report.getReportId());
-                report.setWriterId(currentId);
-                reportService.createReport(report);
-            } else {
-                reportService.updateReport(report);
-            }
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
-        return "redirect:/report/list";
+        model.addAttribute("requests", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+
+        return "report/request-list";
     }
 
-    @DeleteMapping("/delete/{reportId}")
-    public String deleteReport(@RequestParam("reportId") Long reportId) {
-        // 보고서 삭제 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
-
-        // 요청 ID로 요청 조회
-        Report report = reportService.getReportById(reportId);
-
-        // 현재 로그인한 사용자와 writer_id 비교
-        if (report != null && report.getWriterId().equals(currentId)) {
-            reportService.deleteReport(reportId);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
-        return "redirect:/report/list";
-    }
-//=====================================================CRUD 메소드=======================================================
-//=================================================날짜 설정 메소드========================================================
     // 내가 작성한 보고서 날짜 설정 페이지 이동
     @GetMapping("/reportDate")
     public String showReportDatePage() {
@@ -219,60 +220,7 @@ public class ReportController {
         session.setAttribute("staffRequestEnd", requestEnd);
         return "redirect:/report/requestList";
     }
-//=================================================날짜 설정 메소드========================================================
-//=================================================검색, 페이징 메소드=====================================================
-    @GetMapping("/list") // 보고서 리스트 페이지
-    public String showReportList(HttpSession session,
-                                 @RequestParam(name = "page", defaultValue = "1") int page,
-                                 @RequestParam(name = "size", defaultValue = "10") int size,
-                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
-                                 Model model) {
-        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
-        String reportStart = (String) session.getAttribute("staffReportStart");
-        String reportEnd = (String) session.getAttribute("staffReportEnd");
 
-        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Report> pageResult = reportService.searchReports(pageRequest, writerId, searchType, reportStart, reportEnd);
-
-
-        model.addAttribute("reports", pageResult.getData());
-        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
-        model.addAttribute("totalPages", pageResult.getTotalPages());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("searchType", searchType);
-
-        return "report/report-list";
-    }
-
-    @GetMapping("/requestList") // 요청 리스트 페이지
-    public String showRequestList(HttpSession session,
-                                 @RequestParam(name = "page", defaultValue = "1") int page,
-                                 @RequestParam(name = "size", defaultValue = "10") int size,
-                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
-                                 Model model) {
-        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
-        String requestStart = (String) session.getAttribute("staffRequestStart");
-        String requestEnd = (String) session.getAttribute("staffRequestEnd");
-
-        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, requestStart, requestEnd);
-
-        model.addAttribute("requests", pageResult.getData());
-        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
-        model.addAttribute("totalPages", pageResult.getTotalPages());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("searchType", searchType);
-
-        return "report/request-list";
-    }
-//=================================================검색, 페이징 메소드=====================================================
-//=====================================================통계 메소드========================================================
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
     public String showStatisticPage() {
         return "report/statistic";
@@ -288,6 +236,68 @@ public class ReportController {
 
         return "redirect:/report/main";
     }
-//=====================================================통계 메소드========================================================
+
+
+//=================================================조회 메소드============================================================
+//=================================================수정 메소드============================================================
+
+    @GetMapping("/edit") // 수정 페이지 이동
+    public String updateReport(@RequestParam("reportId") Long reportId, Model model) {
+
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        Report report = reportService.getReportById(reportId);
+
+        model.addAttribute("employees", employees); // employees 목록 추가
+        model.addAttribute("report", report);
+        return "report/edit";
+    }
+
+    @PostMapping("/edit") // 보고서 수정
+    public String updateReport(@ModelAttribute Report report) {
+        // 요청 수정 권한이 있는지 확인
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = authService.getAuthenticatedUser().getUsername();
+
+        // 요청 ID로 요청 조회
+        Report reportForCheck = reportService.getReportById(report.getReportId());
+
+        // 현재 로그인한 사용자와 requester_id 비교
+        if (reportForCheck != null && reportForCheck.getWriterId().equals(currentId)) {
+            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
+            if (report.getIdList().size() > 1) {
+                reportService.deleteReport(report.getReportId());
+                report.setWriterId(currentId);
+//                reportService.createReport(report);
+            } else {
+                reportService.updateReport(report);
+            }
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
+        return "redirect:/report/list";
+    }
+
+//=================================================수정 메소드============================================================
+//=================================================삭제 메소드============================================================
+
+    // 보고서 삭제
+    @DeleteMapping("/delete/{reportId}")
+    public String deleteReport(@RequestParam("reportId") Long reportId) {
+        // 보고서 삭제 권한이 있는지 확인
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = authService.getAuthenticatedUser().getUsername();
+
+        // 요청 ID로 요청 조회
+        Report report = reportService.getReportById(reportId);
+
+        // 현재 로그인한 사용자와 writer_id 비교
+        if (report != null && report.getWriterId().equals(currentId)) {
+            reportService.deleteReport(reportId);
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
+        return "redirect:/report/list";
+    }
+//=====================================================삭제 메소드========================================================
 
 }

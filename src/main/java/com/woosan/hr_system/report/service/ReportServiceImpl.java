@@ -8,6 +8,7 @@ import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.upload.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,23 +19,38 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportServiceImpl implements ReportService {
-
     @Autowired
     private ReportDAO reportDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
+//    @Autowired
+//    private FileService fileService;
 
-//=====================================================CRUD 메소드======================================================
+    //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
-    public void createReport(Report report) {
-//    public void createReport(Report report, MultipartFile file) {
+    public void createReport(Report report, List<MultipartFile> reportDocuments) {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-        report.setCreatedDate(createdDate);
-        report.setStatus("미처리"); // 결재상태 설정
+
+        if (reportDocuments != null) {
+            // 파일들 체크 후 DB에 저장할 파일명 반환
+            for (MultipartFile multipartFile : reportDocuments) {
+                Map<String, Object> fileParams = new HashMap<>();
+                fileParams.put("originalFilename", multipartFile.getOriginalFilename());
+//                fileParams.put("stotredFilename", validateFilesAndGetFileName(multipartFile));
+                fileParams.put("fileSize", multipartFile.getSize());
+                fileParams.put("uploadDate", createdDate);
+                fileParams.put("uploadBy", report.getWriterId());
+                fileParams.put("usage", "report");
+
+                reportDAO.insertFile(fileParams);
+            }
+        }
 
         for (int i = 0; i < report.getNameList().size(); i++) {
             Map<String, Object> params = new HashMap<>();
@@ -43,23 +59,48 @@ public class ReportServiceImpl implements ReportService {
             params.put("approverName", report.getNameList().get(i));
             params.put("title", report.getTitle());
             params.put("content", report.getContent());
-            params.put("createdDate", report.getCreatedDate());
-            params.put("status", report.getStatus());
+            params.put("createdDate", createdDate);
+            params.put("status", "미처리");
             params.put("completeDate", report.getCompleteDate());
 
-//            reportDAO.createReport(params, file);
             reportDAO.createReport(params);
         }
-//            reports.add(report);
-        // 파일 업로드
-//            if (!file.isEmpty()) {
-//                reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
-//            }
-
     }
 
+//    // 파일 체크들 후 DB에 저장할 파일명 반환 - 보고서 문서
+//    private void validateFilesAndGetFileName(MultipartFile[] doucments) {
+//        if (doucments != null) {
+//            fileService.checkAndUploadFiles(doucments);
+//        }
+//    }
 
+    @Override // 요청 들어온 보고서 작성
+    public Long createReportFromRequest(Report report, String approverId) {
+//    public void createReport(Report report, MultipartFile file) {
+        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
+        report.setCreatedDate(createdDate);
+        report.setStatus("미처리"); // 결재상태 설정
 
+        // approverName 설정
+        Employee employee = employeeDAO.getEmployeeById(approverId);
+        String approverName = employee.getName();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", report.getWriterId());
+        params.put("approverId", approverId);
+        params.put("approverName", approverName);
+        params.put("title", report.getTitle());
+        params.put("content", report.getContent());
+        params.put("createdDate", report.getCreatedDate());
+        params.put("status", report.getStatus());
+        params.put("completeDate", report.getCompleteDate());
+
+        reportDAO.createReport(params);
+        return report.getReportId();
+    }
+
+//=====================================================생성 메소드======================================================
+//=====================================================조회 메소드======================================================
     @Override // 모든 보고서 조회
     public List<Report> getAllReports(String reportStart, String reportEnd, String employeeId) {
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
@@ -88,62 +129,6 @@ public class ReportServiceImpl implements ReportService {
     @Override // 특정 보고서 조회
     public Report getReportById(Long reportId) {
         return reportDAO.getReportById(reportId);
-    }
-
-    @Override // 보고서 수정
-    public void updateReport(Report report) {
-        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정 시간 설정
-        report.setModifiedDate(modified_date);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("reportId", report.getReportId());
-        params.put("title", report.getTitle());
-        params.put("content", report.getContent());
-        params.put("approverId", report.getIdList().get(0));
-        params.put("approverName", report.getNameList().get(0));
-        params.put("completeDate", report.getCompleteDate());
-        params.put("modifiedDate", report.getModifiedDate());
-
-        reportDAO.updateReport(params);
-    }
-
-    @Override // 보고서 삭제
-    public void deleteReport(Long reportId) {
-        // shared_trash 테이블에 삭제될 데이터들 삽입
-        reportDAO.insertReportIntoSharedTrash(reportId);
-        reportDAO.deleteReport(reportId);
-    }
-//=====================================================CRUD 메소드======================================================
-//=====================================================그 외 보고서======================================================
-    @Override // 요청 들어온 보고서 작성
-    public Long createReportFromRequest(Report report, String approverId) {
-//    public void createReport(Report report, MultipartFile file) {
-        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-        report.setCreatedDate(createdDate);
-        report.setStatus("미처리"); // 결재상태 설정
-
-        // approverName 설정
-        Employee employee = employeeDAO.getEmployeeById(approverId);
-        String approverName = employee.getName();
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", report.getWriterId());
-        params.put("approverId", approverId);
-        params.put("approverName", approverName);
-        params.put("title", report.getTitle());
-        params.put("content", report.getContent());
-        params.put("createdDate", report.getCreatedDate());
-        params.put("status", report.getStatus());
-        params.put("completeDate", report.getCompleteDate());
-
-//            reportDAO.createReport(params, file);
-        //            reports.add(report);
-        // 파일 업로드
-//            if (!file.isEmpty()) {
-//                reportDAO.uploadFiles(report.getReportId(), new MultipartFile[]{file});
-//            }
-        reportDAO.createReport(params);
-        return report.getReportId();
     }
 
     @Override // 날짜범위 내 결재할 보고서 조회
@@ -186,54 +171,6 @@ public class ReportServiceImpl implements ReportService {
 
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
-//=====================================================그 외 보고서======================================================
-//=====================================================파일 메소드======================================================
-
-//    @Override // 파일 업로드
-//    public List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException {
-//        List<FileMetadata> uploadedFiles = new ArrayList<>();
-//        for (MultipartFile file : files) {
-//            if (!file.isEmpty()) {
-//                String originalFilename = file.getOriginalFilename();
-//                String uuidFilename = UUID.randomUUID().toString();
-//                String filePath = saveFile(file, uuidFilename);
-//                FileMetadata fileMetadata = saveMetadata(reportId, originalFilename, uuidFilename, filePath, file.getSize());
-//                uploadedFiles.add(fileMetadata);
-//            }
-//        }
-//        return uploadedFiles;
-//    }
-
-    // 파일 변수 설정
-    private String saveFile(MultipartFile file, String uuidFilename) throws IOException {
-        String uploadDir = "/path/to/upload";
-        File dest = new File(uploadDir + "/" + uuidFilename);
-        file.transferTo(dest);
-        return dest.getAbsolutePath();
-    }
-
-    // 파일 정보 저장
-    private FileMetadata saveMetadata(Long reportId, String originalFilename, String uuidFilename, String filePath, long size) {
-        FileMetadata metadata = new FileMetadata();
-        LocalDate now = LocalDate.now();
-
-        metadata.setCloudServerFileUrl("Cloud URL"); // 클라우드 URL 추후 설정
-        metadata.setOriginalFilename(originalFilename);
-        metadata.setUuidFilename(uuidFilename);
-        metadata.setSize(size);
-        metadata.setUploadDate(now);
-
-        reportDAO.insertFileMetadata(metadata);
-
-        return metadata;
-    }
-
-    @Override // 특정 파일 조회
-    public FileMetadata getReportFileById(Long fileId) {
-        return reportDAO.getReportFileById(fileId);
-    }
-//=====================================================파일 메소드======================================================
-//=====================================================통계 메소드======================================================
 
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
@@ -261,8 +198,37 @@ public class ReportServiceImpl implements ReportService {
 
         return reportDAO.getReportStats(startYearMonth, endYearMonth, writerIdList);
     }
-//=====================================================통계 메소드======================================================
+//=====================================================조회 메소드======================================================
+//=====================================================수정 메소드======================================================
 
+    @Override // 보고서 수정
+    public void updateReport(Report report) {
+        LocalDateTime modified_date = LocalDateTime.now(); // 현재 기준 수정 시간 설정
+        report.setModifiedDate(modified_date);
 
+        Map<String, Object> params = new HashMap<>();
+        params.put("reportId", report.getReportId());
+        params.put("title", report.getTitle());
+        params.put("content", report.getContent());
+        params.put("approverId", report.getIdList().get(0));
+        params.put("approverName", report.getNameList().get(0));
+        params.put("completeDate", report.getCompleteDate());
+        params.put("modifiedDate", report.getModifiedDate());
 
+        reportDAO.updateReport(params);
+    }
+//=====================================================수정 메소드======================================================
+//=====================================================삭제 메소드======================================================
+
+    @Override // 보고서 삭제
+    public void deleteReport(Long reportId) {
+        // shared_trash 테이블에 삭제될 데이터들 삽입
+        reportDAO.insertReportIntoSharedTrash(reportId);
+        reportDAO.deleteReport(reportId);
+    }
+
+//=====================================================삭제 메소드======================================================
 }
+
+
+

@@ -40,7 +40,7 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private AuthService authService;
-//=====================================================CRUD 메소드들======================================================
+
     // main 페이지
     @GetMapping("/main")
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
@@ -89,7 +89,7 @@ public class ExecutiveController {
 
         return "admin/report/main"; // main.html 반환
     }
-
+//=====================================================생성 메소드========================================================
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
         List<Employee> employee = employeeDAO.getAllEmployees();
@@ -107,6 +107,9 @@ public class ExecutiveController {
         requestService.createRequest(request);
         return "redirect:/admin/request/main";
     }
+//=====================================================생성 메소드========================================================
+
+//=====================================================조회 메소드========================================================
 
     @GetMapping("/{requestId}") // 요청 세부 조회
     public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
@@ -121,69 +124,11 @@ public class ExecutiveController {
         model.addAttribute("report", report);
 
         if (report.getFileId() != null) {
-            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
-            model.addAttribute("reportFile", reportFile);
+//            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
+//            model.addAttribute("reportFile", reportFile);
         }
         return "admin/report/report-view";
     }
-
-    @GetMapping("/edit") // 요청 수정 페이지 이동
-    public String showUpdateRequestPage(@RequestParam(name = "requestId") Long requestId, Model model) {
-        Request request = requestService.getRequestById(requestId);
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("employees", employees); // employees 목록 추가
-        model.addAttribute("request", request);
-
-        model.addAttribute("updateRequest", new Request());
-        return "admin/report/request-edit";
-    }
-
-    @PostMapping("/edit") // 요청 수정
-    public String updateRequest(@ModelAttribute Request request) {
-        // 요청 수정 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
-
-        // 요청 ID로 요청 조회
-        Request requestForCheck = requestService.getRequestById(request.getRequestId());
-
-        // 현재 로그인한 사용자와 requester_id 비교
-        if (requestForCheck != null && requestForCheck.getRequesterId().equals(currentId)) {
-            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
-            if (request.getIdList().size() > 1) {
-                requestService.deleteRequest(request.getRequestId());
-                request.setRequesterId(currentId);
-                requestService.createRequest(request);
-            } else {
-                requestService.updateRequest(request);
-            }
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
-
-        return "redirect:/admin/request/main";
-    }
-
-    @DeleteMapping("/delete/{requestId}") // 요청 삭제
-    public String deleteRequest(@PathVariable("requestId") Long requestId) {
-        // 요청 삭제 권한이 있는지 확인
-
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
-
-        // 요청 ID로 요청 조회
-        Request request = requestService.getRequestById(requestId);
-
-        // 현재 로그인한 사용자와 requester_id 비교
-        if (request != null && request.getRequesterId().equals(currentId)) {
-            requestService.deleteRequest(requestId);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
-        return "redirect:/admin/request/main";
-    }
-//=====================================================CRUD 메소드들======================================================
-//=====================================================통계 메소드들======================================================
 
     @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
     public String showStatisticPage(Model model) {
@@ -209,7 +154,6 @@ public class ExecutiveController {
 
         return "redirect:/admin/request/main";
     }
-
 
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
     @PostMapping("/updateStats")
@@ -242,20 +186,6 @@ public class ExecutiveController {
         Map<String, Object> response = new HashMap<>();
         response.put("statsJson", statsJson);
         return response;
-    }
-
-//=====================================================통계 메소드들======================================================
-//====================================================그 외 메소드들=======================================================
-    @PostMapping("/approve") // 보고서 결재 처리
-    public String approveReport(@RequestParam("reportId") Long reportId,
-                                @RequestParam("status") String status,
-                                @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
-        try {
-            requestService.updateApprovalStatus(reportId, status, rejectionReason);
-            return "redirect:/admin/request/main";
-        } catch (Exception e) {
-            return "error"; // 에러 메시지 표시
-        }
     }
 
     // 내 결재 목록 날짜 범위설정 페이지 이동
@@ -296,6 +226,81 @@ public class ExecutiveController {
         List<Employee> employees = employeeDAO.getEmployeesByDepartment(departmentId);
         return employees;
     }
-//===================================================그 외 메소드들=======================================================
+
+//====================================================조회 메소드========================================================
+//====================================================수정 메소드========================================================
+
+    @GetMapping("/edit") // 요청 수정 페이지 이동
+    public String showUpdateRequestPage(@RequestParam(name = "requestId") Long requestId, Model model) {
+        Request request = requestService.getRequestById(requestId);
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        model.addAttribute("employees", employees); // employees 목록 추가
+        model.addAttribute("request", request);
+
+        model.addAttribute("updateRequest", new Request());
+        return "admin/report/request-edit";
+    }
+
+    @PostMapping("/edit") // 요청 수정
+    public String updateRequest(@ModelAttribute Request request) {
+        // 요청 수정 권한이 있는지 확인
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = authService.getAuthenticatedUser().getUsername();
+
+        // 요청 ID로 요청 조회
+        Request requestForCheck = requestService.getRequestById(request.getRequestId());
+
+        // 현재 로그인한 사용자와 requester_id 비교
+        if (requestForCheck != null && requestForCheck.getRequesterId().equals(currentId)) {
+            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
+            if (request.getIdList().size() > 1) {
+                requestService.deleteRequest(request.getRequestId());
+                request.setRequesterId(currentId);
+                requestService.createRequest(request);
+            } else {
+                requestService.updateRequest(request);
+            }
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
+
+        return "redirect:/admin/request/main";
+    }
+
+    @PostMapping("/approve") // 보고서 결재 처리
+    public String approveReport(@RequestParam("reportId") Long reportId,
+                                @RequestParam("status") String status,
+                                @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
+        try {
+            requestService.updateApprovalStatus(reportId, status, rejectionReason);
+            return "redirect:/admin/request/main";
+        } catch (Exception e) {
+            return "error"; // 에러 메시지 표시
+        }
+    }
+//===================================================수정 메소드=========================================================
+
+//===================================================삭제 메소드=========================================================
+
+    @DeleteMapping("/delete/{requestId}") // 요청 삭제
+    public String deleteRequest(@PathVariable("requestId") Long requestId) {
+        // 요청 삭제 권한이 있는지 확인
+
+        // 현재 로그인한 계정의 employeeId를 currentId로 설정
+        String currentId = authService.getAuthenticatedUser().getUsername();
+
+        // 요청 ID로 요청 조회
+        Request request = requestService.getRequestById(requestId);
+
+        // 현재 로그인한 사용자와 requester_id 비교
+        if (request != null && request.getRequesterId().equals(currentId)) {
+            requestService.deleteRequest(requestId);
+        } else {
+            throw new SecurityException("권한이 없습니다.");
+        }
+        return "redirect:/admin/request/main";
+    }
+
+//===================================================삭제 메소드=========================================================
 
 }

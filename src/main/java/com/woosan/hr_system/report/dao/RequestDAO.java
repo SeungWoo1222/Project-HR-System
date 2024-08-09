@@ -20,11 +20,14 @@ public class RequestDAO {
     @Autowired
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.RequestDAO";
-    //===================================================CRUD 메소드=======================================================
+//===================================================생성 메소드=======================================================
     // 요청 생성
     public void createRequest(Map<String, Object> params) {
         sqlSession.insert(NAMESPACE + ".createRequest", params);
     }
+
+//===================================================생성 메소드=======================================================
+// ==================================================조회 메소드=======================================================
 
     // 요청 전체 조회
     public List<Request> getAllRequests() {
@@ -49,25 +52,6 @@ public class RequestDAO {
     // 내게 온 요청 조회
     public List<Request> getMyPendingRequests(String writerId) {
         return sqlSession.selectList(NAMESPACE + ".getRecentRequests", writerId);
-    }
-
-
-    // 요청 수정
-    public void updateRequest(Map<String, Object> params) {
-        sqlSession.update(NAMESPACE + ".updateRequest", params);
-    }
-
-    // 요청 삭제
-    public void deleteRequest(Long requestId) {
-        sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
-    }
-
-//===================================================CRUD 메소드=======================================================
-//===================================================그 외 메소드=======================================================
-
-    // shared_trash(휴지통)에 삭제 데이터들 삽입
-    public void insertRequestIntoSharedTrash(Long requestId) {
-        sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
     }
 
     // 검색과 페이징 로직
@@ -100,5 +84,28 @@ public class RequestDAO {
         sqlSession.update(NAMESPACE + ".updateApprovalStatus", report);
     }
 
-//===================================================그 외 메소드=======================================================
+// ==================================================조회 메소드=======================================================
+
+// ==================================================수정 메소드=======================================================
+
+    // 요청 수정
+    public void updateRequest(Map<String, Object> params) {
+        sqlSession.update(NAMESPACE + ".updateRequest", params);
+    }
+
+// ==================================================수정 메소드=======================================================
+
+// ==================================================삭제 메소드=======================================================
+
+    // 요청 삭제
+    public void deleteRequest(Long requestId) {
+        sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
+    }
+
+    // shared_trash(휴지통)에 삭제 데이터들 삽입
+    public void insertRequestIntoSharedTrash(Long requestId) {
+        sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
+    }
+
+// ==================================================삭제 메소드=======================================================
 }

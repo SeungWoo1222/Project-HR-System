@@ -20,7 +20,7 @@ public interface ReportService {
     Report getReportById(Long reportId);
     // 보고서 생성
 //    void createReport(Report report, MultipartFile file);
-    void createReport(Report report);
+    void createReport(Report report, List<MultipartFile> reportDocuments);
     //    List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
     // 보고서 수정 관련 메소드
     void updateReport(Report report);
@@ -33,7 +33,7 @@ public interface ReportService {
     // 페이징, 검색 + 보고서 조회
     PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd); // 페이징, 서칭 + 보고서 리스트
     // 파일 조회
-    FileMetadata getReportFileById(Long fileId);
+//    FileMetadata getReportFileById(Long fileId);
     // 결재할 보고서 목록 조회
     List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd);
     // 보고서 통계 조회
