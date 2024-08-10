@@ -6,11 +6,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 
 @Getter
-public class ModificationInfo {
+public class UserSessionInfo {
     private String currentEmployeeId;
     private LocalDateTime now;
 
-    public ModificationInfo() {
+    public UserSessionInfo() {
         this.currentEmployeeId = SecurityContextHolder.getContext().getAuthentication().getName();
         this.now = LocalDateTime.now();
     }

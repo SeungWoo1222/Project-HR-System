@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.auth.dao.PasswordDAO;
-import com.woosan.hr_system.auth.model.ModificationInfo;
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
@@ -14,10 +14,12 @@ import com.woosan.hr_system.exception.employee.NoChangesDetectedException;
 import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.upload.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -37,11 +39,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     private PasswordDAO passwordDAO;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private FileService fileService;
 
     // ============================================ 조회 관련 로직 start-point ============================================
     @Override // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) {
         return findEmployeeById(employeeId);
+    }
+
+    @Override // id를 이용한 특정 사원의 이름 조회
+    public String getEmployeeNameById(String employeeId) {
+        Employee employee = findEmployeeById(employeeId);
+        return employee.getName();
     }
 
     // 사원 정보를 찾는 메소드
@@ -129,7 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // ============================================ 등록 관련 로직 start-point ============================================
     @Override // 사원 정보 등록
-    public void insertEmployee(Employee employee) {
+    public String insertEmployee(Employee employee) {
         // 필수 필드를 검증
         List<Object> requiredFields = Arrays.asList(
                 employee.getName(),
@@ -168,6 +178,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 사원 신규 등록
         employeeDAO.insertEmployee(employee);
+
+        return employee.getName();
     }
 
     // 사원 번호 중복 체크하는 메소드
@@ -178,7 +190,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 사원 퇴사 처리 로직
-    public void resignEmployee(String employeeId, Resignation resignation) {
+    public String resignEmployee(String employeeId, Resignation resignation) {
         // 재직 상태 - 퇴사 처리
         Employee employee = findEmployeeById(employeeId);
         employee.setStatus("퇴사");
@@ -192,9 +204,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         resignation.setEmployeeId(employeeId);
 
         // 처리 사원번호와 처리 일시 설정
-        setModificationInfoToResignation(resignation);
+        setProcessInfoToResignation(resignation);
 
         resignationDAO.insertResignation(resignation);
+
+        return employee.getName();
     }
 
     // 퇴사 사유와 설명을 매핑하는 맵 초기화
@@ -239,11 +253,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         resignation.setCodeNumber(description);
     }
+
+    // 사원 퇴사 정보에 수정 정보 설정
+    private void setProcessInfoToResignation(Resignation resignation) {
+        UserSessionInfo info = new UserSessionInfo();
+        resignation.setProcessedBy(info.getCurrentEmployeeId());
+        resignation.setProcessedDate(info.getNow());
+    }
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
     @Override // 사원 정보 수정
-    public void updateEmployee(Employee updatedEmployee) {
+    public String updateEmployee(Employee updatedEmployee) {
         String employeeId = updatedEmployee.getEmployeeId();
         Employee originalEmployee = employeeDAO.getEmployeeById(employeeId);
 
@@ -255,6 +276,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 사원 정보 수정 처리
         employeeDAO.updateEmployee(updatedEmployee);
+
+        return originalEmployee.getName();
     }
 
     // Employee의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
@@ -279,9 +302,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // 사원 정보에 수정 정보 설정
     private void setModificationInfoToEmployee(Employee employee) {
-        ModificationInfo info = getModificationInfo();
-        employee.setModifiedBy(info.getModifiedBy());
-        employee.setLastModified(info.getLastModified());
+        UserSessionInfo info = new UserSessionInfo();
+        employee.setModifiedBy(info.getCurrentEmployeeId());
+        employee.setLastModified(info.getNow());
     }
 
     @Override // 계정 잠금과 해제 수정하는 메소드
@@ -335,7 +358,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     // =========================================== 퇴사 수정 관련 로직 start-point ==========================================
     @Override // 사원 퇴사 정보 수정
-    public void updateResignationInfo(String employeeId, Resignation updatedResignation) {
+    public String updateResignationInfo(String employeeId, Resignation updatedResignation) {
         Resignation originalResignation = resignationDAO.getResignedEmployee(employeeId);
         // 퇴사 사원 정보 확인
         verifyNullResignation(originalResignation, employeeId);
@@ -351,10 +374,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         updatedResignation.setEmployeeId(employeeId);
 
         // 수정 사원번호와 수정 일시 설정
-        setModificationInfoToResignation(updatedResignation);
+        setProcessInfoToResignation(updatedResignation);
 
         // 사원 퇴사 정보 수정
         resignationDAO.updateResignation(updatedResignation);
+
+        return getEmployeeNameById(employeeId);
     }
 
     // Resignation의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
@@ -403,17 +428,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         else resignation.setResignationDocuments(originalDocumentsName + newDocumentsName);
     }
 
-    // 수정한 사원 번호와 일시 반환하는 메소드
-    private ModificationInfo getModificationInfo() {
-        String modifiedBy = authService.getAuthenticatedUser().getUsername();
-        LocalDateTime lastModified = LocalDateTime.now();
-        return new ModificationInfo(modifiedBy, lastModified);
-    }
-    // 사원 퇴사 정보에 수정 정보 설정
-    private void setModificationInfoToResignation(Resignation resignation) {
-        ModificationInfo info = getModificationInfo();
-        resignation.setProcessedBy(info.getModifiedBy());
-        resignation.setProcessedDate(info.getLastModified());
+    @Override //
+    public void assignPictureFromUpload(Employee employee, MultipartFile picture) {
+        int fileId = fileService.uploadingFile(picture, "employee");
+        employee.assignPicture(fileId);
     }
 
     // 변경사항 확인하는 메소드
@@ -440,6 +458,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return false; // 변경 사항 없음
     }
-
-
 }

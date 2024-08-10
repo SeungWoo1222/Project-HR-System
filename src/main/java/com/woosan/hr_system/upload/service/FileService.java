@@ -1,7 +1,7 @@
 package com.woosan.hr_system.upload.service;
 
 import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
-import com.woosan.hr_system.auth.model.ModificationInfo;
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
 import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
@@ -17,7 +17,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -39,7 +38,6 @@ public class FileService {
         return S3_URL_PREFIX + fileName;
     }
 
-
     // 파일 삭제
     @Transactional
     @RequireManagerPermission
@@ -54,14 +52,13 @@ public class FileService {
         // S3에서 제거
         deleteFileFromS3(file);
     }
-
-    private void deleteFileFromS3(File file) {
+    private void deleteFileFromS3(File file) { // 로직 캡슐화
         String storedFileName = file.getStoredFileName();
         s3Service.deleteFileFromS3(storedFileName);
     }
 
     // 파일 확인 후 업로드
-    public void uploadingFile(MultipartFile file, String usage) {
+    public int uploadingFile(MultipartFile file, String usage) {
         // 파일 검증
         validateFile(file);
 
@@ -70,7 +67,7 @@ public class FileService {
 
         try {
             // 트랜잭션 시작
-            saveFileTransactionally(file, storedFileName, usage);
+            return saveFileTransactionally(file, storedFileName, usage);
         } catch (Exception e) {
             // 트랜잭션 실패 시 파일 삭제
             s3Service.deleteFileFromS3(storedFileName);
@@ -80,7 +77,7 @@ public class FileService {
 
     // 트랜잭션 내부에서 파일 정보 저장
     @Transactional
-    protected void saveFileTransactionally(MultipartFile file, String storedFileName, String usage) {
+    protected int saveFileTransactionally(MultipartFile file, String storedFileName, String usage) {
         // 파일 정보 생성
         File fileInfo = createFileInfo(file, storedFileName, usage);
 
@@ -89,6 +86,9 @@ public class FileService {
 
         // 트랜잭션 리스너 등록
         registerRollbackHandler(storedFileName);
+
+        // fileInfo 객체의 ID를 반환
+        return fileInfo.getFileId();
     }
 
     // 트랜잭션 리스너 등록
@@ -115,13 +115,13 @@ public class FileService {
 
     // 파일 정보 생성
     private File createFileInfo(MultipartFile file, String storedFileName, String usage) {
-        ModificationInfo modificationInfo = new ModificationInfo();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
         return new File(
                 file.getOriginalFilename(),
                 storedFileName,
                 file.getSize(),
-                modificationInfo.getCurrentEmployeeId(),
-                modificationInfo.getNow(),
+                userSessionInfo.getNow(),
+                userSessionInfo.getCurrentEmployeeId(),
                 usage
         );
     }
