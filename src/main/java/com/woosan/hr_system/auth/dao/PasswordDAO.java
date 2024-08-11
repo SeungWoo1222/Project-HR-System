@@ -13,10 +13,10 @@ public class PasswordDAO {
 
     private static final String NAMESPACE = "com.woosan.hr_system.auth.mapper.PasswordMapper.";
 
-    // 비밀번호 조회
-    public Password selectPassword(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectPassword", employeeId); }
+    // 비밀번호 정보 조회
+    public Password getPasswordInfoById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectPassword", employeeId); }
 
-    // 비밀번호 등록
+    // 비밀번호 정보 등록
     public void insertPassword(Password password) {
         sqlSession.insert(NAMESPACE + "insertPassword", password);
     }
@@ -26,7 +26,7 @@ public class PasswordDAO {
         sqlSession.update(NAMESPACE + "updatePassword", password);
     }
 
-    // 비밀번호 삭제
+    // 비밀번호 정보 삭제
     public void deletePassword(String employeeId) { sqlSession.delete(NAMESPACE + "deletePassword", employeeId); }
 
     // 비밀번호 카운트 조회

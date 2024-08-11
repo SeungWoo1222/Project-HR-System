@@ -5,15 +5,12 @@ import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.upload.FileService;
+import com.woosan.hr_system.upload.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,7 +24,6 @@ public class EmployeeViewController {
     @Autowired
     private FileService fileService;
 
-    // ============================================ 조회 관련 로직 start-point ============================================
     @RequireHRPermission
     @GetMapping("/list") // 모든 사원 정보 조회
     public String viewEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
@@ -35,7 +31,7 @@ public class EmployeeViewController {
                                @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                Model model) {
         // 매개변수 값 로그에 출력
-        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+                PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
 
         model.addAttribute("employees", pageResult.getData());
@@ -45,6 +41,7 @@ public class EmployeeViewController {
         model.addAttribute("keyword", keyword);
         return "employee/list";
     }
+
     @RequireHRPermission
     @GetMapping("/{employeeId}") // 사원 정보 상세 조회
     public String viewEmployee(@PathVariable("employeeId") String employeeId, Model model) {
@@ -56,17 +53,20 @@ public class EmployeeViewController {
         model.addAttribute("pictureUrl", pictureUrl);
         return "employee/detail";
     }
-    // ============================================= 조회 관련 로직 end-point =============================================
+    @RequireHRPermission
+    @GetMapping("/list/{departmentId}")
+    public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
+        System.out.println("컨트롤러 도착");
+        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
+        return employeeList;
+    }
 
-    // ============================================ 등록 관련 로직 start-point ============================================
     @RequireHRPermission
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동
     public String viewEmployeeForm() {
         return "employee/registration";
     }
-    // ============================================= 등록 관련 로직 end-point =============================================
 
-    // ============================================ 수정 관련 로직 start-point ============================================
     @RequireHRPermission
     @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
@@ -90,33 +90,4 @@ public class EmployeeViewController {
         model.addAttribute("pictureUrl", pictureUrl);
         return "employee/edit/resignation";
     }
-    // ============================================= 수정 관련 로직 end-point =============================================
-
-    // ============================================ 퇴사 관련 로직 start-point ============================================
-    @RequireHRPermission
-    @GetMapping("/resignation") // 사원 퇴사 관리 페이지 이동
-    public String viewResignationManagement(Model model) {
-        List<Employee> preResignationEmployees = employeeService.getPreResignationEmployees();
-        List<Employee> resignedEmployees = employeeService.getResignedEmployees();
-        List<Employee> preDeletionEmployees = employeeService.getPreDeletionEmployees();
-        model.addAttribute("preResignationEmployees", preResignationEmployees);
-        model.addAttribute("resignedEmployees", resignedEmployees);
-        model.addAttribute("preDeletionEmployees", preDeletionEmployees);
-        return "/employee/resignation";
-    }
-
-    @RequireHRPermission
-    @GetMapping("/resignation-form/{employeeId}") // 사원 퇴사 처리 폼 페이지 이동
-    public String viewEmployeeForResignation(@PathVariable("employeeId") String employeeId, Model model) {
-        // 예외 처리된 기본 employee
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        model.addAttribute("employee", employee);
-
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
-        return "employee/resignation-form";
-    }
-    // ============================================= 퇴사 관련 로직 end-point =============================================
-
-    // ================================================== 기타 로직 ======================================================
 }

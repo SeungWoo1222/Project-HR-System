@@ -1,7 +1,9 @@
-package com.woosan.hr_system.upload;
+package com.woosan.hr_system.upload.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.woosan.hr_system.exception.file.FileProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,12 @@ public class S3Service {
 
     private String bucketName = "haruharu-hrsystem-bucket";
 
-    public String uploadFile(MultipartFile file) throws IOException {
+    // S3에 파일 업로드
+    protected String uploadFile(MultipartFile file) throws IOException {
         File convertedFile = convertMultiPartToFile(file);
         String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
         amazonS3.putObject(new PutObjectRequest(bucketName, fileName, convertedFile));
-        logger.debug("‼️File put to S3 with name: {} ‼️", fileName);
+        logger.info("S3에 '{}' 파일이 등록되었습니다.", fileName);
         convertedFile.delete();
         return fileName;
     }
@@ -45,13 +48,25 @@ public class S3Service {
         return convFile;
     }
 
-    public byte[] downloadFile(String keyName) {
+    // S3에서 파일 다운로드
+    protected byte[] downloadFile(String storedFileName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(keyName)
+                .key(storedFileName)
                 .build();
 
         ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
         return objectBytes.asByteArray();
+    }
+
+    // S3에서 파일 삭제
+    protected void deleteFileFromS3(String storedFileName) {
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, storedFileName));
+            logger.info("S3에서 '{}' 파일이 삭제되었습니다.", storedFileName);
+        } catch (Exception e) {
+            logger.error("S3에서 '{}' 파일 삭제 중 오류가 발생하였습니다.", storedFileName, e);
+            throw new FileProcessingException("파일 삭제 중 문제가 발생했습니다.");
+        }
     }
 }

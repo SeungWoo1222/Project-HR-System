@@ -23,11 +23,7 @@ public class EmployeeAdminViewController {
     @GetMapping("/edit/status/{employeeId}")
     public String employeeStatus(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
-        String status = employee.getStatus();
-        String name = employee.getName();
-        model.addAttribute("status", status);
-        model.addAttribute("name", name);
-        model.addAttribute("employeeId", employeeId);
+        model.addAttribute("employee", employee);
         return "/admin/employee/edit/status";
     }
 }

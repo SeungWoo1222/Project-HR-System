@@ -9,7 +9,7 @@ public class Report {
     private String writerId;
     private String approverId;
     private String approverName;
-    private Long fileId;
+    private int fileId;
     private String title;
     private String content;
     private LocalDateTime createdDate;
@@ -115,11 +115,11 @@ public class Report {
         this.completeDate = completeDate;
     }
 
-    public Long getFileId() {
+    public int getFileId() {
         return fileId;
     }
 
-    public void setFileId(Long filePath) {
+    public void setFileId(int filePath) {
         this.fileId = filePath;
     }
 

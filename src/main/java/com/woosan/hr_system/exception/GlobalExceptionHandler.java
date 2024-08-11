@@ -4,7 +4,9 @@ import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
 import com.woosan.hr_system.exception.employee.NoChangesDetectedException;
 import com.woosan.hr_system.exception.employee.PasswordNotFoundException;
 import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
-import com.woosan.hr_system.exception.file.FileException;
+import com.woosan.hr_system.exception.file.FileBadRequestException;
+import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
+import com.woosan.hr_system.exception.file.FileProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(FileInfoNotFoundException.class)
+    public ResponseEntity<String> handleFileInfoNotFoundException(FileInfoNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     // 400 Bad Request 처리
     @ExceptionHandler(NoChangesDetectedException.class)
     public ResponseEntity<String> handleNoChangesDetectedException(NoChangesDetectedException ex) {
@@ -62,9 +69,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(FileBadRequestException.class)
+    public ResponseEntity<String> handleFileBadRequestException(FileBadRequestException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     // 500 Internal Server Error 처리
-    @ExceptionHandler(FileException.class)
-    public ResponseEntity<String> handleFileExceptions(FileException ex) {
+    @ExceptionHandler(FileProcessingException.class)
+    public ResponseEntity<String> handleFileExceptions(FileProcessingException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

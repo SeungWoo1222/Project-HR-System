@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.employee.dao.ResignationDAO">
+<mapper namespace="com.woosan.hr_system.resignation.dao.ResignationDAO">
 
-    <resultMap id="ResignationResultMap" type="com.woosan.hr_system.employee.model.Resignation">
+    <resultMap id="ResignationResultMap" type="com.woosan.hr_system.resignation.model.Resignation">
         <id property="employeeId" column="employee_id"/>
         <result property="resignationReason" column="resignation_reason"/>
         <result property="codeNumber" column="code_number"/>
@@ -28,13 +28,13 @@
     </select>
 
     <!-- 새로운 퇴직 사원 정보 삽입 -->
-    <insert id="insertResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
+    <insert id="insertResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
         INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, resignation_documents, processed_by, processed_date)
         VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{resignationDocuments}, #{processedBy}, #{processedDate})
     </insert>
 
     <!-- 퇴직 사원 정보 업데이트 -->
-    <update id="updateResignation" parameterType="com.woosan.hr_system.employee.model.Resignation">
+    <update id="updateResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
         UPDATE resignation
         SET resignation_reason = #{resignationReason},
             code_number = #{codeNumber},

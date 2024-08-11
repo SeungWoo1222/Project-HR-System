@@ -30,7 +30,8 @@ public class RequestServiceImpl implements RequestService {
     @Autowired
     private AuthService authService;
 
-    //===================================================CRUD 메소드=======================================================
+//===================================================생성 메소드=======================================================
+
     @Override // 요청 생성
     public void createRequest(Request request) {
         LocalDateTime requestDate = LocalDateTime.now();
@@ -48,7 +49,15 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    @Override  // 로그인한 계정 기준 요청 리스트 조회(내가 쓴 요청 리스트 조회)
+//===================================================생성 메소드=======================================================
+//===================================================조회 메소드=======================================================
+
+    @Override // 요청 세부 조회
+    public Request getRequestById(Long requestId) {
+        return requestDAO.getRequestById(requestId);
+    }
+
+    @Override  // 내가 쓴 요청 리스트 조회
     public List<Request> getMyRequests(String employeeId, String requestStart, String requestEnd) {
         // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
@@ -73,15 +82,23 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getMyRequests(employeeId, startYearMonth, endYearMonth);
     }
 
-    @Override  // 로그인한 계정 기준 내게 온 요청 리스트 조회(내게 온 요청 목록 조회)
+    @Override  // 내게 온 요청 리스트 조회
     public List<Request> getMyPendingRequests(String writerId) {
         return requestDAO.getMyPendingRequests(writerId);
     }
 
-    @Override // 요청 세부 조회
-    public Request getRequestById(Long requestId) {
-        return requestDAO.getRequestById(requestId);
+    @Override // 요청 검색
+    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
+        int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
+
+        return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
+
+//===================================================조회 메소드=======================================================
+
+//===================================================수정 메소드=======================================================
 
     @Override // 요청 수정
     public void updateRequest(Request request) {
@@ -99,26 +116,6 @@ public class RequestServiceImpl implements RequestService {
         requestDAO.updateRequest(params);
     }
 
-
-    @Override // 요청 삭제
-    public void deleteRequest(Long requestId) {
-        // shared_trash 테이블에 삭제될 데이터들 삽입
-        requestDAO.insertRequestIntoSharedTrash(requestId);
-        requestDAO.deleteRequest(requestId);
-    }
-
-//===================================================CRUD 메소드=======================================================
-//===================================================그 외 메소드=======================================================
-    @Override // 요청 검색
-    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
-        int offset = pageRequest.getPage() * pageRequest.getSize();
-        List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
-        int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
-
-        return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
-    }
-
-
     @Override // 보고서 결재 처리
     public void updateApprovalStatus(Long reportId, String status, String rejectionReason) {
         // report 객체 설정
@@ -129,6 +126,18 @@ public class RequestServiceImpl implements RequestService {
 
         requestDAO.updateApprovalStatus(report);
     }
-//===================================================그 외 메소드=======================================================
+
+//===================================================수정 메소드=======================================================
+
+//===================================================삭제 메소드=======================================================
+
+    @Override // 요청 삭제
+    public void deleteRequest(Long requestId) {
+        // shared_trash 테이블에 삭제될 데이터들 삽입
+        requestDAO.insertRequestIntoSharedTrash(requestId);
+        requestDAO.deleteRequest(requestId);
+    }
+//===================================================삭제 메소드=======================================================
+
 
 }
