@@ -20,7 +20,7 @@ public interface RequestService {
     // 내가 쓴 요청 리스트 조회 (manager)
     List<Request> getMyRequests(String employeeId, String requestStart , String requestEnd);
     // 보고서 결재 처리
-    void updateApprovalStatus(Long reportId, String status, String rejectionReasont);
+    void updateApprovalStatus(int reportId, String status, String rejectionReasont);
     // 요청 수정
     void updateRequest(Request request);
     // 요청 삭제

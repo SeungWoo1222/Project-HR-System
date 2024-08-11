@@ -117,7 +117,7 @@ public class ExecutiveController {
     }
 
     @GetMapping("/report/{reportId}") // 특정 보고서 조회
-    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
+    public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
@@ -260,7 +260,7 @@ public class ExecutiveController {
     }
 
     @PostMapping("/approve") // 보고서 결재 처리
-    public String approveReport(@RequestParam("reportId") Long reportId,
+    public String approveReport(@RequestParam("reportId") int reportId,
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {

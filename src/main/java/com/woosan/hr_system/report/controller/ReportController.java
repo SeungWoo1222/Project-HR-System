@@ -15,6 +15,7 @@ import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.upload.model.File;
 import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequestMapping("/report")
 public class ReportController {
@@ -92,8 +95,12 @@ public class ReportController {
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String createReport(@ModelAttribute Report report,
                                @RequestParam("reportDocuments") List<MultipartFile> reportDocuments) {
+        // 유효한 파일만 필터링 (null 제거)
+        List<MultipartFile> validFiles = reportDocuments.stream()
+                .filter(file -> !file.isEmpty())
+                .collect(Collectors.toList());
 
-        reportService.createReport(report, reportDocuments);
+        reportService.createReport(report, validFiles);
 
         return "redirect:/report/list";
     }
@@ -101,6 +108,7 @@ public class ReportController {
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
     public String showCreateFromRequestPage(@RequestParam("requestId") Long requestId,
                                             Model model) {
+
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
@@ -125,7 +133,7 @@ public class ReportController {
 //=================================================조회 메소드============================================================
 
     @GetMapping("/{reportId}") // 특정 보고서 조회
-    public String viewReport(@PathVariable("reportId") Long reportId, Model model) {
+    public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
@@ -258,7 +266,7 @@ public class ReportController {
 //=================================================수정 메소드============================================================
 
     @GetMapping("/edit") // 수정 페이지 이동
-    public String updateReport(@RequestParam("reportId") Long reportId, Model model) {
+    public String updateReport(@RequestParam("reportId") int reportId, Model model) {
 
         List<Employee> employees = employeeDAO.getAllEmployees();
         Report report = reportService.getReportById(reportId);
@@ -298,7 +306,7 @@ public class ReportController {
 
     // 보고서 삭제
     @DeleteMapping("/delete/{reportId}")
-    public String deleteReport(@RequestParam("reportId") Long reportId) {
+    public String deleteReport(@RequestParam("reportId") int reportId) {
         // 보고서 삭제 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         String currentId = authService.getAuthenticatedUser().getUsername();

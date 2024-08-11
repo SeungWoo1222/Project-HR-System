@@ -36,13 +36,6 @@
             </ul>
         </div>
 
-
-        <div th:if="${reportFile != null}">
-            <p>
-                첨부 파일:
-                <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
-            </p>
-        </div>
         <form th:action="@{'/report/edit'}" method="get" style="display:inline;">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
             <button type="submit">수정</button>

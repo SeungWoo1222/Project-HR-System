@@ -117,7 +117,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 보고서 결재 처리
-    public void updateApprovalStatus(Long reportId, String status, String rejectionReason) {
+    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);

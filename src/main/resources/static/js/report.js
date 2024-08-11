@@ -49,7 +49,7 @@ function loadEmployeesByDepartment() {
     console.log("loadEmployeesByDepartment");
     const departmentId = document.getElementById('departmentId').value;
 
-    fetch(`/employee/list/${departmentId}`)
+    fetch(`/api/employee/department/list/` + departmentId)
         .then(response => {
             if (!response.ok) {
                 throw new Error('response 오류!');
@@ -145,41 +145,83 @@ function updateSelectedEmployees() {
 
 //===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
 
-function submitReport() {
-    const form = document.getElementById('form');
-    let formData = new FormData(form); // 폼 전체 데이터를 가져옵니다.
+// 파일 유효성 검사 함수
+function validateFiles() {
+    const fileInput = document.getElementById('reportDocuments');
+    const files = fileInput.files;
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const allowedExtensions = ['pdf', 'doc', 'docx', 'xlsx', 'jpg', 'png'];
 
-    const idList = Object.keys(selectedEmployees); // 선택된 임원 ID 목록
-    const nameList = Object.values(selectedEmployees); // 선택된 임원 이름 목록
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileSize = file.size;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
 
-    // 파일이 있으면 FormData에 추가
-    const fileInput = document.querySelector("#reportDocuments");
-    if (fileInput.files.length > 0) {
-        for (let i = 0; i < fileInput.files.length; i++) {
-            formData.append("reportDocuments", fileInput.files[i]);
+        if (fileSize > maxFileSize) {
+            alert(`파일 ${file.name}이(가) 너무 큽니다. 최대 허용 크기는 10MB입니다.`);
+            return false;
+        }
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            alert(`파일 ${file.name}은(는) 허용되지 않는 파일 형식입니다.`);
+            return false;
         }
     }
 
-    // idList와 nameList를 FormData에 추가
-    formData.append('idList', idList);
-    formData.append('nameList', nameList);
-
-    const actionUrl = '/report/write';  // 수정 후 폼의 액션 URL
-
-    // Ajax 요청으로 데이터 전송
-    fetch(actionUrl, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.text())
-        .then(result => {
-            console.log('Success:', result);
-            window.location.href = '/report/list'; // 성공 후 리다이렉션
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+    return true; // 파일이 유효하면 true 반환
 }
+
+// 제출 버튼 클릭 시 호출되는 함수
+function submitReport(event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const isValid = validateFiles(); // 파일 유효성 검사
+
+    if (!isValid) {
+        return false; // 유효성 검사 실패 시 폼 제출 방지
+    }
+
+    const form = document.getElementById('form');
+    const formData = new FormData(form); // 기존 폼 데이터 가져오기
+
+    // filesArr에 저장된 파일들을 FormData에 추가
+    filesArr.forEach((file, index) => {
+        if (!file.is_delete) { // 삭제된 파일 제외
+            formData.append('reportDocuments', file);
+        }
+    });
+
+    const idList = Object.keys(selectedEmployees);
+    const nameList = Object.values(selectedEmployees);
+
+    // 숨겨진 필드에 값 설정
+    formData.set('idList', idList.join(','));
+    formData.set('nameList', nameList.join(','));
+
+    // AJAX를 사용하여 폼 데이터 전송
+    fetch('/report/write', {  // 이 부분에서 '/report/write'로 전송
+        method: 'POST',
+        body: formData,
+    }).then(response => {
+        if (response.ok) {
+            return response.text();
+        } else {
+            throw new Error('폼 제출 중 오류 발생');
+        }
+    }).then(result => {
+        console.log('폼 제출 성공:', result);
+        window.location.href = "/report/list"; // 성공 후 리디렉션
+    }).catch(error => {
+        console.error('폼 제출 오류:', error);
+        alert('폼 제출 중 오류가 발생했습니다.');
+    });
+}
+
+
+
+
+
+
 //===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
 //========================================== 임원 선택 ==================================================================
 

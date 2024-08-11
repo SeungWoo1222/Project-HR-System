@@ -3,6 +3,7 @@ package com.woosan.hr_system.report.service;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.report.controller.ReportController;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportFileLink;
@@ -10,6 +11,7 @@ import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.upload.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ReportServiceImpl implements ReportService {
     @Autowired
@@ -29,20 +32,20 @@ public class ReportServiceImpl implements ReportService {
     private FileService fileService;
 
 
-
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
     public void createReport(Report report, List<MultipartFile> reportDocuments) {
         UserSessionInfo userSessionInfo = new UserSessionInfo(); //로그인한 사용자 id, 현재시간 설정
 
-        List<Integer> fileIds = new ArrayList<>();
-        List<Long> reportIds = new ArrayList<>();
+        List<Integer> fileIdlist = new ArrayList<>();
+        List<Integer> reportIdlist = new ArrayList<>();
+
 
         if (reportDocuments != null) {
             // 파일들 체크 후 DB에 저장할 파일명 반환
             for (MultipartFile reportdocument : reportDocuments) {
-                int fileId = fileService.uploadingFile(reportdocument, "보고서"); // 생성된 fileId 가져옴
-                fileIds.add(fileId);
+                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
+                fileIdlist.add(fileId);
             }
         }
 
@@ -57,18 +60,20 @@ public class ReportServiceImpl implements ReportService {
         for (int i = 0; i < report.getNameList().size(); i++) {
             params.put("approverId", report.getIdList().get(i));
             params.put("approverName", report.getNameList().get(i));
-            Long reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
-            reportIds.add(reportId);
+            int reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
+            reportIdlist.add(reportId);
         }
 
-        Iterator<Long> reportIterater = reportIds.iterator();
-        Iterator<Integer> fileIterater = fileIds.iterator();
-
-        reportDAO.insertReportFileMapping(reportIterater.next(), fileIterater.next());
+        // reportId와 fileId를 모두 순회하며 매핑
+        for (int reportId : reportIdlist) {
+            for (int fileId : fileIdlist) {
+                reportDAO.insertReportFileMapping(reportId, fileId);
+            }
+        }
     }
 
     @Override // 요청 들어온 보고서 작성
-    public Long createReportFromRequest(Report report, String approverId) {
+    public int createReportFromRequest(Report report, String approverId) {
 //    public void createReport(Report report, MultipartFile file) {
         LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
         report.setCreatedDate(createdDate);
@@ -120,12 +125,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 특정 보고서 조회
-    public Report getReportById(Long reportId) {
+    public Report getReportById(int reportId) {
         return reportDAO.getReportById(reportId);
     }
 
     @Override
-    public List<Integer> getFileIdsByReportId(Long reportId) { return reportDAO.getFileIdsByReportId(reportId); }
+    public List<Integer> getFileIdsByReportId(int reportId) { return reportDAO.getFileIdsByReportId(reportId); }
 
 
     @Override // 날짜범위 내 결재할 보고서 조회
@@ -218,7 +223,7 @@ public class ReportServiceImpl implements ReportService {
 //=====================================================삭제 메소드======================================================
 
     @Override // 보고서 삭제
-    public void deleteReport(Long reportId) {
+    public void deleteReport(int reportId) {
         // shared_trash 테이블에 삭제될 데이터들 삽입
         reportDAO.insertReportIntoSharedTrash(reportId);
         reportDAO.deleteReport(reportId);

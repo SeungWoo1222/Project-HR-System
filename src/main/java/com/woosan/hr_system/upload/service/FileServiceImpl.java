@@ -66,6 +66,8 @@ public class FileServiceImpl implements FileService {
         // 파일 업로드
         String storedFileName = uploadToS3(file);
 
+        log.info("Uploading file " + storedFileName + " to S3");
+
         return saveFileTransactionally(file, storedFileName, fileIdUsage);
     }
 
@@ -88,6 +90,7 @@ public class FileServiceImpl implements FileService {
     // 파일 정보 생성
     private File createFileInfo(MultipartFile file, String storedFileName, String fileIdUsage) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
+
         return new File(
                 file.getOriginalFilename(),
                 storedFileName,

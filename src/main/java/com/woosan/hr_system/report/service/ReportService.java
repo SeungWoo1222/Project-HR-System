@@ -13,16 +13,16 @@ public interface ReportService {
     // 모든 리포트 조회
     List<Report> getAllReports(String reportStart, String reportEnd, String employeeId);
     // 특정 리포트 조회
-    Report getReportById(Long reportId);
-    List<Integer> getFileIdsByReportId(Long reportId);
+    Report getReportById(int reportId);
+    List<Integer> getFileIdsByReportId(int reportId);
     // 보고서 생성
     void createReport(Report report, List<MultipartFile> reportDocuments);
     // 보고서 수정 관련 메소드
     void updateReport(Report report);
     // 보고서 삭제
-    void deleteReport(Long reportId);
+    void deleteReport(int reportId);
     //요청들어온 보고서 작성
-    Long createReportFromRequest(Report report, String approverId);
+    int createReportFromRequest(Report report, String approverId);
     // 최근 5개 보고서 조회
     List<Report> getRecentReports(String writerId);
     // 페이징, 검색 + 보고서 조회

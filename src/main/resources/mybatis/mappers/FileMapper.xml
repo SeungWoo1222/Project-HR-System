@@ -5,6 +5,16 @@
 
 <mapper namespace="com.woosan.hr_system.upload.dao.FileDAO">
 
+    <resultMap id="FileResultMap" type="com.woosan.hr_system.upload.model.File">
+        <id property="fileId" column="file_id"/>
+        <result property="originalFileName" column="original_file_name"/>
+        <result property="storedFileName" column="stored_file_name"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="uploadDate" column="upload_date"/>
+        <result property="uploadedBy" column="uploaded_by"/>
+        <result property="fileIdUsage" column="file_id_usage"/>
+    </resultMap>
+
     <!-- 파일 정보 삽입 -->
     <insert id="insertFile" parameterType="com.woosan.hr_system.upload.model.File" useGeneratedKeys="true" keyProperty="fileId">
         INSERT INTO files (original_file_name, stored_file_name, file_size, upload_date, uploaded_by, file_id_usage)
@@ -17,8 +27,16 @@
     </select>
 
     <!-- 파일 ID 리스트로 파일들 정보 조회 -->
-    <select id="selectFileListById" parameterType="list" resultType="com.woosan.hr_system.upload.model.File">
-        SELECT * FROM files WHERE file_id IN
+    <select id="selectFileListById" parameterType="list" resultMap="FileResultMap">
+        SELECT
+            file_id,
+            original_file_name,
+            CAST(stored_file_name AS CHAR) AS stored_file_name,
+            file_size,
+            upload_date,
+            uploaded_by,
+            file_id_usage
+            FROM files WHERE file_id IN
         <foreach item="fileId" collection="list" open="(" separator="," close=")">
             #{fileId}
         </foreach>

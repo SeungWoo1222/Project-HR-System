@@ -35,7 +35,6 @@ public class S3Service {
         File convertedFile = convertMultiPartToFile(file);
         String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
         amazonS3.putObject(new PutObjectRequest(bucketName, fileName, convertedFile));
-        logger.info("S3에 '{}' 파일이 등록되었습니다.", fileName);
         convertedFile.delete();
         return fileName;
     }

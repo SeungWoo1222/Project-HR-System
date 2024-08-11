@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/employee")
@@ -53,5 +55,12 @@ public class EmployeeApiController {
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
         String message = authService.setAccountLock(employeeId);
         return ResponseEntity.ok(message);
+    }
+
+    // 부서 id를 이용한 해당 부서 사원 조회
+    @GetMapping("/department/list/{departmentId}")
+    public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
+        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
+        return employeeList;
     }
 }

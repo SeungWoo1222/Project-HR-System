@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +22,14 @@ public class ReportDAO {
 //=====================================================생성 메소드======================================================
     // 보고서 생성
 //    public void createReport(Map<String, Object> params, MultipartFile file) {
-    public Long createReport(Map<String, Object> params) {
+    public int createReport(Map<String, Object> params) {
         sqlSession.insert(NAMESPACE + ".createReport", params);
-        return (Long) params.get("reportId");
+        BigInteger reportIdBigInt = (BigInteger) params.get("reportId");
+        return reportIdBigInt.intValue();
     }
 
     // reportId와 fileId 삽입
-    public void insertReportFileMapping(Long reportId, int fileId) {
+    public void insertReportFileMapping(int reportId, int fileId) {
         ReportFileLink reportFileLink = new ReportFileLink();
         reportFileLink.setReportId(reportId);
         reportFileLink.setFileId(fileId);
@@ -49,13 +51,13 @@ public class ReportDAO {
 
 
     // 보고서 세부 조회
-    public Report getReportById(Long reportId) {
+    public Report getReportById(int reportId) {
         return sqlSession.selectOne(NAMESPACE + ".getReportById", reportId);
     }
 
     // reportId에 맞는 fileIdList 반환
-    public List<Integer> getFileIdsByReportId(Long reportId) {
-        return sqlSession.selectOne(NAMESPACE + ".getFileIdsByReportId", reportId);
+    public List<Integer> getFileIdsByReportId(int reportId) {
+        return sqlSession.selectList(NAMESPACE + ".getFileIdsByReportId", reportId);
     }
 
 
@@ -126,12 +128,12 @@ public class ReportDAO {
 //=====================================================삭제 메소드======================================================
 
     // 보고서 삭제
-    public void deleteReport(Long reportId) {
+    public void deleteReport(int reportId) {
         sqlSession.delete(NAMESPACE + ".deleteReport", reportId);
     }
 
     // shared_trash(휴지통)에 삭제 데이터들 삽입
-    public void insertReportIntoSharedTrash(Long reportId) {
+    public void insertReportIntoSharedTrash(int reportId) {
         sqlSession.insert(NAMESPACE + ".insertReportIntoSharedTrash", reportId);
     }
 
