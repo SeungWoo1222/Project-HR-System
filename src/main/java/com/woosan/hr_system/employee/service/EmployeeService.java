@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.model.Resignation;
+import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,17 +17,15 @@ public interface EmployeeService {
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
+    List<Employee> getEmployeesByDepartment(String departmentId);
 
     // == 등록 ==
     String insertEmployee(Employee employee);
-    String resignEmployee(String employeeId, Resignation resignation);
 
     // == 수정 ==
     String updateEmployee(Employee employee);
     String updateStatus(String employeeId, String status);
-    String setAccountLock(String employeeId);
     String promoteEmployee(String employeeId);
-    String updateResignationInfo(String employeeId, Resignation resignation);
 
     // == 삭제 ==
     String deleteEmployee(String employeeId);

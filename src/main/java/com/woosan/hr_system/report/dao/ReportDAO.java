@@ -1,24 +1,16 @@
 package com.woosan.hr_system.report.dao;
 
-import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportFileLink;
 import com.woosan.hr_system.report.model.ReportStat;
-import com.woosan.hr_system.report.model.Request;
-import com.woosan.hr_system.search.PageResult;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.Year;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Repository
 public class ReportDAO {
@@ -29,13 +21,18 @@ public class ReportDAO {
 //=====================================================생성 메소드======================================================
     // 보고서 생성
 //    public void createReport(Map<String, Object> params, MultipartFile file) {
-    public void createReport(Map<String, Object> params) {
+    public Long createReport(Map<String, Object> params) {
         sqlSession.insert(NAMESPACE + ".createReport", params);
+        return (Long) params.get("reportId");
     }
 
-    // 파일 생성
-    public void insertFile(Map<String, Object> fileParams) {
-        sqlSession.insert(NAMESPACE + ".insertFile", fileParams);
+    // reportId와 fileId 삽입
+    public void insertReportFileMapping(Long reportId, int fileId) {
+        ReportFileLink reportFileLink = new ReportFileLink();
+        reportFileLink.setReportId(reportId);
+        reportFileLink.setFileId(fileId);
+        sqlSession.insert(NAMESPACE + ".insertReportFileMapping", reportFileLink);
+
     }
 
 //=====================================================생성 메소드======================================================
@@ -54,6 +51,11 @@ public class ReportDAO {
     // 보고서 세부 조회
     public Report getReportById(Long reportId) {
         return sqlSession.selectOne(NAMESPACE + ".getReportById", reportId);
+    }
+
+    // reportId에 맞는 fileIdList 반환
+    public List<Integer> getFileIdsByReportId(Long reportId) {
+        return sqlSession.selectOne(NAMESPACE + ".getFileIdsByReportId", reportId);
     }
 
 

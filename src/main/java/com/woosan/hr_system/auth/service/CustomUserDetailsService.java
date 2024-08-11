@@ -4,9 +4,9 @@ import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.dao.ResignationDAO;
+import com.woosan.hr_system.resignation.dao.ResignationDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.model.Resignation;
+import com.woosan.hr_system.resignation.model.Resignation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,9 +35,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Employee employee = employeeDAO.getEmployeeById(username);
-        Password password = passwordDAO.selectPassword(username);
-
         if (employee == null) { throw new UsernameNotFoundException("해당 사원을 찾을 수 없습니다."); }
+
+        Password password = passwordDAO.getPasswordInfoById(username);
 
         // 비밀번호 카운트 한도 초과로 계정 잠금
         boolean isAccountNonLocked = passwordDAO.getPasswordCount(employee.getEmployeeId()) < 5;

@@ -1,9 +1,8 @@
 package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.model.Resignation;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/employee")
 public class EmployeeApiController {
-
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private EmployeeDAO employeeDAO;
+    private AuthService authService;
 
     // 사원 신규 등록
     @RequireHRPermission
@@ -53,42 +51,7 @@ public class EmployeeApiController {
     @RequireHRPermission
     @PatchMapping("/set/accountLock/{employeeId}")
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
-        String message = employeeService.setAccountLock(employeeId);
+        String message = authService.setAccountLock(employeeId);
         return ResponseEntity.ok(message);
     }
-
-    // 사원 퇴사 처리
-    @RequireHRPermission
-    @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
-                                                 @RequestPart("resignation") Resignation resignation,
-                                                 @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
-        // 파일들 체크 후 DB에 저장할 파일명 반환
-//        validateFilesAndGetFileName(resignation, resignationDocuments);
-
-        // 사원 퇴사 처리
-        String name = employeeService.resignEmployee(employeeId, resignation);
-        return ResponseEntity.ok("'" + name + "' 사원이 퇴사 처리되었습니다.");
-    }
-
-    // 사원 퇴사 정보 수정
-    @RequireHRPermission
-    @PutMapping(value = "/update/resignation/{employeeId}", consumes = "multipart/form-data")
-    public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
-                                                        @RequestPart("resignation") Resignation resignation,
-                                                        @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
-        // 파일들 체크 후 DB에 저장할 파일명 반환
-//        validateFilesAndGetFileName(resignation, resignationDocuments);
-
-        // 퇴사 정보 수정
-        String name = employeeService.updateResignationInfo(employeeId, resignation);
-        return ResponseEntity.ok("'" + name + "' 사원의 퇴사 정보가 수정되었습니다.");
-    }
-
-//    // 파일 체크들 후 DB에 저장할 파일명 반환 - 퇴사 문서
-//    private void validateFilesAndGetFileName(Resignation resignation, MultipartFile[] resignationDocuments) {
-//        if (resignationDocuments != null) {
-//            employeeService.updateResignationDocuments(resignation, fileService.checkAndUploadFiles(resignationDocuments));
-//        }
-//    }
 }

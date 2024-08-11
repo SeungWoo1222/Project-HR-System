@@ -46,20 +46,21 @@ function initEventListeners() {
 
 // 선택된 부서에 맞는 임원들 리스트를 반환해줌
 function loadEmployeesByDepartment() {
+    console.log("loadEmployeesByDepartment");
     const departmentId = document.getElementById('departmentId').value;
 
-    fetch(`/admin/request/employee?departmentId=${departmentId}`)
+    fetch(`/employee/list/${departmentId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('response 오류!');
             }
             return response.json();
         })
-        .then(employees => {
+        .then(employeeList => {
             const idContainer = document.getElementById('idContainer');
             idContainer.innerHTML = '';
 
-            employees.forEach(employee => {
+            employeeList.forEach(employee => {
                 if (employee === null) {
                     console.error('Employee가 비어 있음', employee);
                 } else if (!employee.employeeId || !employee.name) {
@@ -142,30 +143,44 @@ function updateSelectedEmployees() {
     });
 }
 
-function updateFormFields() {
-    const idList = Object.keys(selectedEmployees);
-    const nameList = Object.values(selectedEmployees);
+//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
 
+function submitReport() {
     const form = document.getElementById('form');
+    let formData = new FormData(form); // 폼 전체 데이터를 가져옵니다.
 
-    // 최종 선택된 요소들의 필드만 생성
-    idList.forEach(id => {
-        let idField = document.createElement('input');
-        idField.type = 'hidden';
-        idField.name = 'idList';
-        idField.value = id;
-        form.appendChild(idField);
-    });
+    const idList = Object.keys(selectedEmployees); // 선택된 임원 ID 목록
+    const nameList = Object.values(selectedEmployees); // 선택된 임원 이름 목록
 
-    nameList.forEach(name => {
-        let nameField = document.createElement('input');
-        nameField.type = 'hidden';
-        nameField.name = 'nameList';
-        nameField.value = name;
-        form.appendChild(nameField);
-    });
+    // 파일이 있으면 FormData에 추가
+    const fileInput = document.querySelector("#reportDocuments");
+    if (fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("reportDocuments", fileInput.files[i]);
+        }
+    }
+
+    // idList와 nameList를 FormData에 추가
+    formData.append('idList', idList);
+    formData.append('nameList', nameList);
+
+    const actionUrl = '/report/write';  // 수정 후 폼의 액션 URL
+
+    // Ajax 요청으로 데이터 전송
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.text())
+        .then(result => {
+            console.log('Success:', result);
+            window.location.href = '/report/list'; // 성공 후 리다이렉션
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
-
+//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
 //========================================== 임원 선택 ==================================================================
 
 //========================================== 통계 관련 메소드 ============================================================

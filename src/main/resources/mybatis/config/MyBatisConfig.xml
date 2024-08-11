@@ -7,11 +7,12 @@
     </settings>
     <typeAliases>
         <package name="com.woosan.hr_system.employee.model.Employee"/>
-        <package name="com.woosan.hr_system.employee.model.Resignation"/>
+        <package name="com.woosan.hr_system.resignation.model.Resignation"/>
         <package name="com.woosan.hr_system.auth.model.Password"/>
         <package name="com.woosan.hr_system.report.model.Report"/>
         <package name="com.woosan.hr_system.report.model.Request"/>
         <package name="com.woosan.hr_system.report.model.ReportStat"/>
+        <package name="com.woosan.hr_system.upload.model.File"/>
     </typeAliases>
     <typeHandlers>
         <typeHandler handler="com.woosan.hr_system.employee.model.DepartmentTypeHandler" javaType="com.woosan.hr_system.employee.model.Department"/>
@@ -23,5 +24,6 @@
         <mapper resource="mybatis/mappers/PasswordMapper.xml"/>
         <mapper resource="mybatis/mappers/ReportMapper.xml"/>
         <mapper resource="mybatis/mappers/RequestMapper.xml"/>
+        <mapper resource="mybatis/mappers/FileMapper.xml"/>
     </mappers>
 </configuration>

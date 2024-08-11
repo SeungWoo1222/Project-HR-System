@@ -6,7 +6,7 @@
 <mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
 <!--============================================== 생성 SQL문 =======================================================-->
     <!-- 보고서 생성 -->
-    <insert id="createReport" parameterType="map">
+    <insert id="createReport" parameterType="map" useGeneratedKeys="true" keyProperty="reportId">
         INSERT INTO reports
         (title, content, approver_id, approver_name, complete_date, writer_id, created_date, status)
         VALUES
@@ -67,6 +67,26 @@
         FROM reports
         WHERE report_id = #{reportId}
     </select>
+
+    <!--  reportId와 fileId 삽입  -->
+    <insert id="insertReportFileMapping" parameterType="com.woosan.hr_system.report.model.ReportFileLink">
+        INSERT INTO report_files
+        (report_id, file_id)
+        VALUES
+            (
+                #{reportId},
+                #{fileId}
+            )
+    </insert>
+
+    <!--  reportId로 fileId를 찾아옴  -->
+    <select id="getFileIdsByReportId" parameterType="long" resultType="int">
+        SELECT
+            file_id AS fildId
+        FROM report_files
+        WHERE report_id = #{reportId}
+    </select>
+
 
 <!--============================================== 생성 SQL문 =======================================================-->
 <!--============================================== 조회 SQL문 =======================================================-->
@@ -193,41 +213,5 @@
     </insert>
 
 <!--============================================== 삭제 SQL문 ====================================================-->
-
-<!--        &lt;!&ndash;파일 metaData 생성&ndash;&gt;-->
-<!--        <insert id="insertFile" parameterType="map">-->
-<!--            INSERT INTO files-->
-<!--            (original_filename, stored_filename, file_size, upload_date, uploaded_by, usage)-->
-<!--            VALUES-->
-<!--                (-->
-<!--                    #{originalFilename},-->
-<!--                    #{stotredFilename},-->
-<!--                    #{fileSize},-->
-<!--                    #{uploadDate},-->
-<!--                    #{uploadBy},-->
-<!--                    #{usage}-->
-<!--                )-->
-<!--        </insert>-->
-
-    <!-- 파일 삭제 -->
-    <delete id="deleteFileMetadataByReportId" parameterType="long">
-        DELETE FROM report_files WHERE file_id = #{fileid}
-    </delete>
-
-    <!-- 특정 파일 조회 -->
-    <select id="getReportFileById" parameterType="long" resultType="com.woosan.hr_system.report.model.FileMetadata">
-        SELECT
-            file_id AS fileId,
-            cloud_server_file_url AS cloudServerFileUrl,
-            original_file_name AS originalFilename,
-            uuid_file_name AS uuidFilename,
-            size,
-            upload_date AS uploadDate
-
-        FROM report_files
-        WHERE file_id = #{fileId}
-    </select>
-
-
 
 </mapper>

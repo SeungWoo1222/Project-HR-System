@@ -22,6 +22,20 @@
         <p th:text="'작성일 : ' + ${report.createdDate}" class="dateTime">작성일</p>
         <p th:if="${report.status == '거절'}" th:text="'거절 사유: ' + ${report.rejectReason}">거절 사유</p>
 
+        <!-- 첨부 파일 리스트 표시 -->
+        <div th:if="${files != null}">
+            <p>첨부 파일:</p>
+            <ul>
+                <li th:each="file : ${files}">
+                    <form th:action="@{'/report/downloadFile'}" method="post">
+                        <input type="hidden" name="fileId" th:value="${file.fileId}" />
+                        <input type="hidden" name="originalFileName" th:value="${file.originalFileName}" />
+                        <button type="submit" th:text="${file.originalFileName}">다운로드</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
 
         <div th:if="${reportFile != null}">
             <p>

@@ -1,10 +1,11 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.dao.ReportDAO;
-import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
+import com.woosan.hr_system.report.model.ReportFileLink;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -13,15 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -29,50 +25,47 @@ public class ReportServiceImpl implements ReportService {
     private ReportDAO reportDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
-//    @Autowired
-//    private FileService fileService;
+    @Autowired
+    private FileService fileService;
+
+
 
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
     public void createReport(Report report, List<MultipartFile> reportDocuments) {
-        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
+        UserSessionInfo userSessionInfo = new UserSessionInfo(); //로그인한 사용자 id, 현재시간 설정
+
+        List<Integer> fileIds = new ArrayList<>();
+        List<Long> reportIds = new ArrayList<>();
 
         if (reportDocuments != null) {
             // 파일들 체크 후 DB에 저장할 파일명 반환
-            for (MultipartFile multipartFile : reportDocuments) {
-                Map<String, Object> fileParams = new HashMap<>();
-                fileParams.put("originalFilename", multipartFile.getOriginalFilename());
-//                fileParams.put("stotredFilename", validateFilesAndGetFileName(multipartFile));
-                fileParams.put("fileSize", multipartFile.getSize());
-                fileParams.put("uploadDate", createdDate);
-                fileParams.put("uploadBy", report.getWriterId());
-                fileParams.put("usage", "report");
-
-                reportDAO.insertFile(fileParams);
+            for (MultipartFile reportdocument : reportDocuments) {
+                int fileId = fileService.uploadingFile(reportdocument, "보고서"); // 생성된 fileId 가져옴
+                fileIds.add(fileId);
             }
         }
 
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", userSessionInfo.getCurrentEmployeeId());
+        params.put("title", report.getTitle());
+        params.put("content", report.getContent());
+        params.put("createdDate", userSessionInfo.getNow());
+        params.put("status", "미처리");
+        params.put("completeDate", report.getCompleteDate());
+
         for (int i = 0; i < report.getNameList().size(); i++) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("writerId", report.getWriterId());
             params.put("approverId", report.getIdList().get(i));
             params.put("approverName", report.getNameList().get(i));
-            params.put("title", report.getTitle());
-            params.put("content", report.getContent());
-            params.put("createdDate", createdDate);
-            params.put("status", "미처리");
-            params.put("completeDate", report.getCompleteDate());
-
-            reportDAO.createReport(params);
+            Long reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
+            reportIds.add(reportId);
         }
-    }
 
-//    // 파일 체크들 후 DB에 저장할 파일명 반환 - 보고서 문서
-//    private void validateFilesAndGetFileName(MultipartFile[] doucments) {
-//        if (doucments != null) {
-//            fileService.checkAndUploadFiles(doucments);
-//        }
-//    }
+        Iterator<Long> reportIterater = reportIds.iterator();
+        Iterator<Integer> fileIterater = fileIds.iterator();
+
+        reportDAO.insertReportFileMapping(reportIterater.next(), fileIterater.next());
+    }
 
     @Override // 요청 들어온 보고서 작성
     public Long createReportFromRequest(Report report, String approverId) {
@@ -130,6 +123,10 @@ public class ReportServiceImpl implements ReportService {
     public Report getReportById(Long reportId) {
         return reportDAO.getReportById(reportId);
     }
+
+    @Override
+    public List<Integer> getFileIdsByReportId(Long reportId) { return reportDAO.getFileIdsByReportId(reportId); }
+
 
     @Override // 날짜범위 내 결재할 보고서 조회
     public List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd) {

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -13,18 +12,19 @@ import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.upload.model.File;
+import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +36,8 @@ public class ReportController {
     private ReportService reportService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private FileService fileService;
     @Autowired
     private EmployeeDAO employeeDAO;
     @Autowired
@@ -90,9 +92,7 @@ public class ReportController {
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String createReport(@ModelAttribute Report report,
                                @RequestParam("reportDocuments") List<MultipartFile> reportDocuments) {
-        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
-        report.setWriterId(writerId);
+
         reportService.createReport(report, reportDocuments);
 
         return "redirect:/report/list";
@@ -129,12 +129,28 @@ public class ReportController {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
-//        if (report.getFileId() != null) {
-//            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
-//            model.addAttribute("reportFile", reportFile);
-//        }
+        List<Integer> fileIds = reportService.getFileIdsByReportId(reportId);
+        List<File> files = fileService.getFileListById(fileIds);
+        model.addAttribute("files", files);
+
         return "/report/report-view";
     }
+
+    @PostMapping("/downloadFile")
+    public ResponseEntity<ByteArrayResource> downloadFile(
+            @RequestParam("fileId") int fileId,
+            @RequestParam("originalFileName") String originalFileName) {
+
+        // S3에서 파일 다운로드
+        byte[] fileData = fileService.downloadFile(fileId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFileName + "\"")
+                .body(new ByteArrayResource(fileData));
+    }
+
+
 
     @GetMapping("/list") // 보고서 리스트 페이지
     public String showReportList(HttpSession session,

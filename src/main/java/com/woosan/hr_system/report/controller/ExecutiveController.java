@@ -5,22 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.FileMetadata;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
+import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +36,8 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private AuthService authService;
+    @Autowired
+    private FileService fileService;
 
     // main 페이지
     @GetMapping("/main")
@@ -123,10 +121,9 @@ public class ExecutiveController {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
-        if (report.getFileId() != null) {
-//            FileMetadata reportFile = reportService.getReportFileById(report.getFileId());
-//            model.addAttribute("reportFile", reportFile);
-        }
+
+
+
         return "admin/report/report-view";
     }
 
@@ -220,12 +217,7 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
-    @GetMapping("/employee") // 부서 기반 임원 정보 조회
-    @ResponseBody
-    public List<Employee> getEmployeesByDepartment(@RequestParam("departmentId") String departmentId) {
-        List<Employee> employees = employeeDAO.getEmployeesByDepartment(departmentId);
-        return employees;
-    }
+
 
 //====================================================조회 메소드========================================================
 //====================================================수정 메소드========================================================

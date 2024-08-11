@@ -1,6 +1,5 @@
 package com.woosan.hr_system.auth.controller;
 
-import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,6 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private PasswordDAO passwordDAO;
 
     @GetMapping("/login") // 로그인 페이지 이동
     public String login(@RequestParam(value = "error", required = false) String error,
@@ -50,23 +46,17 @@ public class AuthController {
     @PostMapping("/verifyPassword") // 비밀번호 인증 로직
     public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
-
-        // 비밀번호 카운트 초과 여부 조회
-        if (authService.isExceeded(employeeId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
-        }
-        // 비밀번호 일치 여부 조회
-        if (authService.verifyPassword(password, employeeId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + passwordDAO.getPasswordCount(employeeId) + " / 5 입니다.");
-        }
-
-        return ResponseEntity.ok(url + employeeId);
+        int message = authService.verifyPasswordAttempts(password, employeeId);
+        return switch (message) {
+            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
+            case 0 -> ResponseEntity.ok(url + employeeId);
+            default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
+        };
     }
 
     @GetMapping("/pwd-management") // 비밀번호 관리 페이지 이동
     public String viewPasswordManagement(Model model) {
-        String employeeId = authService.getAuthenticatedUser().getUsername();
-        Password password = passwordDAO.selectPassword(employeeId);
+        Password password = authService.getPasswordInfoById(authService.getAuthenticatedUser().getUsername());
         model.addAttribute("password", password);
         return "/auth/pwd-management";
     }
@@ -80,18 +70,16 @@ public class AuthController {
     @PutMapping("/changePassword") // 비밀번호 변경 로직
     public ResponseEntity<String> updatePassword(@RequestParam("password") String password, @RequestParam("new-password") String newPassword, @RequestParam("strength") int strength) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
+        int message = authService.verifyPasswordAttempts(password, employeeId);
 
-        // 비밀번호 카운트 초과 여부 조회
-        if (authService.isExceeded(employeeId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
-        }
-
-        // 현재 비밀번호 일치 여부 조회
-        if (!authService.verifyPassword(password, employeeId))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("현재 비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + passwordDAO.getPasswordCount(employeeId) + " / 5 입니다.");
-
-        // 현재 비밀번호와 새로운 비밀번호 비교 후 비밀번호 수정
-        authService.changePassword(employeeId, password, newPassword, strength);
-        return ResponseEntity.ok("비밀번호가 변경되었습니다.\n다시 로그인해주세요.");
+        return switch (message) {
+            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
+            case 0 -> {
+                // 현재 비밀번호와 새로운 비밀번호 비교 후 비밀번호 수정
+                authService.changePassword(employeeId, password, newPassword, strength);
+                yield ResponseEntity.ok("비밀번호가 변경되었습니다.\n다시 로그인해주세요.");
+            }
+            default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
+        };
     }
 }

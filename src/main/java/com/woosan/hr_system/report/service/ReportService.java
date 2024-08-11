@@ -1,27 +1,22 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.report.model.ReportFileLink;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 import com.woosan.hr_system.report.model.Report;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import com.woosan.hr_system.report.model.FileMetadata;
 
 public interface ReportService {
     // 모든 리포트 조회
     List<Report> getAllReports(String reportStart, String reportEnd, String employeeId);
     // 특정 리포트 조회
     Report getReportById(Long reportId);
+    List<Integer> getFileIdsByReportId(Long reportId);
     // 보고서 생성
-//    void createReport(Report report, MultipartFile file);
     void createReport(Report report, List<MultipartFile> reportDocuments);
-    //    List<FileMetadata> uploadFiles(Long reportId, MultipartFile[] files) throws IOException;
     // 보고서 수정 관련 메소드
     void updateReport(Report report);
     // 보고서 삭제

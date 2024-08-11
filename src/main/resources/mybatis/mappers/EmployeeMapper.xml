@@ -20,12 +20,31 @@
         <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
-        <association property="resignation" javaType="com.woosan.hr_system.employee.model.Resignation">
+    </resultMap>
+
+    <resultMap id="EmployeeWithResignationResultMap" type="com.woosan.hr_system.employee.model.Employee">
+        <id property="employeeId" column="employee_id"/>
+        <result property="name" column="name"/>
+        <result property="birth" column="birth"/>
+        <result property="residentRegistrationNumber" column="resident_registration_number"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="address" column="address"/>
+        <result property="detailAddress" column="detail_address"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+        <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+        <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+        <result property="remainingLeave" column="remaining_leave"/>
+        <result property="picture" column="picture"/>
+        <result property="lastModified" column="last_modified"/>
+        <result property="modifiedBy" column="modified_by"/>
+        <association property="resignation" javaType="com.woosan.hr_system.resignation.model.Resignation">
             <id property="employeeId" column="employee_id"/>
+            <result property="resignationDate" column="resignation_date"/>
             <result property="resignationReason" column="resignation_reason"/>
             <result property="codeNumber" column="code_number"/>
             <result property="specificReason" column="specific_reason"/>
-            <result property="resignationDate" column="resignation_date"/>
             <result property="resignationDocuments" column="resignation_documents"/>
             <result property="processedBy" column="processed_by"/>
             <result property="processedDate" column="processed_date"/>
@@ -37,10 +56,11 @@
         SELECT * FROM employees
     </select>
 
-
     <!-- id를 이용한 특정 사원 정보 조회 -->
     <select id="getEmployeeById" resultMap="EmployeeResultMap">
-        SELECT * FROM employees WHERE employee_id = #{employeeId}
+        SELECT *
+        FROM employees
+        WHERE employee_id = #{employeeId}
     </select>
 
     <!-- 사원 번호 중복 조회 -->
@@ -106,8 +126,9 @@
     </select>
 
     <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
-    <select id="getResignedEmployees" resultMap="EmployeeResultMap">
-        SELECT e.*, r.resignation_date
+    <select id="getResignedEmployees" resultMap="EmployeeWithResignationResultMap">
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason,
+               r.resignation_documents, r.processed_by, r.processed_date
         FROM employees e
                  LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
@@ -115,12 +136,13 @@
     </select>
 
     <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
-    <select id="getPreDeletionEmployees" resultMap="EmployeeResultMap">
-        SELECT e.*, r.resignation_date
+    <select id="getPreDeletionEmployees" resultMap="EmployeeWithResignationResultMap">
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason,
+               r.resignation_documents, r.processed_by, r.processed_date
         FROM employees e
-        LEFT JOIN resignation r ON e.employee_id = r.employee_id
+                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
-        AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+          AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
     </select>
 
     <!-- 검색어에 해당하는 데이터 결과 조회 -->

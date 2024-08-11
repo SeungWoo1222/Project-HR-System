@@ -49,10 +49,10 @@ public class S3Service {
     }
 
     // S3에서 파일 다운로드
-    protected byte[] downloadFile(String keyName) {
+    protected byte[] downloadFile(String storedFileName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(keyName)
+                .key(storedFileName)
                 .build();
 
         ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);

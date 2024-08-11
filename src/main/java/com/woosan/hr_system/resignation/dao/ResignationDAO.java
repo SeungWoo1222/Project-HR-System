@@ -1,6 +1,6 @@
-package com.woosan.hr_system.employee.dao;
+package com.woosan.hr_system.resignation.dao;
 
-import com.woosan.hr_system.employee.model.Resignation;
+import com.woosan.hr_system.resignation.model.Resignation;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,7 @@ public class ResignationDAO {
     @Autowired
     private SqlSession sqlSession;
 
-    private static final String NAMESPACE = "com.woosan.hr_system.employee.dao.ResignationDAO.";
+    private static final String NAMESPACE = "com.woosan.hr_system.resignation.dao.ResignationDAO.";
 
     // 모든 퇴사 사원 정보 조회
     public List<Resignation> getAllResignedEmployees() { return sqlSession.selectList(NAMESPACE + "getAllResignedEmployees"); }
