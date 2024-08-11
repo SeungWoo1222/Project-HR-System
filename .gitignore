@@ -40,12 +40,3 @@ out/
 /application.yml
 
 src/main/resources/application.properties
-
-### Key Store ###
-# SSL Keystore (Absolute Path)
-# 절대 경로로 추가
-/Users/san/Desktop/Programing/Projects/HR_System_Side_Project/hr-system/etc/ssl/keystore.p12
-
-# SSL Keystore (Relative Path)
-# 상대 경로로 추가
-/hr-system/etc/ssl/keystore.p12
