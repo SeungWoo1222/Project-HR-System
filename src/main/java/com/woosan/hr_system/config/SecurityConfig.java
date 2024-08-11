@@ -87,11 +87,7 @@ public class SecurityConfig {
                 // Authentication Entry Point 설정 - 401
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
-
-                // HTTPS 강제 설정
-                .requiresChannel(channel ->
-                channel.anyRequest().requiresSecure()); // 모든 요청을 HTTPS로 강제
+                );
 
         return http.build();
     }
