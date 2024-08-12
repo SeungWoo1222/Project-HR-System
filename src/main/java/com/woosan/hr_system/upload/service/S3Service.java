@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.woosan.hr_system.exception.file.FileProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class S3Service {
     private static final Logger logger = LoggerFactory.getLogger(S3Service.class);
@@ -49,6 +51,8 @@ public class S3Service {
 
     // S3에서 파일 다운로드
     protected byte[] downloadFile(String storedFileName) {
+        log.info("● S3 downloadFile 접근완료 ●");
+
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(storedFileName)

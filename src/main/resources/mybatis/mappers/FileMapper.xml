@@ -27,17 +27,14 @@
     </select>
 
     <!-- 파일 ID 리스트로 파일들 정보 조회 -->
-    <select id="selectFileListById" parameterType="list" resultMap="FileResultMap">
+    <select id="selectFileListById" parameterType="map" resultType="com.woosan.hr_system.upload.model.File">
         SELECT
-            file_id,
-            original_file_name,
-            CAST(stored_file_name AS CHAR) AS stored_file_name,
-            file_size,
-            upload_date,
-            uploaded_by,
-            file_id_usage
+            file_id AS fileId,
+            original_file_name AS originalFileName,
+            file_size AS fileSize,
+            upload_date AS uploadDate
             FROM files WHERE file_id IN
-        <foreach item="fileId" collection="list" open="(" separator="," close=")">
+        <foreach item="fileId" collection="fileIdList" open="(" separator="," close=")">
             #{fileId}
         </foreach>
     </select>

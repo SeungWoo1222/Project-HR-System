@@ -144,10 +144,12 @@ public class ReportController {
         return "/report/report-view";
     }
 
-    @PostMapping("/downloadFile")
+    @GetMapping("/downloadFile")
     public ResponseEntity<ByteArrayResource> downloadFile(
             @RequestParam("fileId") int fileId,
             @RequestParam("originalFileName") String originalFileName) {
+
+        log.info("● downloadFile컨트롤러 도착완료 {} {} ●", fileId, originalFileName);
 
         // S3에서 파일 다운로드
         byte[] fileData = fileService.downloadFile(fileId);

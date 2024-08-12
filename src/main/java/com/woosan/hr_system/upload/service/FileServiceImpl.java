@@ -153,6 +153,7 @@ public class FileServiceImpl implements FileService {
     public byte[] downloadFile(int fileId) {
         // 파일 정보 조회
         File file = findFileById(fileId);
+        log.info("● FileServiceImpl downloadFile 파일받아옴 파일이름 {} ●", file.getOriginalFileName());
 
         // S3에서 파일 다운로드
         return downloadFileFromS3(file);
@@ -160,6 +161,7 @@ public class FileServiceImpl implements FileService {
 
     private byte[] downloadFileFromS3(File file) {
         String storedFileName = file.getStoredFileName();
+        log.info("● downloadFileFromS3 접근완료 {} ●", file.getStoredFileName());
         return s3Service.downloadFile(storedFileName);
     }
 

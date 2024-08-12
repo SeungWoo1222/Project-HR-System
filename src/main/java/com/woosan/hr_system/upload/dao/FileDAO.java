@@ -1,12 +1,15 @@
 package com.woosan.hr_system.upload.dao;
 
 import com.woosan.hr_system.upload.model.File;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class FileDAO {
@@ -21,23 +24,23 @@ public class FileDAO {
     }
 
     // 파일 ID로 파일 정보 조회
-    public File getFileById(int fileId) { return sqlSession.selectOne(NAMESPACE + "selectFileById", fileId); }
+    public File getFileById(int fileId) {
+
+        return sqlSession.selectOne(NAMESPACE + "selectFileById", fileId);
+    }
 
     // 파일 ID 리스트 파일 정보 조회
-    public List<File> getFileListById(List<Integer> fileIdList) {
-        List<File> files = new ArrayList<>();
-        // 매퍼에서 데이터를 받아온 다음
-        List<File> result = sqlSession.selectList(NAMESPACE + "selectFileListById", fileIdList);
+    public List<File> getFileListById( List<Integer> fileIdList) {
 
-        for (File file : result) {
-            // stored_file_name을 명시적으로 String으로 변환
-            String storedFileName = String.valueOf(file.getStoredFileName());
-            file.setStoredFileName(storedFileName);
-            files.add(file);
+        for(Integer fileId : fileIdList) {
+            System.out.println(fileId);
         }
 
-        return files;
-//        return sqlSession.selectList(NAMESPACE + "selectFileListById", fileIdList); }
+        Map<String, Object> params = new HashMap<>();
+        params.put("fileIdList", fileIdList);
+        return sqlSession.selectList(NAMESPACE + "selectFileListById", params);
+
+//        return sqlSession.selectList(NAMESPACE + "selectFileListById", fileIdList);
     }
 
     // 파일 ID로 저장된 파일 이름 조회
