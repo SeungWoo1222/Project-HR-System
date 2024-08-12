@@ -1,5 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
+import com.woosan.hr_system.auth.aspect.LogAfterExecution;
+import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
@@ -8,7 +10,6 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
-import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.resignation.service.ResignationService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -116,6 +117,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ============================================= 조회 관련 로직 end-point =============================================
 
     // ============================================ 등록 관련 로직 start-point ============================================
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 사원 정보 등록
     public String insertEmployee(Employee employee) {
@@ -135,7 +138,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 첫 비밀번호 생년월일로 설정
         authService.insertPassword(employeeId, employee.getBirth());
 
-        return employee.getName();
+        return "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
     }
 
     // 사원 등록 필수 필드 검증
@@ -171,6 +174,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ============================================= 등록 관련 로직 end-point =============================================
 
     // ============================================ 수정 관련 로직 start-point ============================================
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 사원 정보 수정
     public String updateEmployee(Employee updatedEmployee) {
@@ -186,7 +191,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 사원 정보 수정 처리
         employeeDAO.updateEmployee(updatedEmployee);
 
-        return originalEmployee.getName();
+        return "'" + originalEmployee.getName() + "' 사원의 정보가 수정되었습니다.";
     }
 
     // Employee의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
@@ -212,6 +217,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setLastModified(info.getNow());
     }
 
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 재직 상태 수정하는 메소드
     public String updateStatus(String employeeId, String status) {
@@ -228,6 +235,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         return "'" + getEmployeeNameById(employeeId) + "' 사원의 재직 상태가 '" + status + "'으로 변경되었습니다.";
     }
 
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 직급 승진시키는 메소드
     public String promoteEmployee(String employeeId) {
@@ -253,6 +262,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ============================================ 수정 관련 로직 end-point ============================================
 
     // ============================================== 삭제 로직 start-point ==============================================
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 사원 정보 삭제
     public String deleteEmployee(String employeeId) {
@@ -278,16 +289,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // =============================================== 삭제 로직 end-point ===============================================
 
     // ============================================== 기타 로직 start-point ==============================================
-    @Override // 기존 문서 이름 합치는 메소드
-    public void updateResignationDocuments(Resignation resignation, String newDocumentsName) {
-        String originalDocumentsName = resignation.getResignationDocuments();
-        // 새로 등록하거나 기존 파일이 없을 경우
-        if (originalDocumentsName == null) resignation.setResignationDocuments(newDocumentsName);
-            // 기존 파일이 있을 경우
-        else resignation.setResignationDocuments(originalDocumentsName + newDocumentsName);
-    }
-
-    @Override // 업로드 후 사진 파일 Id 할당
+    @Override // 업로드 후 사진 파일 ID 할당
     public void assignPictureFromUpload(Employee employee, MultipartFile picture) {
         int fileId = fileService.uploadingFile(picture, "employee");
         employee.assignPicture(fileId);

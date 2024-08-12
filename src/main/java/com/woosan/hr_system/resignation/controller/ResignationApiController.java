@@ -34,14 +34,11 @@ public class ResignationApiController {
             resignationService.uploadNewFiles(employeeId, resignationDocuments);
         }
 
-        // 사원 퇴사 처리
-        resignationService.resignEmployee(employeeId, resignation);
-
         // 재직 상태 - 퇴사 처리
         employeeService.updateStatus(employeeId, "퇴사");
 
-        String name = employeeService.getEmployeeNameById(employeeId);
-        return ResponseEntity.ok("'" + name + "' 사원이 퇴사 처리되었습니다.");
+        // 사원 퇴사 처리
+        return ResponseEntity.ok(resignationService.resignEmployee(employeeId, resignation));
     }
 
     // 사원 퇴사 정보 수정
@@ -52,9 +49,6 @@ public class ResignationApiController {
                                                         @RequestPart(value = "oldFileIdList", required = false) List<Integer> oldFileIdList,
                                                         @RequestPart(value = "newFile", required = false) MultipartFile[] newFileArr) {
         // 퇴사 정보 수정
-        resignationService.updateResignation(employeeId, resignation, oldFileIdList, newFileArr);
-
-        String name = employeeService.getEmployeeNameById(employeeId);
-        return ResponseEntity.ok("'" + name + "' 사원의 퇴사 정보가 수정되었습니다.");
+        return ResponseEntity.ok(resignationService.updateResignation(employeeId, resignation, oldFileIdList, newFileArr));
     }
 }

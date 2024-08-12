@@ -3,6 +3,7 @@ package com.woosan.hr_system.config;
 import com.woosan.hr_system.auth.service.CustomAuthenticationEntryPoint;
 import com.woosan.hr_system.auth.service.CustomAuthenticationFailureHandler;
 import com.woosan.hr_system.auth.service.CustomAuthenticationSuccessHandler;
+import com.woosan.hr_system.auth.service.CustomLogoutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/login", "/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/auth/logout","/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
                                 .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("MANAGER")
@@ -57,7 +58,7 @@ public class SecurityConfig {
                 .logout(logout ->
                         logout
                                 .logoutUrl("/logout") // 로그아웃 URL
-                                .logoutSuccessUrl("/auth/logout") // 로그아웃 성공 시 리다이렉트될 경로
+                                .logoutSuccessHandler(new CustomLogoutSuccessHandler()) // 로그아웃 커스텀 성공 핸들러 설정
                                 .invalidateHttpSession(true) // 세션 무효화
                                 .deleteCookies("JSESSIONID") // JSESSIONID 쿠키 삭제
                                 .permitAll() // 로그아웃 URL은 인증 없이 접근 허용

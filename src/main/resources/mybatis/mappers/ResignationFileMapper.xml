@@ -48,7 +48,7 @@
     </delete>
 
     <!-- 특정 resignationId에 대한 모든 파일 레코드 삭제 -->
-    <delete id="deleteAllByResignationId" parameterType="String">
+    <delete id="deleteAllResignationFile" parameterType="String">
         DELETE FROM resignation_files WHERE resignation_id = #{resignationId}
     </delete>
 </mapper>

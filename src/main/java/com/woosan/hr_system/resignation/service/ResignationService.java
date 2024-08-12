@@ -9,8 +9,8 @@ import java.util.List;
 public interface ResignationService {
     List<Resignation> getAllResignation();
     Resignation getResignation(String employeeId);
-    void resignEmployee(String employeeId, Resignation resignation);
-    void updateResignation(String employeeId, Resignation resignation, List<Integer> oldFileIdList, MultipartFile[] newFileArr);
+    String resignEmployee(String employeeId, Resignation resignation);
+    String updateResignation(String employeeId, Resignation resignation, List<Integer> oldFileIdList, MultipartFile[] newFileArr);
     void deleteResignation(String employeeId);
 
     // == resignationFile 관련 코드 ==

@@ -1,7 +1,10 @@
 package com.woosan.hr_system.resignation.service;
 
+import com.woosan.hr_system.auth.aspect.LogAfterExecution;
+import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.common.service.CommonService;
+import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.exception.employee.NoChangesDetectedException;
 import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
 import com.woosan.hr_system.resignation.dao.ResignationDAO;
@@ -26,6 +29,8 @@ public class ResignationServiceImpl implements ResignationService {
     private CommonService commonService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private EmployeeDAO employeeDAO;
     @Autowired
     private ResignationDAO resignationDAO;
     @Autowired
@@ -70,15 +75,18 @@ public class ResignationServiceImpl implements ResignationService {
     // ====================================================== 조회 ======================================================
 
     // ====================================================== 등록 ======================================================
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 사원 퇴사 처리 로직
-    public void resignEmployee(String employeeId, Resignation resignation) {
+    public String resignEmployee(String employeeId, Resignation resignation) {
         // 퇴사 처리 할 resignation 객체 초기화
         UserSessionInfo processInfo = new UserSessionInfo();
         resignation.initializeResignationDetails(employeeId, resignation, processInfo.getCurrentEmployeeId(), processInfo.getNow());
 
         // 퇴사 정보 등록
         resignationDAO.insertResignation(resignation);
+        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원이 퇴사 처리되었습니다.";
     }
 
     @Transactional
@@ -111,23 +119,30 @@ public class ResignationServiceImpl implements ResignationService {
 
         // 퇴사 정보 삭제
         resignationDAO.deleteResignation(employeeId);
+        log.info("'{}' 사원의 퇴사 정보가 삭제되었습니다.", employeeId);
     }
 
-    // 특정 resignationId(employeeId)에 대한 모든 파일 레코드 삭제
+    // 특정 resignationId(employeeId)에 대한 fileId 레코드 삭제
     private void deleteResignationFile(String employeeId, int fileId) {
         resignationFileDAO.deleteResignationFile(new ResignationFile(employeeId, fileId));
+        log.info("resignationFile 테이블에서 {}의 {} 파일 레코드가 삭제되었습니다.", employeeId, fileId);
     }
 
     // 특정 resignationId(employeeId)에 대한 모든 파일 레코드 삭제
     private void deleteAllByResignationId(String employeeId) {
-        resignationFileDAO.deleteAllByResignationId(employeeId);
+        if (resignationFileDAO.countFilesByResignationId(employeeId) > 0) {
+            resignationFileDAO.deleteAllByResignationId(employeeId);
+            log.info("resignationFile 테이블에서 {}의 모든 파일 레코드가 삭제되었습니다.", employeeId);
+        }
     }
     // ====================================================== 삭제 ======================================================
 
     // ================================================== 퇴사 정보 수정 ==================================================
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 사원 퇴사 정보 수정
-    public void updateResignation(String employeeId, Resignation resignation, List<Integer> fileIdList, MultipartFile[] newFileArr) {
+    public String updateResignation(String employeeId, Resignation resignation, List<Integer> fileIdList, MultipartFile[] newFileArr) {
         // 사원 퇴사 정보와 사원 퇴사 문서 변경사항 확인
         boolean hasChangedResignation = hasChangedResignation(employeeId, resignation);
         boolean hasChangedOriginalFiles = !compareFileIdList(employeeId, fileIdList).isEmpty();
@@ -149,6 +164,8 @@ public class ResignationServiceImpl implements ResignationService {
 
         // 퇴사 정보 수정
         if (hasChangedResignation) resignationDAO.updateResignation(resignation);
+
+        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원의 퇴사 정보가 수정되었습니다.";
     }
 
     // 퇴사 정보 변경사항 확인

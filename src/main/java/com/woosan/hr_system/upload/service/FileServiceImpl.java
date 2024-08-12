@@ -79,9 +79,11 @@ public class FileServiceImpl implements FileService {
 
         // DB에 파일 정보 입력
         fileDAO.insertFile(fileInfo);
+        int fileId = fileInfo.getFileId();
+        log.info("파일 ID '{}'가 files 테이블에 등록되었습니다.", fileId);
 
-        // fileInfo 객체의 ID를 반환
-        return fileInfo.getFileId();
+        // file ID 반환
+        return fileId;
     }
 
     // 파일 정보 생성
@@ -148,6 +150,7 @@ public class FileServiceImpl implements FileService {
 
         // DB에서 해당 파일 삭제
         fileDAO.deleteFile(fileId);
+        log.info("파일 ID '{}'번이 files 테이블에서 삭제되었습니다.", fileId);
 
         // S3에서 제거
         deleteFileFromS3(file);
