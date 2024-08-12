@@ -196,7 +196,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 "address", "detailAddress", "department", "position", "hireDate",
                 "status", "remainingLeave", "picture"
         ));
-        commonService.verifyChanges(original, updated, fieldsToCompare);
+        commonService.processFieldChanges(original, updated, fieldsToCompare);
+
+        // 사진 변경 시 기존 파일 삭제
+        int originalFileId = original.getPicture();
+        if (originalFileId != updated.getPicture()) {
+            fileService.deleteFile(originalFileId);
+        }
     }
 
     // 사원 정보에 수정 정보 설정
@@ -260,10 +266,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         LocalDate now = LocalDate.now();
 
         if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
-            employeeDAO.deleteEmployee(employeeId);
-            fileService.deleteFile(employee.getPicture());
             resignationService.deleteResignation(employeeId);
+            fileService.deleteFile(employee.getPicture());
             authService.deletePassword(employeeId);
+            employeeDAO.deleteEmployee(employeeId);
             return "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
         } else {
             throw new IllegalArgumentException("사원이 퇴사 후 1년이 지나지 않았습니다.");

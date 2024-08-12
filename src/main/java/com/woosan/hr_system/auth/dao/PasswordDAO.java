@@ -11,7 +11,7 @@ public class PasswordDAO {
     @Autowired
     private SqlSession sqlSession;
 
-    private static final String NAMESPACE = "com.woosan.hr_system.auth.mapper.PasswordMapper.";
+    private static final String NAMESPACE = "com.woosan.hr_system.auth.dao.PasswordDAO.";
 
     // 비밀번호 정보 조회
     public Password getPasswordInfoById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectPassword", employeeId); }

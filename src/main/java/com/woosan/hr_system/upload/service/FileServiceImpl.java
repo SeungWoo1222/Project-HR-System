@@ -1,6 +1,5 @@
 package com.woosan.hr_system.upload.service;
 
-import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
 import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
@@ -124,26 +123,6 @@ public class FileServiceImpl implements FileService {
     // ===================================================== 업로드 ======================================================
 
     // =============================================== 파일 다운로드와 삭제 =================================================
-//    // 파일들 확인 후 업로드하는 메소드
-//    public String checkAndUploadFiles(MultipartFile[] files) {
-//        // 업로드 파일 개수 확인
-//        checkFilesLength(files);
-//
-//        // 각각의 파일 확인
-//        StringBuilder sb = new StringBuilder();
-//        for(int i = 0; i < files.length; i++) {
-//            validateFile(files[i]);
-//            try {
-//                sb.append(s3Service.uploadFile(files[i]));
-//                if (i != files.length - 1) { sb.append("/"); }
-//            } catch (IOException e) {
-//                log.error("다중 파일 업로드 작업 중 예외가 발생하였습니다.", e);
-//                throw new FileProcessingException("파일 업로드 중 문제가 발생했습니다. 다시 시도해 주세요.");
-//            }
-//        }
-//        return sb.toString();
-//    }
-
     // 파일 다운로드
     @Transactional
     @Override
@@ -162,7 +141,6 @@ public class FileServiceImpl implements FileService {
 
     // 파일 삭제
     @Transactional
-    @RequireManagerPermission
     @Override
     public void deleteFile(int fileId) {
         // 파일 정보 조회
@@ -192,12 +170,13 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    // 업로드 파일 개수 확인
-    private void checkFilesLength(MultipartFile[] files) {
-        if (files.length > 3) {
+    @Override // 업로드 파일 개수 확인
+    public void checkFilesLength(int fileCount) {
+        if (fileCount > 3) {
             throw new FileBadRequestException("최대 3개의 파일만 업로드할 수 있습니다.");
         }
     }
+
     // ==================================================== 유효성 검사 ===================================================
 }
 

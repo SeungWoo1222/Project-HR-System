@@ -8,6 +8,7 @@
     <typeAliases>
         <package name="com.woosan.hr_system.employee.model.Employee"/>
         <package name="com.woosan.hr_system.resignation.model.Resignation"/>
+        <package name="com.woosan.hr_system.resignation.model.ResignationFile"/>
         <package name="com.woosan.hr_system.auth.model.Password"/>
         <package name="com.woosan.hr_system.report.model.Report"/>
         <package name="com.woosan.hr_system.report.model.Request"/>
@@ -21,6 +22,7 @@
     <mappers>
         <mapper resource="mybatis/mappers/EmployeeMapper.xml"/>
         <mapper resource="mybatis/mappers/ResignationMapper.xml"/>
+        <mapper resource="mybatis/mappers/ResignationFileMapper.xml"/>
         <mapper resource="mybatis/mappers/PasswordMapper.xml"/>
         <mapper resource="mybatis/mappers/ReportMapper.xml"/>
         <mapper resource="mybatis/mappers/RequestMapper.xml"/>

@@ -2,7 +2,7 @@
 let errorMessage;
 let fileNo = 0;
 let filesArr = [];
-let registeredFilesArr = [];
+let oldFileIdArr = [];
 // ==================================================== 전역변수 =========================================================
 
 // =================================================== 유효성 검사 ========================================================
@@ -327,30 +327,32 @@ function submitUpdateResignationForm(event) {
     const { form, actionUrl } = handleFormSubmit(event);
     const formData = new FormData();
 
-    // FormData 객체에 registeredResignationDocuments 필드를 추가
-    let registeredResignationDocuments = '';
-    for (let i = 0; i < registeredFilesArr.length; i++) {
-        // 삭제되지 않은 파일만 폼 데이터에 담기
-        if (registeredFilesArr[i] !== "") {
-            registeredResignationDocuments += registeredFilesArr[i] + '/';
-        }
-    }
-
     // FormData 객체에 resignation 필드를 추가
     const resignation = {
         resignationDate: form.resignationDate.value,
         resignationReason: form.resignationReason.value,
         codeNumber: form.codeNumber.value,
-        specificReason: form.specificReason.value,
-        resignationDocuments: registeredResignationDocuments
+        specificReason: form.specificReason.value
     };
     formData.append("resignation", new Blob([JSON.stringify(resignation)], { type: "application/json" }));
 
-    // FormData 객체에 resignationDocuments 필드를 추가
+    // 삭제되지 않은 기존 파일 ID만 필터링하여 배열 생성
+    const filteredFileIdArr = oldFileIdArr.filter(fileId => fileId !== "");
+    formData.append("oldFileIdList", new Blob([JSON.stringify(filteredFileIdArr)], { type: "application/json" }));
+
+    // // FormData 객체에 oldFileIdArr 필드를 추가
+    // for (let i = 0; i < oldFileIdArr.length; i++) {
+    //     // 삭제되지 않은 기존 파일만 폼 데이터에 담기
+    //     if (oldFileIdArr[i] !== "") {
+    //         formData.append("oldFileIdArr", oldFileIdArr[i]);
+    //     }
+    // }
+
+    // FormData 객체에 newFile 필드를 추가
     for (let i = 0; i < filesArr.length; i++) {
-        // 삭제되지 않은 파일만 폼 데이터에 담기
+        // 삭제되지 않은 새로운 파일만 폼 데이터에 담기
         if (!filesArr[i].is_delete) {
-            formData.append("resignationDocuments", filesArr[i]);
+            formData.append("newFile", filesArr[i]);
         }
     }
 
@@ -575,30 +577,34 @@ function formatCodeNumberAndResignationReason(text) {
 
 // 기존 퇴사 관련 문서 초기화하는 함수
 function initializeResignationDocuments() {
-    // null 확인 후 null이면 리턴
-    const registeredDocumentsElement = document.getElementById('registeredDocuments');
-    if (!registeredDocumentsElement) { // 요소 자체 확인
+    console.log(fileList);
+    if (!fileList || !Array.isArray(fileList)) {
+        console.warn('fileList가 없거나 배열이 아닙니다.');
         return;
     }
-    const registeredDocument = registeredDocumentsElement.value;
-    if (!registeredDocument) { // 입력값이 비었는지 확인
+    // fileList에서 fileId와 originalFileName을 추출하여 객체로 배열 생성
+    const oldFileArray = fileList.map(function (file) {
+        return { fileId: file.fileId, originalFileName: file.originalFileName };
+    });
+
+    // oldFileArray에 요소가 있는지 확인
+    if (oldFileArray.length === 0) {
+        console.warn('oldFileArray가 비어 있습니다.');
         return;
     }
 
-    // 기존 문서 배열에 담고 공백 제거 및 유효한 값만 필터링
-    const registeredDocumentList = registeredDocument.split("/")
-        .map(item => item.trim())
-        .filter(item => item); // 빈 문자열, null, undefined가 아닌 항목만 남김
+    console.log('oldFileArray : ', oldFileArray);
 
     // 목록에 기존 문서 추가
-    for (let i = 0; i < registeredDocumentList.length; i++) {
+    for (let i = 0; i < oldFileArray.length; i++) {
         let htmlData = '';
         htmlData += '<div id="file' + fileNo + '" class="filebox">';
-        htmlData += '   <p class="name">' + registeredDocumentList[i] + '</p>';
+        htmlData += '   <p class="name">' + oldFileArray[i].originalFileName + '</p>';
         htmlData += '   <a class="delete" onclick="deleteRegisteredFile(' + fileNo + ');"><img src="/images/icons/delete.png" class="delete-btn" alt="delete-btn" width="20"/></a>';
         htmlData += '</div>';
         document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);
-        registeredFilesArr[fileNo] = registeredDocumentList[i];
+        oldFileIdArr[fileNo] = oldFileArray[i].fileId;
+        console.log(oldFileIdArr);
         fileNo++;
     }
 }
@@ -708,9 +714,9 @@ function deleteRegisteredFile(num) {
     // UI에서 파일을 삭제
     document.querySelector("#file" + num).remove();
     // 'registeredFilesArr[num]' 배열에서 해당 배열 값 ""로 초기화
-    registeredFilesArr[num] = "";
-    for (var i = 0; i < registeredFilesArr.length; i++) {
-        console.log(registeredFilesArr[i]);
+    oldFileIdArr[num] = "";
+    for (var i = 0; i < oldFileIdArr.length; i++) {
+        console.log(oldFileIdArr[i]);
     }
 }
 //=================================================== File 관련 함수 =====================================================
