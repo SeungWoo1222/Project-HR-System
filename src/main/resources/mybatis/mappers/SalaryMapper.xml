@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woosan.hr_system.salary.mapper.SalaryMapper">
+
+    <insert id="insertSalary" parameterType="com.woosan.hr_system.salary.model.Salary">
+        INSERT INTO salaries (employee_id, annual_salary, bank, account_number)
+        VALUES (#{employeeId}, #{annualSalary}, #{bank}, #{accountNumber})
+    </insert>
+
+    <select id="selectSalaryById" parameterType="int" resultType="com.woosan.hr_system.salary.model.Salary">
+        SELECT * FROM salaries WHERE salary_id = #{salaryId}
+    </select>
+
+    <select id="selectAllSalaries" resultType="com.woosan.hr_system.salary.model.Salary">
+        SELECT * FROM salaries
+    </select>
+
+    <update id="updateSalary" parameterType="com.woosan.hr_system.salary.model.Salary">
+        UPDATE salaries SET
+                            employee_id = #{employeeId},
+                            annual_salary = #{annualSalary},
+                            bank = #{bank},
+                            account_number = #{accountNumber}
+        WHERE salary_id = #{salaryId}
+    </update>
+
+    <delete id="deleteSalary" parameterType="int">
+        DELETE FROM salaries WHERE salary_id = #{salaryId}
+    </delete>
+
+</mapper>
