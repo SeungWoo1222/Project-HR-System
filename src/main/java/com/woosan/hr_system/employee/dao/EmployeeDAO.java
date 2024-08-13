@@ -25,10 +25,13 @@ public class EmployeeDAO implements SearchService<Employee> {
         return sqlSession.selectList(NAMESPACE + "getAllEmployees");
     }
 
+    // id를 이용한 특정 사원 정보 조회
+    public Employee getEmployeeById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId); }
+
+    public String getEmployeeName(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeName", employeeId); }
+
     // 사원 번호 중복 조회
-    public boolean existsById(String employeeId) { // 사원 번호 중복 조회
-        return sqlSession.selectOne(NAMESPACE + "existsById", employeeId);
-    }
+    public boolean existsById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "existsById", employeeId); }
 
     // 부서를 이용한 특정 사원 정보 조회
     public List<Employee> getEmployeesByDepartment(String departmentId) { return sqlSession.selectList(NAMESPACE + "getEmployeesByDepartment", departmentId); };
@@ -36,19 +39,14 @@ public class EmployeeDAO implements SearchService<Employee> {
     // 퇴사 예정인 사원 정보 조회
     public List<Employee> getPreResignationEmployees() { return sqlSession.selectList(NAMESPACE + "getPreResignationEmployees"); };
 
-    // 퇴사 사원 정보 조회
-    public List<Employee> getResignedEmployees() { // 퇴사 후 2개월 이내의 사원 정보 조회
-        return sqlSession.selectList(NAMESPACE + "getResignedEmployees");
-    };
+    // 퇴사 후 2개월 이내의 사원 정보 조회
+    public List<Employee> getResignedEmployees() { return sqlSession.selectList(NAMESPACE + "getResignedEmployees"); };
 
     // 퇴사 후 12개월이 지난 사원 정보 조회
     public List<Employee> getPreDeletionEmployees() { return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees"); };
 
     // 이번 년도 입사한 사람의 수 조회
     public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
-
-    // 사원 정보 조회
-    public Employee getEmployeeById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId); }
 
     // 사원 정보 등록 - 입사 처리
     public void insertEmployee(Employee employee) { // 사원 정보 등록
@@ -61,9 +59,7 @@ public class EmployeeDAO implements SearchService<Employee> {
     }
 
     // 사원 재직 상태 수정
-    public void updateStatus(Map<String, Object> params) { // 사원 정보 수정
-        sqlSession.update(NAMESPACE + "updateStatus", params);
-    }
+    public void updateStatus(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updateStatus", params); }
 
     // 사원 직급 +1으로 수정 - 승진
     public void updatePosition(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updatePosition",params); }
@@ -76,7 +72,7 @@ public class EmployeeDAO implements SearchService<Employee> {
     @Override // 검색과 페이징 로직
     public List<Employee> search(String keyword, int pageSize, int offset) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("keyword", keyword);;
+        params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         return sqlSession.selectList(NAMESPACE + "search", params);

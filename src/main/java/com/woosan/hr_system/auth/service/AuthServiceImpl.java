@@ -1,5 +1,7 @@
 package com.woosan.hr_system.auth.service;
 
+import com.woosan.hr_system.auth.aspect.LogAfterExecution;
+import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
@@ -105,9 +107,11 @@ public class AuthServiceImpl implements AuthService {
         passwordDAO.insertPassword(password);
     }
 
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 비밀번호 수정 전 확인하는 메소드
-    public void changePassword(String employeeId, String password, String newPassword, int strength) {
+    public String changePassword(String employeeId, String password, String newPassword, int strength) {
         // 현재 비밀번호와 새로운 비밀번호 비교
         if (password.equals(newPassword)) throw new IllegalArgumentException("현재 비밀번호와 새로운 비밀번호가 일치합니다.\n다른 비밀번호를 입력해주세요.");
 
@@ -115,6 +119,7 @@ public class AuthServiceImpl implements AuthService {
         if (!validatePassword(newPassword)) throw new IllegalArgumentException("새로운 비밀번호는 8~20자 사이여야 하며,\n대문자, 소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.");
 
         updatePassword(employeeId, newPassword, strength);
+        return "비밀번호가 변경되었습니다.";
     }
 
     @Transactional
@@ -173,6 +178,7 @@ public class AuthServiceImpl implements AuthService {
         findPasswordInfoById(employeeId);
         // 비밀번호 정보 삭제
         passwordDAO.deletePassword(employeeId);
+        log.info("'{}' 사원의 비밀번호 정보가 삭제되었습니다.", employeeId);
     }
 
     @Override // 계정 잠금과 해제 수정하는 메소드

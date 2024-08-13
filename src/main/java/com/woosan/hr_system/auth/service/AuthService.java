@@ -10,7 +10,7 @@ public interface AuthService {
     CustomUserDetails getAuthenticatedUser();
     int verifyPasswordAttempts(String password, String employeeId);
     void insertPassword(String employeeId, String birth) throws IllegalArgumentException;
-    void changePassword(String employeeId, String currentPassword, String newPassword, int strength) throws IllegalArgumentException, PasswordNotFoundException, AuthenticationException;
+    String changePassword(String employeeId, String currentPassword, String newPassword, int strength) throws IllegalArgumentException, PasswordNotFoundException, AuthenticationException;
     void updatePassword(String employeeId, String newPassword, int strength) throws PasswordNotFoundException;
     String isPasswordChangeRequired();
     void verifyManagerPermission();
