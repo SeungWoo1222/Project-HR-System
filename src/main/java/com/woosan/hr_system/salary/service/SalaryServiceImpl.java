@@ -1,10 +1,10 @@
-package com.woosan.hr_system.salary.service.impl;
+package com.woosan.hr_system.salary.service;
 
 import com.woosan.hr_system.salary.dao.SalaryDAO;
 import com.woosan.hr_system.salary.model.Salary;
-import com.woosan.hr_system.salary.service.SalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
