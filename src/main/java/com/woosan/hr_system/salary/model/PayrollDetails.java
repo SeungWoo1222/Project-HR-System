@@ -14,8 +14,8 @@ public class PayrollDetails {
     // 고정 수당
     private double baseSalaryRatio;         // 기본급 비율 (70%)
     private double positionAllowanceRatio;  // 직책 수당 비율 (10%)
-    private int mealAllowanceRatio;         // 식대 비율 (5%) - 비과세
-    private int transportAllowanceRatio;    // 교통비 비율 (5%) - 비과세
+    private double mealAllowanceRatio;      // 식대 비율 (5%) - 비과세
+    private double transportAllowanceRatio; // 교통비 비율 (5%) - 비과세
     // 성과급
     private double personalBonusRatio;      // 개인 성과급 비율 (2.5%)
     private double teamBonusRatio;          // 팀 성과급 비율 (2.5%)
@@ -48,12 +48,12 @@ public class PayrollDetails {
         return calculate(personalBonusRatio);
     }
 
-    public int calculateTeamBonus() {
-        return calculate(teamBonusRatio);
+    public int calculateTeamBonus() { // 반기지급으로 1.25%
+        return calculate(teamBonusRatio / 2);
     }
 
-    public int calculateHolidayBonus() {
-        return calculate(holidayBonusRatio);
+    public int calculateHolidayBonus() { // 설, 추석으로 1.25%
+        return calculate(holidayBonusRatio / 2);
     }
 
     public int calculateYearEndBonus() {

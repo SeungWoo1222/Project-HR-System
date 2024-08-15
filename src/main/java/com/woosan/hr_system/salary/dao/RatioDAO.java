@@ -6,7 +6,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -17,8 +16,8 @@ public class RatioDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.salary.dao.RatioDAO.";
 
     // 급여 비율 조회
-    public List<PayrollDetails> selectPayrollRatios() {
-        return sqlSession.selectList(NAMESPACE + "selectPayrollRatios");
+    public PayrollDetails selectPayrollRatios() {
+        return sqlSession.selectOne(NAMESPACE + "selectPayrollRatios");
     }
 
     // 급여 비율 수정
@@ -27,8 +26,8 @@ public class RatioDAO {
     }
 
     // 공제 비율 조회
-    public List<DeductionDetails> selectDeductionRatios() {
-        return sqlSession.selectList(NAMESPACE + "selectDeductionRatios");
+    public DeductionDetails selectDeductionRatios() {
+        return sqlSession.selectOne(NAMESPACE + "selectDeductionRatios");
     }
 
     // 공제 비율 수정
