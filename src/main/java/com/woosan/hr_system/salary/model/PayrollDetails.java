@@ -24,9 +24,6 @@ public class PayrollDetails {
     private double yearEndBonusRatio;       // 연말 보너스 비율 (2.5%)
 
     // 행위 중심 메소드
-
-
-    // 비율에 따른 계산 메서드
     private int calculate(double ratio) {
         return (int) (annualSalary * (ratio / 100));
     }
