@@ -22,7 +22,7 @@
     </insert>
 
     <!-- 파일 ID로 파일 정보 조회 -->
-    <select id="selectFileById" parameterType="int" resultType="com.woosan.hr_system.upload.model.File">
+    <select id="selectFileById" parameterType="int" resultMap="FileResultMap">
         SELECT * FROM files WHERE file_id = #{fileId}
     </select>
 
@@ -31,8 +31,11 @@
         SELECT
             file_id AS fileId,
             original_file_name AS originalFileName,
+            stored_file_name AS storedFileName,
             file_size AS fileSize,
-            upload_date AS uploadDate
+            upload_date AS uploadDate,
+            uploaded_by AS uploadedBy,
+            file_id_usage AS fileIdUsage
             FROM files WHERE file_id IN
         <foreach item="fileId" collection="fileIdList" open="(" separator="," close=")">
             #{fileId}
@@ -62,6 +65,15 @@
     <!-- 파일 정보 삭제 -->
     <delete id="deleteFile" parameterType="int">
         DELETE FROM files WHERE file_id = #{fileId}
+    </delete>
+
+    <!--  파일 정보 삭제 - FileIdList  -->
+    <delete id="deleteFileByFileIdList" parameterType="map">
+        DELETE FROM files
+        WHERE file_id IN
+        <foreach collection="fileIdList" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
     </delete>
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.woosan.hr_system.upload.dao;
 
 import com.woosan.hr_system.upload.model.File;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Repository
 public class FileDAO {
     @Autowired
@@ -25,22 +27,14 @@ public class FileDAO {
 
     // 파일 ID로 파일 정보 조회
     public File getFileById(int fileId) {
-
         return sqlSession.selectOne(NAMESPACE + "selectFileById", fileId);
     }
 
     // 파일 ID 리스트 파일 정보 조회
     public List<File> getFileListById( List<Integer> fileIdList) {
-
-        for(Integer fileId : fileIdList) {
-            System.out.println(fileId);
-        }
-
         Map<String, Object> params = new HashMap<>();
         params.put("fileIdList", fileIdList);
         return sqlSession.selectList(NAMESPACE + "selectFileListById", params);
-
-//        return sqlSession.selectList(NAMESPACE + "selectFileListById", fileIdList);
     }
 
     // 파일 ID로 저장된 파일 이름 조회
@@ -57,5 +51,14 @@ public class FileDAO {
     // 파일 정보 삭제
     public int deleteFile(int fileId) {
         return sqlSession.delete(NAMESPACE + "deleteFile", fileId);
+    }
+
+    // 파일 정보 삭제 - fileIdList에 의한 삭제
+    public void deleteFileByFileIdList(List<Integer> fileIdList) {
+        log.info("FileDAO로 전달된 fileIdList {}", fileIdList);
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("fileIdList", fileIdList);
+        log.info("FileDAO에서 만들어진 paramMap {}", paramMap);
+        sqlSession.delete(NAMESPACE + "deleteFileByFileIdList", paramMap);
     }
 }

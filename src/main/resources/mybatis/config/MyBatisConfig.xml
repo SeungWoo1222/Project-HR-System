@@ -12,6 +12,9 @@
         <package name="com.woosan.hr_system.report.model.Report"/>
         <package name="com.woosan.hr_system.report.model.Request"/>
         <package name="com.woosan.hr_system.report.model.ReportStat"/>
+        <package name="com.woosan.hr_system.report.model.FileArchive"/>
+        <package name="com.woosan.hr_system.report.model.ReportFileLink"/>
+        <package name="com.woosan.hr_system.report.model.SharedTrash"/>
         <package name="com.woosan.hr_system.upload.model.File"/>
     </typeAliases>
     <typeHandlers>
@@ -25,5 +28,6 @@
         <mapper resource="mybatis/mappers/ReportMapper.xml"/>
         <mapper resource="mybatis/mappers/RequestMapper.xml"/>
         <mapper resource="mybatis/mappers/FileMapper.xml"/>
+        <mapper resource="mybatis/mappers/ReportFileMapper.xml"/>
     </mappers>
 </configuration>

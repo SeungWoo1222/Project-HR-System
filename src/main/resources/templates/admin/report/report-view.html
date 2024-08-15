@@ -46,12 +46,6 @@
                 <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
             </p>
         </div>
-<!--        <button type="button" th:onclick="'navigateToEdit(' + ${report.reportId} + ')'">수정</button>-->
-
-<!--        <form th:action="@{'/report/delete/' + ${report.reportId}}" method="post" style="display:inline;">-->
-<!--            <input type="hidden" name="_method" value="delete">-->
-<!--            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>-->
-<!--        </form>-->
 
         <button onclick="closeModal()" >목록으로 </button>
     </div>

@@ -2,12 +2,14 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
+import com.woosan.hr_system.report.service.ReportFileService;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.search.PageRequest;
@@ -16,16 +18,24 @@ import com.woosan.hr_system.upload.model.File;
 import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +57,8 @@ public class ReportController {
     private ObjectMapper objectMapper; // 통계 반환 후 view에 보내면서 JSON로 반환함
     @Autowired
     private AuthService authService;
+    @Autowired
+    private ReportFileService reportFileService;
 
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(HttpSession session,
@@ -82,8 +94,8 @@ public class ReportController {
         return "report/main"; // main.html 반환
     }
 
-//=====================================================생성 메소드======================================================
-    @GetMapping("/write") // 보고서 생성 페이지 이동
+    //=====================================================생성 메소드======================================================
+    @GetMapping("/showCreatePage") // 보고서 생성 페이지 이동
     public String showCreatePage(Model model) {
         List<Employee> employees = employeeDAO.getAllEmployees();
         model.addAttribute("employees", employees); // employees 목록 추가
@@ -94,13 +106,13 @@ public class ReportController {
     // 보고서 생성
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String createReport(@ModelAttribute Report report,
-                               @RequestParam("reportDocuments") List<MultipartFile> reportDocuments) {
+                               @RequestParam("reportFiles") List<MultipartFile> reportDocuments) {
         // 유효한 파일만 필터링 (null 제거)
         List<MultipartFile> validFiles = reportDocuments.stream()
                 .filter(file -> !file.isEmpty())
                 .collect(Collectors.toList());
 
-        reportService.createReport(report, validFiles);
+        reportService.createReportWithFile(report, validFiles);
 
         return "redirect:/report/list";
     }
@@ -117,7 +129,7 @@ public class ReportController {
 
     @PostMapping("/writeFromRequest") // 요청 들어온 보고서 생성
     public String CreateReportFromRequest(@ModelAttribute Report report,
-                                        @RequestParam("approverId") String approverId){
+                                          @RequestParam("approverId") String approverId) {
 //                               @RequestParam("file") MultipartFile file) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         String writerId = authService.getAuthenticatedUser().getUsername();
@@ -137,9 +149,12 @@ public class ReportController {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
-        List<Integer> fileIds = reportService.getFileIdsByReportId(reportId);
-        List<File> files = fileService.getFileListById(fileIds);
-        model.addAttribute("files", files);
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
 
         return "/report/report-view";
     }
@@ -159,7 +174,6 @@ public class ReportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFileName + "\"")
                 .body(new ByteArrayResource(fileData));
     }
-
 
 
     @GetMapping("/list") // 보고서 리스트 페이지
@@ -273,34 +287,181 @@ public class ReportController {
         List<Employee> employees = employeeDAO.getAllEmployees();
         Report report = reportService.getReportById(reportId);
 
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
+
         model.addAttribute("employees", employees); // employees 목록 추가
         model.addAttribute("report", report);
         return "report/edit";
     }
 
+    @Transactional
     @PostMapping("/edit") // 보고서 수정
-    public String updateReport(@ModelAttribute Report report) {
-        // 요청 수정 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
+    public String updateReport(@ModelAttribute Report report,
+                               @RequestParam(value = "reportFileList", required = false) List<MultipartFile> reportFileList,
+                               @RequestParam(value = "registeredFileIdList", required = false) List<String> registeredFileStringIdList) {
 
-        // 요청 ID로 요청 조회
-        Report reportForCheck = reportService.getReportById(report.getReportId());
+        log.info("IdList : {}", report.getIdList());
+
+        // 업로드할 파일의 상세 정보 로그
+        if (reportFileList != null && !reportFileList.isEmpty()) {
+            log.info("업로드할 파일 개수 : {}", reportFileList.size());
+            for (MultipartFile file : reportFileList) {
+                log.info("파일 이름: {}, 파일 크기: {} bytes, 파일 타입: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
+            }
+        } else {
+            log.info("업로드할 파일이 없습니다.");
+        }
+
+        // 기존 파일 ID의 상세 정보 로그
+        if (registeredFileStringIdList != null && !registeredFileStringIdList.isEmpty()) {
+            log.info("기존 파일 Id 개수 : {}", registeredFileStringIdList.size());
+            for (String fileId : registeredFileStringIdList) {
+                log.info("기존 파일 Id: {}", fileId);
+            }
+        } else {
+            log.info("기존 파일 Id가 없습니다.");
+        }
+
+        // List<String>을 List<Integer>로 변환
+        List<Integer> registeredFileIdList = new ArrayList<>();
+        if (registeredFileStringIdList != null) {
+            // JSON으로 변환된 문자열이 들어온 경우 이를 파싱
+            for (String fileIdString : registeredFileStringIdList) {
+                String parsedString = fileIdString.replaceAll("\\[", "").replaceAll("\\]", "")
+                        .replaceAll("\"", "").trim();
+                String[] fileIdArray = parsedString.split(",");
+                for (String fileId : fileIdArray) {
+                    registeredFileIdList.add(Integer.parseInt(fileId.trim()));
+                }
+            }
+        }
+
+        log.info("registeredFileIdList : " + registeredFileIdList);
+        handleFilesForReport(reportFileList, registeredFileIdList);
+
+        // 요청 수정 권한이 있는지 확인
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
 
         // 현재 로그인한 사용자와 requester_id 비교
-        if (reportForCheck != null && reportForCheck.getWriterId().equals(currentId)) {
-            // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
+        if (report != null && report.getWriterId().equals(userSessionInfo.getCurrentEmployeeId())) {
+
+            // 결재자 수에 따른 처리
             if (report.getIdList().size() > 1) {
+                // 결재자 수가 여러명으로 바뀐 경우
+                log.info("createReport 컨트롤러 메소드 실행");
+                report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
                 reportService.deleteReport(report.getReportId());
-                report.setWriterId(currentId);
-//                reportService.createReport(report);
+                List<Integer> reportIdList = reportService.createReport(report);
+                log.info("보고서 생성 후 reportIdList반환 완료 : {}", reportIdList);
+                assembleFileIdReportId(reportIdList, null, null);
+                log.info("assembleFileIdReportId 보고서 완료");
             } else {
+                log.info("결재자 한명인 경우 실행");
+                report.setModifiedDate(userSessionInfo.getNow()); // 현재시간 설정
                 reportService.updateReport(report);
+                assembleFileIdReportId(null, null, report.getReportId());
             }
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
         return "redirect:/report/list";
+    }
+
+    private void handleFilesForReport(List<MultipartFile> reportFileList, List<Integer> fileIdList) {
+        List<Integer> toLinkFileIdList = new ArrayList<>();
+
+        for (Integer fileId : fileIdList) {
+            // ↓ 두 파일이 같은 파일인지 비교 시작 ↓
+            File toCompareFile = fileService.getFileInfo(fileId);
+            for (MultipartFile file : reportFileList) {
+                // 파일이 같은지 다른지 비교하기 위한 변수
+                boolean isFileMatch = false;
+
+                // 두 파일의 사이즈가 같다면 해싱 비교
+                if (toCompareFile.getFileSize() == file.getSize()) {
+                    try (
+                            InputStream fileInputStream = file.getInputStream();
+                            FileInputStream compareFileInputStream = new FileInputStream(String.valueOf(toCompareFile))
+                    ) {
+                        String fileHash = calculateHash(fileInputStream);
+                        String compareFileHash = calculateHash(compareFileInputStream);
+
+                        // 두 파일이 같다면
+                        if (fileHash.equals(compareFileHash)) {
+                            isFileMatch = true;
+                        } else {
+                            isFileMatch = false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } // ↑ 두 파일이 같은 파일인지 비교 끝 ↑
+
+                // 두 파일이 같다면 fileId를 조인테이블에 연결할 fildIdList에 넣어줌
+                if (isFileMatch) {
+                    toLinkFileIdList.add(fileId);
+
+                // 다르다면 파일 업로드 후 fildId를 반환하여 조인테이블에 연결할 fildIdList에 넣어줌
+                } else {
+                    int uploadingFileId = fileService.uploadingFile(file, "report");
+                    toLinkFileIdList.add(uploadingFileId);
+                }
+            }
+        }
+        assembleFileIdReportId(null, toLinkFileIdList, null);
+
+    }
+
+    // 컨트롤러 상에서 실행하는 순서가 달라서 한곳으로 모으기위함
+    private void assembleFileIdReportId(List<Integer> reportIdList, List<Integer> fileIdList, Integer reportId) {
+        List<Integer> jointableReportIdList = new ArrayList<>();
+        List<Integer> jointableFileIdList = new ArrayList<>();
+
+        if(reportIdList != null && reportIdList.size() > 0) {
+            for (int rId : reportIdList) {
+                jointableReportIdList.add(rId);
+            }
+        } else if (fileIdList != null && fileIdList.size() > 0) {
+            for (int fileId : fileIdList) {
+                jointableFileIdList.add(fileId);
+            }
+        } else if (reportId != null) {
+            jointableReportIdList.add(reportId);
+        }
+        insertJoinTable(jointableReportIdList, jointableFileIdList);
+        log.info("insertJoinTable 메소드 호출 완료");
+    }
+
+    // 조인 테이블에 삽입
+    private void insertJoinTable(List<Integer> reportIdList, List<Integer> fileIdList) {
+        for (Integer reportId : reportIdList) {
+            List<Integer> existingFileIds = reportFileService.getFileIdsByReportId(reportId);
+
+            // 이미 존재하는 파일 ID를 제외한 파일만 추가
+            fileIdList.stream()
+                    .filter(fileId -> !existingFileIds.contains(fileId))
+                    .forEach(fileId -> reportFileService.createReportFile(reportId, fileId));
+        }
+        log.info("insertJoinTable 완료");
+    }
+
+
+    private String calculateHash(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] byteArray = new byte[1024];
+        int bytesCount = 0;
+
+        while ((bytesCount = inputStream.read(byteArray)) != -1) {
+            digest.update(byteArray, 0, bytesCount);
+        }
+
+        byte[] bytes = digest.digest();
+        return Hex.encodeHexString(bytes);
     }
 
 //=================================================수정 메소드============================================================

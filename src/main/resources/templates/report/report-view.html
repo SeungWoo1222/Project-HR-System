@@ -33,10 +33,10 @@
                         <button type="submit" th:text="${file.originalFileName}">다운로드</button>
 
                     </form>
-                    <p style="font-size: 10px; color: gray;">
-                        업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span><br>
+                    <div style="font-size: 10px; color: gray;">
+                        업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>
                         파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>
-                    </p>
+                    </div>
                 </li>
             </ul>
         </div>

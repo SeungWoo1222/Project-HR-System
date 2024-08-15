@@ -70,7 +70,7 @@ function loadEmployeesByDepartment() {
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.className = 'idCheckbox';
-                    checkbox.name = 'id';
+                    // checkbox.name = 'id';
                     checkbox.value = employee.employeeId;
                     checkbox.dataset.name = employee.name;
 
@@ -84,7 +84,7 @@ function loadEmployeesByDepartment() {
                     const nameInput = document.createElement('input');
                     nameInput.type = 'hidden';
                     nameInput.className = 'nameInput';
-                    nameInput.name = 'name';
+                    // nameInput.name = 'name';
                     nameInput.value = employee.name;
 
                     const label = document.createElement('label');
@@ -143,43 +143,11 @@ function updateSelectedEmployees() {
     });
 }
 
-//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
-
-// 파일 유효성 검사 함수
-function validateFiles() {
-    const fileInput = document.getElementById('reportDocuments');
-    const files = fileInput.files;
-    const maxFileSize = 10 * 1024 * 1024; // 10MB
-    const allowedExtensions = ['pdf', 'doc', 'docx', 'xlsx', 'jpg', 'png'];
-
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const fileSize = file.size;
-        const fileExtension = file.name.split('.').pop().toLowerCase();
-
-        if (fileSize > maxFileSize) {
-            alert(`파일 ${file.name}이(가) 너무 큽니다. 최대 허용 크기는 10MB입니다.`);
-            return false;
-        }
-
-        if (!allowedExtensions.includes(fileExtension)) {
-            alert(`파일 ${file.name}은(는) 허용되지 않는 파일 형식입니다.`);
-            return false;
-        }
-    }
-
-    return true; // 파일이 유효하면 true 반환
-}
-
-// 제출 버튼 클릭 시 호출되는 함수
-function submitReport(event) {
+//=================================================== 임원 선택 =========================================================
+//================================================= 파일 생성 관련 js ===================================================
+// 보고서 생성 시
+function submitReport(event, url) {
     event.preventDefault(); // 기본 폼 제출 방지
-
-    const isValid = validateFiles(); // 파일 유효성 검사
-
-    if (!isValid) {
-        return false; // 유효성 검사 실패 시 폼 제출 방지
-    }
 
     const form = document.getElementById('form');
     const formData = new FormData(form); // 기존 폼 데이터 가져오기
@@ -187,7 +155,7 @@ function submitReport(event) {
     // filesArr에 저장된 파일들을 FormData에 추가
     filesArr.forEach((file, index) => {
         if (!file.is_delete) { // 삭제된 파일 제외
-            formData.append('reportDocuments', file);
+            formData.append('reportFiles', file);
         }
     });
 
@@ -198,8 +166,12 @@ function submitReport(event) {
     formData.set('idList', idList.join(','));
     formData.set('nameList', nameList.join(','));
 
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
     // AJAX를 사용하여 폼 데이터 전송
-    fetch('/report/write', {  // 이 부분에서 '/report/write'로 전송
+    fetch(url, {  // 이 부분에서 '/report/write'로 전송
         method: 'POST',
         body: formData,
     }).then(response => {
@@ -217,69 +189,64 @@ function submitReport(event) {
     });
 }
 
-
-
-
-
-
-//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
-//========================================== 임원 선택 ==================================================================
+//============================================= 파일 생성 관련 js =======================================================
 
 //========================================== 통계 관련 메소드 ============================================================
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드
-function removeWriter(button) {
-    console.log('Removing writer with ID:', button);
+    function removeWriter(button) {
+        console.log('Removing writer with ID:', button);
 
-    // 선택된 임원 목록에서 해당 임원 삭제
-    var employeeId = button.getAttribute('data-employee-id');
-    console.log("Removing writer with employeeId:", employeeId);
+        // 선택된 임원 목록에서 해당 임원 삭제
+        var employeeId = button.getAttribute('data-employee-id');
+        console.log("Removing writer with employeeId:", employeeId);
 
-    // 부모 노드를 찾아서 삭제
-    var parentLi = button.parentNode;
-    parentLi.parentNode.removeChild(parentLi);
+        // 부모 노드를 찾아서 삭제
+        var parentLi = button.parentNode;
+        parentLi.parentNode.removeChild(parentLi);
 
-    // 선택된 임원 ID 목록 갱신
-    const remainingIds = [];
-    document.querySelectorAll('#selected-writers-list li button').forEach(button => {
-        remainingIds.push(button.getAttribute('data-employee-id'));
-        console.log(button.getAttribute('data-employee-id'));
-    });
+        // 선택된 임원 ID 목록 갱신
+        const remainingIds = [];
+        document.querySelectorAll('#selected-writers-list li button').forEach(button => {
+            remainingIds.push(button.getAttribute('data-employee-id'));
+            console.log(button.getAttribute('data-employee-id'));
+        });
 
-    // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
-    if (remainingIds.length === 0) {
-        var ul = document.getElementById('selected-writers-list');
-        var allMembersLi = document.createElement("li");
-        allMembersLi.innerHTML = "<span>모든 임원</span>";
-        ul.appendChild(allMembersLi);
+        // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
+        if (remainingIds.length === 0) {
+            var ul = document.getElementById('selected-writers-list');
+            var allMembersLi = document.createElement("li");
+            allMembersLi.innerHTML = "<span>모든 임원</span>";
+            ul.appendChild(allMembersLi);
+        }
+
+        // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
+        updateChartWithSelectedWriters(remainingIds);
     }
 
-    // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
-    updateChartWithSelectedWriters(remainingIds);
-}
-
 // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
-function updateChartWithSelectedWriters(ids) {
-    $.ajax({
-        url: '/admin/request/updateStats',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(ids),
-        success: function (response) {
-            // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
-            var stats = JSON.parse(response.statsJson);
+    function updateChartWithSelectedWriters(ids) {
+        $.ajax({
+            url: '/admin/request/updateStats',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function (response) {
+                // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
+                var stats = JSON.parse(response.statsJson);
 
-            var data = google.visualization.arrayToDataTable(stats);
+                var data = google.visualization.arrayToDataTable(stats);
 
-            var options = {};
+                var options = {};
 
-            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
-            chart.draw(data, google.charts.Bar.convertOptions(options));
-        },
-        error: function (error) {
-            console.error('Error:', error);
-        }
-    });
-}
+                var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+
 
 //========================================== 통계 관련 메소드 =================================================================

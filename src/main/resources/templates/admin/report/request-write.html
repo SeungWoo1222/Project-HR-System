@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-<!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
+    <!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
 </th:block>
 
 <th:block layout:fragment="script">
@@ -23,27 +23,30 @@
         <option value="FI">재무</option>
         <option value="HR">인사</option>
         <option value="RD">연구개발</option>
-    </select><br>
+    </select>
 
     <div id="selectAllContainer" style="display:none;">
         <label>
             <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
-        </label><br>
+        </label>
     </div>
 
     <label for="idContainer">보고서 작성자</label>
     <div id="idContainer">
         <!-- 직원 목록이 여기에 추가됩니다. -->
     </div>
-    <br>
 
     <div id="selectedEmployees" class="selected-employees"></div>
 
-    <label for="dueDate">마감 기한:</label>
-    <input type="date" id="dueDate" name="dueDate" required><br>
+    <div>
+        <label for="dueDate">마감 기한:</label>
+        <input type="date" id="dueDate" name="dueDate" required>
+    </div>
 
-    <label for="requestNote">요청 사항:</label>
-    <textarea id="requestNote" name="requestNote" rows="10" required></textarea><br>
+    <div>
+        <label for="requestNote">요청 사항:</label>
+        <textarea id="requestNote" name="requestNote" rows="10" required></textarea>
+    </div>
 
     <button type="submit">생성하기</button>
 </form>

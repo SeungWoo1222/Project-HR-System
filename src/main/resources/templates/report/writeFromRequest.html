@@ -59,18 +59,27 @@
         <h1>요청 들어온 보고서 작성</h1>
         <form th:action="@{/report/writeFromRequest}" method="post" th:object="${report}">
 
+            <div>
             <label for="title">제목:</label>
-            <input type="text" id="title" name="title" required><br>
+            <input type="text" id="title" name="title" required>
+            </div>
 
+            <div>
             <label for="content">내용:</label>
-            <textarea id="content" name="content" rows="10" required></textarea><br>
+            <textarea id="content" name="content" rows="10" required></textarea>
+            </div>
 
+            <div>
             <label for="completeDate">업무 완료 날짜:</label>
-            <input type="date" id="completeDate" name="completeDate" required><br>
+            <input type="date" id="completeDate" name="completeDate" required>
+            </div>
 
+            <div>
             <label>파일 첨부:</label>
             <label for="file" class="custom-file-upload">파일 선택</label> <!-- 사용자 정의 파일 업로드 버튼 -->
-            <input type="file" id="file" name="file" multiple><br> <!-- 파일 입력 요소를 숨깁니다 -->
+            <input type="file" id="file" name="file" multiple> <!-- 파일 입력 요소를 숨깁니다 -->
+            </div>
+
             <ul id="file-list" class="file-list"></ul>
 
             <input type="hidden" name="approverId" th:value="${request.requesterId}">

@@ -180,6 +180,11 @@ public class FileServiceImpl implements FileService {
         deleteFileFromS3(file);
     }
 
+    @Override // 파일 idList로 파일 삭제
+    public void deleteFileByFileIdList(List<Integer> fileIdList) {
+        fileDAO.deleteFileByFileIdList(fileIdList);
+    }
+
     private void deleteFileFromS3(File file) {
         String storedFileName = file.getStoredFileName();
         s3Service.deleteFileFromS3(storedFileName);

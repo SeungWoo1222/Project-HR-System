@@ -4,16 +4,19 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서 수정')}">
 
 <th:block layout:fragment="css">
-<!--    <link rel="stylesheet" th:href="@{css/layout.css}">-->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
 </th:block>
 
 <th:block layout:fragment="script">
-<!--    <script th:src="@{js/example.js}"></script>-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/employee.js}"></script>
+    <script th:src="@{/js/report-file.js}"></script>
     <script>
-        $(document).ready(function() {
-            $('#editButton').on('click', function() {
+        $(document).ready(function () {
+            initializeRegisteredFiles(); // 기존에 있는 파일을 IdList에 추가
+
+            $('#editButton').on('click', function () {
                 $('#departmentIdContainer').show();
                 $('#selectAllContainer').show();
                 $('#idContainer').show();
@@ -21,6 +24,13 @@
 
                 initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
             });
+
+            $('#editFileButton').on('click', function () {
+                $('#file-area').show();
+                $('#fileList').hide();
+            });
+
+
         });
     </script>
 </th:block>
@@ -28,21 +38,26 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>보고서 수정</h1>
-        <form id="form" th:action="@{/report/edit}" method="post" th:object="${report}" onsubmit="updateFormFields()">
+        <form id="form" method="post" enctype="multipart/form-data" onsubmit="return false">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
+            <input type="hidden" name="writerId" th:value="${report.writerId}">
 
-            <label for="title">제목:</label>
-            <input type="text" id="title" name="title" th:value="${report.title}">
-            <br>
-            <label for="content">내용:</label>
-            <textarea id="content" name="content" th:text="${report.content}"></textarea>
-            <br>
-            <label id="currentLabel" for="idContainer">현재 보고서 결재자 : </label>
-            <span id="current" th:text="${report.approverName}"></span>
-            <input type="hidden" name="NameList" th:value="${report.approverName}"/>
-            <input type="hidden" name="IdList" th:value="${report.approverId}"/>
-            <button type="button" id="editButton">결재자 수정</button>
-            <br>
+            <div>
+                <label for="title">제목:</label>
+                <input type="text" id="title" name="title" th:value="${report.title}">
+            </div>
+
+            <div>
+                <label for="content">내용:</label>
+                <textarea id="content" name="content" th:text="${report.content}"></textarea>
+            </div>
+            <div>
+                <label id="currentLabel" for="idContainer">현재 보고서 결재자 : </label>
+                <span id="current" th:text="${report.approverName}"></span>
+                <input type="hidden" id="currentApproverName" th:value="${report.approverName}"/>
+                <input type="hidden" id="currentApproverId" th:value="${report.approverId}"/>
+                <button type="button" id="editButton">결재자 수정</button>
+            </div>
 
             <div id="departmentIdContainer" style="display: none;">
                 <label for="departmentId">부서 선택:</label>
@@ -67,17 +82,58 @@
             <div id="idContainer" style="display: none;">
                 <!-- 직원 목록이 여기에 추가됩니다. -->
             </div>
-            <br>
 
-            <label id="selectedEmployeesLabel" style="display: none;">결재자 리스트</label>
-            <div id="selectedEmployees" class="selected-employees"></div>
-            <br>
+            <div>
+                <label id="selectedEmployeesLabel" style="display: none;">결재자 리스트</label>
+                <div id="selectedEmployees" class="selected-employees"></div>
+            </div>
 
-            <label for="completeDate">업무 처리 날짜:</label>
-            <input type="date" id="completeDate" name="completeDate" th:value="${report.completeDate}">
-            <br>
+            <div>
+                <label for="completeDate">업무 처리 날짜:</label>
+                <input type="date" id="completeDate" name="completeDate" th:value="${report.completeDate}">
+            </div>
+            <!-- 첨부 파일 리스트 표시 -->
+            <div th:if="${files != null}">
+                <span>첨부 파일</span>
+                <button type="button" id="editFileButton">파일 수정</button>
+                <ul id="fileList">
+                    <li th:each="file : ${files}">
+                        <form th:action="@{'/report/downloadFile'}" method="get">
+                            <input type="hidden" class="editFileId" th:value="${file.fileId}"/>
+<!--                            <input type="hidden" class="editOriginalFileName" name="originalFileName"-->
+<!--                                   th:value="${file.originalFileName}"/>-->
+<!--                            <input type="hidden" class="editStoredFileName" name="storedFileName"-->
+<!--                                   th:value="${file.storedFileName}"/>-->
+<!--                            <input type="hidden" class="editUploadedBy" name="uploadedBy"-->
+<!--                                   th:value="${file.uploadedBy}"/>-->
+<!--                            <input type="hidden" class="editFileIdUsage" name="fileIdUsage"-->
+<!--                                   th:value="${file.fileIdUsage}"/>-->
+<!--                            <input type="hidden" class="editUploadDate" name="uploadDate"-->
+<!--                                   th:value="${file.uploadDate}"/>-->
+<!--                            <input type="hidden" class="editFileSize" name="fileSize" th:value="${file.fileSize}"/>-->
 
-            <button type="submit">보고서 수정</button>
+                            <input type="hidden" class="registeredfile" th:value="${file}" >
+
+                            <button type="submit" th:text="${file.originalFileName}">다운로드</button>
+                            <p style="font-size: 10px; color: gray;">
+                                업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>
+                                파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>
+                            </p>
+                        </form>
+                    </li>
+                </ul>
+                <div id="file-area" style="display: none;">
+                    <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
+                    <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
+<!--                    <input type="file" id="reportDocuments" class="hidden" name="reportDocuments"-->
+                    <input type="file" id="reportDocuments" class="hidden"
+                           onchange="addFile(this)"
+                           multiple/>
+                    <div class="file-list"></div>
+                </div>
+            </div>
+
+            <button type="button" onclick="submitUpdatedFiles(event, '/report/edit')">보고서 수정</button>
         </form>
     </div>
 </div>

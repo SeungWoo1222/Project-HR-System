@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.report.dao.ReportFileDAO">
+
+    <insert id="createReportFile">
+        INSERT INTO report_files
+        (report_id,
+         file_id)
+        VALUES (#{reportId}, #{fileId})
+    </insert>
+
+    <!--  조회  -->
+    <select id="getFileIdsByReportId" parameterType="int" resultType="int">
+        SELECT
+            file_id AS fildId
+        FROM report_files
+        WHERE report_id = #{reportId};
+    </select>
+
+    <!-- 삭제 -->
+    <delete id="deleteReportFile">
+        DELETE FROM report_files WHERE report_id = #{reportId};
+    </delete>
+<!--==================================================파일 아카이브 생성===============================================-->
+    <insert id="createReportFileArchive" parameterType="map">
+        INSERT INTO report_file_archive (
+            file_id,
+            report_id,
+            deleted_date,
+            original_file_name,
+            stored_file_name,
+            file_size,
+            upload_date,
+            uploaded_by,
+            file_id_usage
+        ) VALUES (
+            #{fileId},
+            #{reportId},
+            #{deletedDate},
+            #{originalFileName},
+            #{storedFileName},
+            #{fileSize},
+            #{uploadDate},
+            #{uploadedBy},
+            #{fileIdUsage}
+            )
+    </insert>
+</mapper>
