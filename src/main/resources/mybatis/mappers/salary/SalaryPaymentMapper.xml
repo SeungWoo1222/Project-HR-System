@@ -5,8 +5,8 @@
 <mapper namespace="com.woosan.hr_system.salary.mapper.SalaryPaymentMapper">
 
     <insert id="insertSalaryPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
-        INSERT INTO salary_payments (salary_id, payment_date, gross_salary, base_salary, overtime, bonus, deductions, net_salary, remarks)
-        VALUES (#{salaryId}, #{paymentDate}, #{baseSalary}, #{grossSalary},#{overtime}, #{bonus}, #{deductions}, #{netSalary}, #{remarks})
+        INSERT INTO salary_payments (salary_id, payment_date, gross_salary, base_salary, overtime,overtime_pay, bonus, deductions, net_salary, remarks)
+        VALUES (#{salaryId}, #{paymentDate}, #{baseSalary}, #{grossSalary},#{overtime},#{overtimePay}, #{bonus}, #{deductions}, #{netSalary}, #{remarks})
     </insert>
 
     <select id="selectSalaryPaymentById" parameterType="int" resultType="com.woosan.hr_system.salary.model.SalaryPayment">
@@ -21,9 +21,10 @@
         UPDATE salary_payments SET
                                    salary_id = #{salaryId},
                                    payment_date = #{paymentDate},
-                                   goross_salary = #{grossSalary},
+                                   gross_salary = #{grossSalary},
                                    base_salary = #{baseSalary},
                                    overtime = #{overtime},
+                                   overtime_pay = #{overtimePay},
                                    bonus = #{bonus},
                                    deductions = #{deductions},
                                    net_salary = #{netSalary},

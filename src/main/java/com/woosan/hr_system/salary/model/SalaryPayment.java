@@ -16,6 +16,7 @@ public class SalaryPayment {
     private int grossSalary;        // 총 급여
     private int baseSalary;         // 기본급
     private Double overtime;        // 연장 근무 시간
+    private int overtimePay;        // 연장 근무 수당
     private int bonus;              // 보너스
     private int deductions;         // 세금 공제
     private int netSalary;          // 실 지급액
