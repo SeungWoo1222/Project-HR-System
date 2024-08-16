@@ -93,26 +93,14 @@
                 <input type="date" id="completeDate" name="completeDate" th:value="${report.completeDate}">
             </div>
             <!-- 첨부 파일 리스트 표시 -->
+            <button type="button" id="editFileButton">파일 수정</button>
             <div th:if="${files != null}">
-                <span>첨부 파일</span>
-                <button type="button" id="editFileButton">파일 수정</button>
+            <span>첨부 파일</span>
                 <ul id="fileList">
                     <li th:each="file : ${files}">
                         <form th:action="@{'/report/downloadFile'}" method="get">
                             <input type="hidden" class="editFileId" th:value="${file.fileId}"/>
-<!--                            <input type="hidden" class="editOriginalFileName" name="originalFileName"-->
-<!--                                   th:value="${file.originalFileName}"/>-->
-<!--                            <input type="hidden" class="editStoredFileName" name="storedFileName"-->
-<!--                                   th:value="${file.storedFileName}"/>-->
-<!--                            <input type="hidden" class="editUploadedBy" name="uploadedBy"-->
-<!--                                   th:value="${file.uploadedBy}"/>-->
-<!--                            <input type="hidden" class="editFileIdUsage" name="fileIdUsage"-->
-<!--                                   th:value="${file.fileIdUsage}"/>-->
-<!--                            <input type="hidden" class="editUploadDate" name="uploadDate"-->
-<!--                                   th:value="${file.uploadDate}"/>-->
-<!--                            <input type="hidden" class="editFileSize" name="fileSize" th:value="${file.fileSize}"/>-->
-
-                            <input type="hidden" class="registeredfile" th:value="${file}" >
+<!--                            <input type="hidden" class="registeredfile" th:value="${file}" >-->
 
                             <button type="submit" th:text="${file.originalFileName}">다운로드</button>
                             <p style="font-size: 10px; color: gray;">

@@ -5,18 +5,19 @@ let registeredFileIdList = [];
 function initializeRegisteredFiles() {
     const registeredDocumentsElement = document.getElementById('fileList');
 
-    // 기존 파일 목록에서 파일 정보를 가져옴
-    const fileElements = registeredDocumentsElement.querySelectorAll('li');
+    if (registeredDocumentsElement) {
+        // 기존 파일 목록에서 파일 정보를 가져옴
+        const fileElements = registeredDocumentsElement.querySelectorAll('li');
 
+        fileElements.forEach((fileElement, index) => {
+            const fileId = fileElement.querySelector('.editFileId').value;
 
-    fileElements.forEach((fileElement, index) => {
-        const fileId = fileElement.querySelector('.editFileId').value;
-
-        if (fileId) {
-            // 기존 파일을 filesMap에 추가
-            registeredFileIdList.push(fileId);
-        }
-    });
+            if (fileId) {
+                // 기존 파일을 filesMap에 추가
+                registeredFileIdList.push(fileId);
+            }
+        });
+    }
     console.log("registeredFileIdList 설정완료", registeredFileIdList);
 }
 
@@ -76,15 +77,15 @@ function submitUpdatedFiles(event, url) {
     fetch(url, {
         method: 'POST',
         body: formData,
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
         .then(response => {
-            if (response.status) {
+            if (response.status === 200) {
                 alert('보고서 수정이 완료되었습니다.');
-                window.location.href = 'list';
+                window.location.href = '/report/list';
+                // window.location.href = "/report/list";
             } else {
                 alert('보고서 수정 중 오류가 발생했습니다.');
             }

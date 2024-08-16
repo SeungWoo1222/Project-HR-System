@@ -71,11 +71,15 @@
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
+<!--            수정함 -->
+            <th:block th:if="${totalPages != null}">
             <span th:if="${totalPages <= 5}">
+
                 <span th:each="i : ${#numbers.sequence(1, totalPages)}">
                     <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
+
             </span>
             <span th:if="${totalPages > 5}">
                 <span th:each="i : ${#numbers.sequence(
@@ -90,6 +94,7 @@
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>
+            </th:block>
         </div>
     </div>
 </div>

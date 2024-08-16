@@ -182,11 +182,12 @@ function submitReport(event, url) {
         if (response.status === 200) {
             alert(response.text);
             window.location.href = "/report/list"; // 성공 후 리디렉션
-        } else if (response.status === 400) {
-            alert(response.text);
-            alert('400 error!!');
-            window.location.href = "/error/500";
         }
+        // else if (response.status === 400) {
+        //     alert(response.text);
+        //     alert('400 error!!');
+        //     window.location.href = "/error/500";
+        // }
     }).catch(error => {
         console.error('폼 제출 오류:', error);
         alert('폼 제출 중 오류가 발생했습니다.');

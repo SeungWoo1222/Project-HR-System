@@ -19,7 +19,6 @@ import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -115,8 +114,7 @@ public class ReportController {
                 .collect(Collectors.toList());
 
         reportService.createReportWithFile(report, validFiles);
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("앙 나 오류띠");
+        return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
     }
 
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
@@ -185,6 +183,7 @@ public class ReportController {
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                  Model model) {
+        log.info("list페이지 이동");
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         String writerId = authService.getAuthenticatedUser().getUsername();
         String reportStart = (String) session.getAttribute("staffReportStart");
@@ -197,6 +196,7 @@ public class ReportController {
         model.addAttribute("reports", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
+        log.info("Total페이지 : {}", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
