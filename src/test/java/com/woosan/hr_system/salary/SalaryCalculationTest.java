@@ -1,6 +1,7 @@
 package com.woosan.hr_system.salary;
 
 import com.woosan.hr_system.salary.dao.RatioDAO;
+import com.woosan.hr_system.salary.model.DeductionDetails;
 import com.woosan.hr_system.salary.model.PayrollDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,15 @@ public class SalaryCalculationTest {
         payrollDetails.setYearEndBonusRatio(2.5);
 
         when(ratioDAO.selectPayrollRatios()).thenReturn(payrollDetails);
+
+        DeductionDetails deductionDetails = new DeductionDetails();
+        deductionDetails.setLocalIncomeTaxRate(10); // 적절한 값 설정
+        deductionDetails.setNationalPensionRate(4.5);
+        deductionDetails.setHealthInsuranceRate(3.545);
+        deductionDetails.setLongTermCareRate(0.4591);
+        deductionDetails.setEmploymentInsuranceRate(0.9);
+
+        when(ratioDAO.selectDeductionRatios()).thenReturn(deductionDetails);
     }
 
     // 연 수익 -> 월 수익으로 계산
@@ -143,9 +153,40 @@ public class SalaryCalculationTest {
         }
     }
 
+    // 공제 항목(소득세, 국민연금, 건강보험, 장기요양보험, 고용보험) 계산
+    private Map<String, Integer> calculateDeductions() {
+        // 비과세 미포함 월급
+        int netMonthlySalary = 3000000;
+        DeductionDetails deductionRatios = ratioDAO.selectDeductionRatios();
+
+        // 근로소득세 계산
+        int thisMonthIncomeTax = deductionRatios.calculateIncomeTax();
+
+        DeductionDetails deductionDetails = deductionRatios.toBuilder()
+                .netMonthlySalary(netMonthlySalary)
+                .incomeTax(thisMonthIncomeTax)
+                .build();
+
+        Map<String, Integer> components = new HashMap<>();
+        addComponent(components, "incomeTax", deductionDetails.getIncomeTax());
+        addComponent(components, "localIncomeTaxRate", deductionDetails.calculateLocalIncomeTax());
+        addComponent(components, "nationalPensionRate", deductionDetails.calculateNationalPension());
+        addComponent(components, "healthInsuranceRate", deductionDetails.calculateHealthInsurance());
+        addComponent(components, "longTermCareInsurance", deductionDetails.calculateLongTermCareInsurance());
+        addComponent(components, "employmentInsurance", deductionDetails.calculateEmploymentInsurance());
+        return components;
+    }
+
     @Test
     public void testCalculateDeductions() {
+        Map<String, Integer> result = calculateDeductions();
+        assertNotNull(result);
 
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        for(String key : result.keySet()) {
+            String formattedValue = formatter.format(result.get(key));
+            log.info("{} : {}", key, formattedValue);
+        }
     }
 
 }

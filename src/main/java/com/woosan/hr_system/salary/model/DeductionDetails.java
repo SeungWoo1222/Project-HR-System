@@ -19,34 +19,35 @@ public class DeductionDetails {
     private double employmentInsuranceRate; // 고용보험 비율 (0.9%)
 
     // 행위 중심 메소드
-    private double calculate(double ratio) {
-        return ratio / 100;
+    private int calculate(double ratio, int income) {
+        return (int) (income * (ratio / 100));
     }
 
-    public void calculateIncomeTax() {
+    public int calculateIncomeTax() {
+        return 0;
     }
 
-    public double calculateLocalIncomeTax() {
-        return incomeTax * calculate(localIncomeTaxRate);
+    public int calculateLocalIncomeTax() {
+        return incomeTax * calculate(localIncomeTaxRate,incomeTax);
     }
 
-    public double calculateNationalPension() {
-        return netMonthlySalary * calculate(nationalPensionRate);
+    public int calculateNationalPension() {
+        return calculate(nationalPensionRate, netMonthlySalary);
     }
 
-    public double calculateHealthInsurance() {
-        return netMonthlySalary * calculate(healthInsuranceRate);
+    public int calculateHealthInsurance() {
+        return calculate(healthInsuranceRate, netMonthlySalary);
     }
 
-    public double calculateLongTermCareInsurance() {
-        return netMonthlySalary * calculate(longTermCareRate);
+    public int calculateLongTermCareInsurance() {
+        return calculate(longTermCareRate, netMonthlySalary);
     }
 
-    public double calculateEmploymentInsurance() {
-        return netMonthlySalary * calculate(employmentInsuranceRate);
+    public int calculateEmploymentInsurance() {
+        return calculate(employmentInsuranceRate, netMonthlySalary);
     }
 
-    public double calculateTotalDeductions() {
+    public int calculateTotalDeductions() {
         return incomeTax
                 + calculateLocalIncomeTax()
                 + calculateNationalPension()
