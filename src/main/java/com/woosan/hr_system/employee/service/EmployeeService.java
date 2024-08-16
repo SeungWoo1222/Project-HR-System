@@ -19,16 +19,13 @@ public interface EmployeeService {
     List<Employee> getEmployeesByDepartment(String departmentId);
 
     // == 등록 ==
-    String insertEmployee(Employee employee);
+    String insertEmployee(Employee employee, MultipartFile picture);
 
     // == 수정 ==
-    String updateEmployee(Employee employee);
+    String updateEmployee(Employee employee, MultipartFile picture);
     String updateStatus(String employeeId, String status);
     String promoteEmployee(String employeeId);
 
     // == 삭제 ==
     String deleteEmployee(String employeeId);
-
-    // == 기타 ==
-    void assignPictureFromUpload(Employee employee, MultipartFile file);
 }

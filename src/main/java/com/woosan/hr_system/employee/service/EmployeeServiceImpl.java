@@ -121,7 +121,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @LogAfterExecution
     @Transactional
     @Override // 사원 정보 등록
-    public String insertEmployee(Employee employee) {
+    public String insertEmployee(Employee employee, MultipartFile picture) {
+        // 업로드 후 사진 파일ID 할당
+        if (picture == null || picture.isEmpty()) { throw new IllegalArgumentException("사원 사진이 업로드되지 않았습니다.\n사진을 업로드한 후 다시 시도해 주세요."); }
+        assignPictureFromUpload(employee, picture);
+
         // 필수 필드를 검증
         verifyRegisterEmployeeFields(employee);
 
@@ -151,7 +155,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.getDetailAddress(),
                 employee.getDepartment(),
                 employee.getPosition(),
-                employee.getHireDate()
+                employee.getHireDate(),
+                employee.getMaritalStatus(),
+                employee.getNumDependents(),
+                employee.getNumChildren()
         );
         boolean hasEmptyField = requiredFields.stream().anyMatch(Objects::isNull);
         if (hasEmptyField) {
@@ -178,11 +185,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @LogAfterExecution
     @Transactional
     @Override // 사원 정보 수정
-    public String updateEmployee(Employee updatedEmployee) {
-        String employeeId = updatedEmployee.getEmployeeId();
-        Employee originalEmployee = findEmployeeById(employeeId);
+    public String updateEmployee(Employee updatedEmployee, MultipartFile picture) {
+        // 파일 체크 후 업로드 후 사진 파일ID 할당
+        if (picture != null) {
+            assignPictureFromUpload(updatedEmployee, picture);
+        }
 
         // 변경사항 확인
+        String employeeId = updatedEmployee.getEmployeeId();
+        Employee originalEmployee = findEmployeeById(employeeId);
         checkForEmployeeChanges(originalEmployee, updatedEmployee);
 
         // 수정 사원번호와 수정 일시 설정
@@ -199,7 +210,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "name", "birth", "residentRegistrationNumber", "phone", "email",
                 "address", "detailAddress", "department", "position", "hireDate",
-                "status", "remainingLeave", "picture"
+                "status", "remainingLeave", "picture", "maritalStatus", "numDependents", "numChildren"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
 
@@ -289,8 +300,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // =============================================== 삭제 로직 end-point ===============================================
 
     // ============================================== 기타 로직 start-point ==============================================
-    @Override // 업로드 후 사진 파일 ID 할당
-    public void assignPictureFromUpload(Employee employee, MultipartFile picture) {
+    // 업로드 후 사진 파일 ID 할당
+    private void assignPictureFromUpload(Employee employee, MultipartFile picture) {
         int fileId = fileService.uploadingFile(picture, "employee");
         employee.assignPicture(fileId);
     }

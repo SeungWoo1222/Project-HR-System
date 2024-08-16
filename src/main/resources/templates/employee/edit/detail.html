@@ -98,6 +98,27 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>결혼 여부</th>
+                    <td>
+                        <input type="radio" id="marriedYes" name="maritalStatus" value="1"
+                               th:checked="${employee.maritalStatus == true}" onchange="updateDependents()"> 기혼
+                        <input type="radio" id="marriedNo" name="maritalStatus" value="0"
+                               th:checked="${employee.maritalStatus == false}" onchange="updateDependents()"> 미혼
+                    </td>
+                </tr>
+                <tr>
+                    <th>부양 가족 수</th>
+                    <td>
+                        <input type="number" id="numDependents" name="numDependents" min="1" max="11" th:value="${employee.numDependents}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>자녀 수 (8~20세)</th>
+                    <td>
+                        <input type="number" id="numChildren" name="numChildren" min="0" max="11" th:value="${employee.numChildren}">
+                    </td>
+                </tr>
+                <tr>
                     <th>부서</th>
                     <td th:text="${employee.department}"></td>
                     <input type="hidden" id="department" name="department" th:value="${employee.department}" readonly/>

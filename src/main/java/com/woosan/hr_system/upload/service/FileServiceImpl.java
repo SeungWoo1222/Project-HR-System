@@ -107,6 +107,7 @@ public class FileServiceImpl implements FileService {
             public void afterCompletion(int status) {
                 if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
                     // 롤백이 발생했을 때 S3에서 파일 삭제
+                    log.info("트랜잭션 롤백이 발생하여 방금 등록한 S3에서 '{}' 파일을 삭제합니다.", storedFileName);
                     s3Service.deleteFileFromS3(storedFileName);
                 }
             }

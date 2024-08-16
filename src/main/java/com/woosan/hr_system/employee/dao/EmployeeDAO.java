@@ -48,10 +48,8 @@ public class EmployeeDAO implements SearchService<Employee> {
     // 이번 년도 입사한 사람의 수 조회
     public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
 
-    // 사원 정보 등록 - 입사 처리
-    public void insertEmployee(Employee employee) { // 사원 정보 등록
-        sqlSession.insert(NAMESPACE + "insertEmployee", employee);
-    }
+    // 사원 정보 등록
+    public void insertEmployee(Employee employee) { sqlSession.insert(NAMESPACE + "insertEmployee", employee); }
 
     // 사원 정보 수정
     public void updateEmployee(Employee employee) { // 사원 정보 수정
@@ -65,9 +63,7 @@ public class EmployeeDAO implements SearchService<Employee> {
     public void updatePosition(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updatePosition",params); }
 
     // 사원 정보 삭제 - 퇴사 후 12개월 지난 사원 정보
-    public void deleteEmployee(String employeeId) { // 사원 정보 삭제
-        sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId);
-    }
+    public void deleteEmployee(String employeeId) { sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId); }
 
     @Override // 검색과 페이징 로직
     public List<Employee> search(String keyword, int pageSize, int offset) {
