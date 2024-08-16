@@ -174,15 +174,19 @@ function submitReport(event, url) {
     fetch(url, {  // 이 부분에서 '/report/write'로 전송
         method: 'POST',
         body: formData,
-    }).then(response => {
-        if (response.ok) {
-            return response.text();
-        } else {
-            throw new Error('폼 제출 중 오류 발생');
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
+    .then(response => {
+        if (response.status === 200) {
+            alert(response.text);
+            window.location.href = "/report/list"; // 성공 후 리디렉션
+        } else if (response.status === 400) {
+            alert(response.text);
+            alert('400 error!!');
+            window.location.href = "/error/500";
         }
-    }).then(result => {
-        console.log('폼 제출 성공:', result);
-        window.location.href = "/report/list"; // 성공 후 리디렉션
     }).catch(error => {
         console.error('폼 제출 오류:', error);
         alert('폼 제출 중 오류가 발생했습니다.');

@@ -77,17 +77,20 @@ function submitUpdatedFiles(event, url) {
         method: 'POST',
         body: formData,
     })
-        // .then(response => response.json())
-        // .then(result => {
-        //     if (result.success) {
-        //         alert('보고서 수정이 완료되었습니다.');
-        //         window.location.href = "/report/list";
-        //     } else {
-        //         alert('보고서 수정 중 오류가 발생했습니다.');
-        //     }
-        // })
-        // .catch(error => {
-        //     console.error('Error:', error);
-        //     alert('보고서 수정 중 오류가 발생했습니다.');
-        // });
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            if (response.status) {
+                alert('보고서 수정이 완료되었습니다.');
+                window.location.href = 'list';
+            } else {
+                alert('보고서 수정 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('보고서 수정 중 오류가 발생했습니다.');
+        });
 }

@@ -170,11 +170,13 @@ public class FileServiceImpl implements FileService {
     @RequireManagerPermission
     @Override
     public void deleteFile(int fileId) {
+        log.info("fileServiceImpl.deleteFile로 오는 fileId : {}", fileId);
         // 파일 정보 조회
         File file = findFileById(fileId);
 
         // DB에서 해당 파일 삭제
         fileDAO.deleteFile(fileId);
+        log.info("fileDAO.deleteFile 완료");
 
         // S3에서 제거
         deleteFileFromS3(file);

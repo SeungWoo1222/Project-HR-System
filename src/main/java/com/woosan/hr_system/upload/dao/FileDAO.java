@@ -50,6 +50,7 @@ public class FileDAO {
 
     // 파일 정보 삭제
     public int deleteFile(int fileId) {
+        log.info("fildDAO.deleteFile 실행");
         return sqlSession.delete(NAMESPACE + "deleteFile", fileId);
     }
 

@@ -21,12 +21,49 @@
         WHERE report_id = #{reportId};
     </select>
 
-    <!-- 삭제 -->
-    <delete id="deleteReportFile">
+    <!-- ReportId로 삭제 -->
+    <delete id="deleteReportFileByReportId">
         DELETE FROM report_files WHERE report_id = #{reportId};
     </delete>
+
+    <!-- FileId로 삭제 -->
+    <delete id="deleteReportFileByFileId">
+        DELETE FROM report_files WHERE file_id = #{fileId};
+    </delete>
+
+    <!--  특정 파일이 다른 reportId와 연결돼있는지 확인  -->
+    <select id="countOtherReportConnect" parameterType="int" resultType="int">
+        SELECT COUNT(report_id)
+        FROM report_files
+        WHERE file_id = #{fileId};
+    </select>
+
 <!--==================================================파일 아카이브 생성===============================================-->
     <insert id="createReportFileArchive" parameterType="map">
+        INSERT INTO report_file_archive (
+            file_id,
+            report_id,
+            deleted_date,
+            original_file_name,
+            stored_file_name,
+            file_size,
+            upload_date,
+            uploaded_by,
+            file_id_usage
+        ) VALUES (
+                     #{fileId},
+                     #{reportId},
+                     #{deletedDate},
+                     #{originalFileName},
+                     #{storedFileName},
+                     #{fileSize},
+                     #{uploadDate},
+                     #{uploadedBy},
+                     #{fileIdUsage}
+                 )
+    </insert>
+
+    <insert id="createReportFileArchiveByFileList" parameterType="map">
         INSERT INTO report_file_archive (
             file_id,
             report_id,
