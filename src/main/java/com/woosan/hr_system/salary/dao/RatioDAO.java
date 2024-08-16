@@ -34,4 +34,9 @@ public class RatioDAO {
     public void updateDeductionRatio(Map<String, Object> map) {
         sqlSession.update(NAMESPACE + "updateDeductionRatios", map);
     }
+
+    // 근로소득세 조회
+    public int selectIncomeTax(Map<String, Object> map) {
+        return sqlSession.selectOne(NAMESPACE + "selectIncomeTax", map);
+    }
 }

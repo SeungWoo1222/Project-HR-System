@@ -156,14 +156,14 @@ public class SalaryCalculationTest {
     // 공제 항목(소득세, 국민연금, 건강보험, 장기요양보험, 고용보험) 계산
     private Map<String, Integer> calculateDeductions() {
         // 비과세 미포함 월급
-        int netMonthlySalary = 3000000;
+        int taxableSalary = 3000000;
         DeductionDetails deductionRatios = ratioDAO.selectDeductionRatios();
 
         // 근로소득세 계산
         int thisMonthIncomeTax = deductionRatios.calculateIncomeTax();
 
         DeductionDetails deductionDetails = deductionRatios.toBuilder()
-                .netMonthlySalary(netMonthlySalary)
+                .taxableSalary(taxableSalary)
                 .incomeTax(thisMonthIncomeTax)
                 .build();
 
