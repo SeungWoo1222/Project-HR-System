@@ -3,20 +3,36 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.woosan.hr_system.salary.mapper.SalaryMapper">
+    <resultMap id="SalaryResultMap" type="com.woosan.hr_system.salary.model.Salary">
+        <id property="salaryId" column="salary_id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="annualSalary" column="annual_salary" />
+        <result property="bank" column="bank" />
+        <result property="accountNumber" column="account_number" />
+    </resultMap>
 
-    <insert id="insertSalary" parameterType="com.woosan.hr_system.salary.model.Salary">
+    <!-- 급여 ID를 이용한 특정 사원의 급여 정보 조회 -->
+    <select id="selectSalaryById" parameterType="int" resultMap="SalaryResultMap">
+        SELECT * FROM salaries WHERE salary_id = #{salaryId}
+    </select>
+
+    <!-- 사원 ID를 이용한 특정 사원의 급여 정보 조회 -->
+    <select id="selectSalaryByEmployeeId" parameterType="String" resultMap="SalaryResultMap">
+        SELECT * FROM salaries WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 모든 사원의 급여 정보 조회 -->
+    <select id="selectAllSalaries" resultMap="SalaryResultMap">
+        SELECT * FROM salaries
+    </select>
+
+    <!-- 사원 급여 정보 등록 -->
+    <insert id="insertSalary" parameterType="com.woosan.hr_system.salary.model.Salary" useGeneratedKeys="true" keyProperty="salaryId">
         INSERT INTO salaries (employee_id, annual_salary, bank, account_number)
         VALUES (#{employeeId}, #{annualSalary}, #{bank}, #{accountNumber})
     </insert>
 
-    <select id="selectSalaryById" parameterType="int" resultType="com.woosan.hr_system.salary.model.Salary">
-        SELECT * FROM salaries WHERE salary_id = #{salaryId}
-    </select>
-
-    <select id="selectAllSalaries" resultType="com.woosan.hr_system.salary.model.Salary">
-        SELECT * FROM salaries
-    </select>
-
+    <!-- 사원 급여 정보 수정 -->
     <update id="updateSalary" parameterType="com.woosan.hr_system.salary.model.Salary">
         UPDATE salaries SET
                             employee_id = #{employeeId},
@@ -26,6 +42,7 @@
         WHERE salary_id = #{salaryId}
     </update>
 
+    <!-- 사원 급여 정보 삭제 -->
     <delete id="deleteSalary" parameterType="int">
         DELETE FROM salaries WHERE salary_id = #{salaryId}
     </delete>

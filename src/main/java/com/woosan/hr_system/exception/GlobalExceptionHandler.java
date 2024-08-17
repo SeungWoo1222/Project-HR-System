@@ -7,6 +7,7 @@ import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
 import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
 import com.woosan.hr_system.exception.file.FileProcessingException;
+import com.woosan.hr_system.exception.salary.SalaryNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileInfoNotFoundException.class)
     public ResponseEntity<String> handleFileInfoNotFoundException(FileInfoNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SalaryNotFoundException.class)
+    public ResponseEntity<String> handleSalaryNotFoundException(SalaryNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
