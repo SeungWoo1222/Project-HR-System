@@ -9,7 +9,7 @@
 <div>
     <div>
         <h3>'<span th:text="${employee.name}"></span>' 사원의 재직상태 수정</h3>
-        <form th:action="@{/api/admin/employee/update/status/{employeeId}(employeeId=${employeeId})}" onsubmit="updateStatus(event)">
+        <form th:action="@{/api/admin/employee/{employeeId}(employeeId=${employeeId})/status}" onsubmit="updateStatus(event)">
             <select id="status" name="status">
                 <option value="재직" th:selected="${employee.status == '재직'}">재직</option>
                 <option value="휴직" th:selected="${employee.status == '휴직'}">휴직</option>

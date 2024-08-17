@@ -21,14 +21,14 @@ public class SalaryApiController {
     }
 
     // 급여 정보 수정
-    @PutMapping("/update")
-    ResponseEntity<String> updateSalaryInfo(@RequestBody Salary salary, @RequestParam String employeeId) {
+    @PutMapping("/{employeeId}")
+    ResponseEntity<String> updateSalaryInfo(@PathVariable String employeeId, @RequestBody Salary salary) {
         return ResponseEntity.ok(salaryService.updateSalary(salary, employeeId));
     }
 
     // 급여 정보 삭제
     @RequireHRPermission
-    @DeleteMapping("/delete/{salaryId}")
+    @DeleteMapping("/{salaryId}")
     ResponseEntity<String> deleteSalaryInfo(@PathVariable int salaryId) {
         return ResponseEntity.ok(salaryService.removeSalary(salaryId));
     }

@@ -20,10 +20,10 @@ public class EmployeeAdminViewController {
 
     // 재직 상태 수정
     @RequireHRPermission
-    @GetMapping("/edit/status/{employeeId}")
+    @GetMapping("/{employeeId}/status/edit")
     public String employeeStatus(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
-        return "/admin/employee/edit/status";
+        return "employee/status";
     }
 }

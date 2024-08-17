@@ -58,19 +58,17 @@ public class EmployeeViewController {
     @RequireHRPermission
     @GetMapping("/list/{departmentId}")
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
-        System.out.println("컨트롤러 도착");
-        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
-        return employeeList;
+        return employeeService.getEmployeesByDepartment(departmentId);
     }
 
     @RequireHRPermission
-    @GetMapping("/registration") // 신규 사원 등록 페이지 이동
+    @GetMapping("/register") // 신규 사원 등록 페이지 이동
     public String viewEmployeeForm() {
         return "employee/registration";
     }
 
     @RequireHRPermission
-    @GetMapping("/edit/detail/{employeeId}") // 사원 정보 수정 페이지 이동
+    @GetMapping("/{employeeId}/edit") // 사원 정보 수정 페이지 이동
     public String viewEmployeeEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
         Employee employee = employeeService.getEmployeeDetails(employeeId);
@@ -82,6 +80,6 @@ public class EmployeeViewController {
 
         String pictureUrl = fileService.getUrl(employee.getPicture());
         model.addAttribute("pictureUrl", pictureUrl);
-        return "employee/edit/detail";
+        return "employee/edit";
     }
 }

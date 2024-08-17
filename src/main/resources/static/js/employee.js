@@ -454,7 +454,7 @@ function submitDelete(event) {
 
     var confirmMessage = '\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?';
 
-    let actionUrl = '/api/admin/employee/delete/' + employeeId;
+    let actionUrl = '/api/admin/employee/' + employeeId;
 
     if (confirm(confirmMessage)) {
         fetch(actionUrl, {

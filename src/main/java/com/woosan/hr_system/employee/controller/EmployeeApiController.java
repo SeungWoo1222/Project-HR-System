@@ -39,7 +39,7 @@ public class EmployeeApiController {
 
     // 계정 잠금 설정
     @RequireHRPermission
-    @PatchMapping("/set/accountLock/{employeeId}")
+    @PatchMapping("/{employeeId}/accountLock")
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(authService.setAccountLock(employeeId));
     }

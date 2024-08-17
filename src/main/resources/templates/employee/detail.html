@@ -135,7 +135,7 @@
         <div>
             <button type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editEmployee(this)">사원 정보 수정</button>
             <button th:if="${employee.status} == '퇴사'" type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editResignedEmployee(this)">퇴사 정보 수정</button>
-            <button th:unless="${employee.status} == '퇴사'" type="button" class="btn" th:employeeId="${employee.employeeId}" th:onclick="openModal('/admin/employee/edit/status/' + this.getAttribute('employeeId'))">재직 상태 수정</button>
+            <button th:unless="${employee.status} == '퇴사'" type="button" class="btn" th:employeeId="${employee.employeeId}" th:onclick="openModal('/admin/employee/' + this.getAttribute('employeeId') + '/status/edit')">재직 상태 수정</button>
             <button type="button" class="btn" th:employeeId="${employee.employeeId}" th:name="${employee.name}" th:position="${employee.position}" onclick="promoteEmployee(this)">승진 처리</button>
             <button th:unless="${employee.password?.passwordCount == 5}" class="btn" th:employeeId="${employee.employeeId}" th:name="${employee.name}" onclick="lockAccount(this)">계정 잠금</button>
             <button th:if="${employee.password?.passwordCount == 5}" class="btn" th:employeeId="${employee.employeeId}" th:name="${employee.name}" onclick="unlockAccount(this)">계정 잠금 해제</button>

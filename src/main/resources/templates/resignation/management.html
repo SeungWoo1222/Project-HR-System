@@ -36,7 +36,7 @@
                 <td th:text="${employee.hireDate}">입사일</td>
                 <td th:text="${employee.status}">상태</td>
                 <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/resignation-form/' + this.getAttribute('employeeId'))">퇴사 처리</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/resignation/' + this.getAttribute('employeeId'))">퇴사 처리</button>
                 </td>
             </tr>
             </tbody>
