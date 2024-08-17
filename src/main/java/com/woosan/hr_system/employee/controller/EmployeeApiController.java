@@ -22,7 +22,7 @@ public class EmployeeApiController {
 
     // 사원 신규 등록
     @RequireHRPermission
-    @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
                                                    @RequestPart(value = "picture", required = false) MultipartFile picture) {
         // 사원 등록
