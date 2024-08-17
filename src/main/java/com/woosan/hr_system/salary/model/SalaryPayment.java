@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalaryPayment {
+public class SalaryPayment { // 급여 명세서
     private int paymentId;             // PK
     private int salaryId;              // FK, salaries 테이블 참조
     private Date paymentDate;          // 급여 지급일
