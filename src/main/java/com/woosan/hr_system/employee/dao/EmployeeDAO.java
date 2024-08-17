@@ -48,6 +48,9 @@ public class EmployeeDAO implements SearchService<Employee> {
     // 이번 년도 입사한 사람의 수 조회
     public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
 
+    // 사원 가족 정보 조회
+    public Map<String, Integer> selectFamilyInfoById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectFamilyInfoById", employeeId);}
+
     // 사원 정보 등록
     public void insertEmployee(Employee employee) { sqlSession.insert(NAMESPACE + "insertEmployee", employee); }
 

@@ -227,4 +227,11 @@
         SET position_id = #{positionId}
         WHERE employee_id = #{employeeId}
     </update>
+
+    <!-- 사원 가족 정보 조회 -->
+    <select id="selectFamilyInfoById" parameterType="String" resultType="Map">
+        SELECT num_dependents, num_children
+        FROM employees
+        WHERE employee_id = #{employeeId}
+    </select>
 </mapper>
