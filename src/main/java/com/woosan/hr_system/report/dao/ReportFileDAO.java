@@ -31,12 +31,19 @@ public class ReportFileDAO {
         return sqlSession.selectList(NAMESPACE + "getFileIdsByReportId", reportId);
     }
 
+    public int getReportIdByFileId(int fileId) {
+        return sqlSession.selectOne(NAMESPACE + "getReportIdByFileId", fileId);
+    }
+
     public void deleteReportFileByReportId(int reportId) {
         sqlSession.delete(NAMESPACE + "deleteReportFileByReportId", reportId);
     }
 
-    public void deleteReportFileByFileId(int fileId) {
-        sqlSession.delete(NAMESPACE + "deleteReportFileByFileId", fileId);
+    public void deleteReportFile(int reportId, int fileId) {
+        HashMap<String, Integer> params = new HashMap<>();
+        params.put("reportId", reportId);
+        params.put("fileId", fileId);
+        sqlSession.delete(NAMESPACE + "deleteReportFile", params);
     }
 
 

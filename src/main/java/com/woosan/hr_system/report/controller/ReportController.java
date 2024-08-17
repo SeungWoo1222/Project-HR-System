@@ -196,7 +196,6 @@ public class ReportController {
         model.addAttribute("reports", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
-        log.info("Total페이지 : {}", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
@@ -308,10 +307,11 @@ public class ReportController {
                                @RequestParam(value = "registeredFileIdList", required = false) List<String> registeredFileStringIdList) {
 
         log.info("IdList : {}", report.getIdList());
+        log.info("기존 reportId : {}", report.getReportId());
 
         // 업로드할 파일의 상세 정보 로그
         if (reportFileList != null && !reportFileList.isEmpty()) {
-            log.info("업로드할 파일 개수 : {}", reportFileList.size());
+            log.info("업로드할 파일 개수 : {} 파일 정보 : {}",reportFileList.size(), reportFileList);
             for (MultipartFile file : reportFileList) {
                 log.info("파일 이름: {}, 파일 크기: {} bytes, 파일 타입: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
             }

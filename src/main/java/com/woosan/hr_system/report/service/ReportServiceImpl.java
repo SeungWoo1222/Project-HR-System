@@ -72,7 +72,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 보고서 + 파일 생성
     public void createReportWithFile(Report report, List<MultipartFile> reportDocuments) {
-        if(report != null) throw new IllegalArgumentException("에러 발생!!");
         UserSessionInfo userSessionInfo = new UserSessionInfo(); //로그인한 사용자 id, 현재시간 설정
 
         List<Integer> fileIdlist = new ArrayList<>();
@@ -244,10 +243,20 @@ public class ReportServiceImpl implements ReportService {
         List<Integer> newFileIdList = new ArrayList<>();
         List<Integer> reportIdList = new ArrayList<>();
 
-        // 파일 처리
-        if (reportFileList != null && !reportFileList.isEmpty()) {
-            newFileIdList = handleFilesForReport(reportFileList, registeredFileIdList);
-        }
+        log.info("ReportImpl에 전송된 reportFileList : {}", reportFileList);
+        // ↓ 파일 처리 ↓
+        // 기존의 파일이 없다면 업로드파일을 업로드 후 조인테이블에 fileId 삽입
+        if (registeredFileIdList == null || registeredFileIdList.isEmpty()) {
+            for (MultipartFile file : reportFileList) {
+                int fileId = fileService.uploadingFile(file, "report");
+                newFileIdList.add(fileId);
+                log.info("기존 파일 없을 시 파일 업로드 후 newFileIdList : {}", newFileIdList);
+            }
+            // 업로드할 파일이 있다면 기존의 파일과 같은지 비교함 - 같다면 조인테이블만 수정
+            } else if (reportFileList != null && !reportFileList.isEmpty()) {
+                    newFileIdList = handleFilesForReport(reportFileList, registeredFileIdList, report.getReportId());
+                }
+        // ↑ 파일 처리 ↑
 
         // 결재자 수에 따른 처리
         if (report.getIdList().size() > 1) {
@@ -265,14 +274,23 @@ public class ReportServiceImpl implements ReportService {
             report.setApproverId(report.getIdList().get(0));
             report.setApproverName(report.getNameList().get(0));
             reportDAO.updateReport(report);
-            reportIdList.add(report.getReportId());
+            reportIdList.add(report.getReportId()); // 조인테이블 수정
         }
 
         insertJoinTable(reportIdList, newFileIdList);
     }
 
-    private List<Integer> handleFilesForReport(List<MultipartFile> toUploadFileList, List<Integer> fileIdList) {
+    // 기존의 파일과 업로드할 파일이 같은지 비교함
+    private List<Integer> handleFilesForReport(List<MultipartFile> toUploadFileList, List<Integer> fileIdList, int reportId) {
         List<Integer> toLinkFileIdList = new ArrayList<>();
+        Map<Integer, Boolean> deleteFileMap = new HashMap<>(); // 삭제 할 파일들
+
+        // 초기 deleteFileMap 설정
+        for (Integer fileId : fileIdList) {
+            deleteFileMap.put(fileId, true);
+        }
+
+        log.info("handleFilesForReport 메소드 올려야 할 파일 리스트 : {}", toUploadFileList);
 
         for (Integer fileId : fileIdList) {
             // ↓ 두 파일이 같은 파일인지 비교 시작 ↓
@@ -285,34 +303,25 @@ public class ReportServiceImpl implements ReportService {
                     log.info("비교 할 file : {}", registeredFile);
                     log.info("업로드 할 file : {}", file);
 
-                    // 두 파일의 사이즈가 같다면 해싱 비교
-                    if (registeredFile.getFileSize() == file.getSize()) {
-                        try (
-                                InputStream fileInputStream = file.getInputStream();
-                                FileInputStream compareFileInputStream = new FileInputStream(String.valueOf(registeredFile))
-                        ) {
-                            String fileHash = calculateHash(fileInputStream);
-                            String compareFileHash = calculateHash(compareFileInputStream);
-
-                            // 두 파일이 같다면
-                            if (fileHash.equals(compareFileHash)) {
+                    // 두 파일이 같은지 비교
+                    if (registeredFile.getFileSize() == file.getSize() &&
+                            registeredFile.getOriginalFileName().equals(file.getOriginalFilename())) {
+                        log.info("두 파일이 같음 원래파일 이름 : {}, 올린 파일 이름 : {}", registeredFile.getOriginalFileName(), file.getOriginalFilename());
+                        log.info("두 파일이 같음 원래파일 사이즈 : {}, 올린 파일 사이즈 : {}", registeredFile.getFileSize(), file.getSize());
                                 isFileMatch = true;
-                            } else {
-                                isFileMatch = false;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        // ↑ 두 파일이 같은 파일인지 비교 끝 ↑
-                    } else if (registeredFile.getFileSize() != file.getSize()) {
+                    } else {
+                        log.info("두 파일이 다름 원래파일 이름 : {}, 올린 파일 이름 : {}", registeredFile.getOriginalFileName(), file.getOriginalFilename());
+                        log.info("두 파일이 다름 원래파일 사이즈 : {}, 올린 파일 사이즈 : {}", registeredFile.getFileSize(), file.getSize());
                         isFileMatch = false;
                     }
 
                     // 두 파일이 같다면 fileId를 조인테이블에 연결할 fildIdList에 넣어줌
                     if (isFileMatch) {
                         toLinkFileIdList.add(fileId);
+                        deleteFileMap.put(fileId, false); // 파일이 같다면 삭제하지 않도록 설정
 
-                        // 다르다면 파일 업로드 후 fildId를 반환하여 조인테이블에 연결할 fildIdList에 넣어줌
+                    // 다르다면 파일 업로드 후 fildId를 반환하여 조인테이블에 연결할 fildIdList에 넣어줌
+                    // deleteFileMap에서는 true로 설정하여 삭제하도록 함
                     } else {
                         int uploadingFileId = fileService.uploadingFile(file, "report");
                         toLinkFileIdList.add(uploadingFileId);
@@ -323,10 +332,20 @@ public class ReportServiceImpl implements ReportService {
 
             }
         }
+        log.info("삭제 할 deleteFileMap : {}", deleteFileMap);
+        log.info("삭제 할 deleteFileMap의 reportId : {}", reportId);
+
+        // deleteFileMap에서 true로 설정된 파일들만 삭제
+        deleteFileMap.forEach((fileId, deleteTrue) -> {
+            if (deleteTrue) {
+                reportFileService.deleteReportFile(reportId, fileId);
+            }
+        });
+
         return toLinkFileIdList;
     }
 
-    // 컨트롤러 상에서 실행하는 순서가 달라서 한곳으로 모으기위함
+    // fileId와 reportId를 받아서 조인테이블 데이터 생성
     private void insertJoinTable(List<Integer> reportIdList, List<Integer> fileIdList) {
         log.info("insertJoinTable 메소드 호출 완료 reportIdList : {} fileIdList : {}", reportIdList, fileIdList);
 
@@ -350,18 +369,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-    private String calculateHash(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] byteArray = new byte[1024];
-        int bytesCount = 0;
-
-        while ((bytesCount = inputStream.read(byteArray)) != -1) {
-            digest.update(byteArray, 0, bytesCount);
-        }
-
-        byte[] bytes = digest.digest();
-        return Hex.encodeHexString(bytes);
-    }
 
     //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================
@@ -374,12 +381,11 @@ public class ReportServiceImpl implements ReportService {
         // 보고서 삭제
         reportDAO.deleteReport(reportId);
 
-        // 조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
-        reportFileService.deleteReportFile(reportId);
+//         조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
+        reportFileService.deleteReportFileByReportId(reportId);
     }
-
-//=====================================================삭제 메소드======================================================
 }
+//=====================================================삭제 메소드======================================================
 
 
 

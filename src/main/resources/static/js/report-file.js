@@ -61,9 +61,9 @@ function submitUpdatedFiles(event, url) {
         });
     }
 
-    for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
+    // for (let pair of formData.entries()) {
+    //     console.log(`${pair[0]}: ${pair[1]}`);
+    // }
 
     let fileCount = 0;
     for (let pair of formData.entries()) {
@@ -87,11 +87,11 @@ function submitUpdatedFiles(event, url) {
                 window.location.href = '/report/list';
                 // window.location.href = "/report/list";
             } else {
-                alert('보고서 수정 중 오류가 발생했습니다.');
+                window.location.href = response.text;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('보고서 수정 중 오류가 발생했습니다.');
+            alert(error);
         });
 }

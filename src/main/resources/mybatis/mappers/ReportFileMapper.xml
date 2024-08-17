@@ -21,14 +21,21 @@
         WHERE report_id = #{reportId};
     </select>
 
+    <select id="getReportIdByFileId" parameterType="int" resultType="int">
+        SELECT
+            report_id AS reportId
+        FROM report_files
+        WHERE file_id = #{fileId};
+    </select>
+
     <!-- ReportId로 삭제 -->
     <delete id="deleteReportFileByReportId">
         DELETE FROM report_files WHERE report_id = #{reportId};
     </delete>
 
-    <!-- FileId로 삭제 -->
-    <delete id="deleteReportFileByFileId">
-        DELETE FROM report_files WHERE file_id = #{fileId};
+    <!-- reportId와 fileId로 삭제 -->
+    <delete id="deleteReportFile" parameterType="map">
+        DELETE FROM report_files WHERE file_id = #{fileId} and report_id = #{reportId};
     </delete>
 
     <!--  특정 파일이 다른 reportId와 연결돼있는지 확인  -->

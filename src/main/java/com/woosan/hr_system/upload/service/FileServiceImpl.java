@@ -167,10 +167,9 @@ public class FileServiceImpl implements FileService {
 
     // 파일 삭제
     @Transactional
-    @RequireManagerPermission
     @Override
     public void deleteFile(int fileId) {
-        log.info("fileServiceImpl.deleteFile로 오는 fileId : {}", fileId);
+        log.debug("fileServiceImpl.deleteFile로 오는 fileId : {}", fileId);
         // 파일 정보 조회
         File file = findFileById(fileId);
 

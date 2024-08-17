@@ -32,9 +32,13 @@ public class ReportFileServiceImpl implements ReportFileService {
         return reportFileDAO.getFileIdsByReportId(reportId);
     }
 
+    @Override
+    public int getReportIdByFileId(int fileId) {
+        return reportFileDAO.getReportIdByFileId(fileId);
+    }
 
     @Override // 보고서 파일 삭제
-    public void deleteReportFile(int reportId) {
+    public void deleteReportFileByReportId(int reportId) {
         log.info("보고서 삭제 과정 중 ReportFileServiceImpl deleteReport도착완료");
 
         // 조인 테이블에서 reportId에 해당하는 fileId 리스트를 가져옴
@@ -42,35 +46,46 @@ public class ReportFileServiceImpl implements ReportFileService {
         log.info("reportFileDAO로 fileIdList받아옴 fileIdList {}", fileIdList);
 
         for (Integer fileId : fileIdList) {
-            // 다른 reportId가 fileId를 참조하는지 확인 - 한다면 count는 0보다 큼
-            int count = reportFileDAO.countOtherReportConnect(fileId);
-            log.info("reportFileDAO.countOtherReportConnect 완료 : {}", count);
-
-            if (count <= 0) {
-                log.info("다른 reportId에 연결된 것이 없으므로 삭제 대상임");
-                // 다른 reportId에 연결된 것이 없으면 파일 삭제
-
-                // 조인 테이블에서 reportId에 해당하는 레코드를 삭제
-                reportFileDAO.deleteReportFileByFileId(fileId); // 수정필요 fileId로 그거에 맞는 fileId를 지워야됨
-                log.info("reportFileDAO.deleteReportFile 완료");
-
-                // ↓ 파일 아카이브에 삽입하는 로직 ↓
-                // 파일 정보를 가져옴
-                File file = fileService.getFileInfo(fileId); // 수정필요 fileId로 그 파일만 생성해야함 나머지는 확인 후 생성해야함
-                log.info("fileDAO.getFileListById에서 받아온 fileList 형태 : {}", file);
-
-                // 파일아카이브 삽입
-                reportFileDAO.createReportFileArchive(file, reportId); // 여기도 fileList가 아니라 file로 생성
-                log.info("reportFileDAO.createReportFileArchive 완료");
-                // ↑ 파일 아카이브에 삽입하는 로직 ↑
-
-                // 파일 삭제
-                fileService.deleteFile(fileId); // 파일삭제또한 fileIdList가 아닌 fileId를 보내줘서 그 파일만 삭제하는 방식으로 바꿔야함
-                log.info("fileDAO.deleteFile 완료");
-            } else {
-                // fileId에 연결된 보고서 있다면 reportId로 조인테이블 삭제
-                reportFileDAO.deleteReportFileByReportId(reportId);
-            }
+            // report의 file 개수만큼 조인테이블 삭제
+            deleteReportFile(fileId, reportId);
         }
     }
+
+//    @Override // 보고서 파일 삭제
+//    public void deleteReportFile(int reportId, int fileId) {
+//        log.info("deleteReportFileByFileId의 fileId : {}", fileId);
+//        // file이 다른 report에도 연결이 돼있는지 확인
+//        int count = reportFileDAO.countOtherReportConnect(fileId);
+//        // 없다면 file 삭제
+//        if (count <= 1) {
+//            int reportId = getReportIdByFileId(fileId);
+//            log.info("deleteReportFileByFileId의 fileId : {}, reportId : {}", fileId, reportId);
+//            deleteFile(fileId, reportId);
+//        }
+//    }
+
+    @Override
+    // 파일 삭제 - ReportId는 파일 아카이브 테이블에 등록하기 위함
+    public void deleteReportFile(int reportId, int fileId) {
+        log.info("deleteReportFile의 reportId : {},  : fileId{}", reportId, fileId);
+        // 조인 테이블에서 파일Id와 reportId에 해당하는 레코드를 삭제
+        reportFileDAO.deleteReportFile(reportId, fileId);
+        log.info("reportFileDAO.deleteReportFile 완료");
+
+        // ↓ 파일 아카이브에 삽입하는 로직 ↓
+        // 파일 정보를 가져옴
+        File file = fileService.getFileInfo(fileId);
+        log.info("fileDAO.getFileListById에서 받아온 fileList 형태 : {}", file);
+
+        // 파일아카이브 삽입
+        reportFileDAO.createReportFileArchive(file, reportId);
+        log.info("reportFileDAO.createReportFileArchive 완료");
+        // ↑ 파일 아카이브에 삽입하는 로직 ↑
+
+        log.debug("fileService.deleteFile 하기 전 fileId 확인 : {}", fileId);
+
+        fileService.deleteFile(fileId); // 파일삭제또한 fileIdList가 아닌 fileId를 보내줘서 그 파일만 삭제하는 방식으로 바꿔야함
+        log.info("fileDAO.deleteFile 완료");
+    }
+
 }
