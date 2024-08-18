@@ -23,10 +23,6 @@ public class DeductionDetails {
         return (int) (income * (ratio / 100));
     }
 
-    public int calculateIncomeTax() {
-        return 0;
-    }
-
     public int calculateLocalIncomeTax() {
         return incomeTax * calculate(localIncomeTaxRate,incomeTax);
     }

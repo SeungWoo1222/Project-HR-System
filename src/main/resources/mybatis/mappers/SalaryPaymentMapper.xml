@@ -49,7 +49,7 @@
     </select>
 
     <!-- 급여 지급 내역 등록 -->
-    <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
+    <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO salary_payments (salary_id, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)
         VALUES (#{salaryId}, #{paymentDate}, #{grossSalary}, #{baseSalary}, #{overtime}, #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{deductions}, #{netSalary}, #{remarks})
     </insert>

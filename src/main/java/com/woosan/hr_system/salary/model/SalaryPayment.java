@@ -1,18 +1,20 @@
 package com.woosan.hr_system.salary.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class SalaryPayment { // 급여 명세서
     private int paymentId;             // PK
     private int salaryId;              // FK, salaries 테이블 참조
-    private Date paymentDate;          // 급여 지급일
+    private LocalDate paymentDate;     // 급여 지급일
 
     // 급여 구성 항목
     private int baseSalary;            // 기본급

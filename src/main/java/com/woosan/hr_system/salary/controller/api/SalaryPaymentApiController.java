@@ -1,6 +1,7 @@
 package com.woosan.hr_system.salary.controller.api;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.salary.service.SalaryPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,25 +9,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/salary/payment/")
+@RequestMapping("/api/salary/payment")
 public class SalaryPaymentApiController {
     @Autowired
     private SalaryPaymentService salaryPaymentService;
 
     @RequireHRPermission
-    @PostMapping("register")
-    ResponseEntity<String> registerPayment(@RequestBody SalaryPayment salaryPayment) {
-        return ResponseEntity.ok(salaryPaymentService.addPayment(salaryPayment));
+    @PostMapping("/register") // 급여명세서 등록
+    ResponseEntity<String> registerPayment(int salaryId) {
+        return ResponseEntity.ok(salaryPaymentService.addPayment(salaryId));
     }
 
     @RequireHRPermission
-    @PutMapping("/{paymentId}")
+    @PutMapping("/{paymentId}") // 급여명세서 수정
     ResponseEntity<String> updatePayment(@RequestBody SalaryPayment salaryPayment, @PathVariable int paymentId) {
         return ResponseEntity.ok(salaryPaymentService.updatePayment(salaryPayment, paymentId));
     }
 
     @RequireHRPermission
-    @DeleteMapping("/{paymentId}")
+    @RequireManagerPermission
+    @DeleteMapping("/{paymentId}") // 급여명세서 삭제
     ResponseEntity<String> deletePayment(@PathVariable int paymentId) {
         return ResponseEntity.ok(salaryPaymentService.removePayment(paymentId));
     }

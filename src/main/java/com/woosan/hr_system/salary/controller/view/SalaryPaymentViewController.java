@@ -1,5 +1,6 @@
 package com.woosan.hr_system.salary.controller.view;
 
+import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.salary.service.SalaryPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslips";
     }
 
+    @RequireHRPermission
     @GetMapping("/all") // 모든 급여 지급 내역 조회
     public String viewAllPayslip(Model model) {
         List<SalaryPayment> allPayslips = salaryPaymentService.getAllPayments();

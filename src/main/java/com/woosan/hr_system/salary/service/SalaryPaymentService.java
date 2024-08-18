@@ -7,7 +7,7 @@ public interface SalaryPaymentService {
     SalaryPayment getPaymentById(int paymentId);
     List<SalaryPayment> getAllPayments();
     List<SalaryPayment> getPaymentsByEmployeeId(String employeeId);
-    String addPayment(SalaryPayment salaryPayment);
+    String addPayment(int salaryId);
     String updatePayment(SalaryPayment salaryPayment, int paymentId);
     String removePayment(int paymentId);
 }

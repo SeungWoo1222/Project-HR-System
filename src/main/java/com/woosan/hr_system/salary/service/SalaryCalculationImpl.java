@@ -7,6 +7,7 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.model.DeductionDetails;
 import com.woosan.hr_system.salary.model.PayrollDetails;
+import com.woosan.hr_system.salary.model.SalaryPayment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,6 @@ import java.util.Map;
 public class SalaryCalculationImpl implements SalaryCalculation {
     @Autowired
     private RatioDAO ratioDAO;
-
     @Autowired
     private EmployeeDAO employeeDAO;
 
@@ -62,10 +62,13 @@ public class SalaryCalculationImpl implements SalaryCalculation {
             int value = components.get(key);
             taxableSalary += value;
         }
+        components.put("grossSalary", taxableSalary); // 비과세 제외 전 총액 components에 입력
+
         // 비과세 제외
         int taxFree = 0;
         if (components.get("mealAllowance") != null) taxFree += components.get("mealAllowance");
         if (components.get("transportAllowance") != null) taxFree += components.get("transportAllowance");
+        if (components.get("overtimePay") != null) taxFree += components.get("overtimePay");
 
         taxableSalary -= taxFree;
         return taxableSalary;
@@ -162,6 +165,40 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         addComponent(components, "healthInsuranceRate", deductionDetails.calculateHealthInsurance());
         addComponent(components, "longTermCareInsurance", deductionDetails.calculateLongTermCareInsurance());
         addComponent(components, "employmentInsurance", deductionDetails.calculateEmploymentInsurance());
+        addComponent(components, "deductions", deductionDetails.calculateTotalDeductions());
+    }
+
+    @Override // 수정된 공제 항목(소득세, 국민연금, 건강보험, 장기요양보험, 고용보험) 재계산
+    public SalaryPayment calculateDeductions(SalaryPayment salaryPayment, String employeeId) {
+        // 비과세 제외된 월급 계산
+        int taxableSalary = salaryPayment.getGrossSalary()
+                - salaryPayment.getMealAllowance()
+                - salaryPayment.getTransportAllowance()
+                - salaryPayment.getOvertimePay();
+
+        // 근로소득세 계산
+        int thisMonthIncomeTax = calculateIncomeTax(taxableSalary, employeeId);
+
+        // 공제 항목의 비율 불러오기
+        DeductionDetails deductionRatios = ratioDAO.selectDeductionRatios();
+
+        // 새로운 DeductionDetails 객체 생성
+        DeductionDetails deductionDetails = deductionRatios.toBuilder()
+                .taxableSalary(taxableSalary)
+                .incomeTax(thisMonthIncomeTax)
+                .build();
+
+        // 수정된 공제 항목 반환
+        return salaryPayment.toBuilder()
+                .incomeTax(thisMonthIncomeTax)
+                .localIncomeTax(deductionDetails.calculateLocalIncomeTax())
+                .nationalPension(deductionDetails.calculateNationalPension())
+                .healthInsurance(deductionDetails.calculateHealthInsurance())
+                .longTermCareInsurance(deductionDetails.calculateLongTermCareInsurance())
+                .employmentInsurance(deductionDetails.calculateEmploymentInsurance())
+                .deductions(deductionDetails.calculateTotalDeductions())
+                .netSalary(salaryPayment.getGrossSalary() - deductionDetails.calculateTotalDeductions())
+                .build();
     }
 
     // 근로소득세 계산
