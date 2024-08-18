@@ -1,11 +1,11 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +23,11 @@ import java.util.HashMap;
 
 
 @Service
+@Slf4j
 public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private RequestDAO requestDAO;
-    @Autowired
-    private AuthService authService;
 
 //===================================================생성 메소드=======================================================
 
@@ -53,7 +52,7 @@ public class RequestServiceImpl implements RequestService {
 //===================================================조회 메소드=======================================================
 
     @Override // 요청 세부 조회
-    public Request getRequestById(Long requestId) {
+    public Request getRequestById(int requestId) {
         return requestDAO.getRequestById(requestId);
     }
 
@@ -89,6 +88,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 검색
     public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
+        log.info("서비스 writerId : {}", writerId);
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
         int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
@@ -116,6 +116,17 @@ public class RequestServiceImpl implements RequestService {
         requestDAO.updateRequest(params);
     }
 
+    // 요청에 의한 보고서 생성 후 요청에 reportId 삽입
+    @Override
+    public void updateReportId(int requestId, int reportId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("requestId", requestId);
+        params.put("reportId", reportId);
+
+        requestDAO.updateReportId(params);
+    }
+
+
     @Override // 보고서 결재 처리
     public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
@@ -132,11 +143,18 @@ public class RequestServiceImpl implements RequestService {
 //===================================================삭제 메소드=======================================================
 
     @Override // 요청 삭제
-    public void deleteRequest(Long requestId) {
+    public void deleteRequest(int requestId) {
         // shared_trash 테이블에 삭제될 데이터들 삽입
         requestDAO.insertRequestIntoSharedTrash(requestId);
         requestDAO.deleteRequest(requestId);
     }
+
+    @Override // 요청에 의한 보고서 삭제시 reportId 삭제
+    public void deleteReportId(Integer reportId) {
+        requestDAO.deleteReportId(reportId);
+    }
+
+
 //===================================================삭제 메소드=======================================================
 
 

@@ -11,11 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 public class RequestDAO {
     @Autowired
     private SqlSession sqlSession;
@@ -35,7 +37,7 @@ public class RequestDAO {
     }
 
     // 요청 세부 조회
-    public Request getRequestById(Long requestId) {
+    public Request getRequestById(int requestId) {
         return sqlSession.selectOne(NAMESPACE + ".getRequestById", requestId);
     }
 
@@ -56,6 +58,11 @@ public class RequestDAO {
 
     // 검색과 페이징 로직
     public List<Request> search(String keyword, int pageSize, int offset, String writerId, int searchType, String requestStart, String requestEnd) {
+        log.info("서비스 writerId : {}", writerId);
+        log.info("서비스 keyword : {}", keyword);
+        log.info("서비스 startdate : {}", requestStart);
+        log.info("서비스 enddate : {}", requestEnd);
+
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -93,19 +100,32 @@ public class RequestDAO {
         sqlSession.update(NAMESPACE + ".updateRequest", params);
     }
 
+    // 요청에 의한 보고서 생성 후 요청에 reportId 삽입
+    public void updateReportId(Map<String, Object> params) {
+        sqlSession.update(NAMESPACE + ".updateReportId", params);
+    }
+
+
+
 // ==================================================수정 메소드=======================================================
 
 // ==================================================삭제 메소드=======================================================
 
     // 요청 삭제
-    public void deleteRequest(Long requestId) {
+    public void deleteRequest(int requestId) {
         sqlSession.delete(NAMESPACE + ".deleteRequest", requestId);
     }
 
     // shared_trash(휴지통)에 삭제 데이터들 삽입
-    public void insertRequestIntoSharedTrash(Long requestId) {
+    public void insertRequestIntoSharedTrash(int requestId) {
         sqlSession.insert(NAMESPACE + ".insertRequestIntoSharedTrash", requestId);
     }
+
+    // 요청에의한 보고서 삭제시 reportId 삭제
+    public void deleteReportId(Integer reportId) {
+        sqlSession.delete(NAMESPACE + ".deleteReportId", reportId);
+    }
+
 
 // ==================================================삭제 메소드=======================================================
 }

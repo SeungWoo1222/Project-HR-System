@@ -51,7 +51,6 @@ public class S3Service {
 
     // S3에서 파일 다운로드
     protected byte[] downloadFile(String storedFileName) {
-        log.info("● S3 downloadFile 접근완료 ●");
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)

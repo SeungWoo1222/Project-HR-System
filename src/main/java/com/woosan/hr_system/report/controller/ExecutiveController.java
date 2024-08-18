@@ -2,7 +2,8 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Report;
@@ -35,16 +36,16 @@ public class ExecutiveController {
     @Autowired
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
-    private AuthService authService;
-    @Autowired
     private FileService fileService;
 
     // main 페이지
+//    @RequireManagerPermission
     @GetMapping("/main")
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
 
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
-        String employeeId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String employeeId = userSessionInfo.getCurrentEmployeeId();
 
         // 내가 결재할 보고서 목록 조회
         String approvalStart = (String) session.getAttribute("approvalStart");
@@ -88,6 +89,7 @@ public class ExecutiveController {
         return "admin/report/main"; // main.html 반환
     }
 //=====================================================생성 메소드========================================================
+    @RequireManagerPermission
     @GetMapping("/write") // 요청 생성 페이지 이동
     public String showWritePage(Model model) {
         List<Employee> employee = employeeDAO.getAllEmployees();
@@ -97,10 +99,12 @@ public class ExecutiveController {
     }
 
     // 요청 생성
+    @RequireManagerPermission
     @PostMapping("/write")
     public String createRequest(@ModelAttribute Request request) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        String requesterId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String requesterId = userSessionInfo.getCurrentEmployeeId();
         request.setRequesterId(requesterId);
         requestService.createRequest(request);
         return "redirect:/admin/request/main";
@@ -110,7 +114,7 @@ public class ExecutiveController {
 //=====================================================조회 메소드========================================================
 
     @GetMapping("/{requestId}") // 요청 세부 조회
-    public String viewRequest(@PathVariable("requestId") Long requestId, Model model) {
+    public String viewRequest(@PathVariable("requestId") int requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
         return "admin/report/request-view";
@@ -120,9 +124,6 @@ public class ExecutiveController {
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
-
-
-
 
         return "admin/report/report-view";
     }
@@ -134,6 +135,7 @@ public class ExecutiveController {
         return "/admin/report/statistic";
     }
 
+    @RequireManagerPermission
     @GetMapping("/stats") // 통계 날짜, 임원 설정
     public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
                                  @RequestParam(name = "statisticEnd") String statisticEnd,
@@ -153,8 +155,9 @@ public class ExecutiveController {
     }
 
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
-    @PostMapping("/updateStats")
     @ResponseBody
+    @RequireManagerPermission
+    @PostMapping("/updateStats")
     public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> ids) throws JsonProcessingException {
         String statisticStart = (String) session.getAttribute("statisticStart");
         String statisticEnd = (String) session.getAttribute("statisticEnd");
@@ -186,12 +189,14 @@ public class ExecutiveController {
     }
 
     // 내 결재 목록 날짜 범위설정 페이지 이동
+    @RequireManagerPermission
     @GetMapping("/approvalDatePage")
     public String showApprovalDatePage() {
         return "admin/report/report-approval-date";
     }
 
     // 내 결재 목록 조회 + 날짜 범위 설정
+    @RequireManagerPermission
     @GetMapping("/approvalDate")
     public String setApprovalListDateRange(@RequestParam(name = "approvalStart") String approvalStart,
                                            @RequestParam(name = "approvalEnd") String approvalEnd,
@@ -202,12 +207,14 @@ public class ExecutiveController {
     }
 
     // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
+    @RequireManagerPermission
     @GetMapping("/requestDatePage")
     public String showRequestDatePage() {
         return "admin/report/request-date";
     }
 
     // 내 결재 목록 조회 + 날짜 범위 설정
+    @RequireManagerPermission
     @GetMapping("/requestDate")
     public String setRequestListDateRange(@RequestParam(name = "requestStart") String requestStart,
                                           @RequestParam(name = "requestEnd") String requestEnd,
@@ -221,9 +228,9 @@ public class ExecutiveController {
 
 //====================================================조회 메소드========================================================
 //====================================================수정 메소드========================================================
-
+    @RequireManagerPermission
     @GetMapping("/edit") // 요청 수정 페이지 이동
-    public String showUpdateRequestPage(@RequestParam(name = "requestId") Long requestId, Model model) {
+    public String showUpdateRequestPage(@RequestParam(name = "requestId") int requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         List<Employee> employees = employeeDAO.getAllEmployees();
         model.addAttribute("employees", employees); // employees 목록 추가
@@ -233,11 +240,13 @@ public class ExecutiveController {
         return "admin/report/request-edit";
     }
 
+    @RequireManagerPermission
     @PostMapping("/edit") // 요청 수정
     public String updateRequest(@ModelAttribute Request request) {
         // 요청 수정 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentId = userSessionInfo.getCurrentEmployeeId();
 
         // 요청 ID로 요청 조회
         Request requestForCheck = requestService.getRequestById(request.getRequestId());
@@ -259,6 +268,7 @@ public class ExecutiveController {
         return "redirect:/admin/request/main";
     }
 
+    @RequireManagerPermission
     @PostMapping("/approve") // 보고서 결재 처리
     public String approveReport(@RequestParam("reportId") int reportId,
                                 @RequestParam("status") String status,
@@ -274,12 +284,14 @@ public class ExecutiveController {
 
 //===================================================삭제 메소드=========================================================
 
+    @RequireManagerPermission
     @DeleteMapping("/delete/{requestId}") // 요청 삭제
-    public String deleteRequest(@PathVariable("requestId") Long requestId) {
+    public String deleteRequest(@PathVariable("requestId") int requestId) {
         // 요청 삭제 권한이 있는지 확인
 
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentId = userSessionInfo.getCurrentEmployeeId();
 
         // 요청 ID로 요청 조회
         Request request = requestService.getRequestById(requestId);

@@ -3,7 +3,6 @@ package com.woosan.hr_system.report.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
-import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.report.model.Report;
@@ -18,11 +17,9 @@ import com.woosan.hr_system.upload.model.File;
 import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,17 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -57,8 +48,6 @@ public class ReportController {
     @Autowired
     private ObjectMapper objectMapper; // 통계 반환 후 view에 보내면서 JSON로 반환함
     @Autowired
-    private AuthService authService;
-    @Autowired
     private ReportFileService reportFileService;
 
     @GetMapping("/main") // main 페이지 이동
@@ -66,7 +55,8 @@ public class ReportController {
                               Model model) throws JsonProcessingException {
 
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
 
         // 내가 쓴 보고서 조회(최근 5개)
         List<Report> reports = reportService.getRecentReports(writerId);
@@ -107,38 +97,54 @@ public class ReportController {
     // 보고서 생성
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createReport(@ModelAttribute Report report,
-                               @RequestParam("reportFiles") List<MultipartFile> reportDocuments) {
-        // 유효한 파일만 필터링 (null 제거)
-        List<MultipartFile> validFiles = reportDocuments.stream()
-                .filter(file -> !file.isEmpty())
-                .collect(Collectors.toList());
+                               @RequestParam(value="reportFiles", required=false) List<MultipartFile> reportDocuments) {
 
-        reportService.createReportWithFile(report, validFiles);
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
+        LocalDateTime currentTime = userSessionInfo.getNow();
+        report.setWriterId(writerId);
+        report.setCreatedDate(currentTime);
+
+        if (reportDocuments == null || reportDocuments.isEmpty()) {
+            reportService.createReport(report);
+        } else if (reportDocuments.size() > 1) {
+            reportService.createReportWithFile(report, reportDocuments);
+        }
         return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
     }
 
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
-    public String showCreateFromRequestPage(@RequestParam("requestId") Long requestId,
+    public String showCreateFromRequestPage(@RequestParam("requestId") int requestId,
                                             Model model) {
 
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
-        return "report/writeFromRequest";
+        return "/report/write-from-request";
     }
 
     @PostMapping("/writeFromRequest") // 요청 들어온 보고서 생성
-    public String CreateReportFromRequest(@ModelAttribute Report report,
-                                          @RequestParam("approverId") String approverId) {
-//                               @RequestParam("file") MultipartFile file) {
-        // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
+    public ResponseEntity<String> CreateReportFromRequest(
+                                          @ModelAttribute Report report,
+                                          @RequestParam(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                                          @RequestParam(value="requestId") int requestId) {
+
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        // 현재 로그인한 계정의 employeeId를 요청자(writer)로 설정
+        String writerId = userSessionInfo.getCurrentEmployeeId();
+        // 보고서 생성 시간 설정
+        LocalDateTime currentTime = userSessionInfo.getNow();
         report.setWriterId(writerId);
-//        reportService.createReport(report, file);
+        report.setCreatedDate(currentTime);
 
-        reportService.createReportFromRequest(report, approverId);
-
-        return "redirect:/report/list";
+        if (reportDocuments == null || reportDocuments.isEmpty()) {
+            int reportId = reportService.createReportFromRequest(report);
+            requestService.updateReportId(requestId, reportId);
+        } else if (reportDocuments != null || !reportDocuments.isEmpty()) {
+            int reportId = reportService.createReportFromRequestWithFile(report, reportDocuments);
+            requestService.updateReportId(requestId, reportId);
+        }
+        return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
     }
 
 //=================================================생성 메소드============================================================
@@ -164,8 +170,6 @@ public class ReportController {
             @RequestParam("fileId") int fileId,
             @RequestParam("originalFileName") String originalFileName) {
 
-        log.info("● downloadFile컨트롤러 도착완료 {} {} ●", fileId, originalFileName);
-
         // S3에서 파일 다운로드
         byte[] fileData = fileService.downloadFile(fileId);
 
@@ -183,9 +187,9 @@ public class ReportController {
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                  Model model) {
-        log.info("list페이지 이동");
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
         String reportStart = (String) session.getAttribute("staffReportStart");
         String reportEnd = (String) session.getAttribute("staffReportEnd");
 
@@ -211,12 +215,15 @@ public class ReportController {
                                   @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                   Model model) {
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
-        String writerId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
         String requestStart = (String) session.getAttribute("staffRequestStart");
         String requestEnd = (String) session.getAttribute("staffRequestEnd");
 
+
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, requestStart, requestEnd);
+
 
         model.addAttribute("requests", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -303,21 +310,8 @@ public class ReportController {
     @Transactional
     @PostMapping("/edit") // 보고서 수정
     public String updateReport(@ModelAttribute Report report,
-                               @RequestParam(value = "reportFileList", required = false) List<MultipartFile> reportFileList,
+                               @RequestParam(value = "reportFileList", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<String> registeredFileStringIdList) {
-
-        log.info("IdList : {}", report.getIdList());
-        log.info("기존 reportId : {}", report.getReportId());
-
-        // 업로드할 파일의 상세 정보 로그
-        if (reportFileList != null && !reportFileList.isEmpty()) {
-            log.info("업로드할 파일 개수 : {} 파일 정보 : {}",reportFileList.size(), reportFileList);
-            for (MultipartFile file : reportFileList) {
-                log.info("파일 이름: {}, 파일 크기: {} bytes, 파일 타입: {}", file.getOriginalFilename(), file.getSize(), file.getContentType());
-            }
-        } else {
-            log.info("업로드할 파일이 없습니다.");
-        }
 
         // List<String>을 List<Integer>로 변환
         List<Integer> registeredFileIdList = new ArrayList<>();
@@ -333,24 +327,19 @@ public class ReportController {
             }
         }
 
-        // 기존 파일 ID의 상세 정보 로그
-        if (registeredFileIdList != null && !registeredFileIdList.isEmpty()) {
-            log.info("기존 파일 Id 개수 : {}", registeredFileIdList.size());
-            for (Integer fileId : registeredFileIdList) {
-                log.info("기존 파일 Id: {}", fileId);
+        // 업로드된 파일이 없다면 기존의 파일 삭제
+        if (toUploadFileList == null || toUploadFileList.isEmpty()) {
+            for (int fileId : registeredFileIdList) {
+                reportFileService.deleteReportFile(report.getReportId(), fileId);
             }
-        } else {
-            log.info("기존 파일 Id가 없습니다.");
         }
-
-
 
         // 요청 수정 권한이 있는지 확인
         UserSessionInfo userSessionInfo = new UserSessionInfo();
 
         // 현재 로그인한 사용자와 requester_id 비교
         if (report != null && report.getWriterId().equals(userSessionInfo.getCurrentEmployeeId())) {
-            reportService.updateReport(report, reportFileList, registeredFileIdList);
+            reportService.updateReport(report, toUploadFileList, registeredFileIdList);
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
@@ -365,7 +354,8 @@ public class ReportController {
     public String deleteReport(@RequestParam("reportId") int reportId) {
         // 보고서 삭제 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        String currentId = authService.getAuthenticatedUser().getUsername();
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentId = userSessionInfo.getCurrentEmployeeId();
 
         // 요청 ID로 요청 조회
         Report report = reportService.getReportById(reportId);

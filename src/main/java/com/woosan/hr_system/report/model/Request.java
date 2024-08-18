@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Request {
-    private Long requestId;
-    private Long reportId;
+    private int requestId;
+    private Integer reportId;
     private String requesterId;
     private String writerId;
     private String writerName;
@@ -28,11 +28,11 @@ public class Request {
 
     // method
     // Getters and Setters
-    public Long getRequestId() {
+    public int getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(Long requestId) {
+    public void setRequestId(int requestId) {
         this.requestId = requestId;
     }
 
@@ -92,11 +92,11 @@ public class Request {
         this.requestNote = requestNote;
     }
 
-    public Long getReportId() {
+    public Integer getReportId() {
         return reportId;
     }
 
-    public void setReportId(Long reportId) {
+    public void setReportId(Integer reportId) {
         this.reportId = reportId;
     }
 

@@ -43,10 +43,12 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileDAO reportFileDAO;
     @Autowired
     private ReportFileService reportFileService;
+    @Autowired
+    private RequestService requestService;
 
 
     //=====================================================생성 메소드======================================================
-    @Override // 보고서
+    @Override // 보고서 생성
     public List<Integer> createReport(Report report) {
         log.info("createReport ServiceImpl 도착 완료");
 
@@ -63,25 +65,23 @@ public class ReportServiceImpl implements ReportService {
         for (int i = 0; i < report.getNameList().size(); i++) {
             params.put("approverId", report.getIdList().get(i));
             params.put("approverName", report.getNameList().get(i));
-            int reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
+            int reportId = reportDAO.createReport(params);
             reportIdList.add(reportId);
         }
-        log.info("createReport ServiceImpl 반환 완료");
         return reportIdList;
     }
 
     @Override // 보고서 + 파일 생성
     public void createReportWithFile(Report report, List<MultipartFile> reportDocuments) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo(); //로그인한 사용자 id, 현재시간 설정
 
         List<Integer> fileIdlist = new ArrayList<>();
         List<Integer> reportIdlist = new ArrayList<>();
 
         Map<String, Object> params = new HashMap<>();
-        params.put("writerId", userSessionInfo.getCurrentEmployeeId());
+        params.put("writerId", report.getWriterId());
         params.put("title", report.getTitle());
         params.put("content", report.getContent());
-        params.put("createdDate", userSessionInfo.getNow());
+        params.put("createdDate", report.getCreatedDate());
         params.put("status", "미처리");
         params.put("completeDate", report.getCompleteDate());
 
@@ -109,28 +109,61 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 요청 들어온 보고서 작성
-    public int createReportFromRequest(Report report, String approverId) {
-//    public void createReport(Report report, MultipartFile file) {
-        LocalDateTime createdDate = LocalDateTime.now(); // 현재 기준 생성시간 설정
-        report.setCreatedDate(createdDate);
-        report.setStatus("미처리"); // 결재상태 설정
-
+    public int createReportFromRequest(Report report) {
         // approverName 설정
-        Employee employee = employeeDAO.getEmployeeById(approverId);
+        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
         String approverName = employee.getName();
 
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
-        params.put("approverId", approverId);
+        params.put("approverId", report.getApproverId());
         params.put("approverName", approverName);
         params.put("title", report.getTitle());
         params.put("content", report.getContent());
         params.put("createdDate", report.getCreatedDate());
-        params.put("status", report.getStatus());
+        params.put("status", "미처리");
         params.put("completeDate", report.getCompleteDate());
 
-        reportDAO.createReport(params);
-        return report.getReportId();
+        int reportId = reportDAO.createReport(params);
+        return reportId;
+    }
+
+    @Override // 요청 들어온 보고서 + 파일 작성
+    public int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments) {
+        log.info("보고서 + 파일 생성 서비스 도착");
+        // 조인 테이블에 연결 할 file, report Id리스트 생성
+        List<Integer> fileIdlist = new ArrayList<>();
+
+        // approverName 설정
+        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
+        String approverName = employee.getName();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("writerId", report.getWriterId());
+        params.put("approverId", report.getApproverId());
+        params.put("approverName", approverName);
+        params.put("title", report.getTitle());
+        params.put("content", report.getContent());
+        params.put("createdDate", report.getCreatedDate());
+        params.put("status", "미처리");
+        params.put("completeDate", report.getCompleteDate());
+
+        int reportId = reportDAO.createReport(params);
+
+        if (reportDocuments != null) {
+            // 파일들 체크 후 DB에 저장할 파일명 반환
+            for (MultipartFile reportdocument : reportDocuments) {
+                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
+                fileIdlist.add(fileId);
+            }
+        }
+
+        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
+        for (int fileId : fileIdlist) {
+            reportFileDAO.createReportFile(reportId, fileId);
+        }
+
+        return reportId;
     }
 
 //=====================================================생성 메소드======================================================
@@ -238,38 +271,19 @@ public class ReportServiceImpl implements ReportService {
 //=====================================================수정 메소드======================================================
     @Transactional
     @Override // 보고서 수정
-    public void updateReport(Report report, List<MultipartFile> reportFileList, List<Integer> registeredFileIdList) {
+    public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
-        List<Integer> newFileIdList = new ArrayList<>();
         List<Integer> reportIdList = new ArrayList<>();
-
-        log.info("ReportImpl에 전송된 reportFileList : {}", reportFileList);
-        // ↓ 파일 처리 ↓
-        // 기존의 파일이 없다면 업로드파일을 업로드 후 조인테이블에 fileId 삽입
-        if (registeredFileIdList == null || registeredFileIdList.isEmpty()) {
-            for (MultipartFile file : reportFileList) {
-                int fileId = fileService.uploadingFile(file, "report");
-                newFileIdList.add(fileId);
-                log.info("기존 파일 없을 시 파일 업로드 후 newFileIdList : {}", newFileIdList);
-            }
-            // 업로드할 파일이 있다면 기존의 파일과 같은지 비교함 - 같다면 조인테이블만 수정
-            } else if (reportFileList != null && !reportFileList.isEmpty()) {
-                    newFileIdList = handleFilesForReport(reportFileList, registeredFileIdList, report.getReportId());
-                }
-        // ↑ 파일 처리 ↑
 
         // 결재자 수에 따른 처리
         if (report.getIdList().size() > 1) {
             // 결재자 수가 여러명으로 바뀐 경우
-            log.info("reportUpdate 서비스 메소드 실행");
             deleteReport(report.getReportId());
 
             report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
             reportIdList = createReport(report); // 보고서 생성 후 reportId 반환
 
-            log.info("보고서 생성 후 reportIdList반환 완료 : {}", reportIdList);
         } else {
-            log.info("결재자 한명인 경우 실행");
             report.setModifiedDate(userSessionInfo.getNow()); // 현재시간 설정
             report.setApproverId(report.getIdList().get(0));
             report.setApproverName(report.getNameList().get(0));
@@ -277,111 +291,24 @@ public class ReportServiceImpl implements ReportService {
             reportIdList.add(report.getReportId()); // 조인테이블 수정
         }
 
-        insertJoinTable(reportIdList, newFileIdList);
+        reportFileService.updateReportFile(report, toUploadFileList, registeredFileIdList, reportIdList);
     }
-
-    // 기존의 파일과 업로드할 파일이 같은지 비교함
-    private List<Integer> handleFilesForReport(List<MultipartFile> toUploadFileList, List<Integer> fileIdList, int reportId) {
-        List<Integer> toLinkFileIdList = new ArrayList<>();
-        Map<Integer, Boolean> deleteFileMap = new HashMap<>(); // 삭제 할 파일들
-
-        // 초기 deleteFileMap 설정
-        for (Integer fileId : fileIdList) {
-            deleteFileMap.put(fileId, true);
-        }
-
-        log.info("handleFilesForReport 메소드 올려야 할 파일 리스트 : {}", toUploadFileList);
-
-        for (Integer fileId : fileIdList) {
-            // ↓ 두 파일이 같은 파일인지 비교 시작 ↓
-            File registeredFile = fileService.getFileInfo(fileId);
-
-            for (MultipartFile file : toUploadFileList) {
-                if (toLinkFileIdList.size() != toUploadFileList.size()) { // 파일을 모두 비교했는지 확인
-                    // 파일이 같은지 다른지 비교하기 위한 변수
-                    boolean isFileMatch = false;
-                    log.info("비교 할 file : {}", registeredFile);
-                    log.info("업로드 할 file : {}", file);
-
-                    // 두 파일이 같은지 비교
-                    if (registeredFile.getFileSize() == file.getSize() &&
-                            registeredFile.getOriginalFileName().equals(file.getOriginalFilename())) {
-                        log.info("두 파일이 같음 원래파일 이름 : {}, 올린 파일 이름 : {}", registeredFile.getOriginalFileName(), file.getOriginalFilename());
-                        log.info("두 파일이 같음 원래파일 사이즈 : {}, 올린 파일 사이즈 : {}", registeredFile.getFileSize(), file.getSize());
-                                isFileMatch = true;
-                    } else {
-                        log.info("두 파일이 다름 원래파일 이름 : {}, 올린 파일 이름 : {}", registeredFile.getOriginalFileName(), file.getOriginalFilename());
-                        log.info("두 파일이 다름 원래파일 사이즈 : {}, 올린 파일 사이즈 : {}", registeredFile.getFileSize(), file.getSize());
-                        isFileMatch = false;
-                    }
-
-                    // 두 파일이 같다면 fileId를 조인테이블에 연결할 fildIdList에 넣어줌
-                    if (isFileMatch) {
-                        toLinkFileIdList.add(fileId);
-                        deleteFileMap.put(fileId, false); // 파일이 같다면 삭제하지 않도록 설정
-
-                    // 다르다면 파일 업로드 후 fildId를 반환하여 조인테이블에 연결할 fildIdList에 넣어줌
-                    // deleteFileMap에서는 true로 설정하여 삭제하도록 함
-                    } else {
-                        int uploadingFileId = fileService.uploadingFile(file, "report");
-                        toLinkFileIdList.add(uploadingFileId);
-                    }
-                } else {
-                    break; // 업로드할 파일 비교 완료 시
-                }
-
-            }
-        }
-        log.info("삭제 할 deleteFileMap : {}", deleteFileMap);
-        log.info("삭제 할 deleteFileMap의 reportId : {}", reportId);
-
-        // deleteFileMap에서 true로 설정된 파일들만 삭제
-        deleteFileMap.forEach((fileId, deleteTrue) -> {
-            if (deleteTrue) {
-                reportFileService.deleteReportFile(reportId, fileId);
-            }
-        });
-
-        return toLinkFileIdList;
-    }
-
-    // fileId와 reportId를 받아서 조인테이블 데이터 생성
-    private void insertJoinTable(List<Integer> reportIdList, List<Integer> fileIdList) {
-        log.info("insertJoinTable 메소드 호출 완료 reportIdList : {} fileIdList : {}", reportIdList, fileIdList);
-
-        List<Integer> jointableReportIdList = new ArrayList<>(reportIdList);
-        List<Integer> jointableFileIdList = new ArrayList<>(fileIdList);
-
-        for (Integer reportId : jointableReportIdList) {
-            List<Integer> existingFileIdList = reportFileService.getFileIdsByReportId(reportId);
-            log.info("reportId에 맞춰 존재하는 파일아이디 리스트 reportId : {} 아이디리스트 : {} ", reportId, existingFileIdList);
-            log.info("조인테이블에 넣어야할 fileId : {} 이미 존재하는 fileId : {}", jointableFileIdList, existingFileIdList);
-
-            // 이미 존재하는 파일 ID를 제외한 파일만 추가
-            jointableFileIdList.stream()
-                    .filter(fileId -> !existingFileIdList.contains(fileId))
-                    .forEach(fileId -> reportFileService.createReportFile(reportId, fileId))
-            ;
-        }
-        log.info("insertJoinTable 완료");
-
-
-    }
-
-
 
     //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================
     @Transactional
     @Override // 보고서 삭제
     public void deleteReport(int reportId) {
-        log.info("보고서 삭제 과정 중 ReportServiceImpl deleteReport도착완료");
         // shared_trash 테이블에 삭제될 데이터들 삽입
         reportDAO.insertReportIntoSharedTrash(reportId);
+
         // 보고서 삭제
         reportDAO.deleteReport(reportId);
 
-//         조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
+        // 요청 된 보고서라면 requset테이블의 reportId 삭제
+        requestService.deleteReportId(reportId);
+
+        // 조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
         reportFileService.deleteReportFileByReportId(reportId);
     }
 }

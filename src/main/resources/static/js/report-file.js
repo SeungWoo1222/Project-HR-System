@@ -18,12 +18,10 @@ function initializeRegisteredFiles() {
             }
         });
     }
-    console.log("registeredFileIdList 설정완료", registeredFileIdList);
 }
 
 // 보고서 수정 시 파일 데이터를 처리하고 제출하는 함수
 function submitUpdatedFiles(event, url) {
-    console.log(url);
     event.preventDefault();
 
     const form = document.getElementById('form');
@@ -61,18 +59,6 @@ function submitUpdatedFiles(event, url) {
         });
     }
 
-    // for (let pair of formData.entries()) {
-    //     console.log(`${pair[0]}: ${pair[1]}`);
-    // }
-
-    let fileCount = 0;
-    for (let pair of formData.entries()) {
-        if (pair[0] === 'reportFileList') {
-            console.log(`파일 ${++fileCount}: 이름 - ${pair[1].name}, 크기 - ${pair[1].size}`);
-        } else {
-            console.log(`${pair[0]}: ${pair[1]}`);
-        }
-    }
 
     fetch(url, {
         method: 'POST',

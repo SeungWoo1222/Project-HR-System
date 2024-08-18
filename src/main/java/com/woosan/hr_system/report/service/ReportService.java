@@ -18,7 +18,9 @@ public interface ReportService {
     void createReportWithFile(Report report, List<MultipartFile> reportDocuments);
 
     //요청들어온 보고서 생성
-    int createReportFromRequest(Report report, String approverId);
+    int createReportFromRequest(Report report);
+
+    int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments);
 
 //======================================================생성============================================================
 //======================================================조회============================================================
@@ -44,7 +46,7 @@ public interface ReportService {
 //======================================================수정============================================================
 
     // 보고서 수정 관련 메소드
-    void updateReport(Report report, List<MultipartFile> reportFileList, List<Integer> registeredFileIdList);
+    void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList);
 
 //======================================================수정============================================================
 //======================================================삭제============================================================

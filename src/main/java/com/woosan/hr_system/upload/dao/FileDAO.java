@@ -50,16 +50,13 @@ public class FileDAO {
 
     // 파일 정보 삭제
     public int deleteFile(int fileId) {
-        log.info("fildDAO.deleteFile 실행");
         return sqlSession.delete(NAMESPACE + "deleteFile", fileId);
     }
 
     // 파일 정보 삭제 - fileIdList에 의한 삭제
     public void deleteFileByFileIdList(List<Integer> fileIdList) {
-        log.info("FileDAO로 전달된 fileIdList {}", fileIdList);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("fileIdList", fileIdList);
-        log.info("FileDAO에서 만들어진 paramMap {}", paramMap);
         sqlSession.delete(NAMESPACE + "deleteFileByFileIdList", paramMap);
     }
 }

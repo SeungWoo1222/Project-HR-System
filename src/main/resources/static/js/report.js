@@ -16,14 +16,6 @@ function toggleRejectionReason() {
 //========================================결재 상태 변경 =================================================================
 
 //========================================== 임원 선택 ==================================================================
-// 접속 URL기준으로 실행시킬 경우
-// document.addEventListener("DOMContentLoaded", function() {
-//     var currentUrl = window.location.pathname;
-//     if (currentUrl.includes('report/write')) {
-//         initEventListeners();
-//     }
-// });
-
 selectedEmployees = {}; // 선택된 임원들 목록 초기화 - 다른 부서 임원을 고르기 위한 변수
 
 //  부서 선택, 임원 전체선택 메소드 정의
@@ -31,22 +23,13 @@ function initEventListeners() {
     const departmentSelect = document.getElementById('departmentId');
     const selectAllCheckbox = document.getElementById('selectAllEmployeesCheckbox');
 
-    if (departmentSelect) {
-        departmentSelect.addEventListener('change', loadEmployeesByDepartment);
-    } else {
-        console.log("departmentSelect is null");
-    }
+    departmentSelect.addEventListener('change', loadEmployeesByDepartment);
+    selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
 
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
-    } else {
-        console.log("selectAllEmployeesCheckbox is null");
-    }
 }
 
 // 선택된 부서에 맞는 임원들 리스트를 반환해줌
 function loadEmployeesByDepartment() {
-    console.log("loadEmployeesByDepartment");
     const departmentId = document.getElementById('departmentId').value;
 
     fetch(`/api/employee/department/list/` + departmentId)
@@ -61,11 +44,6 @@ function loadEmployeesByDepartment() {
             idContainer.innerHTML = '';
 
             employeeList.forEach(employee => {
-                if (employee === null) {
-                    console.error('Employee가 비어 있음', employee);
-                } else if (!employee.employeeId || !employee.name) {
-                    console.error('Employee는 있으나 요소가 없음', employee);
-                } else {
                     const checkboxContainer = document.createElement('div');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
@@ -94,7 +72,6 @@ function loadEmployeesByDepartment() {
                     checkboxContainer.appendChild(label);
                     checkboxContainer.appendChild(nameInput);
                     idContainer.appendChild(checkboxContainer);
-                }
             });
 
             // 임원 전체선택 체크박스를 보여줌
@@ -159,17 +136,20 @@ function submitReport(event, url) {
         }
     });
 
-    const idList = Object.keys(selectedEmployees);
-    const nameList = Object.values(selectedEmployees);
+    if (Object.keys(selectedEmployees).length > 0) {
+        const idList = Object.keys(selectedEmployees);
+        const nameList = Object.values(selectedEmployees);
 
-    // 숨겨진 필드에 값 설정
-    formData.set('idList', idList.join(','));
-    formData.set('nameList', nameList.join(','));
+        // 숨겨진 필드에 값 설정
+        formData.set('idList', idList.join(','));
+        formData.set('nameList', nameList.join(','));
+    }
 
-    console.log(url);
-    for (let pair of formData.entries()) {
+    // FormData의 모든 키-값 쌍을 출력합니다.
+    for (var pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
     }
+
 
     // AJAX를 사용하여 폼 데이터 전송
     fetch(url, {  // 이 부분에서 '/report/write'로 전송
@@ -199,11 +179,9 @@ function submitReport(event, url) {
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드
     function removeWriter(button) {
-        console.log('Removing writer with ID:', button);
 
         // 선택된 임원 목록에서 해당 임원 삭제
         var employeeId = button.getAttribute('data-employee-id');
-        console.log("Removing writer with employeeId:", employeeId);
 
         // 부모 노드를 찾아서 삭제
         var parentLi = button.parentNode;
@@ -213,7 +191,6 @@ function submitReport(event, url) {
         const remainingIds = [];
         document.querySelectorAll('#selected-writers-list li button').forEach(button => {
             remainingIds.push(button.getAttribute('data-employee-id'));
-            console.log(button.getAttribute('data-employee-id'));
         });
 
         // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가

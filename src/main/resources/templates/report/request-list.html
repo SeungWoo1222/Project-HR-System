@@ -16,6 +16,11 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             updateDateTimeElements();
+            // 모든 reportId 값을 콘솔에 출력
+            const reportIds = document.querySelectorAll('[data-report-id]');
+            reportIds.forEach(function (element) {
+                console.log('reportId:', element.getAttribute('data-report-id'));
+            });
         });
     </script>
 </th:block>
@@ -59,7 +64,9 @@
             <tbody>
             <tr th:each="request : ${requests}">
                 <td>
-                    <a th:if="${request.reportId != null}" th:href="@{/report/${request.reportId}}">조회</a>
+<!--                    <a th:if="${request.reportId != null}" th:href="@{/report/{reportId}(reportId=*{request.reportId})}">조회</a>-->
+                    <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
+                       th:onclick="openModal('/report/' + this.getAttribute('reportId'))">조회</a>
                     <a th:if="${request.reportId == null}" th:href="@{/report/writeFromRequest(requestId=${request.requestId})}">작성하기</a>
                 </td>
                 <td th:text="${request.requesterName}"></td>

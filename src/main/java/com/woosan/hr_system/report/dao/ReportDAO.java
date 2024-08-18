@@ -25,11 +25,9 @@ public class ReportDAO {
 //=====================================================생성 메소드======================================================
     // 보고서 생성
     public int createReport(Map<String, Object> params) {
-        log.info("createReport DAO 도착 완료");
 
         sqlSession.insert(NAMESPACE + "createReport", params);
         BigInteger reportIdBigInt = (BigInteger) params.get("reportId");
-        log.info("createReport DAO 반환 완료");
         return reportIdBigInt.intValue();
     }
 
@@ -111,7 +109,6 @@ public class ReportDAO {
 
     // 보고서 수정
     public void updateReport(Report report) {
-        log.info("ReportDAO 수정 메소드");
         sqlSession.update(NAMESPACE + "updateReport", report);
     }
 
