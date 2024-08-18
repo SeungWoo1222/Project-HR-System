@@ -27,7 +27,7 @@
             <p>첨부 파일:</p>
             <ul>
                 <li th:each="file : ${files}">
-                    <form th:action="@{'/report/downloadFile'}" method="get">
+                    <form th:action="@{'/file/downloadFile'}" method="get">
                         <input type="hidden" name="fileId" th:value="${file.fileId}" />
                         <input type="hidden" name="originalFileName" th:value="${file.originalFileName}" />
                         <button type="submit" th:text="${file.originalFileName}">다운로드</button>

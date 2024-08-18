@@ -165,21 +165,6 @@ public class ReportController {
         return "/report/report-view";
     }
 
-    @GetMapping("/downloadFile")
-    public ResponseEntity<ByteArrayResource> downloadFile(
-            @RequestParam("fileId") int fileId,
-            @RequestParam("originalFileName") String originalFileName) {
-
-        // S3에서 파일 다운로드
-        byte[] fileData = fileService.downloadFile(fileId);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFileName + "\"")
-                .body(new ByteArrayResource(fileData));
-    }
-
-
     @GetMapping("/list") // 보고서 리스트 페이지
     public String showReportList(HttpSession session,
                                  @RequestParam(name = "page", defaultValue = "1") int page,
