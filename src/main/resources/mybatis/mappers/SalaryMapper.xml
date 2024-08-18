@@ -6,9 +6,11 @@
     <resultMap id="SalaryResultMap" type="com.woosan.hr_system.salary.model.Salary">
         <id property="salaryId" column="salary_id" />
         <result property="employeeId" column="employee_id" />
-        <result property="annualSalary" column="annual_salary" />
+        <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+        <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
         <result property="bank" column="bank" />
         <result property="accountNumber" column="account_number" />
+        <result property="annualSalary" column="annual_salary" />
     </resultMap>
 
     <!-- 급여 ID를 이용한 특정 사원의 급여 정보 조회 -->
@@ -33,8 +35,8 @@
 
     <!-- 사원 급여 정보 등록 -->
     <insert id="insertSalary" parameterType="com.woosan.hr_system.salary.model.Salary" useGeneratedKeys="true" keyProperty="salaryId">
-        INSERT INTO salaries (employee_id, annual_salary, bank, account_number)
-        VALUES (#{employeeId}, #{annualSalary}, #{bank}, #{accountNumber})
+        INSERT INTO salaries (employee_id, annual_salary, bank, account_number, department_id, position_id)
+        VALUES (#{employeeId}, #{annualSalary}, #{bank}, #{accountNumber}, #{department}, #{position})
     </insert>
 
     <!-- 사원 급여 정보 수정 -->
@@ -43,7 +45,9 @@
                             employee_id = #{employeeId},
                             annual_salary = #{annualSalary},
                             bank = #{bank},
-                            account_number = #{accountNumber}
+                            account_number = #{accountNumber},
+                            department_id = #{department},
+                            position_id = #{position}
         WHERE salary_id = #{salaryId}
     </update>
 

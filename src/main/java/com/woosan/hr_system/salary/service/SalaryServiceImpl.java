@@ -59,9 +59,9 @@ public class SalaryServiceImpl implements SalaryService {
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 사원 급여 정보 등록
-    public String addSalary(Salary salary, String employeeId) {
+    public String addSalary(Salary salary) {
         salaryDAO.insertSalary(salary);
-        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원의 급여 정보가 등록되었습니다.";
+        return "'" + employeeDAO.getEmployeeName(salary.getEmployeeId()) + "' 사원의 급여 정보가 등록되었습니다.";
     }
 
     @LogBeforeExecution

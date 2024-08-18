@@ -8,7 +8,7 @@ public interface SalaryService {
     Salary getSalaryByEmployeeId(String employeeId);
     List<Integer> getSalaryIdList(String employeeId);
     List<Salary> getAllSalaries();
-    String addSalary(Salary salary, String employeeId);
+    String addSalary(Salary salary);
     String updateSalary(Salary salary, String employeeId);
     String removeSalary(int salaryId);
 }
