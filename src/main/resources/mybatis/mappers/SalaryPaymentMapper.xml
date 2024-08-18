@@ -3,21 +3,59 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.woosan.hr_system.salary.mapper.SalaryPaymentMapper">
+    <resultMap id="SalaryPaymentResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
+        <id property="paymentId" column="payment_id" />
+        <result property="salaryId" column="salary_id" />
+        <result property="paymentDate" column="payment_date" />
+        <result property="baseSalary" column="base_salary" />
+        <result property="positionAllowance" column="position_allowance" />
+        <result property="mealAllowance" column="meal_allowance" />
+        <result property="transportAllowance" column="transport_allowance" />
+        <result property="personalBonus" column="personal_bonus" />
+        <result property="teamBonus" column="team_bonus" />
+        <result property="holidayBonus" column="holiday_bonus" />
+        <result property="yearEndBonus" column="year_end_bonus" />
+        <result property="overtimePay" column="overtime_pay" />
+        <result property="incomeTax" column="income_tax" />
+        <result property="localIncomeTax" column="local_income_tax" />
+        <result property="nationalPension" column="national_pension" />
+        <result property="healthInsurance" column="health_insurance" />
+        <result property="longTermCareInsurance" column="long_term_care_insurance" />
+        <result property="employmentInsurance" column="employment_insurance" />
+        <result property="deductions" column="deductions" />
+        <result property="grossSalary" column="gross_salary" />
+        <result property="netSalary" column="net_salary" />
+        <result property="remarks" column="remarks" />
+    </resultMap>
 
-    <insert id="insertSalaryPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
+    <!-- 지급 ID를 이용한 특정 사원의 급여 지급 내역 조회 -->
+    <select id="selectPaymentById" parameterType="int" resultMap="SalaryPaymentResultMap">
+        SELECT * FROM salary_payments WHERE payment_id = #{paymentId}
+    </select>
+
+    <!-- 급여 ID 리스트를 이용한 특정 사원의 모든 급여 지급 내역 조회 -->
+    <select id="selectPaymentsBySalaryIdList" parameterType="list" resultMap="SalaryPaymentResultMap">
+        SELECT *
+        FROM salary_payments
+        WHERE salary_id IN
+        <foreach item="salaryId" collection="list" open="(" separator="," close=")">
+            #{salaryId}
+        </foreach>
+    </select>
+
+    <!-- 모든 급여 지급 내역 조회 -->
+    <select id="selectAllPayments" resultMap="SalaryPaymentResultMap">
+        SELECT * FROM salary_payments
+    </select>
+
+    <!-- 급여 지급 내역 등록 -->
+    <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
         INSERT INTO salary_payments (salary_id, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)
         VALUES (#{salaryId}, #{paymentDate}, #{grossSalary}, #{baseSalary}, #{overtime}, #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{deductions}, #{netSalary}, #{remarks})
     </insert>
 
-    <select id="selectSalaryPaymentById" parameterType="int" resultType="com.woosan.hr_system.salary.model.SalaryPayment">
-        SELECT * FROM salary_payments WHERE payment_id = #{paymentId}
-    </select>
-
-    <select id="selectAllSalaryPayments" resultType="com.woosan.hr_system.salary.model.SalaryPayment">
-        SELECT * FROM salary_payments
-    </select>
-
-    <update id="updateSalaryPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
+    <!-- 급여 지급 내용 수정 -->
+    <update id="updatePayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
         UPDATE salary_payments SET
                                    salary_id = #{salaryId},
                                    payment_date = #{paymentDate},
@@ -38,7 +76,8 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <delete id="deleteSalaryPayment" parameterType="int">
+    <!-- 급여 지급 내역 삭제 -->
+    <delete id="deletePayment" parameterType="int">
         DELETE FROM salary_payments WHERE payment_id = #{paymentId}
     </delete>
 

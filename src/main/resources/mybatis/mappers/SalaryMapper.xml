@@ -21,6 +21,11 @@
         SELECT * FROM salaries WHERE employee_id = #{employeeId}
     </select>
 
+    <!-- 사원 ID를 이용한 특정 사원의 모든 급여 ID 조회 -->
+    <select id="selectSalaryIdList" parameterType="String" resultType="int">
+        SELECT salary_id FROM salaries WHERE employee_id = #{employeeId}
+    </select>
+
     <!-- 모든 사원의 급여 정보 조회 -->
     <select id="selectAllSalaries" resultMap="SalaryResultMap">
         SELECT * FROM salaries

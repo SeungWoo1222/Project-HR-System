@@ -12,30 +12,41 @@ import java.util.List;
 @Service
 public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Autowired
+    private SalaryService salaryService;
+    @Autowired
     private SalaryPaymentDAO salaryPaymentDAO;
 
-    @Override
-    public void addSalaryPayment(SalaryPayment salaryPayment) {
-        salaryPaymentDAO.insertSalaryPayment(salaryPayment);
+    @Override // 지급 ID를 이용한 특정 사원의 급여 지급 내역 조회
+    public SalaryPayment getPaymentById(int paymentId) {
+        return salaryPaymentDAO.selectPaymentById(paymentId);
     }
 
-    @Override
-    public SalaryPayment getSalaryPaymentById(int paymentId) {
-        return salaryPaymentDAO.selectSalaryPaymentById(paymentId);
+    @Override // 사원 ID를 이용한 특정 사원의 모든 급여 지급 내역 조회
+    public List<SalaryPayment> getPaymentsByEmployeeId(String employeeId) {
+        List<Integer> salaryIdList = salaryService.getSalaryIdList(employeeId);
+        return salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
     }
 
-    @Override
-    public List<SalaryPayment> getAllSalaryPayments() {
-        return salaryPaymentDAO.selectAllSalaryPayments();
+    @Override // 모든 급여 지급 내역 조회
+    public List<SalaryPayment> getAllPayments() {
+        return salaryPaymentDAO.selectAllPayments();
     }
 
-    @Override
-    public void updateSalaryPayment(SalaryPayment salaryPayment) {
-        salaryPaymentDAO.updateSalaryPayment(salaryPayment);
+    @Override // 급여 지급 내역 등록
+    public String addPayment(SalaryPayment salaryPayment) {
+        salaryPaymentDAO.insertPayment(salaryPayment);
+        return null;
     }
 
-    @Override
-    public void removeSalaryPayment(int paymentId) {
-        salaryPaymentDAO.deleteSalaryPayment(paymentId);
+    @Override // 급여 지급 내용 수정
+    public String updatePayment(SalaryPayment salaryPayment, int paymentId) {
+        salaryPaymentDAO.updatePayment(salaryPayment);
+        return null;
+    }
+
+    @Override // 급여 지급 내역 삭제
+    public String removePayment(int paymentId) {
+        salaryPaymentDAO.deletePayment(paymentId);
+        return null;
     }
 }

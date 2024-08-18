@@ -41,6 +41,11 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryInfo;
     }
 
+    @Override // 사원 ID를 이용한 특정 사원의 급여 ID 리스트 조회
+    public List<Integer> getSalaryIdList(String employeeId) {
+        return salaryDAO.selectSalaryIdList(employeeId);
+    }
+
     // Salary 객체 Null 검사
     private void checkForNull(Salary salary, Object id) {
         if (salary == null) throw new SalaryNotFoundException(id);

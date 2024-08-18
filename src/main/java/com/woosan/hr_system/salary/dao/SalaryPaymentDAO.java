@@ -14,23 +14,33 @@ public class SalaryPaymentDAO {
 
     private static final String NAMESPACE = "com.woosan.hr_system.salary.mapper.SalaryPaymentMapper";
 
-    public void insertSalaryPayment(SalaryPayment salaryPayment) {
-        sqlSession.insert(NAMESPACE + ".insertSalaryPayment", salaryPayment);
+    // 지급 ID를 이용한 특정 사원의 급여 지급 내역 조회
+    public SalaryPayment selectPaymentById(int paymentId) {
+        return sqlSession.selectOne(NAMESPACE + ".selectPaymentById", paymentId);
     }
 
-    public SalaryPayment selectSalaryPaymentById(int paymentId) {
-        return sqlSession.selectOne(NAMESPACE + ".selectSalaryPaymentById", paymentId);
+    // 급여 ID 리스트를 이용한 특정 사원의 모든 급여 지급 내역 조회
+    public List<SalaryPayment> getPaymentsByEmployeeId(List<Integer> salaryIdList) {
+        return sqlSession.selectList(NAMESPACE + ".selectPaymentsBySalaryIdList", salaryIdList);
     }
 
-    public List<SalaryPayment> selectAllSalaryPayments() {
-        return sqlSession.selectList(NAMESPACE + ".selectAllSalaryPayments");
+    // 모든 급여 지급 내역 조회
+    public List<SalaryPayment> selectAllPayments() {
+        return sqlSession.selectList(NAMESPACE + ".selectAllPayments");
     }
 
-    public void updateSalaryPayment(SalaryPayment salaryPayment) {
-        sqlSession.update(NAMESPACE + ".updateSalaryPayment", salaryPayment);
+    // 급여 지급 내역 등록
+    public void insertPayment(SalaryPayment salaryPayment) {
+        sqlSession.insert(NAMESPACE + ".insertPayment", salaryPayment);
     }
 
-    public void deleteSalaryPayment(int paymentId) {
-        sqlSession.delete(NAMESPACE + ".deleteSalaryPayment", paymentId);
+    // 급여 지급 내용 수정
+    public void updatePayment(SalaryPayment salaryPayment) {
+        sqlSession.update(NAMESPACE + ".updatePayment", salaryPayment);
+    }
+
+    // 급여 지급 내역 삭제
+    public void deletePayment(int paymentId) {
+        sqlSession.delete(NAMESPACE + ".deletePayment", paymentId);
     }
 }

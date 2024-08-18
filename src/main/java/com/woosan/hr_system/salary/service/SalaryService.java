@@ -6,6 +6,7 @@ import java.util.List;
 public interface SalaryService {
     Salary getSalaryById(int salaryId);
     Salary getSalaryByEmployeeId(String employeeId);
+    List<Integer> getSalaryIdList(String employeeId);
     List<Salary> getAllSalaries();
     String addSalary(Salary salary, String employeeId);
     String updateSalary(Salary salary, String employeeId);
