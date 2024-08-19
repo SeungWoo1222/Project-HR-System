@@ -47,7 +47,7 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h3>모든 급여정보 조회</h3>
+        <h3>모든 급여정보 목록</h3>
         <div class="search-container">
             <form th:action="@{/salary/list}" method="get" id="pageSizeForm">
                 <input type="hidden" name="page" th:value="1"/>
@@ -151,6 +151,35 @@
                 </a>
             </span>
         </div>
+
+        <h3>급여정보 미등록 사원 목록</h3>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th>급여 ID</th>
+                <th>사원 ID</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>급여정보 등록</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${employeesWithoutSalary.isEmpty()}">
+                <td colspan="7" style="text-align: center; padding: 20px;">
+                    모든 사원의 급여 정보가 등록되어 있습니다.
+                </td>
+            </tr>
+            <tr th:each="employee : ${employeesWithoutSalary}" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
+                <td th:text="${employee.employeeId}">사원 ID</td>
+                <td th:text="${employee.name}">이름</td>
+                <td th:text="${employee.department}">부서</td>
+                <td th:text="${employee.position}">직급</td>
+                <td>
+                    <button type="button" th:employeeId="${employee.employeeId}" onclick="goToRegisterForm(event, this.getAttribute('employeeId'))">급여정보 등록</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 </html>

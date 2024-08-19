@@ -85,7 +85,7 @@
                 <td th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
                 <td th:text="${employee.resignation?.specificReason}">구체적 사유</td>
                 <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">상세 정보 조회</button>
+                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">상세정보 조회</button>
                 </td>
             </tr>
             </tbody>
@@ -124,7 +124,7 @@
                 <td th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
                 <td th:text="${employee.resignation?.specificReason}">구체적 사유</td>
                 <td>
-                    <button type="button" class="delete-btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="submitDelete(event)">삭제하기</button>
+                    <button type="button" class="delete-btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="submitDelete(event)">영구 삭제</button>
                 </td>
             </tr>
             </tbody>

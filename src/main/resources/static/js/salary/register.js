@@ -1,6 +1,6 @@
 // employeeId 선택시 부서와 직급 업데이트
 function updateEmployeeDetails() {
-    const selectElement = document.getElementById("employeeId");
+    const selectElement = document.getElementById("employeeSelect");
     const selectedOption = selectElement.options[selectElement.selectedIndex];
 
     const department = selectedOption.getAttribute("data-department");

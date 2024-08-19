@@ -11,3 +11,9 @@ function formatSalaries() {
         cell.textContent = formatAnnualSalary(rawValue);
     });
 }
+
+// 급여정보 등록 페이지로 이동
+function goToRegisterForm(event, employeeId) {
+    event.stopPropagation();
+    window.location.href='/salary/register?employeeId=' + employeeId;
+}

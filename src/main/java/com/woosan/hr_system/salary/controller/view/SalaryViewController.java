@@ -45,6 +45,10 @@ public class SalaryViewController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("department", department);
+
+        // 급여정보 미등록 사원 목록
+        List<Employee> employeesWithoutSalary = salaryService.getEmployeeList();
+        model.addAttribute("employeesWithoutSalary", employeesWithoutSalary);
         return "/salary/list";
     }
 
@@ -54,7 +58,7 @@ public class SalaryViewController {
     public String viewSalaryRegisterForm(@RequestParam(name = "employeeId", required = false) String employeeId,
                                           Model model) {
         if (employeeId != null) {
-            model.addAttribute("employee", employeeService.getEmployeeById(employeeId));
+            model.addAttribute("selectedEmployeeId", employeeId);
         }
         List<Employee> employeeListWithoutSalaryInfo = salaryService.getEmployeeList();
         model.addAttribute("employeeList", employeeListWithoutSalaryInfo);

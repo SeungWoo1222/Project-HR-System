@@ -9,16 +9,22 @@
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/salary/register.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateEmployeeDetails();
+        });
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
         <form action="/api/salary/register" method="POST" onsubmit="submitForm(event)">
             <div class="form-group">
-                <label for="employeeId">사원</label>
-                <select id="employeeId" name="employeeId" onchange="updateEmployeeDetails()">
-                    <option value="">사원을 선택해주세요.</option>
+                <label for="employeeSelect">사원</label>
+                <select id="employeeSelect" name="employeeId" onchange="updateEmployeeDetails()">
+                    <option value="" disabled selected>사원을 선택해주세요.</option>
                     <option th:each="employee : ${employeeList}" th:value="${employee.employeeId}"
+                            th:selected="${employee.employeeId == selectedEmployeeId}"
                             th:data-department="${employee.department}"
                             th:data-position="${employee.position}"
                             th:text="${employee.name} + ' (' + ${employee.employeeId} + ')'">
@@ -36,6 +42,7 @@
             <div class="form-group">
                 <label>은행</label>
                 <select id="bank" name="bank">
+                    <option value="" disabled selected>은행을 선택해주세요.</option>
                     <option value="KB국민은행">KB국민은행</option>
                     <option value="카카오뱅크">카카오뱅크</option>
                     <option value="신한은행">신한은행</option>
