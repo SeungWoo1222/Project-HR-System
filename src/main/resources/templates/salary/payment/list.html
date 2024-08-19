@@ -1,10 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='급여명세서 조회')}">
 
+<th:block layout:fragment="css">
+    <style>
+        .list tbody tr:hover {
+            cursor: pointer;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <!--    <script th:src="@{/js/employee.js}"></script>-->
+    <!--    <script th:src="@{/js/employee-detail-edit.js}"></script>-->
+</th:block>
+
+<body layout:fragemnt="~{content}">
+    <div class="content">
+
+    </div>
 </body>
 </html>

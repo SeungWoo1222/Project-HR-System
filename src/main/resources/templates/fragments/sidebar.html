@@ -55,8 +55,9 @@
                     src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 보상 및 복리후생</a>
                 <ul class="submenu">
                     <li><a th:href="@{/salary/list}">- 급여정보 조회</a></li>
-                    <li><a th:href="@{/salary/}">- 급여정보 등록</a></li>
+                    <li><a th:href="@{/salary/register}">- 급여정보 등록</a></li>
                     <li><a th:href="@{/salary/}">- 급여 지급</a></li>
+                    <li><a th:href="@{/salary/payment/all}">- 급여명세서 조회</a></li>
                 </ul>
             </li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img

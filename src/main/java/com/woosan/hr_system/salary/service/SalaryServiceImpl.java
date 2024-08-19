@@ -4,11 +4,15 @@ import com.woosan.hr_system.auth.aspect.LogAfterExecution;
 import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.exception.salary.SalaryNotFoundException;
 import com.woosan.hr_system.salary.dao.SalaryDAO;
 import com.woosan.hr_system.salary.model.Salary;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -18,14 +22,19 @@ import java.util.Set;
 
 @Slf4j
 @Service
+@Component
 public class SalaryServiceImpl implements SalaryService {
-
     @Autowired
     private CommonService commonService;
     @Autowired
     private SalaryDAO salaryDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
+
+    // Salary 객체 Null 검사
+    private void checkForNull(Salary salary, Object id) {
+        if (salary == null) throw new SalaryNotFoundException(id);
+    }
 
     @Override // 급여 ID를 이용한 특정 사원의 급여 정보 조회
     public Salary getSalaryById(int salaryId) {
@@ -46,9 +55,18 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryDAO.selectSalaryIdList(employeeId);
     }
 
-    // Salary 객체 Null 검사
-    private void checkForNull(Salary salary, Object id) {
-        if (salary == null) throw new SalaryNotFoundException(id);
+    @Override // 급여 정보가 없는 사원 리스트 조회
+    public List<Employee> getEmployeeList() {
+        return salaryDAO.selectEmployeeList();
+    }
+
+    @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
+    public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Salary> salaries = salaryDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
+        int total = salaryDAO.count(pageRequest.getKeyword());
+
+        return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // 모든 사원의 급여 정보 조회

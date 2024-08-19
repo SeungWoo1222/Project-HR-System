@@ -16,7 +16,7 @@ public class SalaryApiController {
     // 급여 정보 등록
     @RequireHRPermission
     @PostMapping("/register")
-    ResponseEntity<String> registerSalaryInfo(@RequestBody Salary salary) {
+    ResponseEntity<String> registerSalaryInfo(@ModelAttribute Salary salary) {
         return ResponseEntity.ok(salaryService.addSalary(salary));
     }
 
