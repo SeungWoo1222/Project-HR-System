@@ -57,28 +57,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override  // 내가 쓴 요청 리스트 조회
-    public List<Request> getMyRequests(String employeeId, String requestStart, String requestEnd) {
-        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        YearMonth startYearMonth;
-        YearMonth endYearMonth;
-
-        // 현재 연월 가져오기
-        YearMonth currentYearMonth = YearMonth.now();
-
-        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
-        if (requestStart == null) {
-            startYearMonth = currentYearMonth;
-        } else {
-            startYearMonth = YearMonth.parse(requestStart, formatter);
-        }
-
-        if (requestEnd == null) {
-            endYearMonth = currentYearMonth;
-        } else {
-            endYearMonth = YearMonth.parse(requestEnd, formatter);
-        }
-        return requestDAO.getMyRequests(employeeId, startYearMonth, endYearMonth);
+    public List<Request> getMyRequests(String requesterId) {
+        return requestDAO.getMyRequests(requesterId);
     }
 
     @Override  // 내게 온 요청 리스트 조회
@@ -88,13 +68,45 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 검색
     public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
-        log.info("서비스 writerId : {}", writerId);
+
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (requestStart == null || requestEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            requestStart = formattedDate;
+            requestEnd = formattedDate;
+        }
+
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
         int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
 
         return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
+
+    @Override // 요청 검색
+    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, String requestStart, String requestEnd) {
+
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (requestStart == null || requestEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            requestStart = formattedDate;
+            requestEnd = formattedDate;
+        }
+
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Request> requests = requestDAO.searchMyRequests(pageRequest.getKeyword(), pageRequest.getSize(), offset, requesterId, searchType, requestStart, requestEnd);
+        int total = requestDAO.countMyRequests(pageRequest.getKeyword(), requesterId, searchType, requestStart, requestEnd);
+
+        return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+
 
 //===================================================조회 메소드=======================================================
 

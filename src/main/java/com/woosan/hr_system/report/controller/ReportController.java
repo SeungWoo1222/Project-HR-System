@@ -66,7 +66,11 @@ public class ReportController {
         List<Request> requests = requestService.getMyPendingRequests(writerId);
         model.addAttribute("requests", requests);
 
-        // 보고서 통계
+        for (Request request : requests) {
+            log.info("request: {}", request.getReportId());
+        }
+
+        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
         String statisticStart = (String) session.getAttribute("staffStatisticStart");
         String statisticEnd = (String) session.getAttribute("staffStatisticEnd");
 
@@ -175,6 +179,8 @@ public class ReportController {
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
+
+        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
         String reportStart = (String) session.getAttribute("staffReportStart");
         String reportEnd = (String) session.getAttribute("staffReportEnd");
 
@@ -199,9 +205,12 @@ public class ReportController {
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                   @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                   Model model) {
+
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
+
+        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
         String requestStart = (String) session.getAttribute("staffRequestStart");
         String requestEnd = (String) session.getAttribute("staffRequestEnd");
 
@@ -231,7 +240,6 @@ public class ReportController {
     public String setReportDateRange(@RequestParam(name = "reportStart") String reportStart,
                                      @RequestParam(name = "reportEnd") String reportEnd,
                                      HttpSession session) {
-
         session.setAttribute("staffReportStart", reportStart);
         session.setAttribute("staffReportEnd", reportEnd);
         return "redirect:/report/list";

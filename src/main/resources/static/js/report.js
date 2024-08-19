@@ -123,18 +123,21 @@ function updateSelectedEmployees() {
 //=================================================== 임원 선택 =========================================================
 //================================================= 파일 생성 관련 js ===================================================
 // 보고서 생성 시
-function submitReport(event, url) {
+function submitReport(event, url, redirectUrl) {
     event.preventDefault(); // 기본 폼 제출 방지
 
     const form = document.getElementById('form');
     const formData = new FormData(form); // 기존 폼 데이터 가져오기
 
     // filesArr에 저장된 파일들을 FormData에 추가
-    filesArr.forEach((file, index) => {
-        if (!file.is_delete) { // 삭제된 파일 제외
-            formData.append('reportFiles', file);
-        }
-    });
+    if (filesArr != null) {
+        filesArr.forEach((file, index) => {
+            if (!file.is_delete) { // 삭제된 파일 제외
+                formData.append('reportFiles', file);
+            }
+        });
+    }
+
 
     if (Object.keys(selectedEmployees).length > 0) {
         const idList = Object.keys(selectedEmployees);
@@ -161,8 +164,8 @@ function submitReport(event, url) {
     })))
     .then(response => {
         if (response.status === 200) {
-            alert(response.text);
-            window.location.href = "/report/list"; // 성공 후 리디렉션
+            alert("성공!");
+            window.location.href = redirectUrl; // 전달받은 URL로 리다이렉트
         } else {
             console.log(response.status);
             console.log(response.text);

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +51,6 @@ public class ReportServiceImpl implements ReportService {
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
     public List<Integer> createReport(Report report) {
-        log.info("createReport ServiceImpl 도착 완료");
 
         List<Integer> reportIdList = new ArrayList<>();
 
@@ -130,7 +130,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 요청 들어온 보고서 + 파일 작성
     public int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments) {
-        log.info("보고서 + 파일 생성 서비스 도착");
         // 조인 테이블에 연결 할 file, report Id리스트 생성
         List<Integer> fileIdlist = new ArrayList<>();
 
@@ -199,73 +198,80 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-
-    @Override // 날짜범위 내 결재할 보고서 조회
-    public List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd) {
-        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        YearMonth startYearMonth;
-        YearMonth endYearMonth;
-
-        // 현재 연월 가져오기
-        YearMonth currentYearMonth = YearMonth.now();
-
-        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
-        if (approvalStart == null) {
-            startYearMonth = currentYearMonth;
-        } else {
-            startYearMonth = YearMonth.parse(approvalStart, formatter);
-        }
-
-        if (approvalEnd == null) {
-            endYearMonth = currentYearMonth;
-        } else {
-            endYearMonth = YearMonth.parse(approvalEnd, formatter);
-        }
-
-        // 파싱된 날짜를 DAO로 전달하여 호출
-        return reportDAO.getPendingApprovalReports(approverId, startYearMonth, endYearMonth);
-    }
-
     @Override // 최근 5개 보고서 조회
     public List<Report> getRecentReports(String writerId) {
         return reportDAO.getRecentReports(writerId);
     }
 
+    @Override // 결재 미처리 보고서 조회(MANAGER)
+    public List<Report> getUnprocessedReports(String approverId) {
+        return reportDAO.getUnprocessedReports(approverId);
+    }
+
+
+
+
     @Override // 보고서 검색
     public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd) {
+
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (reportStart == null || reportEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            reportStart = formattedDate;
+            reportEnd = formattedDate;
+        }
+
+        // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
+        // 범위에 속하는 보고서를 검색함
         List<Report> reports = reportDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, reportStart, reportEnd);
+        // 범위에 속하는 보고서 개수를 세서 페이징
         int total = reportDAO.count(pageRequest.getKeyword(), writerId, searchType, reportStart, reportEnd);
 
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
+    @Override
+    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String reportStart, String reportEnd) {
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (reportStart == null || reportEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            reportStart = formattedDate;
+            reportEnd = formattedDate;
+        }
+
+        // 보여줄 리스트의 범위를 지정
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        // 범위에 속하는 보고서를 검색함
+        List<Report> reports = reportDAO.toApproveSearch(pageRequest.getKeyword(), pageRequest.getSize(), offset, approverId, searchType, reportStart, reportEnd);
+        // 범위에 속하는 보고서 개수를 세서 페이징
+        int total = reportDAO.toApproveCount(pageRequest.getKeyword(), approverId, searchType, reportStart, reportEnd);
+
+        return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
 
-        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        YearMonth startYearMonth;
-        YearMonth endYearMonth;
-
-        // 현재 연월 가져오기
-        YearMonth currentYearMonth = YearMonth.now();
-
-        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
-        if (statisticStart == null) {
-            startYearMonth = currentYearMonth;
-        } else {
-            startYearMonth = YearMonth.parse(statisticStart, formatter);
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (statisticStart == null || statisticStart.trim().isEmpty() ||
+                statisticEnd == null || statisticEnd.trim().isEmpty()) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            statisticStart = formattedDate;
+            statisticEnd = formattedDate;
         }
 
-        if (statisticEnd == null) {
-            endYearMonth = currentYearMonth;
-        } else {
-            endYearMonth = YearMonth.parse(statisticEnd, formatter);
-        }
-
-        return reportDAO.getReportStats(startYearMonth, endYearMonth, writerIdList);
+        return reportDAO.getReportStats(statisticStart, statisticEnd, writerIdList);
     }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================

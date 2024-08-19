@@ -51,7 +51,7 @@
 
             <input type="hidden" name="requestId" th:value="${request.requestId}">
             <input type="hidden" name="approverId" th:value="${request.requesterId}">
-            <button type="button" onclick="submitReport(event, '/report/writeFromRequest')">제출하기</button>
+            <button type="button" onclick="submitReport(event, '/report/writeFromRequest', '/report/list')">제출하기</button>
         </form>
     </div>
 </div>

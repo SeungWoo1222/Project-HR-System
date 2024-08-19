@@ -6,14 +6,21 @@ import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
+import com.woosan.hr_system.report.service.ReportFileService;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.upload.model.File;
 import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/request")
 public class ExecutiveController {
@@ -37,9 +45,11 @@ public class ExecutiveController {
     private ObjectMapper objectMapper; // 통계 모델 반환 후 JSON 변환용
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ReportFileService reportFileService;
 
     // main 페이지
-//    @RequireManagerPermission
+    @RequireManagerPermission
     @GetMapping("/main")
     public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
 
@@ -48,14 +58,10 @@ public class ExecutiveController {
         String employeeId = userSessionInfo.getCurrentEmployeeId();
 
         // 내가 결재할 보고서 목록 조회
-        String approvalStart = (String) session.getAttribute("approvalStart");
-        String approvalEnd = (String) session.getAttribute("approvalEnd");
-        List<Report> reports = reportService.getPendingApprovalReports(employeeId, approvalStart, approvalEnd);
+        List<Report> reports = reportService.getUnprocessedReports(employeeId);
 
         // 내가 쓴 요청 목록 조회
-        String requestStart = (String) session.getAttribute("requestStart");
-        String requestEnd = (String) session.getAttribute("requestEnd");
-        List<Request> requests = requestService.getMyRequests(employeeId, requestStart ,requestEnd);
+        List<Request> requests = requestService.getMyRequests(employeeId);
 
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
@@ -86,7 +92,7 @@ public class ExecutiveController {
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        return "admin/report/main"; // main.html 반환
+        return "admin/report/main";
     }
 //=====================================================생성 메소드========================================================
     @RequireManagerPermission
@@ -107,11 +113,68 @@ public class ExecutiveController {
         String requesterId = userSessionInfo.getCurrentEmployeeId();
         request.setRequesterId(requesterId);
         requestService.createRequest(request);
-        return "redirect:/admin/request/main";
+        return "redirect:/admin/request/requestList";
     }
 //=====================================================생성 메소드========================================================
 
 //=====================================================조회 메소드========================================================
+    @GetMapping("/requestList")
+    public String showRequestList(HttpSession session,
+                                 @RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 Model model) {
+        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String requesterId = userSessionInfo.getCurrentEmployeeId();
+
+        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
+        String requestStart = (String) session.getAttribute("requestStart");
+        String requestEnd = (String) session.getAttribute("requestEnd");
+
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Request> pageResult = requestService.searchMyRequests(pageRequest, requesterId, searchType, requestStart, requestEnd);
+
+
+        model.addAttribute("requests", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+
+        return "/admin/report/request-list";
+    }
+
+    @GetMapping("toApproveReportList")
+    public String showReportList(HttpSession session,
+                                 @RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 Model model) {
+        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String approverId = userSessionInfo.getCurrentEmployeeId();
+
+        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
+        String reportStart = (String) session.getAttribute("approvalStart");
+        String reportEnd = (String) session.getAttribute("approvalEnd");
+
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Report> pageResult = reportService.toApproveSearchReports(pageRequest, approverId, searchType, reportStart, reportEnd);
+
+
+        model.addAttribute("reports", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+
+        return "admin/report/report-list";
+    }
 
     @GetMapping("/{requestId}") // 요청 세부 조회
     public String viewRequest(@PathVariable("requestId") int requestId, Model model) {
@@ -125,6 +188,13 @@ public class ExecutiveController {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
 
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
+
         return "admin/report/report-view";
     }
 
@@ -136,7 +206,7 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @GetMapping("/stats") // 통계 날짜, 임원 설정
+    @PostMapping("/stats") // 통계 날짜, 임원 설정
     public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
                                  @RequestParam(name = "statisticEnd") String statisticEnd,
                                  @RequestParam(required = false, name = "idList") List<String> idList,
@@ -203,7 +273,7 @@ public class ExecutiveController {
                                            HttpSession session) {
         session.setAttribute("approvalStart", approvalStart);
         session.setAttribute("approvalEnd", approvalEnd);
-        return "redirect:/admin/request/main";
+        return "redirect:/admin/request/toApproveReportList";
     }
 
     // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
@@ -221,7 +291,7 @@ public class ExecutiveController {
                                           HttpSession session) {
         session.setAttribute("requestStart", requestStart);
         session.setAttribute("requestEnd", requestEnd);
-        return "redirect:/admin/request/main";
+        return "redirect:/admin/request/requestList";
     }
 
 
@@ -265,7 +335,7 @@ public class ExecutiveController {
             throw new SecurityException("권한이 없습니다.");
         }
 
-        return "redirect:/admin/request/main";
+        return "redirect:/admin/request/requestList";
     }
 
     @RequireManagerPermission
@@ -275,7 +345,7 @@ public class ExecutiveController {
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {
             requestService.updateApprovalStatus(reportId, status, rejectionReason);
-            return "redirect:/admin/request/main";
+            return "redirect:/admin/request/toApproveReportList";
         } catch (Exception e) {
             return "error"; // 에러 메시지 표시
         }

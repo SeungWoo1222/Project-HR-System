@@ -33,11 +33,14 @@ public interface ReportService {
     // 최근 5개 보고서 조회
     List<Report> getRecentReports(String writerId);
 
-    // 페이징, 검색 + 보고서 조회
-    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd); // 페이징, 서칭 + 보고서 리스트
+    // 내가 쓴 보고서 페이징, 검색 + 보고서 조회
+    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd);
 
-    // 결재할 보고서 목록 조회
-    List<Report> getPendingApprovalReports(String approverId, String approvalStart, String approvalEnd);
+    // 결재 할 보고서 페이징, 검색 + 보고서 조회
+    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String reportStart, String reportEnd);
+
+    // 결재 미처리 보고서 조회(MANAGER)
+    List<Report> getUnprocessedReports(String approverId);
 
     // 보고서 통계 조회
     List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList);

@@ -51,10 +51,10 @@ public class ReportDAO {
 
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(YearMonth startYearMonth, YearMonth endYearMonth, List<String> writerIdList) {
+    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
         Map<String, Object> params = new HashMap<>();
-        params.put("startYearMonth", startYearMonth);
-        params.put("endYearMonth", endYearMonth);
+        params.put("statisticStart", statisticStart);
+        params.put("statisticEnd", statisticEnd);
         if (writerIdList != null && !writerIdList.isEmpty()) {
             params.put("writerIds", writerIdList);
         } else {
@@ -69,7 +69,13 @@ public class ReportDAO {
         return sqlSession.selectList(NAMESPACE + "getRecentReports", writerId);
     }
 
-    // 검색과 페이징 로직
+    // 결재 미처리 보고서 조회(MANAGER)
+    public List<Report> getUnprocessedReports(String approverId) {
+        return sqlSession.selectList(NAMESPACE + "getUnprocessedReports", approverId);
+    }
+
+
+        // 검색과 페이징 로직
     public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType, String reportStart, String reportEnd) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -94,16 +100,31 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + "count", params);
     }
 
-    // 결재할 보고서 조회
-    public List<Report> getPendingApprovalReports(String approverId, YearMonth startYearMonth, YearMonth endYearMonth) {
-        // Map 설정 (Mapper에서 각 요소의 유무를 빠르게 파악하고 가독성, 재사용성을 위해)
-        Map<String, Object> params = new HashMap<>();
+    // 검색과 페이징 로직
+    public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, int searchType, String reportStart, String reportEnd) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("pageSize", pageSize);
+        params.put("offset", offset);
         params.put("approverId", approverId);
-        params.put("startYearMonth", startYearMonth);
-        params.put("endYearMonth", endYearMonth);
+        params.put("searchType", searchType);
+        params.put("reportStart", reportStart);
+        params.put("reportEnd", reportEnd);
 
-        return sqlSession.selectList(NAMESPACE + "getAllReports", params);
+        return sqlSession.selectList(NAMESPACE + "toApproveSearch", params);
     }
+
+    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    public int toApproveCount(String keyword, String approverId, int searchType, String reportStart, String reportEnd) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("searchType", searchType);
+        params.put("approverId", approverId);
+        params.put("reportStart", reportStart);
+        params.put("reportEnd", reportEnd);
+        return sqlSession.selectOne(NAMESPACE + "toApproveCount", params);
+    }
+
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
 

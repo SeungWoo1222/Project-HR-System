@@ -94,6 +94,11 @@
                 approver_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
+            <if test="keyword != null and keyword != '' and searchType == 3">
+                AND (
+                status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="reportStart != null and reportEnd != null">
                 AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
             </if>
@@ -118,8 +123,77 @@
                 approver_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
+            <if test="keyword != null and keyword != '' and searchType == 3">
+                AND (
+                status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="reportStart != null and reportEnd != null">
                 AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="toApproveSearch" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+        r.report_id AS reportId,
+        r.writer_id AS writerId,
+        e.name AS writerName,
+        r.title,
+        r.created_date AS createdDate,
+        r.approver_name AS approverName,
+        r.status
+        FROM reports r JOIN employees e ON r.writer_id = e.employee_id
+        <where>
+            r.approver_id = #{approverId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                r.title LIKE CONCAT('%', #{keyword}, '%') OR
+                r.content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 3">
+                AND (
+                r.status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="reportStart != null and reportEnd != null">
+                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            </if>
+        </where>
+        ORDER BY r.created_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="toApproveCount" parameterType="map" resultType="int">
+        SELECT COUNT(r.writer_id) FROM reports r JOIN employees e ON r.writer_id = e.employee_id
+        <where>
+            r.approver_id = #{approverId}
+            <if test="keyword != null and keyword != '' and searchType == 1">
+                AND (
+                r.title LIKE CONCAT('%', #{keyword}, '%') OR
+                r.content LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 2">
+                AND (
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 3">
+                AND (
+                r.status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="reportStart != null and reportEnd != null">
+                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
             </if>
         </where>
     </select>
@@ -140,6 +214,20 @@
             LIMIT 5;
     </select>
 
+    <!-- 결재 미처리 보고서 조회(MANAGER) -->
+    <select id="getUnprocessedReports" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT
+            r.report_id AS reportId,
+            r.writer_id AS writerId,
+            e.name AS writerName,
+            r.title,
+            r.created_date AS createdDate,
+            r.approver_name AS approverName,
+            r.status
+        FROM reports r JOIN employees e ON employee_id = writer_id
+        WHERE r.approver_id = #{approverId} AND r.status = '미처리';
+    </select>
+
     <!-- 통계 조회 -->
     <select id="getReportStats" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
         SELECT
@@ -148,7 +236,7 @@
         SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
         SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
         FROM reports
-        WHERE DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
+        WHERE DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{statisticStart} AND #{statisticEnd}
         <if test="writerIds != null and writerIds.size() > 0">
             AND writer_id IN
             <foreach item="writerId" collection="writerIds" open="(" separator="," close=")">

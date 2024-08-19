@@ -13,13 +13,17 @@
     <!-- jQuery 추가 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/employee.js}"></script>
+    <script>
+    </script>
+
 </th:block>
 
 <div>
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
     <h1>보고서 범위 설정</h1>
     <h2>기간 설정</h2>
-    <form id="form" th:action="@{/admin/request/stats}" method="get" onsubmit="updateFormFields()">
+    <form id="form" method="post" onsubmit="return false;">
         <label for="statisticStart">시작 월:</label>
         <input type="month" id="statisticStart" name="statisticStart" required>
         <label for="statisticEnd">종료 월:</label>
@@ -51,7 +55,8 @@
             </div>
 
             <div id="selectedEmployees" class="selected-employees"></div>
-            <button type="submit">조회</button>
+
+            <button type="submit" onclick="submitReport(event, '/admin/request/stats', '/admin/request/main')">조회</button>
         </div>
     </form>
 </div>

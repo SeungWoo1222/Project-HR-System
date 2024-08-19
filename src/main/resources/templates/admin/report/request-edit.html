@@ -11,6 +11,8 @@
     <!--  <script th:src="@{/js/example.js}"></script> &lt;!&ndash; 외부 JS도 요렇게 &ndash;&gt;-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/employee.js}"></script>
+
     <script>
         $(document).ready(function () {
             $('#editButton').on('click', function () {
@@ -28,8 +30,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>요청 수정</h1>
-        <form id="form" th:action="@{/admin/request/edit}" method="post" th:object="${request}"
-              onsubmit="updateFormFields()">
+        <form id="form" method="post" onsubmit="return false;">
             <input type="hidden" name="requestId" th:value="${request.requestId}">
 
             <div>
@@ -80,7 +81,8 @@
                 <textarea id="requestNote" name="requestNote" rows="10" th:text="${request.requestNote}"></textarea>
             </div>
 
-            <button type="submit">요청 수정</button>
+            <input type="hidden" name="requestId" th:value="${request.requestId}">
+            <button type="button" onclick="submitReport(event, '/admin/request/edit', '/admin/request/requestList')">생성하기</button>
         </form>
     </div>
 </div>
