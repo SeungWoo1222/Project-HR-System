@@ -62,7 +62,7 @@ public class ReportController {
         List<Report> reports = reportService.getRecentReports(writerId);
         model.addAttribute("reports", reports);
 
-        // 내게 온 요청 조회(최근 5개 + 보고서가 안쓰인 요청)
+        // 내게 온 요청 조회(최근 5개 요청)
         List<Request> requests = requestService.getMyPendingRequests(writerId);
         model.addAttribute("requests", requests);
 

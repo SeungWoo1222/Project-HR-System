@@ -50,7 +50,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="report : ${reports}" th:reportId="${report.reportId}">
+                <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
+                    th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
                     <td th:text="${report.title}"></td>
                     <td th:text="${report.approverName}"></td>
                     <td th:text="${report.status}"></td>
@@ -62,7 +63,7 @@
 
         <!-- 작성 요청 목록 -->
         <div>
-            <h1>작성해야 할 요청 목록</h1>
+            <h1>최근 요청 목록</h1>
             <div>
                 <table>
                     <thead>
