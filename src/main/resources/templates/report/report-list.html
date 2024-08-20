@@ -4,9 +4,7 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='작성한 보고서 조회')}">
 
 <th:block layout:fragment="css">
-    <!--    <link rel="stylesheet" th:href="@{example.css}"> -->
     <style>
-        /* 여기에 CSS 코드를 입력 */
     </style>
 </th:block>
 
@@ -14,8 +12,26 @@
     <script th:src="@{/js/report.js}"></script>
     <script th:src="@{/js/employee.js}"></script>
     <script>
+        function toggleSearchField() {
+            const searchType = document.getElementById('searchType').value;
+            const keywordField = document.getElementById('keywordField');
+            const approvalStatus = document.getElementById('approvalStatus');
+
+            if (searchType == 3) {
+                keywordField.style.display = 'none';
+                keywordField.name = ''; // 폼 전송 시 전송되지 않도록 name 제거
+                approvalStatus.style.display = 'block';
+            } else {
+                keywordField.style.display = 'block';
+                keywordField.name = 'keyword'; // 폼 전송 시 전송되도록 name 추가
+                approvalStatus.style.display = 'none';
+            }
+        }
+
+        // 페이지 로드 시 초기 상태 설정
         document.addEventListener("DOMContentLoaded", function () {
             updateDateTimeElements();
+            toggleSearchField();
         });
     </script>
 </th:block>
@@ -24,26 +40,25 @@
     <div class="content">
         <h1>내가 쓴 보고서 목록</h1>
         <button th:onclick="openModal('/report/reportDate')">날짜 검색</button>
-        <button onclick="location.href='/report/write'">보고서 작성하기</button>
         <div>
-            <form th:action="@{/report/list}" method="get" id="pageSizeForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="20" th:text="'20개씩 보기'" th:selected="${pageSize == 20}">20개씩 보기</option>
-                    <option th:value="30" th:text="'30개씩 보기'" th:selected="${pageSize == 30}">30개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-            </form>
-
             <form th:action="@{/report/list}" method="get">
                 <input type="hidden" name="page" value="1"/>
                 <input type="hidden" name="size" th:value="${pageSize}"/>
-                <select name="searchType">
+                <select name="searchType" id="searchType" onchange="toggleSearchField()">
                     <option th:value="1" th:text="'제목+내용'" th:selected="${searchType == 1}">제목+내용</option>
                     <option th:value="2" th:text="'보고서 결재자'" th:selected="${searchType == 2}">보고서 결재자</option>
+                    <option th:value="3" th:text="'결재 상태'" th:selected="${searchType == 3}">결재 상태</option>
                 </select>
-                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+
+                <!-- 검색어 입력 필드 -->
+                <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+
+                <!-- 결재 상태 라디오 버튼 -->
+                <div id="approvalStatus" style="display:none;">
+                    <label><input type="radio" name="keyword" value="승인" th:checked="${keyword == '승인'}"> 승인</label>
+                    <label><input type="radio" name="keyword" value="거절" th:checked="${keyword == '거절'}"> 거절</label>
+                    <label><input type="radio" name="keyword" value="미처리" th:checked="${keyword == '미처리'}"> 미처리</label>
+                </div>
                 <button type="submit">검색</button>
             </form>
         </div>
@@ -72,11 +87,14 @@
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
+            <th:block th:if="${totalPages != null}">
             <span th:if="${totalPages <= 5}">
+
                 <span th:each="i : ${#numbers.sequence(1, totalPages)}">
                     <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
+
             </span>
             <span th:if="${totalPages > 5}">
                 <span th:each="i : ${#numbers.sequence(
@@ -91,6 +109,7 @@
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>
+            </th:block>
         </div>
     </div>
 </div>

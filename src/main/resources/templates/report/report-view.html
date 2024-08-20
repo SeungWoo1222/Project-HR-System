@@ -27,22 +27,20 @@
             <p>첨부 파일:</p>
             <ul>
                 <li th:each="file : ${files}">
-                    <form th:action="@{'/report/downloadFile'}" method="post">
+                    <form th:action="@{'/file/downloadFile'}" method="get">
                         <input type="hidden" name="fileId" th:value="${file.fileId}" />
                         <input type="hidden" name="originalFileName" th:value="${file.originalFileName}" />
                         <button type="submit" th:text="${file.originalFileName}">다운로드</button>
+
                     </form>
+                    <div style="font-size: 10px; color: gray;">
+                        업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>
+                        파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>
+                    </div>
                 </li>
             </ul>
         </div>
 
-
-        <div th:if="${reportFile != null}">
-            <p>
-                첨부 파일:
-                <a th:href="${reportFile.cloudServerFileUrl}" th:text="${reportFile.originalFileName}">파일 이름</a>
-            </p>
-        </div>
         <form th:action="@{'/report/edit'}" method="get" style="display:inline;">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
             <button type="submit">수정</button>

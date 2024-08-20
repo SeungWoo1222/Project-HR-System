@@ -15,7 +15,6 @@ public class SharedTrash {
     private String content;
     private String approverWriterId;
     private String approverWriterName;
-    private Integer fileId;
     private Date completionDueDate;
     private String title;
     private String status;
@@ -98,14 +97,6 @@ public class SharedTrash {
 
     public void setApproverWriterName(String approverWriterName) {
         this.approverWriterName = approverWriterName;
-    }
-
-    public Integer getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(Integer fileId) {
-        this.fileId = fileId;
     }
 
     public Date getCompletionDueDate() {

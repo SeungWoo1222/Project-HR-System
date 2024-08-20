@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.report.dao.ReportFileDAO">
+
+    <insert id="createReportFile">
+        INSERT INTO report_files
+        (report_id,
+         file_id)
+        VALUES (#{reportId}, #{fileId})
+    </insert>
+
+    <!--  조회  -->
+    <select id="getFileIdsByReportId" parameterType="int" resultType="int">
+        SELECT
+            file_id AS fildId
+        FROM report_files
+        WHERE report_id = #{reportId};
+    </select>
+
+    <select id="getReportIdByFileId" parameterType="int" resultType="int">
+        SELECT
+            report_id AS reportId
+        FROM report_files
+        WHERE file_id = #{fileId};
+    </select>
+
+    <!-- ReportId로 삭제 -->
+    <delete id="deleteReportFileByReportId">
+        DELETE FROM report_files WHERE report_id = #{reportId};
+    </delete>
+
+    <!-- reportId와 fileId로 삭제 -->
+    <delete id="deleteReportFile" parameterType="map">
+        DELETE FROM report_files WHERE file_id = #{fileId} and report_id = #{reportId};
+    </delete>
+
+    <!--  특정 파일이 다른 reportId와 연결돼있는지 확인  -->
+    <select id="countOtherReportConnect" parameterType="int" resultType="int">
+        SELECT COUNT(report_id)
+        FROM report_files
+        WHERE file_id = #{fileId};
+    </select>
+
+<!--==================================================파일 아카이브 생성===============================================-->
+    <insert id="createReportFileArchive" parameterType="map">
+        INSERT INTO report_file_archive (
+            file_id,
+            report_id,
+            deleted_date,
+            original_file_name,
+            stored_file_name,
+            file_size,
+            upload_date,
+            uploaded_by,
+            file_id_usage
+        ) VALUES (
+                     #{fileId},
+                     #{reportId},
+                     #{deletedDate},
+                     #{originalFileName},
+                     #{storedFileName},
+                     #{fileSize},
+                     #{uploadDate},
+                     #{uploadedBy},
+                     #{fileIdUsage}
+                 )
+    </insert>
+
+    <insert id="createReportFileArchiveByFileList" parameterType="map">
+        INSERT INTO report_file_archive (
+            file_id,
+            report_id,
+            deleted_date,
+            original_file_name,
+            stored_file_name,
+            file_size,
+            upload_date,
+            uploaded_by,
+            file_id_usage
+        ) VALUES (
+            #{fileId},
+            #{reportId},
+            #{deletedDate},
+            #{originalFileName},
+            #{storedFileName},
+            #{fileSize},
+            #{uploadDate},
+            #{uploadedBy},
+            #{fileIdUsage}
+            )
+    </insert>
+</mapper>

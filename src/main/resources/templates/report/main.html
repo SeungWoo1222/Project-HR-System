@@ -50,7 +50,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="report : ${reports}" th:reportId="${report.reportId}">
+                <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
+                    th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
                     <td th:text="${report.title}"></td>
                     <td th:text="${report.approverName}"></td>
                     <td th:text="${report.status}"></td>
@@ -62,11 +63,12 @@
 
         <!-- 작성 요청 목록 -->
         <div>
-            <h1>내게 온 작성 요청 목록</h1>
+            <h1>최근 요청 목록</h1>
             <div>
                 <table>
                     <thead>
                     <tr>
+                        <th>보고서</th>
                         <th>요청자</th>
                         <th>마감 기한</th>
                         <th>요청 일자</th>
@@ -74,6 +76,11 @@
                     </thead>
                     <tbody>
                     <tr th:each="request : ${requests}">
+                        <td>
+                            <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
+                               th:onclick="openModal('/report/' + this.getAttribute('reportId'))">조회하기</a>
+                            <a th:if="${request.reportId == null}" th:href="@{/report/writeFromRequest(requestId=${request.requestId})}">작성하기</a>
+                        </td>
                         <td th:text="${request.requesterName}"></td>
                         <td th:text="${request.dueDate}"></td>
                         <td th:text="${request.requestDate}" class="dateTime"></td>
