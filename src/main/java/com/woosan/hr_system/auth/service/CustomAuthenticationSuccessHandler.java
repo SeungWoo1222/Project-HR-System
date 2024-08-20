@@ -25,6 +25,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         // 로그인 성공 시 비밀번호 카운트 초기화
         passwordDAO.resetPasswordCount(employeeId);
 
+        log.info("'{}' 사원이 로그인하였습니다.", employeeId);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

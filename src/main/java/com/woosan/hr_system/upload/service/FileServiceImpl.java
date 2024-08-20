@@ -1,6 +1,5 @@
 package com.woosan.hr_system.upload.service;
 
-import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
 import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
@@ -82,9 +81,11 @@ public class FileServiceImpl implements FileService {
 
         // DB에 파일 정보 입력
         fileDAO.insertFile(fileInfo);
+        int fileId = fileInfo.getFileId();
+        log.info("파일 ID '{}'가 files 테이블에 등록되었습니다.", fileId);
 
-        // fileInfo 객체의 ID를 반환
-        return fileInfo.getFileId();
+        // file ID 반환
+        return fileId;
     }
 
     // 파일 정보 생성
@@ -127,26 +128,6 @@ public class FileServiceImpl implements FileService {
     // ===================================================== 업로드 ======================================================
 
     // =============================================== 파일 다운로드와 삭제 =================================================
-//    // 파일들 확인 후 업로드하는 메소드
-//    public String checkAndUploadFiles(MultipartFile[] files) {
-//        // 업로드 파일 개수 확인
-//        checkFilesLength(files);
-//
-//        // 각각의 파일 확인
-//        StringBuilder sb = new StringBuilder();
-//        for(int i = 0; i < files.length; i++) {
-//            validateFile(files[i]);
-//            try {
-//                sb.append(s3Service.uploadFile(files[i]));
-//                if (i != files.length - 1) { sb.append("/"); }
-//            } catch (IOException e) {
-//                log.error("다중 파일 업로드 작업 중 예외가 발생하였습니다.", e);
-//                throw new FileProcessingException("파일 업로드 중 문제가 발생했습니다. 다시 시도해 주세요.");
-//            }
-//        }
-//        return sb.toString();
-//    }
-
     // 파일 다운로드
     @Transactional
     @Override
@@ -173,15 +154,12 @@ public class FileServiceImpl implements FileService {
 
         // DB에서 해당 파일 삭제
         fileDAO.deleteFile(fileId);
+        log.info("파일 ID '{}'번이 files 테이블에서 삭제되었습니다.", fileId);
 
         // S3에서 제거
         deleteFileFromS3(file);
     }
 
-    @Override // 파일 idList로 파일 삭제
-    public void deleteFileByFileIdList(List<Integer> fileIdList) {
-        fileDAO.deleteFileByFileIdList(fileIdList);
-    }
 
     private void deleteFileFromS3(File file) {
         String storedFileName = file.getStoredFileName();
@@ -200,12 +178,13 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    // 업로드 파일 개수 확인
-    private void checkFilesLength(MultipartFile[] files) {
-        if (files.length > 3) {
+    @Override // 업로드 파일 개수 확인
+    public void checkFilesLength(int fileCount) {
+        if (fileCount > 3) {
             throw new FileBadRequestException("최대 3개의 파일만 업로드할 수 있습니다.");
         }
     }
+
     // ==================================================== 유효성 검사 ===================================================
 }
 

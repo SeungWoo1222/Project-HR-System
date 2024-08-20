@@ -9,11 +9,19 @@ import java.util.Set;
 
 @Service
 public class CommonServiceImpl implements CommonService {
-    @Override // 변경사항 확인하는 메소드
-    public <T> void verifyChanges(T original, T updated, Set<String> fieldsToCompare) {
+    @Override // 변경사항 확인 return NoChangesDetectedException
+    public <T> void processFieldChanges(T original, T updated, Set<String> fieldsToCompare) {
         if (!compareFields(original, updated, fieldsToCompare)) {
             throw new NoChangesDetectedException();
         }
+    }
+
+    @Override // 변경사항 확인 return boolean
+    public <T> boolean hasFieldChanges(T original, T updated, Set<String> fieldsToCompare) {
+        if (!compareFields(original, updated, fieldsToCompare)) {
+            return false;
+        }
+        return true;
     }
 
     // 두 객체의 필드가 동일한지 비교 확인하는 메소드

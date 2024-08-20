@@ -43,7 +43,7 @@ public class AuthController {
         return "/auth/pwd";
     }
 
-    @PostMapping("/verifyPassword") // 비밀번호 인증 로직
+    @PostMapping("/verifyPassword") // 비밀번호 검증 로직
     public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         int message = authService.verifyPasswordAttempts(password, employeeId);
@@ -70,16 +70,16 @@ public class AuthController {
     @PutMapping("/changePassword") // 비밀번호 변경 로직
     public ResponseEntity<String> updatePassword(@RequestParam("password") String password, @RequestParam("new-password") String newPassword, @RequestParam("strength") int strength) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
-        int message = authService.verifyPasswordAttempts(password, employeeId);
-
-        return switch (message) {
+        // 비밀번호 검증
+        int result = authService.verifyPasswordAttempts(password, employeeId);
+        return switch (result) {
             case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
             case 0 -> {
                 // 현재 비밀번호와 새로운 비밀번호 비교 후 비밀번호 수정
-                authService.changePassword(employeeId, password, newPassword, strength);
-                yield ResponseEntity.ok("비밀번호가 변경되었습니다.\n다시 로그인해주세요.");
+                String message = authService.changePassword(employeeId, password, newPassword, strength);
+                yield ResponseEntity.ok(message + "\n다시 로그인해주세요.");
             }
-            default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
+            default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + result + " / 5 입니다.");
         };
     }
 }

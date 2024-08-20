@@ -4,20 +4,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.resignation.dao.ResignationDAO">
-
     <resultMap id="ResignationResultMap" type="com.woosan.hr_system.resignation.model.Resignation">
         <id property="employeeId" column="employee_id"/>
         <result property="resignationReason" column="resignation_reason"/>
         <result property="codeNumber" column="code_number"/>
         <result property="specificReason" column="specific_reason"/>
         <result property="resignationDate" column="resignation_date"/>
-        <result property="resignationDocuments" column="resignation_documents"/>
         <result property="processedBy" column="processed_by"/>
         <result property="processedDate" column="processed_date"/>
     </resultMap>
 
     <!-- id를 이용한 퇴직 사원 정보 조회 -->
-    <select id="getResignedEmployee" resultMap="ResignationResultMap" parameterType="String">
+    <select id="getResignedEmployee" parameterType="String" resultMap="ResignationResultMap">
         SELECT * FROM resignation
         WHERE employee_id = #{employeeId}
     </select>
@@ -29,8 +27,8 @@
 
     <!-- 새로운 퇴직 사원 정보 삽입 -->
     <insert id="insertResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
-        INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, resignation_documents, processed_by, processed_date)
-        VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{resignationDocuments}, #{processedBy}, #{processedDate})
+        INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, processed_by, processed_date)
+        VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{processedBy}, #{processedDate})
     </insert>
 
     <!-- 퇴직 사원 정보 업데이트 -->
@@ -40,7 +38,6 @@
             code_number = #{codeNumber},
             specific_reason = #{specificReason},
             resignation_date = #{resignationDate},
-            resignation_documents = #{resignationDocuments},
             processed_by = #{processedBy},
             processed_date = #{processedDate}
         WHERE employee_id = #{employeeId}

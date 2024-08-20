@@ -53,8 +53,13 @@ public class EmployeeViewController {
         model.addAttribute("pictureUrl", pictureUrl);
         return "employee/detail";
     }
-
-
+    @RequireHRPermission
+    @GetMapping("/list/{departmentId}")
+    public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
+        System.out.println("컨트롤러 도착");
+        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
+        return employeeList;
+    }
 
     @RequireHRPermission
     @GetMapping("/registration") // 신규 사원 등록 페이지 이동

@@ -45,7 +45,6 @@
             <result property="resignationReason" column="resignation_reason"/>
             <result property="codeNumber" column="code_number"/>
             <result property="specificReason" column="specific_reason"/>
-            <result property="resignationDocuments" column="resignation_documents"/>
             <result property="processedBy" column="processed_by"/>
             <result property="processedDate" column="processed_date"/>
         </association>
@@ -59,6 +58,13 @@
     <!-- id를 이용한 특정 사원 정보 조회 -->
     <select id="getEmployeeById" resultMap="EmployeeResultMap">
         SELECT *
+        FROM employees
+        WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- id를 이용한 사원 이름 조회 -->
+    <select id="getEmployeeName" parameterType="String" resultType="String">
+        SELECT employees.name
         FROM employees
         WHERE employee_id = #{employeeId}
     </select>
@@ -127,8 +133,7 @@
 
     <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
     <select id="getResignedEmployees" resultMap="EmployeeWithResignationResultMap">
-        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason,
-               r.resignation_documents, r.processed_by, r.processed_date
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_date
         FROM employees e
                  LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
@@ -137,8 +142,7 @@
 
     <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
     <select id="getPreDeletionEmployees" resultMap="EmployeeWithResignationResultMap">
-        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason,
-               r.resignation_documents, r.processed_by, r.processed_date
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_date
         FROM employees e
                  LEFT JOIN resignation r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'

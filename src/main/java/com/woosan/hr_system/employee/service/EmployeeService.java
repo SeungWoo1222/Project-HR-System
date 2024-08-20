@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +30,5 @@ public interface EmployeeService {
     String deleteEmployee(String employeeId);
 
     // == 기타 ==
-    void updateResignationDocuments(Resignation resignation, String newDocumentsName);
     void assignPictureFromUpload(Employee employee, MultipartFile file);
 }

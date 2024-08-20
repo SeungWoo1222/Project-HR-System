@@ -8,6 +8,11 @@
 </th:block>
 
 <th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var fileList = /*[[${fileList}]]*/ [];
+        /*]]>*/
+    </script>
     <script th:src="@{/js/employee.js}"></script>
     <script th:src="@{/js/emloyee-detail-edit.js}"></script>
     <script>
@@ -111,7 +116,7 @@
                     <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다..</p>
                     <label for="resignationDocuments" class="input-file-btn">문서 업로드</label>
                     <input type="file" id="resignationDocuments" class="hidden" name="resignationDocuments" onchange="addFile(this)" multiple/>
-                    <input type="hidden" id="registeredDocuments" th:value="${employee.resignation?.resignationDocuments}"/>
+<!--                    <input type="hidden" id="registeredDocuments" th:value="${employee.resignation?.resignationDocuments}"/>-->
                     <div class="file-list"></div>
                 </div>
                 <tr>

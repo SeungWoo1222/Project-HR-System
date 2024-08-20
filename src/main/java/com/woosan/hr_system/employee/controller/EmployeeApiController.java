@@ -27,34 +27,31 @@ public class EmployeeApiController {
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
                                                    @RequestPart("picture") MultipartFile picture) {
-        // 파일 체크 후 DB에 저장할 파일명 반환
+        // 업로드 후 사진 파일ID 할당
         employeeService.assignPictureFromUpload(employee, picture);
 
         // 사원 등록
-        String name = employeeService.insertEmployee(employee);
-        return ResponseEntity.ok( "'" + name + "' 사원이 신규 등록되었습니다.");
+        return ResponseEntity.ok(employeeService.insertEmployee(employee));
     }
 
     // 사원 정보 수정
     @PutMapping("/update")
     public ResponseEntity<String> updateEmployee(@RequestPart("employee") Employee employee,
                                                  @RequestPart(value = "picture", required = false) MultipartFile picture) {
-        // 파일 체크 후 DB에 저장할 파일명 반환
+        // 파일 체크 후 업로드 후 사진 파일ID 할당
         if (picture != null) {
             employeeService.assignPictureFromUpload(employee, picture);
         }
 
         // 사원 정보 수정
-        String name = employeeService.updateEmployee(employee);
-        return ResponseEntity.ok("'" + name + "' 사원의 정보가 수정되었습니다.");
+        return ResponseEntity.ok(employeeService.updateEmployee(employee));
     }
 
     // 계정 잠금 설정
     @RequireHRPermission
     @PatchMapping("/set/accountLock/{employeeId}")
     public ResponseEntity<String> setAccountLock(@PathVariable("employeeId") String employeeId) {
-        String message = authService.setAccountLock(employeeId);
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(authService.setAccountLock(employeeId));
     }
 
     // 부서 id를 이용한 해당 부서 사원 조회

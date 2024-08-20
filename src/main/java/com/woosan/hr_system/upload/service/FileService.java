@@ -17,5 +17,5 @@ public interface FileService {
     // == 다운로드와 삭제
     byte[] downloadFile(int fileId);
     void deleteFile(int fileId);
-    void deleteFileByFileIdList(List<Integer> fileIdList);
-}
+    void checkFilesLength(int fileCount);
+    }

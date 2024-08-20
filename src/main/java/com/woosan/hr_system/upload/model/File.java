@@ -1,22 +1,17 @@
 package com.woosan.hr_system.upload.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class File {
     private int fileId;
-    private String originalFileName;
+    private final String originalFileName;
     private String storedFileName;
-    private long fileSize;
-    private LocalDateTime uploadDate;
-    private String uploadedBy;
+    private final long fileSize;
+    private final LocalDateTime uploadDate;
+    private final String uploadedBy;
     private String fileIdUsage;
 
     // 생성자
