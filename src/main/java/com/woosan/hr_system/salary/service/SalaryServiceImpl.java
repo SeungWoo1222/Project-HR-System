@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +68,20 @@ public class SalaryServiceImpl implements SalaryService {
         int total = salaryDAO.count(pageRequest.getKeyword());
 
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 현재 사용하는 급여 정보 조회 (검색 기능 추가)
+    public PageResult<Salary> searchUsingSalaries(PageRequest pageRequest, String department, YearMonth yearMonth) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Salary> salaries = salaryDAO.searchUsingSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, yearMonth);
+        int total = salaryDAO.count(pageRequest.getKeyword());
+
+        return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 현재 사용하는 모든 급여 ID 조회
+    public List<Integer> getUsingSalaryIdList() {
+        return salaryDAO.selectUsingSalaryIdList();
     }
 
     @Override // 모든 사원의 급여 정보 조회

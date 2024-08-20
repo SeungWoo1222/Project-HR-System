@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class SalaryDAO {
         return sqlSession.selectList(NAMESPACE + "selectSalaryIdList", employeeId);
     }
 
-    // 검색과 페이징 로직
+    // 모든 급여 정보 검색과 페이징 로직
     public List<Salary> search(String keyword, int pageSize, int offset, String department) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -41,10 +42,25 @@ public class SalaryDAO {
         return sqlSession.selectList(NAMESPACE + "search", params);
     }
 
+    // 현재 사용하는 급여 정보 검색과 페이징 로직
+    public List<Salary> searchUsingSalaries(String keyword, int pageSize, int offset, String department, YearMonth yearMonth) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("pageSize", pageSize);
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("status", 1);
+        params.put("yearMonth", yearMonth);
+        return sqlSession.selectList(NAMESPACE + "searchUsingSalaries", params);
+    }
+
     // 검색어에 해당하는 전체 데이터의 개수 세는 로직
     public int count(String keyword) {
         return sqlSession.selectOne(NAMESPACE + "count", keyword);
     }
+
+    // 현재 사용하는 모든 급여 ID 조회
+    public List<Integer> selectUsingSalaryIdList() { return sqlSession.selectList(NAMESPACE + "selectUsingSalaryIdList"); }
 
     // 모든 사원의 급여 정보 조회
     public List<Salary> selectAllSalaries() {

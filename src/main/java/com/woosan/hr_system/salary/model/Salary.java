@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,4 +19,6 @@ public class Salary { // 급여 정보
     private String bank;           // 은행명
     private String accountNumber;  // 계좌번호
     private int annualSalary;      // 연봉
+    private LocalDate createdAt;   // 등록된 날짜
+    private Boolean status;        // 사용 여부
 }

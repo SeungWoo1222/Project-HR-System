@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -139,5 +141,21 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         // 삭제
         salaryPaymentDAO.deletePayment(paymentId);
         return "급여명세서(" + paymentId + ")가 삭제되었습니다.";
+    }
+
+    @Override // 해당 달 모든 사원의 급여 지급 여부 리스트 조회
+    public Map<Integer, Boolean> hasPaidSalaryThisMonth(YearMonth yearMonth) {
+        // 현재 사용중인 급여 정보 조회
+        List<Integer> allSalaryIds = salaryService.getUsingSalaryIdList();
+
+        // 해당 월 지급된 급여내역 조회
+        List<Integer> paidSalaryIds = salaryPaymentDAO.selectPaymentByMonth(yearMonth);
+
+        // 두 리스트 비교하여 급여가 지급됐는지 여부 Map에 저장
+        return allSalaryIds.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        paidSalaryIds::contains
+                ));
     }
 }

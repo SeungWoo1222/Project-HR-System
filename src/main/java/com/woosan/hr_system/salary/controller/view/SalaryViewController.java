@@ -35,7 +35,7 @@ public class SalaryViewController {
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                   @RequestParam(name = "department", defaultValue = "") String department,
                                   Model model) {
-        // 매개변수 값 로그에 출력
+        // 검색 후 페이징
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Salary> pageResult = salaryService.searchSalaries(pageRequest, department);
 

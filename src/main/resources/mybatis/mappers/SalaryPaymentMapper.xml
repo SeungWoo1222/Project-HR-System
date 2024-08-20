@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.salaryTest.mapper.SalaryPaymentMapper">
+<mapper namespace="com.woosan.hr_system.salary.dao.SalaryPaymentDAO">
     <resultMap id="SalaryPaymentResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
         <id property="paymentId" column="payment_id" />
         <result property="salaryId" column="salary_id" />
@@ -46,6 +46,13 @@
     <!-- 모든 급여 지급 내역 조회 -->
     <select id="selectAllPayments" resultMap="SalaryPaymentResultMap">
         SELECT * FROM salary_payments
+    </select>
+
+    <!-- 해당 달 모든 급여 지급 내역 조회 -->
+    <select id="selectPaymentByMonth" parameterType="String" resultType="int">
+        SELECT salary_id
+        FROM salary_payments
+        WHERE DATE_FORMAT(payment_date, '%Y-%m') = #{yearMonthString}
     </select>
 
     <!-- 급여 지급 내역 등록 -->

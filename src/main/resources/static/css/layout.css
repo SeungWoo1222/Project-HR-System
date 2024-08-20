@@ -108,6 +108,7 @@ body {
 
 .submenu li a {
     padding: 3px 10px;
+    font-size: 15px;
     display: block;
 }
 

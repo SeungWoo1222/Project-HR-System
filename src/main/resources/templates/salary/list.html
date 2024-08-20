@@ -4,36 +4,8 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='급여정보 조회')}">
 
 <th:block layout:fragment="css">
-    <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-        #department-nav {
-            margin-bottom: 10px;
-        }
-        .radio-btn {
-            background-color: white;
-            color: black;
-            border: 2px #18a8f1 solid;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            padding: 10px;
-            text-align: center;
-            width: 85px;
-            font-size: 15px;
-        }
-        .radio-btn:hover {
-            background-color: #18a8f1;
-            color: white;
-        }
-        input[type="radio"]:checked + .radio-btn {
-            background-color: #18a8f1;
-            color: white;
-        }
-    </style>
+    <link th:href="@{/css/salary.css}" rel="stylesheet">
+
 </th:block>
 
 <th:block layout:fragment="script">
@@ -106,11 +78,13 @@
                     <th>은행</th>
                     <th>계좌번호</th>
                     <th>연봉</th>
+                    <th>등록된 날짜</th>
+                    <th>사용 여부</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${salaries.isEmpty()}">
-                    <td colspan="7" style="text-align: center; padding: 20px;">
+                    <td colspan="8" style="text-align: center; padding: 20px;">
                         조회된 급여 정보가 없습니다. 다른 검색 조건을 시도해보세요.
                     </td>
                 </tr>
@@ -122,6 +96,9 @@
                     <td th:text="${salary.bank}">은행</td>
                     <td th:text="${salary.accountNumber}">계좌번호</td>
                     <td th:text="${salary.annualSalary}" class="annualSalary">연봉</td>
+                    <td th:text="${salary.createdAt}">등록된 날짜</td>
+                    <td th:text="${salary.status} ? '사용 중' : '사용 중지'"
+                        th:classappend="${salary.status} ? 'true' : 'false'">사용 여부</td>
                 </tr>
             </tbody>
         </table>

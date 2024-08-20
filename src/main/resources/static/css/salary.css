@@ -1,0 +1,37 @@
+.list tbody tr:hover {
+    cursor: pointer;
+}
+#department-nav {
+    margin-bottom: 10px;
+}
+.radio-btn {
+    background-color: white;
+    color: black;
+    border: 2px #18a8f1 solid;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px;
+    text-align: center;
+    width: 85px;
+    font-size: 15px;
+}
+.radio-btn:hover {
+    background-color: #18a8f1;
+    color: white;
+}
+input[type="radio"]:checked + .radio-btn {
+    background-color: #18a8f1;
+    color: white;
+}
+
+.true {
+    color: green;
+    font-weight: bold;
+}
+.false {
+    color: red;
+    font-weight: bold;
+}
