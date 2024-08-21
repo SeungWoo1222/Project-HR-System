@@ -4,104 +4,13 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='급여 지급 내역 조회')}">
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/salary.css}" rel="stylesheet">
-    <style>
-        .month-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-
-        .nav-btn {
-            width: 20px;
-            height: 20px;
-            border: 8px solid #18a8f1;
-            border-width: 0 8px 8px 0;
-            border-radius: 5px;
-            display: inline-block;
-            cursor: pointer;
-            margin: 0 10px;
-            transition: border-color 0.3s ease;
-            transform: rotate(45deg);
-        }
-
-        .nav-btn.prev {
-            transform: rotate(135deg);
-        }
-
-        .nav-btn.prev:hover {
-            border-color: #0c7bb3;
-        }
-
-        .nav-btn.next {
-            transform: rotate(-45deg);
-        }
-
-        .nav-btn.next:hover {
-            border-color: #0c7bb3;
-        }
-
-        .current-month {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+    <link th:href="@{/css/salary/salary.css}" rel="stylesheet">
+    <link th:href="@{/css/salary/pay.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/salary/list.js}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            formatSalaries();
-            updateNextButtons();
-        });
-
-        // > 버튼 표시 설정
-        function updateNextButtons() {
-            const yearMonthInput = document.getElementById("yearmonth");
-            let currentYearMonth = yearMonthInput.value.split('-');
-            let year = parseInt(currentYearMonth[0]);
-            let month = parseInt(currentYearMonth[1]);
-
-            const nowYear = new Date().getFullYear();
-            const nowMonth = new Date().getMonth() + 1;
-
-            const nextBtn = document.getElementById('nextBtn');
-
-            // 다음 버튼은 현재 월까지만 표시
-            if (year >= nowYear  &&  month >= nowMonth) {
-                nextBtn.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'block';
-            }
-        }
-
-        // 검색 월 설정
-        function changeMonth(offset) {
-            const yearMonthInput = document.getElementById("yearmonth");
-            let currentYearMonth = yearMonthInput.value.split('-');
-            let year = parseInt(currentYearMonth[0]);
-            let month = parseInt(currentYearMonth[1]);
-
-            month += offset;
-
-            if (month < 1) {
-                month = 12;
-                year -= 1;
-            } else if (month > 12) {
-                month = 1;
-                year += 1;
-            }
-
-            // 다시 년월 형식으로 포멧
-            yearMonthInput.value = `${year}-${month.toString().padStart(2, '0')}`;
-
-            // 새로운 월로 검색
-            document.getElementById("yearMonthForm").submit();
-        }
-    </script>
+    <script th:src="@{/js/salary/pay.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -111,6 +20,7 @@
                 <input type="hidden" name="page" th:value="1"/>
                 <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
                     <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                    <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">10개씩 보기</option>
                     <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                     <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
                 </select>
@@ -121,7 +31,7 @@
             <form id="yearMonthForm" th:action="@{/salary/payment}" method="get">
                 <div class="month-nav">
                     <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
-                    <span class="current-month" th:text="${yearmonth}">2024-08</span>
+                    <span class="current-month" th:text="${yearmonth}"></span>
                     <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
                 </div>
                 <input type="hidden" name="page" value="1">
@@ -172,6 +82,7 @@
         <table border="1" class="list">
             <thead>
             <tr>
+                <th></th>
                 <th>급여 ID</th>
                 <th>사원 ID</th>
                 <th>부서</th>
@@ -181,15 +92,21 @@
                 <th>연봉</th>
                 <th>등록된 날짜</th>
                 <th>지급 여부</th>
+                <th>사원 정보</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${salaries.isEmpty()}">
-                <td colspan="9" style="text-align: center; padding: 20px;">
+                <td colspan="11" style="text-align: center; padding: 20px;">
                     조회된 급여 지급내역이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
-            <tr th:each="salary : ${salaries}" th:employeeId="${salary.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
+            <tr th:each="salary : ${salaries}" th:data-salary-id="${salary.salaryId}" onclick="toggleCheckbox(this)">
+                <td th:if="${paymentStatus[salary.salaryId] == false}">
+                    <label>
+                        <input type="checkbox" class="pay-checkbox" th:data-salary-id="${salary.salaryId}">
+                    </label>
+                </td>
                 <td th:text="${salary.salaryId}">급여 ID</td>
                 <td th:text="${salary.employeeId}">사원 ID</td>
                 <td th:text="${salary.department.name}">부서</td>
@@ -200,34 +117,44 @@
                 <td th:text="${salary.createdAt}">등록된 날짜</td>
                 <td th:text="${paymentStatus[salary.salaryId] ? '지급 완료' : '미지급'}"
                     th:classappend="${paymentStatus[salary.salaryId] ? 'true' : 'false'}"></td>
+                <td>
+                    <button type="button" th:employeeId="${salary.employeeId}" onclick="openEmployeeDetailModal(event, this)">상세 보기</button>
+                </td>
             </tr>
             </tbody>
         </table>
-        <div class="pagination">
-            <span th:if="${currentPage > 1}">
-                <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
-                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
-                </a>
-            </span>
-            <span th:if="${totalPages <= 5}">
-                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
-                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+        <div class="pagination-container">
+            <div class="pagination">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
                 </span>
-            </span>
-            <span th:if="${totalPages > 5}">
-                <span th:each="i : ${#numbers.sequence(
-                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
-                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                    <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
-                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                    <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                        </span>
+                </div>
+                <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
                 </span>
-                </span>
-            <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/salary/payment?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
-                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
-                </a>
-            </span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn" th:onclick="submitSelectedSalaries()">급여 지급</button>
+            </div>
         </div>
     </div>
 </div>

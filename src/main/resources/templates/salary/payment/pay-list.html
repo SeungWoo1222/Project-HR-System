@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+<!--  <link rel="stylesheet" th:href="@{/css/employee.css}"/>-->
+</th:block>
+
+<th:block layout:fragment="script">
+
+</th:block>
+
+<div>
+    <h3> <span th:text="${yearmonth}"></span>월 급여 지급 목록</h3>
+    <div>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th>급여 ID</th>
+                <th>사원 ID</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>연봉</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="salary : ${salaries}">
+                <td th:text="${salary.salaryId}">급여 ID</td>
+                <td th:text="${salary.employeeId}">사원 ID</td>
+                <td th:text="${salary.department.name}">부서</td>
+                <td th:text="${salary.position.name}">직급</td>
+                <td th:text="${salary.bank}">은행</td>
+                <td th:text="${salary.accountNumber}">계좌번호</td>
+                <td th:text="${salary.annualSalary}" class="annualSalary">연봉</td>
+            </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn" th:onclick="">급여 지급</button>
+    </div>
+</div>
+</html>

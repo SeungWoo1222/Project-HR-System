@@ -89,6 +89,15 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryDAO.selectAllSalaries();
     }
 
+    @Override // 사원 ID를 이용한 특정 사원의 급여 ID 리스트 조회
+    public List<Salary> fetchSalaryListByIds(String salaryIds) {
+        // 문자열 -> 리스트로 변환
+        String[] salaryIdArr = salaryIds.split(",");
+        Integer[] salaryIdArrInt = Arrays.stream(salaryIdArr).map(Integer::parseInt).toArray(Integer[]::new);
+        List<Integer> salaryIdList = Arrays.asList(salaryIdArrInt);
+        return salaryDAO.selectSalariesByIds(salaryIdList);
+    }
+
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 사원 급여 정보 등록

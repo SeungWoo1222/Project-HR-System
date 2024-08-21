@@ -32,6 +32,14 @@
         SELECT * FROM salaries WHERE employee_id = #{employeeId}
     </select>
 
+    <!-- 사원 ID 리스트를 이용한 사원들의 급여 정보 조회 -->
+    <select id="selectSalariesByIds" parameterType="List" resultMap="SalaryResultMap">
+        SELECT * FROM salaries WHERE salary_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <!-- 사원 ID를 이용한 특정 사원의 모든 급여 ID 조회 -->
     <select id="selectSalaryIdList" parameterType="String" resultType="int">
         SELECT salary_id FROM salaries WHERE employee_id = #{employeeId}

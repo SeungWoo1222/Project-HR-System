@@ -27,6 +27,11 @@ public class SalaryDAO {
         return sqlSession.selectOne(NAMESPACE + "selectSalaryByEmployeeId", employeeId);
     }
 
+    // 사원 ID 리스트를 이용한 사원들의 급여 정보 조회
+    public List<Salary> selectSalariesByIds(List<Integer> salaryIdList) {
+        return sqlSession.selectList(NAMESPACE + "selectSalariesByIds", salaryIdList);
+    }
+
     // 사원 ID를 이용한 특정 사원의 모든 급여 ID 조회
     public List<Integer> selectSalaryIdList(String employeeId) {
         return sqlSession.selectList(NAMESPACE + "selectSalaryIdList", employeeId);

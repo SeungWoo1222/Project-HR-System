@@ -3,7 +3,7 @@ function formatAnnualSalary(value) {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-// 테이블의 모든 연봉 값을 포맷팅
+// 테이블의 모든 연봉 값을 포맷팅 (3자리마다 ',' 삽입)
 function formatSalaries() {
     const salaryCells = document.querySelectorAll('.annualSalary');
     salaryCells.forEach(cell => {
