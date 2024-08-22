@@ -6,6 +6,7 @@
     <resultMap id="SalaryPaymentResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
         <id property="paymentId" column="payment_id" />
         <result property="salaryId" column="salary_id" />
+        <result property="compensationMonth" column="compensation_month" />
         <result property="paymentDate" column="payment_date" />
         <result property="baseSalary" column="base_salary" />
         <result property="positionAllowance" column="position_allowance" />
@@ -52,23 +53,52 @@
     <select id="selectPaymentByMonth" parameterType="String" resultType="int">
         SELECT salary_id
         FROM salary_payments
-        WHERE DATE_FORMAT(payment_date, '%Y-%m') = #{yearMonthString}
+        WHERE compensation_month = #{yearMonthString}
+    </select>
+
+    <!-- 해당 달 모든 급여 지급 내역 조회 -->
+    <select id="selectPaymentBySalaryAndMonth" resultMap="SalaryPaymentResultMap">
+        SELECT *
+        FROM salary_payments
+        WHERE salary_id IN
+        <foreach item="salaryId" collection="salaryIdList" open="(" separator="," close=")">
+            #{salaryId}
+        </foreach>
+        AND compensation_month = #{yearMonth}
     </select>
 
     <!-- 급여 지급 내역 등록 -->
     <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO salary_payments (salary_id, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)
-        VALUES (#{salaryId}, #{paymentDate}, #{grossSalary}, #{baseSalary}, #{overtime}, #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{deductions}, #{netSalary}, #{remarks})
+        INSERT INTO salary_payments (salary_id, compensation_month, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)
+        VALUES (#{salaryId}, #{compensationMonth}, #{paymentDate}, #{grossSalary}, #{baseSalary}, #{overtime}, #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{deductions}, #{netSalary}, #{remarks})
+    </insert>
+
+    <!-- 급여 지급 리스트 내역 등록 -->
+    <insert id="insertPaymentList" parameterType="List" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO salary_payments (
+        salary_id, compensation_month, payment_date, gross_salary, base_salary,
+        overtime_pay, position_allowance, meal_allowance,
+        transport_allowance, personal_bonus, team_bonus, holiday_bonus,
+        year_end_bonus, deductions, net_salary, remarks
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.salaryId}, #{item.compensationMonth}, #{item.paymentDate}, #{item.grossSalary},
+            #{item.baseSalary}, #{item.overtimePay}, #{item.positionAllowance},
+            #{item.mealAllowance}, #{item.transportAllowance}, #{item.personalBonus},
+            #{item.teamBonus}, #{item.holidayBonus}, #{item.yearEndBonus},
+            #{item.deductions}, #{item.netSalary}, #{item.remarks})
+        </foreach>
     </insert>
 
     <!-- 급여 지급 내용 수정 -->
     <update id="updatePayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
         UPDATE salary_payments SET
                                    salary_id = #{salaryId},
+                                   compensation_month = #{compensationMonth},
                                    payment_date = #{paymentDate},
                                    gross_salary = #{grossSalary},
                                    base_salary = #{baseSalary},
-                                   overtime = #{overtime},
                                    overtime_pay = #{overtimePay},
                                    position_allowance = #{positionAllowance},
                                    meal_allowance = #{mealAllowance},

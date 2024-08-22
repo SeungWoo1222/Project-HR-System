@@ -49,7 +49,7 @@ public class SalaryViewController {
         // 급여정보 미등록 사원 목록
         List<Employee> employeesWithoutSalary = salaryService.getEmployeeList();
         model.addAttribute("employeesWithoutSalary", employeesWithoutSalary);
-        return "/salary/list";
+        return "salary/list";
     }
 
     // 급여 정보 등록 페이지 이동
@@ -62,7 +62,7 @@ public class SalaryViewController {
         }
         List<Employee> employeeListWithoutSalaryInfo = salaryService.getEmployeeList();
         model.addAttribute("employeeList", employeeListWithoutSalaryInfo);
-        return "/salary/register";
+        return "salary/register";
     }
 
     // 급여 정보 수정 페이지 이동
@@ -71,6 +71,6 @@ public class SalaryViewController {
     public String viewSalaryEditForm(@PathVariable int salaryId, Model model) {
         Salary salaryInfo = salaryService.getSalaryById(salaryId);
         model.addAttribute("salary", salaryInfo);
-        return "/salary/edit";
+        return "salary/edit";
     }
 }

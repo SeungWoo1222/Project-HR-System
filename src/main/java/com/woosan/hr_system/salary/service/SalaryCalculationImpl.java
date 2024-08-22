@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class SalaryCalculationImpl implements SalaryCalculation {
     @LogAfterExecution
     @Transactional
     @Override // 급여명세서에 입력할 월 급여 계산
-    public String calculateSalaryPayment(String employeeId, int annualSalary, Map<String, Integer> components) {
+    public String calculateSalaryPayment(String employeeId, int annualSalary, Map<String, Integer> components, YearMonth yearMonth) {
         // 급여 구성항목의 비율 불러오기
         PayrollDetails payrollRatios = ratioDAO.selectPayrollRatios();
 
@@ -42,7 +43,7 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         calculateSalaryComponents(payrollDetails, components);
 
         // 보너스 항목 계산 후 components에 입력
-        calculateBonusComponents(payrollDetails, components);
+        calculateBonusComponents(payrollDetails, components, yearMonth);
 
         // 비과세 제외된 월급
         int taxableSalary = calculateTaxableSalary(components);
@@ -101,15 +102,14 @@ public class SalaryCalculationImpl implements SalaryCalculation {
     }
 
     // 성과급과 보너스 계산
-    private void calculateBonusComponents(PayrollDetails payrollDetails, Map<String, Integer> components) {
-        // 올해의 구정과 추석 날짜 구하기
-        LocalDate now = LocalDate.now();
-        Map<String, LocalDate> holiday = getGujeongAndChuseok(now.getYear());
+    private void calculateBonusComponents(PayrollDetails payrollDetails, Map<String, Integer> components, YearMonth yearMonth) {
+        // 해당 년월의 구정과 추석 날짜 구하기
+        Map<String, LocalDate> holiday = getGujeongAndChuseok(yearMonth.getYear());
         int gujeongMonth = holiday.get("gujeong").getMonthValue();
         int chuseokMonth = holiday.get("chuseok").getMonthValue();
 
         // 해당 달에 맞게 보너스 계산
-        int previousMonth = now.getMonthValue() - 1;
+        int previousMonth = yearMonth.getMonthValue() - 1;
         if (previousMonth == gujeongMonth || previousMonth == chuseokMonth) {
             // 명절 보너스 (1.25%)
             addComponent(components ,"holidayBonus", payrollDetails.calculateHolidayBonus());
@@ -160,9 +160,9 @@ public class SalaryCalculationImpl implements SalaryCalculation {
 
         // 공제 항목 비율로 계산하여 계산
         addComponent(components, "incomeTax", deductionDetails.getIncomeTax());
-        addComponent(components, "localIncomeTaxRate", deductionDetails.calculateLocalIncomeTax());
-        addComponent(components, "nationalPensionRate", deductionDetails.calculateNationalPension());
-        addComponent(components, "healthInsuranceRate", deductionDetails.calculateHealthInsurance());
+        addComponent(components, "localIncomeTax", deductionDetails.calculateLocalIncomeTax());
+        addComponent(components, "nationalPension", deductionDetails.calculateNationalPension());
+        addComponent(components, "healthInsurance", deductionDetails.calculateHealthInsurance());
         addComponent(components, "longTermCareInsurance", deductionDetails.calculateLongTermCareInsurance());
         addComponent(components, "employmentInsurance", deductionDetails.calculateEmploymentInsurance());
         addComponent(components, "deductions", deductionDetails.calculateTotalDeductions());

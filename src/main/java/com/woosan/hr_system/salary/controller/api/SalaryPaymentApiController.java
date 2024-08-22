@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/salary/payment")
 public class SalaryPaymentApiController {
@@ -18,6 +20,12 @@ public class SalaryPaymentApiController {
     @PostMapping("/register") // 급여명세서 등록
     ResponseEntity<String> registerPayment(int salaryId) {
         return ResponseEntity.ok(salaryPaymentService.addPayment(salaryId));
+    }
+    @RequireHRPermission
+    @PostMapping("/register/batch") // 다수의 급여명세서 등록
+    ResponseEntity<String> registerPayments(@RequestParam(name = "yearmonth") String yearmonthString,
+                                            @RequestParam(name= "salaryIdList") List<Integer> salaryIdList) {
+        return ResponseEntity.ok(salaryPaymentService.addPayment(salaryIdList, yearmonthString));
     }
 
     @RequireHRPermission

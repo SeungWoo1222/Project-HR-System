@@ -7,7 +7,6 @@
 </th:block>
 
 <th:block layout:fragment="script">
-
 </th:block>
 
 <div>
@@ -22,7 +21,6 @@
                 <th>직급</th>
                 <th>은행</th>
                 <th>계좌번호</th>
-                <th>연봉</th>
             </tr>
             </thead>
             <tbody>
@@ -33,11 +31,16 @@
                 <td th:text="${salary.position.name}">직급</td>
                 <td th:text="${salary.bank}">은행</td>
                 <td th:text="${salary.accountNumber}">계좌번호</td>
-                <td th:text="${salary.annualSalary}" class="annualSalary">연봉</td>
             </tr>
             </tbody>
         </table>
-        <button type="button" class="btn" th:onclick="">급여 지급</button>
+        <form action="/api/salary/payment/register/batch" onsubmit="submitPayForm(event)">
+            <input type="hidden" name="yearmonth" th:value="${yearmonth}"/>
+            <div th:each="salary : ${salaries}">
+                <input type="hidden" name="salaryIdList" th:value="${salary.salaryId}"/>
+            </div>
+            <button type="submit" class="btn">급여 지급</button>
+        </form>
     </div>
 </div>
 </html>

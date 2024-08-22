@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,9 +25,7 @@ public class DeductionDetails {
         return (int) (income * (ratio / 100));
     }
 
-    public int calculateLocalIncomeTax() {
-        return incomeTax * calculate(localIncomeTaxRate,incomeTax);
-    }
+    public int calculateLocalIncomeTax() { return calculate(localIncomeTaxRate, incomeTax); }
 
     public int calculateNationalPension() {
         return calculate(nationalPensionRate, taxableSalary);

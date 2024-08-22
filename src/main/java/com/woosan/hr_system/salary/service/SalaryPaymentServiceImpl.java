@@ -47,6 +47,19 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.selectAllPayments();
     }
 
+    @Override // salaryId와 yearMonth를 이용한 급여명세서 리스트 조회
+    public List<SalaryPayment> getPaymentBySalaryAndMonth(List<Integer> salaryIdList, String yearMonthString) {
+//        // 문자열 -> 리스트로 변환
+//        String[] salaryIdArr = salaryIds.split(",");
+//        Integer[] salaryIdArrInt = Arrays.stream(salaryIdArr).map(Integer::parseInt).toArray(Integer[]::new);
+//        List<Integer> salaryIdList = Arrays.asList(salaryIdArrInt);
+
+        // 문자열 -> YearMonth로 변환
+        YearMonth yearMonth = YearMonth.parse(yearMonthString);
+
+        return salaryPaymentDAO.selectPaymentBySalaryAndMonth(salaryIdList, yearMonth);
+    }
+
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 급여명세서 등록
@@ -55,21 +68,41 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         Salary salaryInfo = salaryService.getSalaryById(salaryId);
 
         // 급여명세서 생성 후 등록
-        SalaryPayment payslip = createPayslip(salaryInfo);
+        YearMonth yearMonth = YearMonth.now();
+        SalaryPayment payslip = createPayslip(salaryInfo, yearMonth);
         salaryPaymentDAO.insertPayment(payslip);
         return "'" + employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()) + "' 사원의 급여명세서가 등록되었습니다.";
     }
+    @Transactional
+    @LogBeforeExecution
+    @LogAfterExecution
+    @Override // 다수의 급여명세서 등록
+    public String addPayment(List<Integer> salaryIdList, String yearmonthString) {
+        YearMonth yearMonth = YearMonth.parse(yearmonthString);
+        List<SalaryPayment> payslipList = new ArrayList<>();
+        for (Integer salaryId : salaryIdList) {
+            // 급여 정보 조회
+            Salary salaryInfo = salaryService.getSalaryById(salaryId);
+
+            // 급여명세서 생성 후 등록
+            SalaryPayment payslip = createPayslip(salaryInfo, yearMonth);
+            payslipList.add(payslip);
+        }
+        salaryPaymentDAO.insertPaymentList(payslipList);
+        return (salaryIdList.size()) + "명의 사원에게 급여가 지급되었습니다.";
+    }
 
     // 급여명세서 생성
-    private SalaryPayment createPayslip(Salary salaryInfo) {
+    private SalaryPayment createPayslip(Salary salaryInfo, YearMonth yearMonth) {
         // 급여 항목 계산
         Map<String, Integer> payslipComponents = new HashMap<>();
-        salaryCalculation.calculateSalaryPayment(salaryInfo.getEmployeeId(), salaryInfo.getAnnualSalary(), payslipComponents);
+        salaryCalculation.calculateSalaryPayment(salaryInfo.getEmployeeId(), salaryInfo.getAnnualSalary(), payslipComponents, yearMonth);
+        log.info("'{}' 사원의 {}년 {}월 급여명세서가 생성되었습니다.", employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()), yearMonth.getYear(), yearMonth.getMonthValue());
 
-        log.info("'{}' 사원의 {}월 급여명세서가 생성되었습니다.", employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()), LocalDate.now().getMonthValue());
         // 급여명세서 작성
         return SalaryPayment.builder()
                 .salaryId(salaryInfo.getSalaryId())
+                .compensationMonth(yearMonth)
                 .paymentDate(LocalDate.now())
 
                 // 급여 구성 항목 설정

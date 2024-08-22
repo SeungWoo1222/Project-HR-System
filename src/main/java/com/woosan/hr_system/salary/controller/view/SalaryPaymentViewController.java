@@ -7,6 +7,7 @@ import com.woosan.hr_system.salary.service.SalaryPaymentService;
 import com.woosan.hr_system.salary.service.SalaryService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.YearMonth;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/salary/payment")
 public class SalaryPaymentViewController {
@@ -34,6 +36,7 @@ public class SalaryPaymentViewController {
                               @RequestParam(name = "department", defaultValue = "") String department,
                               @RequestParam(name = "yearmonth", defaultValue = "") String yearMonthString,
                               Model model) {
+        log.debug("yearMonthString: {}", yearMonthString);
         // 해당 달 급여 지급 정보
         YearMonth yearMonth;
         if (yearMonthString.isEmpty()) {
@@ -60,13 +63,23 @@ public class SalaryPaymentViewController {
 
     @RequireHRPermission
     @GetMapping("/confirm") // 급여 지급 전 급여 지급 목록 페이지 이동
-    public String viewPayForm(@RequestParam(name="yearmonth") String yearMonthString,
-                              @RequestParam(name="salaryIds") String salaryIds,
+    public String viewPayForm(@RequestParam(name = "yearmonth") String yearMonthString,
+                              @RequestParam(name = "salaryIds") String salaryIds,
                               Model model) {
         List<Salary> salaries = salaryService.fetchSalaryListByIds(salaryIds);
         model.addAttribute("salaries", salaries);
         model.addAttribute("yearmonth", yearMonthString);
         return "salary/payment/pay-list";
+    }
+
+    @RequireHRPermission
+    @GetMapping("/complete") // 급여 지급 완료 목록 페이지 이동
+    public String viewPayComplete(@RequestParam(name = "yearmonth") String yearMonthString,
+                                  @RequestParam(name = "salaryIdList") List<Integer> salaryIdList,
+                                  Model model) {
+        List<SalaryPayment> payments = salaryPaymentService.getPaymentBySalaryAndMonth(salaryIdList, yearMonthString);
+        model.addAttribute("payments", payments);
+        return "salary/payment/pay-complete";
     }
 
     @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 조회

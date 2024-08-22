@@ -6,8 +6,8 @@
     <resultMap id="PayrollDetailsResultMap" type="com.woosan.hr_system.salary.model.PayrollDetails">
         <result column="base_salary_ratio" property="baseSalaryRatio" />
         <result column="position_allowance_ratio" property="positionAllowanceRatio" />
-        <result column="meal_allowance_ratio" property="mealAllowance" />
-        <result column="transport_allowance_ratio" property="transportAllowance" />
+        <result column="meal_allowance_ratio" property="mealAllowanceRatio" />
+        <result column="transport_allowance_ratio" property="transportAllowanceRatio" />
         <result column="personal_bonus_ratio" property="personalBonusRatio" />
         <result column="team_bonus_ratio" property="teamBonusRatio" />
         <result column="holiday_bonus_ratio" property="holidayBonusRatio" />
@@ -104,7 +104,7 @@
                     tax_amount_for_11_dependent
                 </when>
                 <otherwise>
-                    tax_amount_for_4_dependent
+                    tax_amount_for_1_dependent
                 </otherwise>
             </choose>
         FROM income_tax

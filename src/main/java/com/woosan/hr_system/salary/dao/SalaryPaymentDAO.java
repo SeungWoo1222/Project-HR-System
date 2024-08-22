@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class SalaryPaymentDAO {
@@ -36,9 +37,19 @@ public class SalaryPaymentDAO {
         return sqlSession.selectList(NAMESPACE + "selectPaymentByMonth", yearMonthString);
     }
 
+    // salaryId와 yearMonth를 이용한 급여명세서 리스트 조회
+    public List<SalaryPayment> selectPaymentBySalaryAndMonth(List<Integer> salaryIdList, YearMonth yearMonth) {
+        return sqlSession.selectList(NAMESPACE + "selectPaymentBySalaryAndMonth",
+                Map.of("salaryIdList", salaryIdList, "yearMonth", yearMonth));
+    }
+
     // 급여 지급 내역 등록
     public void insertPayment(SalaryPayment salaryPayment) {
         sqlSession.insert(NAMESPACE + "insertPayment", salaryPayment);
+    }
+    // 급여 지급 내역 리스트 등록
+    public void insertPaymentList(List<SalaryPayment> salaryPaymentList) {
+        sqlSession.insert(NAMESPACE + "insertPaymentList", salaryPaymentList);
     }
 
     // 급여 지급 내용 수정

@@ -82,7 +82,7 @@
         <table border="1" class="list">
             <thead>
             <tr>
-                <th></th>
+                <th style="font-size: 20px">☑︎</th>
                 <th>급여 ID</th>
                 <th>사원 ID</th>
                 <th>부서</th>
@@ -102,8 +102,8 @@
                 </td>
             </tr>
             <tr th:each="salary : ${salaries}" th:data-salary-id="${salary.salaryId}" onclick="toggleCheckbox(this)">
-                <td th:if="${paymentStatus[salary.salaryId] == false}">
-                    <label>
+                <td>
+                    <label th:if="${paymentStatus[salary.salaryId] == false}">
                         <input type="checkbox" class="pay-checkbox" th:data-salary-id="${salary.salaryId}">
                     </label>
                 </td>
