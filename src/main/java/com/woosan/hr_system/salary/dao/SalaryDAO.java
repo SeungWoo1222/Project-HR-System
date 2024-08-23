@@ -2,6 +2,7 @@ package com.woosan.hr_system.salary.dao;
 
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.salary.model.Salary;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class SalaryDAO {
     @Autowired
@@ -29,6 +31,7 @@ public class SalaryDAO {
 
     // 사원 ID 리스트를 이용한 사원들의 급여 정보 조회
     public List<Salary> selectSalariesByIds(List<Integer> salaryIdList) {
+        log.debug("오늘도 로그를 찍는구나~ selectSalariesByIds: {}", salaryIdList);
         return sqlSession.selectList(NAMESPACE + "selectSalariesByIds", salaryIdList);
     }
 

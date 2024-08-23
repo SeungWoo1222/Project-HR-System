@@ -69,71 +69,91 @@
 
     <!-- 검색어에 해당하는 데이터 결과 조회 -->
     <select id="searchPayslips" parameterType="map" resultMap="SalaryPaymentResultMap">
-        SELECT *
-        FROM salary_payments
+        SELECT sp.*, s.name
+        FROM salary_payments sp
+        JOIN salaries s ON sp.salary_id = s.salary_id
         <where>
             <if test="keyword != null and keyword != ''">
                 (
-                payment_id LIKE CONCAT('%', #{keyword}, '%') OR
-                salary_id LIKE CONCAT('%', #{keyword}, '%') OR
-                compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
-                payment_date LIKE CONCAT('%', #{keyword}, '%') OR
-                base_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
-                income_tax LIKE CONCAT('%', #{keyword}, '%') OR
-                local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
-                national_pension LIKE CONCAT('%', #{keyword}, '%') OR
-                health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                deductions LIKE CONCAT('%', #{keyword}, '%') OR
-                gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                net_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                remarks LIKE CONCAT('%', #{keyword}, '%')
+                sp.payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.remarks LIKE CONCAT('%', #{keyword}, '%') OR
+                s.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.name LIKE CONCAT('%', #{keyword}, '%') OR
+                s.department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.bank LIKE CONCAT('%', #{keyword}, '%') OR
+                s.account_number LIKE CONCAT('%', #{keyword}, '%') OR
+                s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>
-        ORDER BY payment_date DESC
+        ORDER BY sp.payment_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
     <select id="count" parameterType="string" resultType="int">
         SELECT COUNT(*)
-        FROM salary_payments
+        FROM salary_payments sp
+        JOIN salaries s ON sp.salary_id = s.salary_id
         <where>
             <if test="keyword != null and keyword != ''">
                 (
-                payment_id LIKE CONCAT('%', #{keyword}, '%') OR
-                salary_id LIKE CONCAT('%', #{keyword}, '%') OR
-                compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
-                payment_date LIKE CONCAT('%', #{keyword}, '%') OR
-                base_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
-                personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
-                overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
-                income_tax LIKE CONCAT('%', #{keyword}, '%') OR
-                local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
-                national_pension LIKE CONCAT('%', #{keyword}, '%') OR
-                health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
-                deductions LIKE CONCAT('%', #{keyword}, '%') OR
-                gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                net_salary LIKE CONCAT('%', #{keyword}, '%') OR
-                remarks LIKE CONCAT('%', #{keyword}, '%')
+                sp.payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.remarks LIKE CONCAT('%', #{keyword}, '%') OR
+                s.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.name LIKE CONCAT('%', #{keyword}, '%') OR
+                s.department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.bank LIKE CONCAT('%', #{keyword}, '%') OR
+                s.account_number LIKE CONCAT('%', #{keyword}, '%') OR
+                s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>

@@ -23,13 +23,15 @@
                 <label for="employeeSelect">사원</label>
                 <select id="employeeSelect" name="employeeId" onchange="updateEmployeeDetails()">
                     <option value="" disabled selected>사원을 선택해주세요.</option>
-                    <option th:each="employee : ${employeeList}" th:value="${employee.employeeId}"
+                    <option id="employeeId" th:each="employee : ${employeeList}" th:value="${employee.employeeId}"
                             th:selected="${employee.employeeId == selectedEmployeeId}"
+                            th:data-name="${employee.name}"
                             th:data-department="${employee.department}"
                             th:data-position="${employee.position}"
                             th:text="${employee.name} + ' (' + ${employee.employeeId} + ')'">
                     </option>
                 </select>
+                <input type="hidden" id="name" name="name"/>
             </div>
             <div class="form-group">
                 <label for="department">부서</label>
@@ -67,8 +69,8 @@
             </div>
             <div class="error-message"></div>
             <div class="btn-are">
-                <button type="submit" class="btn">초기화</button>
-                <button type="reset" class="btn">급여 정보 등록</button>
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">급여 정보 등록</button>
             </div>
         </form>
     </div>

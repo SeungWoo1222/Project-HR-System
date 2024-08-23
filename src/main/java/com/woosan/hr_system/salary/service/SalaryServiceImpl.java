@@ -65,12 +65,7 @@ public class SalaryServiceImpl implements SalaryService {
     public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Salary> salaries = salaryDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
-
-        // 급여 정보에 사원 이름 추가
-        setEmployeeNameInSalary(salaries);
-
         int total = salaryDAO.count(pageRequest.getKeyword());
-
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
@@ -78,20 +73,8 @@ public class SalaryServiceImpl implements SalaryService {
     public PageResult<Salary> searchUsingSalaries(PageRequest pageRequest, String department, YearMonth yearMonth) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Salary> salaries = salaryDAO.searchUsingSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, yearMonth);
-
-        // 급여 정보에 사원 이름 추가
-        setEmployeeNameInSalary(salaries);
-
         int total = salaryDAO.count(pageRequest.getKeyword());
-
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
-    }
-
-    // 급여 정보에 사원 이름 추가
-    private void setEmployeeNameInSalary(List<Salary> salaries) {
-        for (Salary salary : salaries) {
-            salary.setName(employeeDAO.getEmployeeName(salary.getEmployeeId()));
-        }
     }
 
     @Override // 모든 사원의 급여 정보 조회
@@ -101,9 +84,7 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override // 급여 ID 리스트를 이용한 사원들의 급여 정보 리스트 조회
     public List<Salary> getSalariesByIds(List<Integer> salaryIdList) {
-        List<Salary> salaryList = salaryDAO.selectSalariesByIds(salaryIdList);
-        setEmployeeNameInSalary(salaryList);
-        return salaryList;
+        return salaryDAO.selectSalariesByIds(salaryIdList);
     }
 
     @Override // 급여 ID 리스트를 이용한 사원들의 급여 정보 리스트 조회
@@ -120,7 +101,7 @@ public class SalaryServiceImpl implements SalaryService {
     @Override // 사원 급여 정보 등록
     public String addSalary(Salary salary) {
         salaryDAO.insertSalary(salary);
-        return "'" + employeeDAO.getEmployeeName(salary.getEmployeeId()) + "' 사원의 급여 정보가 등록되었습니다.";
+        return "'" + salary.getName() + "' 사원의 급여 정보가 등록되었습니다.";
     }
 
     @LogBeforeExecution
@@ -133,7 +114,7 @@ public class SalaryServiceImpl implements SalaryService {
 
         // 급여 정보 수정
         salaryDAO.updateSalary(updatedSalary);
-        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원의 급여 정보가 수정되었습니다.";
+        return "'" + updatedSalary.getName() + "' 사원의 급여 정보가 수정되었습니다.";
     }
 
     // Salary의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
@@ -154,6 +135,6 @@ public class SalaryServiceImpl implements SalaryService {
 
         // 급여 정보 삭제
         salaryDAO.deleteSalary(salaryId);
-        return "'" + employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()) + "' 사원의 급여 정보가 삭제되었습니다.";
+        return "'" + salaryInfo.getName() + "' 사원의 급여 정보가 삭제되었습니다.";
     }
 }

@@ -3,9 +3,11 @@ function updateEmployeeDetails() {
     const selectElement = document.getElementById("employeeSelect");
     const selectedOption = selectElement.options[selectElement.selectedIndex];
 
+    const name = selectedOption.getAttribute("data-name");
     const department = selectedOption.getAttribute("data-department");
     const position = selectedOption.getAttribute("data-position");
 
+    document.getElementById("name").value = name || "";
     document.getElementById("department").value = department || "";
     document.getElementById("position").value = position || "";
 }
@@ -36,6 +38,7 @@ function validateForm(event) {
     event.preventDefault();
 
     const employeeId = document.getElementById("employeeId").value.trim();
+    const name = document.getElementById("name").value.trim();
     const department = document.getElementById("department").value.trim();
     const position = document.getElementById("position").value.trim();
     const bank = document.getElementById("bank").value.trim();
@@ -46,6 +49,10 @@ function validateForm(event) {
 
     if (employeeId === "") {
         errorMessage.textContent = "사원을 선택해주세요.";
+        return false;
+    }
+    if (name === "") {
+        errorMessage.textContent = "이름을 입력해주세요.";
         return false;
     }
     if (department === "") {

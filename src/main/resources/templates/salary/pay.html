@@ -125,7 +125,7 @@
             </tr>
             </tbody>
         </table>
-        <div class="pagination-container">
+        <div class="pagination-container" th:if="${totalPages > 0}">
             <div class="pagination">
                 <span th:if="${currentPage > 1}">
                     <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">

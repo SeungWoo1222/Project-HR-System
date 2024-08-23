@@ -6,6 +6,7 @@
     <resultMap id="SalaryResultMap" type="com.woosan.hr_system.salary.model.Salary">
         <id property="salaryId" column="salary_id" />
         <result property="employeeId" column="employee_id" />
+        <result property="name" column="name" />
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
         <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
         <result property="bank" column="bank" />
@@ -35,8 +36,8 @@
     <!-- 사원 ID 리스트를 이용한 사원들의 급여 정보 조회 -->
     <select id="selectSalariesByIds" parameterType="List" resultMap="SalaryResultMap">
         SELECT * FROM salaries WHERE salary_id IN
-        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
-            #{item}
+        <foreach item="salaryId" index="index" collection="list" open="(" separator="," close=")">
+            #{salaryId}
         </foreach>
     </select>
 
@@ -62,6 +63,7 @@
                 (
                 salary_id LIKE CONCAT('%', #{keyword}, '%') OR
                 employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
                 department_id LIKE CONCAT('%', #{keyword}, '%') OR
                 position_id LIKE CONCAT('%', #{keyword}, '%') OR
                 bank LIKE CONCAT('%', #{keyword}, '%') OR
@@ -87,6 +89,7 @@
                 (
                 salary_id LIKE CONCAT('%', #{keyword}, '%') OR
                 employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
                 department_id LIKE CONCAT('%', #{keyword}, '%') OR
                 position_id LIKE CONCAT('%', #{keyword}, '%') OR
                 bank LIKE CONCAT('%', #{keyword}, '%') OR
@@ -115,6 +118,7 @@
                 (
                 salary_id LIKE CONCAT('%', #{keyword}, '%') OR
                 employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
                 department_id LIKE CONCAT('%', #{keyword}, '%') OR
                 position_id LIKE CONCAT('%', #{keyword}, '%') OR
                 bank LIKE CONCAT('%', #{keyword}, '%') OR
@@ -138,14 +142,15 @@
 
     <!-- 사원 급여 정보 등록 -->
     <insert id="insertSalary" parameterType="com.woosan.hr_system.salary.model.Salary" useGeneratedKeys="true" keyProperty="salaryId">
-        INSERT INTO salaries (employee_id, annual_salary, bank, account_number, department_id, position_id, status)
-        VALUES (#{employeeId}, #{annualSalary}, #{bank}, #{accountNumber}, #{department}, #{position}, #{status})
+        INSERT INTO salaries (employee_id, name, annual_salary, bank, account_number, department_id, position_id)
+        VALUES (#{employeeId}, #{name}, #{annualSalary}, #{bank}, #{accountNumber}, #{department}, #{position})
     </insert>
 
     <!-- 사원 급여 정보 수정 -->
     <update id="updateSalary" parameterType="com.woosan.hr_system.salary.model.Salary">
         UPDATE salaries SET
                             employee_id = #{employeeId},
+                            name = #{name},
                             annual_salary = #{annualSalary},
                             bank = #{bank},
                             account_number = #{accountNumber},
