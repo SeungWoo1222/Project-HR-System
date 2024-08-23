@@ -141,25 +141,36 @@
 
     <!-- 급여 지급 내역 등록 -->
     <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO salary_payments (salary_id, compensation_month, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)
-        VALUES (#{salaryId}, #{compensationMonth}, #{paymentDate}, #{grossSalary}, #{baseSalary}, #{overtime}, #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{deductions}, #{netSalary}, #{remarks})
+        INSERT INTO salary_payments (
+            salary_id, compensation_month, payment_date, gross_salary, base_salary,
+            overtime_pay, position_allowance, meal_allowance, transport_allowance,
+            personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
+            local_income_tax, national_pension, health_insurance, long_term_care_insurance,
+            employment_insurance, deductions, net_salary, remarks
+        ) VALUES (
+                     #{salaryId}, #{compensationMonth}, #{paymentDate}, #{grossSalary}, #{baseSalary},
+                     #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance},
+                     #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{incomeTax},
+                     #{localIncomeTax}, #{nationalPension}, #{healthInsurance}, #{longTermCareInsurance},
+                     #{employmentInsurance}, #{deductions}, #{netSalary}, #{remarks}
+                 )
     </insert>
 
     <!-- 급여 지급 리스트 내역 등록 -->
     <insert id="insertPaymentList" parameterType="List" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO salary_payments (
         salary_id, compensation_month, payment_date, gross_salary, base_salary,
-        overtime_pay, position_allowance, meal_allowance,
-        transport_allowance, personal_bonus, team_bonus, holiday_bonus,
-        year_end_bonus, deductions, net_salary, remarks
-        )
-        VALUES
+        overtime_pay, position_allowance, meal_allowance, transport_allowance,
+        personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
+        local_income_tax, national_pension, health_insurance, long_term_care_insurance,
+        employment_insurance, deductions, net_salary, remarks
+        ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.salaryId}, #{item.compensationMonth}, #{item.paymentDate}, #{item.grossSalary},
-            #{item.baseSalary}, #{item.overtimePay}, #{item.positionAllowance},
-            #{item.mealAllowance}, #{item.transportAllowance}, #{item.personalBonus},
-            #{item.teamBonus}, #{item.holidayBonus}, #{item.yearEndBonus},
-            #{item.deductions}, #{item.netSalary}, #{item.remarks})
+            (#{item.salaryId}, #{item.compensationMonth}, #{item.paymentDate}, #{item.grossSalary}, #{item.baseSalary},
+            #{item.overtimePay}, #{item.positionAllowance}, #{item.mealAllowance}, #{item.transportAllowance},
+            #{item.personalBonus}, #{item.teamBonus}, #{item.holidayBonus}, #{item.yearEndBonus}, #{item.incomeTax},
+            #{item.localIncomeTax}, #{item.nationalPension}, #{item.healthInsurance}, #{item.longTermCareInsurance},
+            #{item.employmentInsurance}, #{item.deductions}, #{item.netSalary}, #{item.remarks})
         </foreach>
     </insert>
 
@@ -179,6 +190,12 @@
                                    team_bonus = #{teamBonus},
                                    holiday_bonus = #{holidayBonus},
                                    year_end_bonus = #{yearEndBonus},
+                                   income_tax = #{incomeTax},
+                                   local_income_tax = #{localIncomeTax},
+                                   national_pension = #{nationalPension},
+                                   health_insurance = #{healthInsurance},
+                                   long_term_care_insurance = #{longTermCareInsurance},
+                                   employment_insurance = #{employmentInsurance},
                                    deductions = #{deductions},
                                    net_salary = #{netSalary},
                                    remarks = #{remarks}

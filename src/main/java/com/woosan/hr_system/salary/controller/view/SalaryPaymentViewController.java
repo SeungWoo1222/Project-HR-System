@@ -1,6 +1,8 @@
 package com.woosan.hr_system.salary.controller.view;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.salary.service.SalaryPaymentService;
@@ -23,6 +25,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/salary/payment")
 public class SalaryPaymentViewController {
+    @Autowired
+    private EmployeeService employeeService;
     @Autowired
     private SalaryService salaryService;
     @Autowired
@@ -81,11 +85,37 @@ public class SalaryPaymentViewController {
         return "salary/payment/pay-complete";
     }
 
-    @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 조회
-    public String viewPayslip(@PathVariable int paymentId, Model model) {
+    @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 페이지 이동
+    public String viewPayslip(@PathVariable("paymentId") int paymentId, Model model) {
+        // 급여명세서 조회
         SalaryPayment payslip = salaryPaymentService.getPaymentById(paymentId);
+
+        // 급여명세서에 급여 정보 삽입
+        Salary salaryInfo = salaryService.getSalaryById(payslip.getSalaryId());
+        payslip.setSalary(salaryInfo);
         model.addAttribute("payslip", payslip);
-        return "salary/payment/payslip";
+
+        // 급여명세서에 사원 정보 삽입
+        Employee employee = employeeService.getEmployeeById(salaryInfo.getEmployeeId());
+        model.addAttribute("employee", employee);
+        return "salary/payment/payslip-modal";
+    }
+
+    @GetMapping("/{paymentId}/print") // 특정 사원의 급여 지급 내역 출력 및 pdf 변환 페이지 이동
+    public String viewPayslipPrint(@PathVariable("paymentId") int paymentId, Model model) {
+        // 급여명세서 조회
+        SalaryPayment payslip = salaryPaymentService.getPaymentById(paymentId);
+
+        // 급여명세서에 급여 정보 삽입
+        Salary salaryInfo = salaryService.getSalaryById(payslip.getSalaryId());
+        payslip.setSalary(salaryInfo);
+        model.addAttribute("payslip", payslip);
+
+        // 급여명세서에 사원 정보 삽입
+        Employee employee = employeeService.getEmployeeById(salaryInfo.getEmployeeId());
+        model.addAttribute("employee", employee);
+
+        return "salary/payment/payslip-print";
     }
 
     @GetMapping("/employee/{employeeId}") // 특정 사원의 모든 급여 지급 내역 조회

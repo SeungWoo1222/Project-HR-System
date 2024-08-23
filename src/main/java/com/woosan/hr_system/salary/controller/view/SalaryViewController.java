@@ -2,7 +2,6 @@ package com.woosan.hr_system.salary.controller.view;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.service.SalaryService;
 import com.woosan.hr_system.search.PageRequest;
@@ -24,12 +23,9 @@ import java.util.List;
 public class SalaryViewController {
     @Autowired
     private SalaryService salaryService;
-    @Autowired
-    private EmployeeService employeeService;
 
-    // 모든 급여 정보 페이지 이동
     @RequireHRPermission
-    @GetMapping("/list")
+    @GetMapping("/list") // 모든 급여 정보 페이지 이동
     public String viewAllSalaries(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
@@ -52,9 +48,8 @@ public class SalaryViewController {
         return "salary/list";
     }
 
-    // 급여 정보 등록 페이지 이동
     @RequireHRPermission
-    @GetMapping("/register")
+    @GetMapping("/register") // 급여 정보 등록 페이지 이동
     public String viewSalaryRegisterForm(@RequestParam(name = "employeeId", required = false) String employeeId,
                                           Model model) {
         if (employeeId != null) {
@@ -65,9 +60,8 @@ public class SalaryViewController {
         return "salary/register";
     }
 
-    // 급여 정보 수정 페이지 이동
     @RequireHRPermission
-    @GetMapping("/{salaryId}/edit")
+    @GetMapping("/{salaryId}/edit") // 급여 정보 수정 페이지 이동
     public String viewSalaryEditForm(@PathVariable int salaryId, Model model) {
         Salary salaryInfo = salaryService.getSalaryById(salaryId);
         model.addAttribute("salary", salaryInfo);

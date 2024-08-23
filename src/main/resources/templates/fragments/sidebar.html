@@ -57,7 +57,7 @@
                     <li><a th:href="@{/salary/list}">- 급여정보 목록</a></li>
                     <li><a th:href="@{/salary/register}">- 급여정보 등록</a></li>
                     <li><a th:href="@{/salary/payment}">- 급여 지급 내역</a></li>
-                    <li><a th:href="@{/salary/payment/all}">- 급여명세서 목록</a></li>
+                    <li><a th:href="@{/salary/payment/list}">- 급여명세서 목록</a></li>
                 </ul>
             </li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img
