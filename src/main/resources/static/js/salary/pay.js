@@ -101,6 +101,12 @@ function openEmployeeDetailModal(event, button) {
 function submitPayForm(event) {
     event.preventDefault();
 
+    // 사용자 확인
+    const userConfirmed = confirm("급여를 지급하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+    if (!userConfirmed) {
+        return;
+    }
+
     const form = event.currentTarget;
     const formData = new FormData(form);
 
@@ -163,6 +169,3 @@ function submitPayForm(event) {
             alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
         });
 }
-
-
-function calculateTotalNetSalary() {}

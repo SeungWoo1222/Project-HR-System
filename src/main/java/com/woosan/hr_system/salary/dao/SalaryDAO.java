@@ -31,7 +31,6 @@ public class SalaryDAO {
 
     // 사원 ID 리스트를 이용한 사원들의 급여 정보 조회
     public List<Salary> selectSalariesByIds(List<Integer> salaryIdList) {
-        log.debug("오늘도 로그를 찍는구나~ selectSalariesByIds: {}", salaryIdList);
         return sqlSession.selectList(NAMESPACE + "selectSalariesByIds", salaryIdList);
     }
 

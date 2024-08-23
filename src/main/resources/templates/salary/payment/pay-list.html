@@ -10,7 +10,8 @@
 </th:block>
 
 <div>
-    <h3> <span th:text="${yearmonth}"></span>월 급여 지급 목록</h3>
+    <div class="title" id="title" ></div>
+    <h3> <span th:text="${yearmonth.year} + '년 ' + ${'%02d'.formatted(yearmonth.monthValue)} + '월'"></span> 급여 지급 목록</h3>
     <div>
         <table border="1" class="list">
             <thead>

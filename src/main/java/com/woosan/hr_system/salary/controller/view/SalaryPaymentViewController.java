@@ -71,7 +71,9 @@ public class SalaryPaymentViewController {
                               Model model) {
         List<Salary> salaries = salaryService.fetchSalaryListByIds(salaryIds);
         model.addAttribute("salaries", salaries);
-        model.addAttribute("yearmonth", yearMonthString);
+
+        YearMonth yearMonth = YearMonth.parse(yearMonthString);
+        model.addAttribute("yearmonth", yearMonth);
         return "salary/payment/pay-list";
     }
 
