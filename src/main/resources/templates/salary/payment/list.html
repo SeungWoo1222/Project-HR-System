@@ -1,24 +1,92 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='급여명세서 조회')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='급여명세서 조회')}">
 
 <th:block layout:fragment="css">
-    <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-    </style>
 </th:block>
 
 <th:block layout:fragment="script">
-    <!--    <script th:src="@{/js/employee.js}"></script>-->
-    <!--    <script th:src="@{/js/employee-detail-edit.js}"></script>-->
 </th:block>
 
-<body layout:fragemnt="~{content}">
+<div layout:fragment="~{content}">
     <div class="content">
-
+        <div class="search-container">
+            <form th:action="@{/salary/payment/list}" method="get" id="pageSizeForm">
+                <input type="hidden" name="page" th:value="1"/>
+                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                </select>
+                <input type="hidden" name="keyword" th:value="${keyword}"/>
+            </form>
+            <form th:action="@{/salary/payment/list}" method="get">
+                <input type="hidden" name="page" value="1">
+                <input type="hidden" name="size" th:value="${pageSize}"/>
+                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                <button type="submit">검색</button>
+            </form>
+        </div>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th>급여지급 ID</th>
+                <th>급여 ID</th>
+                <th>사원 ID</th>
+                <th>지급대상 월</th>
+                <th>지급일</th>
+                <th>총 급여</th>
+                <th>총 공제 금액</th>
+                <th>실 지급액</th>
+                <th>비고</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${payslips.isEmpty()}">
+                <td colspan="8" style="text-align: center; padding: 20px;">
+                    조회된 급여명세서 내역이 없습니다. 다른 검색 조건을 시도해보세요.
+                </td>
+            </tr>
+            <tr th:each="payslip : ${payslips}" th:onclick="openModal()">
+                <td th:text="${payslip.paymentId}">급여지급 ID</td>
+                <td th:text="${payslip.salaryId}">급여 ID</td>
+                <td th:text="${payslip.salary?.employeeId}">사원 ID</td>
+                <td th:text="${payslip.compensationMonth}">지급대상 월</td>
+                <td th:text="${payslip.paymentDate}">지급일</td>
+                <td th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}">총 급여</td>
+                <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}" style="color: red; font-weight: bold">총 공제 금액</td>
+                <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" style="color: green; font-weight: bold">실 지급액</td>
+                <td th:text="${payslip.remarks}">비고</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span th:if="${currentPage > 1}">
+                <a th:href="@{'/salary/payment/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                </a>
+            </span>
+            <span th:if="${totalPages <= 5}">
+                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a th:href="@{'/salary/payment/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+            </span>
+            <span th:if="${totalPages > 5}">
+                <span th:each="i : ${#numbers.sequence(
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                    <a th:href="@{'/salary/payment/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+                </span>
+            <span th:if="${currentPage < totalPages}">
+                <a th:href="@{'/salary/payment/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                </a>
+            </span>
+        </div>
     </div>
-</body>
+</div>
 </html>

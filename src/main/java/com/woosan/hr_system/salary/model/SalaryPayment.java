@@ -45,4 +45,6 @@ public class SalaryPayment { // 급여 명세서
     private int grossSalary;             // 총 급여
     private int netSalary;               // 실 지급액 (총 급여 - 공제 금액)
     private String remarks;              // 비고
+
+    private Salary salary;               // 급여 정보
 }

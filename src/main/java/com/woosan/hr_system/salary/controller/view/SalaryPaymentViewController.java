@@ -36,7 +36,6 @@ public class SalaryPaymentViewController {
                               @RequestParam(name = "department", defaultValue = "") String department,
                               @RequestParam(name = "yearmonth", defaultValue = "") String yearMonthString,
                               Model model) {
-        log.debug("yearMonthString: {}", yearMonthString);
         // 해당 달 급여 지급 정보
         YearMonth yearMonth;
         if (yearMonthString.isEmpty()) {
@@ -97,10 +96,21 @@ public class SalaryPaymentViewController {
     }
 
     @RequireHRPermission
-    @GetMapping("/all") // 모든 급여 지급 내역 조회
-    public String viewAllPayslip(Model model) {
-        List<SalaryPayment> allPayslips = salaryPaymentService.getAllPayments();
-        model.addAttribute("allPayslips", allPayslips);
+    @GetMapping("/list") // 모든 급여 지급 내역 조회
+    public String viewAllPayslip(@RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                 Model model) {
+        // 검색 후 페이징
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<SalaryPayment> pageResult = salaryPaymentService.searchPayslips(pageRequest);
+
+        model.addAttribute("payslips", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+
         return "salary/payment/list";
     }
 }

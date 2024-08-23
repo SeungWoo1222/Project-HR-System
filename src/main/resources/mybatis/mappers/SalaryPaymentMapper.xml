@@ -67,6 +67,78 @@
         AND compensation_month = #{yearMonth}
     </select>
 
+    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="searchPayslips" parameterType="map" resultMap="SalaryPaymentResultMap">
+        SELECT *
+        FROM salary_payments
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                remarks LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY payment_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="count" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM salary_payments
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                remarks LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
     <!-- 급여 지급 내역 등록 -->
     <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO salary_payments (salary_id, compensation_month, payment_date, gross_salary, base_salary, overtime, overtime_pay, position_allowance, meal_allowance, transport_allowance, personal_bonus, team_bonus, holiday_bonus, year_end_bonus, deductions, net_salary, remarks)

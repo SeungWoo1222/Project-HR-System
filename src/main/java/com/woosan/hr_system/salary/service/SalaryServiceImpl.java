@@ -79,11 +79,6 @@ public class SalaryServiceImpl implements SalaryService {
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-    @Override // 현재 사용하는 모든 급여 ID 조회
-    public List<Integer> getUsingSalaryIdList() {
-        return salaryDAO.selectUsingSalaryIdList();
-    }
-
     @Override // 모든 사원의 급여 정보 조회
     public List<Salary> getAllSalaries() {
         return salaryDAO.selectAllSalaries();

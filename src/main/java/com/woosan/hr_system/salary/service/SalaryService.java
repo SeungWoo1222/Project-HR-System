@@ -15,7 +15,6 @@ public interface SalaryService {
     List<Employee> getEmployeeList();
     PageResult<Salary> searchSalaries(PageRequest pageRequest, String department);
     PageResult<Salary> searchUsingSalaries(PageRequest pageRequest, String department, YearMonth yearMonth);
-    List<Integer> getUsingSalaryIdList();
     List<Salary> getAllSalaries();
     List<Salary> fetchSalaryListByIds(String salaryIds);
     String addSalary(Salary salary);

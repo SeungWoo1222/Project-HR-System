@@ -4,9 +4,12 @@ import com.woosan.hr_system.auth.aspect.LogAfterExecution;
 import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.salary.dao.SalaryDAO;
 import com.woosan.hr_system.salary.dao.SalaryPaymentDAO;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.model.SalaryPayment;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Autowired
     private SalaryCalculation salaryCalculation;
     @Autowired
+    private SalaryDAO salaryDAO;
+    @Autowired
     private SalaryPaymentDAO salaryPaymentDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
@@ -40,6 +45,38 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     public List<SalaryPayment> getPaymentsByEmployeeId(String employeeId) {
         List<Integer> salaryIdList = salaryService.getSalaryIdList(employeeId);
         return salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
+    }
+
+    @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
+    public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
+
+        // 급여명세서에 급여 정보 삽입
+        mergeSalaryInfo(payslips);
+
+        int total = salaryPaymentDAO.count(pageRequest.getKeyword());
+
+        return new PageResult<>(payslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    // SalaryPayment에 Salary 정보 담기
+    private void mergeSalaryInfo(List<SalaryPayment> salaryPaymentList) {
+        // 급여명세서에서 salaryId 추출 후 리스트로 변환
+        List<Integer> salaryIdList = salaryPaymentList.stream()
+                .map(SalaryPayment::getSalaryId)
+                .toList();
+
+        // 추출한 salaryIdList 이용하여 급여 정보 조회
+        List<Salary> salaryList = salaryDAO.selectSalariesByIds(salaryIdList);
+
+        // 급여 정보를 맵으로 변환하여 salaryId를 키로 매핑
+        Map<Integer, Salary> salaryMap = salaryList.stream()
+                .collect(Collectors.toMap(Salary::getSalaryId, salary -> salary));
+
+        // 급여 정보를 급여명세서에 삽입
+        salaryPaymentList.forEach(salaryPayment ->
+                salaryPayment.setSalary(salaryMap.get(salaryPayment.getSalaryId())));
     }
 
     @Override // 모든 급여명세서 조회
@@ -179,7 +216,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Override // 해당 달 모든 사원의 급여 지급 여부 리스트 조회
     public Map<Integer, Boolean> hasPaidSalaryThisMonth(YearMonth yearMonth) {
         // 현재 사용중인 급여 정보 조회
-        List<Integer> allSalaryIds = salaryService.getUsingSalaryIdList();
+        List<Integer> allSalaryIds = salaryDAO.selectUsingSalaryIdList();
 
         // 해당 월 지급된 급여내역 조회
         List<Integer> paidSalaryIds = salaryPaymentDAO.selectPaymentByMonth(yearMonth);
