@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='퇴사 관리')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='퇴사 사원 관리')}">
 
 <th:block layout:fragment="css"></th:block>
 
@@ -19,8 +19,6 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h1>퇴사 관리</h1>
-
         <div><h2>퇴사 예정 사원 목록</h2></div>
         <table class="list">
             <thead>
