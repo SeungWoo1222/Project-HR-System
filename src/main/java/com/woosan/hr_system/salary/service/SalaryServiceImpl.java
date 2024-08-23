@@ -65,6 +65,10 @@ public class SalaryServiceImpl implements SalaryService {
     public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Salary> salaries = salaryDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
+
+        // 급여 정보에 사원 이름 추가
+        setEmployeeNameInSalary(salaries);
+
         int total = salaryDAO.count(pageRequest.getKeyword());
 
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
@@ -74,9 +78,20 @@ public class SalaryServiceImpl implements SalaryService {
     public PageResult<Salary> searchUsingSalaries(PageRequest pageRequest, String department, YearMonth yearMonth) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Salary> salaries = salaryDAO.searchUsingSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, yearMonth);
+
+        // 급여 정보에 사원 이름 추가
+        setEmployeeNameInSalary(salaries);
+
         int total = salaryDAO.count(pageRequest.getKeyword());
 
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    // 급여 정보에 사원 이름 추가
+    private void setEmployeeNameInSalary(List<Salary> salaries) {
+        for (Salary salary : salaries) {
+            salary.setName(employeeDAO.getEmployeeName(salary.getEmployeeId()));
+        }
     }
 
     @Override // 모든 사원의 급여 정보 조회
@@ -84,7 +99,14 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryDAO.selectAllSalaries();
     }
 
-    @Override // 사원 ID를 이용한 특정 사원의 급여 ID 리스트 조회
+    @Override // 급여 ID 리스트를 이용한 사원들의 급여 정보 리스트 조회
+    public List<Salary> getSalariesByIds(List<Integer> salaryIdList) {
+        List<Salary> salaryList = salaryDAO.selectSalariesByIds(salaryIdList);
+        setEmployeeNameInSalary(salaryList);
+        return salaryList;
+    }
+
+    @Override // 급여 ID 리스트를 이용한 사원들의 급여 정보 리스트 조회
     public List<Salary> fetchSalaryListByIds(String salaryIds) {
         // 문자열 -> 리스트로 변환
         String[] salaryIdArr = salaryIds.split(",");

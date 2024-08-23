@@ -32,6 +32,7 @@
             <thead>
             <tr>
                 <th>사원 ID</th>
+                <th>이름</th>
                 <th>급여 ID</th>
                 <th>급여지급 ID</th>
                 <th>지급대상 월</th>
@@ -44,12 +45,13 @@
             </thead>
             <tbody>
             <tr th:if="${payslips.isEmpty()}">
-                <td colspan="8" style="text-align: center; padding: 20px;">
+                <td colspan="9" style="text-align: center; padding: 20px;">
                     조회된 급여명세서 내역이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
             <tr th:each="payslip : ${payslips}" th:paymentId="${payslip.paymentId}" th:onclick="openModal('/salary/payment/' + this.getAttribute('paymentId'))">
                 <td th:text="${payslip.salary?.employeeId}">사원 ID</td>
+                <td th:text="${payslip.salary?.name}">이름</td>
                 <td th:text="${payslip.salaryId}">급여 ID</td>
                 <td th:text="${payslip.paymentId}">급여지급 ID</td>
                 <td th:text="${payslip.compensationMonth}">지급대상 월</td>

@@ -53,7 +53,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
 
         // 급여명세서에 급여 정보 삽입
-        mergeSalaryInfo(payslips);
+        setSalaryInfoToPayslips(payslips);
 
         int total = salaryPaymentDAO.count(pageRequest.getKeyword());
 
@@ -61,14 +61,14 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     }
 
     // SalaryPayment에 Salary 정보 담기
-    private void mergeSalaryInfo(List<SalaryPayment> salaryPaymentList) {
+    private void setSalaryInfoToPayslips(List<SalaryPayment> salaryPaymentList) {
         // 급여명세서에서 salaryId 추출 후 리스트로 변환
         List<Integer> salaryIdList = salaryPaymentList.stream()
                 .map(SalaryPayment::getSalaryId)
                 .toList();
 
         // 추출한 salaryIdList 이용하여 급여 정보 조회
-        List<Salary> salaryList = salaryDAO.selectSalariesByIds(salaryIdList);
+        List<Salary> salaryList = salaryService.getSalariesByIds(salaryIdList);
 
         // 급여 정보를 맵으로 변환하여 salaryId를 키로 매핑
         Map<Integer, Salary> salaryMap = salaryList.stream()

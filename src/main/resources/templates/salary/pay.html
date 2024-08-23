@@ -85,6 +85,7 @@
                 <th style="font-size: 20px">☑︎</th>
                 <th>급여 ID</th>
                 <th>사원 ID</th>
+                <th>이름</th>
                 <th>부서</th>
                 <th>직급</th>
                 <th>은행</th>
@@ -97,7 +98,7 @@
             </thead>
             <tbody>
             <tr th:if="${salaries.isEmpty()}">
-                <td colspan="11" style="text-align: center; padding: 20px;">
+                <td colspan="12" style="text-align: center; padding: 20px;">
                     조회된 급여 지급내역이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
@@ -109,6 +110,7 @@
                 </td>
                 <td th:text="${salary.salaryId}">급여 ID</td>
                 <td th:text="${salary.employeeId}">사원 ID</td>
+                <td th:text="${salary.name}">이름</td>
                 <td th:text="${salary.department.name}">부서</td>
                 <td th:text="${salary.position.name}">직급</td>
                 <td th:text="${salary.bank}">은행</td>

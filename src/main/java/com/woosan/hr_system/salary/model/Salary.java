@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class Salary { // 급여 정보
     private int salaryId;          // PK
     private String employeeId;     // FK, employees 테이블 참조
+    private String name;           // 이름
     private Department department; // 부서
     private Position position;     // 직급
     private String bank;           // 은행명
