@@ -25,7 +25,9 @@ public class DeductionDetails {
         return (int) (income * (ratio / 100));
     }
 
-    public int calculateLocalIncomeTax() { return calculate(localIncomeTaxRate, incomeTax); }
+    public int calculateLocalIncomeTax() {
+        return Math.max(calculate(localIncomeTaxRate, incomeTax), 0);
+    }
 
     public int calculateNationalPension() {
         return calculate(nationalPensionRate, taxableSalary);

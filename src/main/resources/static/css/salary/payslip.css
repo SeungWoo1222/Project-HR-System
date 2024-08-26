@@ -68,6 +68,19 @@
     background-color: #f0f0f0;
 }
 
+.center {
+    text-align: center;
+}
+
 .right {
     text-align: right;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+td input[type="text"] {
+    width: 95%;
 }

@@ -120,6 +120,22 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslip-print";
     }
 
+    @GetMapping("/{paymentId}/edit") // 특정 사원의 급여 지급 수정 페이지 이동
+    public String viewPayslipEditForm(@PathVariable("paymentId") int paymentId, Model model) {
+        // 급여명세서 조회
+        SalaryPayment payslip = salaryPaymentService.getPaymentById(paymentId);
+
+        // 급여명세서에 급여 정보 삽입
+        Salary salaryInfo = salaryService.getSalaryById(payslip.getSalaryId());
+        payslip.setSalary(salaryInfo);
+        model.addAttribute("payslip", payslip);
+
+        // 급여명세서에 사원 정보 삽입
+        Employee employee = employeeService.getEmployeeById(salaryInfo.getEmployeeId());
+        model.addAttribute("employee", employee);
+        return "salary/payment/payslip-edit";
+    }
+
     @GetMapping("/employee/{employeeId}") // 특정 사원의 모든 급여 지급 내역 조회
     public String viewPayslipsByEmployeeId(@PathVariable String employeeId, Model model) {
         List<SalaryPayment> payslips = salaryPaymentService.getPaymentsByEmployeeId(employeeId);

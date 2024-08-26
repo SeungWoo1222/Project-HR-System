@@ -46,7 +46,7 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         calculateBonusComponents(payrollDetails, components, yearMonth);
 
         // 비과세 제외된 월급
-        int taxableSalary = calculateTaxableSalary(components);
+        int taxableSalary = payrollDetails.calculateTaxableSalary();
 
         // 공제 항목 계산 후 components에 입력
         calculateDeductions(taxableSalary, employeeId, components);
@@ -169,15 +169,26 @@ public class SalaryCalculationImpl implements SalaryCalculation {
     }
 
     @Override // 수정된 공제 항목(소득세, 국민연금, 건강보험, 장기요양보험, 고용보험) 재계산
-    public SalaryPayment calculateDeductions(SalaryPayment salaryPayment, String employeeId) {
-        // 비과세 제외된 월급 계산
-        int taxableSalary = salaryPayment.getGrossSalary()
+    public SalaryPayment calculateDeductions(SalaryPayment salaryPayment) {
+        // 총 월 급여 계산
+        int grossSalary = salaryPayment.getBaseSalary()
+                + salaryPayment.getPositionAllowance()
+                + salaryPayment.getMealAllowance()
+                + salaryPayment.getTransportAllowance()
+                + (salaryPayment.getPersonalBonus() != null ? salaryPayment.getPersonalBonus() : 0)
+                + (salaryPayment.getTeamBonus() != null ? salaryPayment.getTeamBonus() : 0)
+                + (salaryPayment.getHolidayBonus() != null ? salaryPayment.getHolidayBonus() : 0)
+                + (salaryPayment.getYearEndBonus() != null ? salaryPayment.getYearEndBonus() : 0)
+                + (salaryPayment.getOvertimePay() != null ? salaryPayment.getOvertimePay() : 0);
+
+        // 비과세 월 급여 계산
+        int taxableSalary = grossSalary
                 - salaryPayment.getMealAllowance()
                 - salaryPayment.getTransportAllowance()
-                - salaryPayment.getOvertimePay();
+                - (salaryPayment.getOvertimePay() != null ? salaryPayment.getOvertimePay() : 0);
 
         // 근로소득세 계산
-        int thisMonthIncomeTax = calculateIncomeTax(taxableSalary, employeeId);
+        int thisMonthIncomeTax = calculateIncomeTax(taxableSalary, salaryPayment.getSalary().getEmployeeId());
 
         // 공제 항목의 비율 불러오기
         DeductionDetails deductionRatios = ratioDAO.selectDeductionRatios();
@@ -190,19 +201,31 @@ public class SalaryCalculationImpl implements SalaryCalculation {
 
         // 수정된 공제 항목 반환
         return salaryPayment.toBuilder()
-                .incomeTax(thisMonthIncomeTax)
-                .localIncomeTax(deductionDetails.calculateLocalIncomeTax())
-                .nationalPension(deductionDetails.calculateNationalPension())
-                .healthInsurance(deductionDetails.calculateHealthInsurance())
-                .longTermCareInsurance(deductionDetails.calculateLongTermCareInsurance())
-                .employmentInsurance(deductionDetails.calculateEmploymentInsurance())
-                .deductions(deductionDetails.calculateTotalDeductions())
-                .netSalary(salaryPayment.getGrossSalary() - deductionDetails.calculateTotalDeductions())
+                .grossSalary(computeRoundIncome(grossSalary))
+                .incomeTax(computeRoundIncome(thisMonthIncomeTax))
+                .localIncomeTax(computeRoundIncome(deductionDetails.calculateLocalIncomeTax()))
+                .nationalPension(computeRoundIncome(deductionDetails.calculateNationalPension()))
+                .healthInsurance(computeRoundIncome(deductionDetails.calculateHealthInsurance()))
+                .longTermCareInsurance(computeRoundIncome(deductionDetails.calculateLongTermCareInsurance()))
+                .employmentInsurance(computeRoundIncome(deductionDetails.calculateEmploymentInsurance()))
+                .deductions(computeRoundIncome(deductionDetails.calculateTotalDeductions()))
+                .netSalary(computeRoundIncome(grossSalary - deductionDetails.calculateTotalDeductions()))
                 .build();
     }
 
-    // 근로소득세 계산
+    // 근로소득세 계산 전 검사
     private int calculateIncomeTax(int taxableSalary, String employeeId) {
+        log.debug("taxableSalary : {}", taxableSalary);
+        // 월급여 1,060,000원 미만은 원천징수 세금 0
+        if (taxableSalary < 1060000) return 0;
+        // 월급여 1,060,000원 이상 10,000,000원 이하
+        else if (taxableSalary < 10000000) return calculateBasicIncomeTax(taxableSalary, employeeId);
+        // 월 급여 10,000,000 초과
+        else { return calculateIncomeTaxOverOneMillion(taxableSalary, employeeId); }
+    }
+
+    // 근로소득세 계산
+    private int calculateBasicIncomeTax(int taxableSalary, String employeeId) {
         // 사원의 가족 정보 조회
         Map<String, Integer> familyInfo = employeeDAO.selectFamilyInfoById(employeeId);
 
@@ -219,6 +242,27 @@ public class SalaryCalculationImpl implements SalaryCalculation {
 
         // 공제한 금액이 음수인 경우의 세액은 0원
         return Math.max(income, 0);
+    }
+    // 1천만원 초과 근로소득세 계산
+    private int calculateIncomeTaxOverOneMillion(int taxableSalary, String employeeId) {
+        int basicIncomeTax = calculateBasicIncomeTax(10000000, employeeId);
+        double additionalIncomeTax = 0;
+        if (taxableSalary <= 14000000) {
+            additionalIncomeTax = (((taxableSalary - 10000000) * 0.98) * 0.35) + (25000);
+        } else if (taxableSalary <= 28000000) {
+            additionalIncomeTax = (((taxableSalary - 14000000) * 0.98) * 0.38) + (1397000);
+        } else if (taxableSalary <= 30000000) {
+            additionalIncomeTax = (((taxableSalary - 28000000) * 0.98) * 0.4) + (6610600);
+        } else if (taxableSalary <= 45000000) {
+            additionalIncomeTax = ((taxableSalary - 30000000) * 0.4) + (7394600);
+        } else if (taxableSalary <= 87000000) {
+            additionalIncomeTax = ((taxableSalary - 45000000) * 0.42) + (13394600);
+        } else {
+            additionalIncomeTax = ((taxableSalary - 87000000) * 0.45) + (31034600);
+        }
+        // 1원 단위 반올림
+        additionalIncomeTax = Math.round(additionalIncomeTax / 10.0) * 10;
+        return basicIncomeTax + (int) additionalIncomeTax;
     }
 
     // 가족 중 8세 이상 20세 이하 자녀 수만큼 공제한 금액 계산

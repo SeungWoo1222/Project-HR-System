@@ -1,39 +1,44 @@
-document.addEventListener("DOMContentLoaded", function() {
-    function saveAsPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const element = document.getElementById('payslip-container');
+// 급여명세서 수정 페이지로 이동
+function goToUpdateForm(button) {
+    const paymentId = button.getAttribute('data-paymentId');
+    if (confirm("급여명세서를 수정하시겠습니까?")) {
+        openModal('/salary/payment/' + paymentId + '/edit');
+        // window.location.href='/salary/payment/' + paymentId + '/edit';
+    }
+    return;
+}
 
-        html2canvas(element).then(canvas => {
-            document.body.appendChild(canvas); // 캡처된 캔버스를 브라우저에 추가하여 확인
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = 210; // A4 width in mm
-            const pageHeight = 295; // A4 height in mm
-            const imgHeight = canvas.height * imgWidth / canvas.width;
-            let heightLeft = imgHeight;
+// AJAX PUT 요청 - 급여명세서 수정
+function submitUpdateForm(event) {
+    event.preventDefault();
 
-            let position = 0;
+    if (!confirm("급여명세서를 수정하시겠습니까?")) {
+        return;
+    }
 
-            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                doc.addPage();
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+    fetch('/api/salary/payment/' + form.paymentId.value, {
+        method: 'PUT',
+        body: formData
+    })
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            if (response.status === 200) {
+                alert(response.text);
+            } else if (response.status === 400) {
+                alert(response.text);
+            } else {
+                alert('급여명세서 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
             }
-
-            doc.save(document.getElementById('title') + '(' + document.getElementById('employeeId') +')');
+            openModal('/salary/payment/' + form.paymentId.value);
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
         });
-    }
-
-        function printPayslip() {
-        window.print();
-    }
-
-        // saveAsPDF 함수 전역으로 선언
-        window.saveAsPDF = saveAsPDF;
-        window.printPayslip = printPayslip;
-});
-
+}

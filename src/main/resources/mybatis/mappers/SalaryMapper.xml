@@ -30,7 +30,7 @@
 
     <!-- 사원 ID를 이용한 특정 사원의 급여 정보 조회 -->
     <select id="selectSalaryByEmployeeId" parameterType="String" resultMap="SalaryResultMap">
-        SELECT * FROM salaries WHERE employee_id = #{employeeId}
+        SELECT * FROM salaries WHERE employee_id = #{employeeId} AND status = 1
     </select>
 
     <!-- 사원 ID 리스트를 이용한 사원들의 급여 정보 조회 -->

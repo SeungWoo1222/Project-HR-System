@@ -176,22 +176,27 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @LogAfterExecution
     @Transactional
     @Override // 급여명세서 수정
-    public String updatePayment(SalaryPayment salaryPayment, int paymentId) {
+    public String updatePayment(SalaryPayment salaryPayment) {
+        int paymentId = salaryPayment.getPaymentId();
         // 변경사항 확인
         SalaryPayment originalPayment = getPaymentById(paymentId);
         checkForPaymentChanges(originalPayment, salaryPayment);
 
         // 수정된 급여명세서 공제 항목 재계산
-        Salary salaryInfo = salaryService.getSalaryById(salaryPayment.getSalaryId());
-        SalaryPayment updatedPayment = salaryCalculation.calculateDeductions(salaryPayment, salaryInfo.getEmployeeId());
+        Salary salaryInfo = salaryService.getSalaryById(paymentId);
+        salaryPayment.setSalary(salaryInfo);
+        SalaryPayment updatedPayment = salaryCalculation.calculateDeductions(salaryPayment);
 
         // 급여명세서 수정
         salaryPaymentDAO.updatePayment(updatedPayment);
-        return "급여명세서(" + paymentId + ")가 수정되었습니다.";
+        return "'" + salaryPayment.getSalary().getName() + "' 사원의 급여명세서('" + paymentId + "')가 수정되었습니다.";
     }
 
     // Salary의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
     private void checkForPaymentChanges(SalaryPayment original, SalaryPayment updated) {
+        if (updated.getRemarks().trim().isEmpty()) updated.setRemarks(null);
+        log.debug("remark: {}", updated.getRemarks());
+
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "baseSalary", "positionAllowance", "mealAllowance", "transportAllowance",
                 "personalBonus", "teamBonus", "holidayBonus", "yearEndBonus", "overtimePay", "remarks"

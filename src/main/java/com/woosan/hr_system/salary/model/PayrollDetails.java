@@ -59,12 +59,21 @@ public class PayrollDetails {
     public int calculateYearEndBonus() {
         return calculate(yearEndBonusRatio);
     }
-
+    // 비과세 포함한 월급 계산
     public int calculateTotalPayrolls() {
         return calculateBaseSalary()
                 + calculatePositionAllowance()
                 + calculateMealAllowance()
                 + calculateTransportAllowance()
+                + calculatePersonalBonus()
+                + calculateTeamBonus()
+                + calculateHolidayBonus()
+                + calculateYearEndBonus();
+    }
+    // 비과세 제외한 월급 계산
+    public int calculateTaxableSalary() {
+        return calculateBaseSalary()
+                + calculatePositionAllowance()
                 + calculatePersonalBonus()
                 + calculateTeamBonus()
                 + calculateHolidayBonus()

@@ -16,7 +16,7 @@ public interface SalaryPaymentService {
     List<SalaryPayment> getAllPayments();
     String addPayment(int salaryId);
     String addPayment(List<Integer> salaryIdList, String yearmonthString);
-    String updatePayment(SalaryPayment salaryPayment, int paymentId);
+    String updatePayment(SalaryPayment salaryPayment);
     String removePayment(int paymentId);
     Map<Integer, Boolean> hasPaidSalaryThisMonth(YearMonth yearMonth);
 }

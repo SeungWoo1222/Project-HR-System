@@ -30,8 +30,8 @@ public class SalaryPaymentApiController {
 
     @RequireHRPermission
     @PutMapping("/{paymentId}") // 급여명세서 수정
-    ResponseEntity<String> updatePayment(@RequestBody SalaryPayment salaryPayment, @PathVariable int paymentId) {
-        return ResponseEntity.ok(salaryPaymentService.updatePayment(salaryPayment, paymentId));
+    ResponseEntity<String> updatePayment(@ModelAttribute SalaryPayment payslip) {
+        return ResponseEntity.ok(salaryPaymentService.updatePayment(payslip));
     }
 
     @RequireHRPermission

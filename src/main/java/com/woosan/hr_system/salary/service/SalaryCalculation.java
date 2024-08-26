@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface SalaryCalculation {
     String calculateSalaryPayment(String employeeId, int annualSalary, Map<String, Integer> components, YearMonth yearMonth);
-    SalaryPayment calculateDeductions(SalaryPayment salaryPayment, String employeeId);
+    SalaryPayment calculateDeductions(SalaryPayment salaryPayment);
 }
