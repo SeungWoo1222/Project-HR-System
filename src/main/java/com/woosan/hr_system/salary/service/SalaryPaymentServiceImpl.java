@@ -41,6 +41,11 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.selectPaymentById(paymentId);
     }
 
+    @Override // 지급 ID를 이용한 특정 사원의 급여명세서 (급여정보 포함) 조회
+    public SalaryPayment getPaymentWithSalaryById(int paymentId) {
+        return salaryPaymentDAO.selectPaymentWithSalaryById(paymentId);
+    }
+
     @Override // 사원 ID를 이용한 특정 사원의 모든 급여명세서 조회
     public List<SalaryPayment> getPaymentsByEmployeeId(String employeeId) {
         List<Integer> salaryIdList = salaryService.getSalaryIdList(employeeId);
@@ -176,20 +181,20 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @LogAfterExecution
     @Transactional
     @Override // 급여명세서 수정
-    public String updatePayment(SalaryPayment salaryPayment) {
-        int paymentId = salaryPayment.getPaymentId();
+    public String updatePayment(SalaryPayment payslip) {
+        int paymentId = payslip.getPaymentId();
         // 변경사항 확인
         SalaryPayment originalPayment = getPaymentById(paymentId);
-        checkForPaymentChanges(originalPayment, salaryPayment);
+        checkForPaymentChanges(originalPayment, payslip);
 
         // 수정된 급여명세서 공제 항목 재계산
         Salary salaryInfo = salaryService.getSalaryById(paymentId);
-        salaryPayment.setSalary(salaryInfo);
-        SalaryPayment updatedPayment = salaryCalculation.calculateDeductions(salaryPayment);
+        payslip.setSalary(salaryInfo);
+        SalaryPayment updatedPayment = salaryCalculation.calculateDeductions(payslip);
 
         // 급여명세서 수정
         salaryPaymentDAO.updatePayment(updatedPayment);
-        return "'" + salaryPayment.getSalary().getName() + "' 사원의 급여명세서('" + paymentId + "')가 수정되었습니다.";
+        return "'" + payslip.getSalary().getName() + "' 사원의 급여명세서('" + paymentId + "')가 수정되었습니다.";
     }
 
     // Salary의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
@@ -209,13 +214,14 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Override // 급여명세서 삭제
     public String removePayment(int paymentId) {
         // 급여 명세서 확인
-        if (getPaymentById(paymentId) == null) {
+        SalaryPayment payslip = getPaymentWithSalaryById(paymentId);
+        if (payslip == null) {
             throw new IllegalArgumentException("해당 급여명세서를 찾을 수 없습니다.\n급여명세서 ID :" + paymentId);
         }
 
         // 삭제
         salaryPaymentDAO.deletePayment(paymentId);
-        return "급여명세서(" + paymentId + ")가 삭제되었습니다.";
+        return "'" + payslip.getSalary().getName() + "' 사원의 급여명세서('" + paymentId + "')가 삭제되었습니다.";
     }
 
     @Override // 해당 달 모든 사원의 급여 지급 여부 리스트 조회

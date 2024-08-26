@@ -37,7 +37,7 @@ public class SalaryPaymentApiController {
     @RequireHRPermission
     @RequireManagerPermission
     @DeleteMapping("/{paymentId}") // 급여명세서 삭제
-    ResponseEntity<String> deletePayment(@PathVariable int paymentId) {
+    ResponseEntity<String> deletePayment(@PathVariable("paymentId") int paymentId) {
         return ResponseEntity.ok(salaryPaymentService.removePayment(paymentId));
     }
 }

@@ -8,7 +8,10 @@
         <button type="button" class="btn" th:onclick="'window.open(\'/salary/payment/' + ${payslip.paymentId} + '/print\', \'_blank\')'">
             인쇄하기, PDF로 저장
         </button>
-        <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정하기</button>
+        <div>
+            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제하기</button>
+            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정하기</button>
+        </div>
     </div>
     <div class="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>
     <table class="header">

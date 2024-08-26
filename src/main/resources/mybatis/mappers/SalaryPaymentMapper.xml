@@ -29,12 +29,58 @@
         <result property="remarks" column="remarks" />
     </resultMap>
 
-    <!-- 지급 ID를 이용한 특정 사원의 급여 지급 내역 조회 -->
+    <resultMap id="SalaryPaymentWithSalaryResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
+        <id property="paymentId" column="payment_id" />
+        <result property="salaryId" column="salary_id" />
+        <result property="compensationMonth" column="compensation_month" />
+        <result property="paymentDate" column="payment_date" />
+        <result property="baseSalary" column="base_salary" />
+        <result property="positionAllowance" column="position_allowance" />
+        <result property="mealAllowance" column="meal_allowance" />
+        <result property="transportAllowance" column="transport_allowance" />
+        <result property="personalBonus" column="personal_bonus" />
+        <result property="teamBonus" column="team_bonus" />
+        <result property="holidayBonus" column="holiday_bonus" />
+        <result property="yearEndBonus" column="year_end_bonus" />
+        <result property="overtimePay" column="overtime_pay" />
+        <result property="incomeTax" column="income_tax" />
+        <result property="localIncomeTax" column="local_income_tax" />
+        <result property="nationalPension" column="national_pension" />
+        <result property="healthInsurance" column="health_insurance" />
+        <result property="longTermCareInsurance" column="long_term_care_insurance" />
+        <result property="employmentInsurance" column="employment_insurance" />
+        <result property="deductions" column="deductions" />
+        <result property="grossSalary" column="gross_salary" />
+        <result property="netSalary" column="net_salary" />
+        <result property="remarks" column="remarks" />
+        <!-- 급여 관련 정보 -->
+        <result property="salary.salaryId" column="salary_id" />
+        <result property="salary.employeeId" column="employee_id" />
+        <result property="salary.name" column="name" />
+        <result property="salary.department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+        <result property="salary.position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+        <result property="salary.bank" column="bank" />
+        <result property="salary.accountNumber" column="account_number" />
+        <result property="salary.annualSalary" column="annual_salary" />
+        <result property="salary.createdAt" column="created_at" />
+        <result property="salary.status" column="status" />
+    </resultMap>
+
+    <!-- 지급 ID를 이용한 특정 사원의 급여명세서 조회 -->
     <select id="selectPaymentById" parameterType="int" resultMap="SalaryPaymentResultMap">
         SELECT * FROM salary_payments WHERE payment_id = #{paymentId}
     </select>
 
-    <!-- 급여 ID 리스트를 이용한 특정 사원의 모든 급여 지급 내역 조회 -->
+    <!-- 지급 ID를 이용한 특정 사원의 급여명세서 (급여정보 포함) 조회 -->
+    <select id="selectPaymentWithSalaryById" parameterType="int" resultMap="SalaryPaymentWithSalaryResultMap">
+        SELECT sp.*,
+               s.*
+        FROM salary_payments sp
+                 JOIN salaries s ON sp.salary_id = s.salary_id
+        WHERE sp.payment_id = #{paymentId}
+    </select>
+
+    <!-- 급여 ID 리스트를 이용한 특정 사원의 모든 급여명세서 조회 -->
     <select id="selectPaymentsBySalaryIdList" parameterType="list" resultMap="SalaryPaymentResultMap">
         SELECT *
         FROM salary_payments
@@ -44,19 +90,19 @@
         </foreach>
     </select>
 
-    <!-- 모든 급여 지급 내역 조회 -->
+    <!-- 모든 급여명세서 조회 -->
     <select id="selectAllPayments" resultMap="SalaryPaymentResultMap">
         SELECT * FROM salary_payments
     </select>
 
-    <!-- 해당 달 모든 급여 지급 내역 조회 -->
+    <!-- 해당 달 모든 급여명세서 조회 -->
     <select id="selectPaymentByMonth" parameterType="String" resultType="int">
         SELECT salary_id
         FROM salary_payments
         WHERE compensation_month = #{yearMonthString}
     </select>
 
-    <!-- 해당 달 모든 급여 지급 내역 조회 -->
+    <!-- 해당 달 모든 급여명세서 조회 -->
     <select id="selectPaymentBySalaryAndMonth" resultMap="SalaryPaymentResultMap">
         SELECT *
         FROM salary_payments
@@ -159,7 +205,7 @@
         </where>
     </select>
 
-    <!-- 급여 지급 내역 등록 -->
+    <!-- 급여명세서 등록 -->
     <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO salary_payments (
             salary_id, compensation_month, payment_date, gross_salary, base_salary,
@@ -176,7 +222,7 @@
                  )
     </insert>
 
-    <!-- 급여 지급 리스트 내역 등록 -->
+    <!-- 급여명세서 리스트 등록 -->
     <insert id="insertPaymentList" parameterType="List" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO salary_payments (
         salary_id, compensation_month, payment_date, gross_salary, base_salary,
@@ -194,7 +240,7 @@
         </foreach>
     </insert>
 
-    <!-- 급여 지급 내용 수정 -->
+    <!-- 급여명세서 수정 -->
     <update id="updatePayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
         UPDATE salary_payments SET
                                    salary_id = #{salaryId},
@@ -222,7 +268,7 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <!-- 급여 지급 내역 삭제 -->
+    <!-- 급여명세서 삭제 -->
     <delete id="deletePayment" parameterType="int">
         DELETE FROM salary_payments WHERE payment_id = #{paymentId}
     </delete>
