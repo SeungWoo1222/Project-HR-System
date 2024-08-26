@@ -4,8 +4,7 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='급여정보 조회')}">
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/salary/salary.css}" rel="stylesheet">
-
+    <link th:href="@{/css/department-nav.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -106,26 +105,28 @@
         </table>
         <div class="pagination" th:if="${totalPages > 0}">
             <span th:if="${currentPage > 1}">
-                <a th:href="@{'/salary/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                <a th:href="@{'/salary/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department}}">
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
-            <span th:if="${totalPages <= 5}">
-                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
-                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+            <div class="page-area">
+                <span th:if="${totalPages <= 5}">
+                    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                        <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department}}"
+                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                    </span>
                 </span>
-            </span>
-            <span th:if="${totalPages > 5}">
-                <span th:each="i : ${#numbers.sequence(
-                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
-                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                    <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
-                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                <span th:if="${totalPages > 5}">
+                    <span th:each="i : ${#numbers.sequence(
+                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                        <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department}}"
+                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                    </span>
                 </span>
-                </span>
+            </div>
             <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/salary/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                <a th:href="@{'/salary/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department}}">
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>

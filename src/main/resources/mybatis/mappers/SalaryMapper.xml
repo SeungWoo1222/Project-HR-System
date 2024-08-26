@@ -54,8 +54,8 @@
         WHERE s.employee_id IS NULL;
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
-    <select id="search" parameterType="map" resultMap="SalaryResultMap">
+    <!-- 모든 급여정보 - 검색어와 부서에 해당하는 데이터 결과 조회 -->
+    <select id="searchSalaries" parameterType="map" resultMap="SalaryResultMap">
         SELECT *
         FROM salaries
         <where>
@@ -80,7 +80,31 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 모든 급여정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회 -->
+    <select id="countSalaries" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM salaries
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                name LIKE CONCAT('%', #{keyword}, '%') OR
+                department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                bank LIKE CONCAT('%', #{keyword}, '%') OR
+                account_number LIKE CONCAT('%', #{keyword}, '%') OR
+                annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND department_id = #{department}
+            </if>
+        </where>
+    </select>
+
+    <!-- 급여 지급 조회를 위한 현재 사용하는 급여정보 - 검색어와 부서에 해당하는 데이터 결과 조회 -->
     <select id="searchUsingSalaries" parameterType="map" resultMap="SalaryResultMap">
         SELECT *
         FROM salaries
@@ -109,8 +133,8 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
-    <select id="count" parameterType="string" resultType="int">
+    <!-- 급여 지급 조회를 위한 현재 사용하는 급여정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회 -->
+    <select id="countUsingSalaries" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM salaries
         <where>
@@ -126,6 +150,13 @@
                 annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
                 status LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="department != null and department != ''">
+                AND department_id = #{department}
+            </if>
+            AND status = #{status}
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(created_at, '%Y-%m') &lt;= #{yearMonth}
             </if>
         </where>
     </select>

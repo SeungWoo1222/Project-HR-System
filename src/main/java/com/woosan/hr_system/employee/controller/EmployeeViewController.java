@@ -30,16 +30,19 @@ public class EmployeeViewController {
     public String viewEmployees(@RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "size", defaultValue = "10") int size,
                                @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                @RequestParam(name = "department", defaultValue = "") String department,
                                Model model) {
         // 매개변수 값 로그에 출력
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest);
+        PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest, department);
 
         model.addAttribute("employees", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("department", department);
+
         return "employee/list";
     }
 

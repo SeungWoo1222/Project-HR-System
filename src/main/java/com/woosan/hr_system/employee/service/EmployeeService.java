@@ -12,7 +12,7 @@ public interface EmployeeService {
     Employee getEmployeeById(String employeeId);
     String getEmployeeNameById(String employeeId);
     Employee getEmployeeDetails(String employeeId);
-    PageResult<Employee> searchEmployees(PageRequest pageRequest);
+    PageResult<Employee> searchEmployees(PageRequest pageRequest, String department);
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();

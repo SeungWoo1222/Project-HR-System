@@ -63,17 +63,27 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
     public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
-        List<Salary> salaries = salaryDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
-        int total = salaryDAO.count(pageRequest.getKeyword());
+
+        // 검색 결과 데이터
+        List<Salary> salaries = salaryDAO.searchSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
+
+        // 검색 결과 총 개수
+        int total = salaryDAO.countSalaries(pageRequest.getKeyword(), department);
+
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // 현재 사용하는 급여 정보 조회 (검색 기능 추가)
     public PageResult<Salary> searchUsingSalaries(PageRequest pageRequest, String department, YearMonth yearMonth) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
+        // 검색 결과 데이터
         List<Salary> salaries = salaryDAO.searchUsingSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, yearMonth);
-        int total = salaryDAO.count(pageRequest.getKeyword());
+        // 검색 결과 총 개수
+        int total = salaryDAO.countUsingSalaries(pageRequest.getKeyword(), department, yearMonth);
+
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 

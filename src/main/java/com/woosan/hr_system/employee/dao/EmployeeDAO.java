@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.dao;
 
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.search.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import java.util.Map;
 
 @Slf4j
 @Repository
-public class EmployeeDAO implements SearchService<Employee> {
+public class EmployeeDAO {
 
     @Autowired
     private SqlSession sqlSession;
@@ -68,17 +67,21 @@ public class EmployeeDAO implements SearchService<Employee> {
     // 사원 정보 삭제 - 퇴사 후 12개월 지난 사원 정보
     public void deleteEmployee(String employeeId) { sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId); }
 
-    @Override // 검색과 페이징 로직
-    public List<Employee> search(String keyword, int pageSize, int offset) {
+    // 모든 사원 정보 - 검색어와 부서에 해당하는 데이터 결과 조회
+    public List<Employee> searchEmployees(String keyword, int pageSize, int offset, String department) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
-        return sqlSession.selectList(NAMESPACE + "search", params);
+        params.put("department", department);
+        return sqlSession.selectList(NAMESPACE + "searchEmployees", params);
     }
 
-    @Override // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int count(String keyword) {
-        return sqlSession.selectOne(NAMESPACE + "count", keyword);
+    // 모든 사원 정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회
+    public int countEmployees(String keyword, String department) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("department", department);
+        return sqlSession.selectOne(NAMESPACE + "countEmployees", params);
     }
 }
