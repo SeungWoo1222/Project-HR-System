@@ -56,7 +56,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="request : ${requests}">
+            <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
+                th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
                 <td>
                     <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
                        th:onclick="openModal('/report/' + this.getAttribute('reportId'))">조회</a>

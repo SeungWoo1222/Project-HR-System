@@ -17,10 +17,6 @@
         $(document).ready(function () {
             $('#editButton').on('click', function () {
                 $('#departmentIdContainer').show();
-                $('#selectAllContainer').show();
-                $('#idContainer').show();
-                $('#selectedEmployeesLabel').show();
-
                 initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
             });
         });
@@ -46,28 +42,27 @@
                 <label for="departmentId">부서 선택:</label>
                 <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
                     <option value="" disabled selected>부서를 선택하세요</option>
-                    <option value="PR">생산</option>
-                    <option value="QC">품질 관리</option>
-                    <option value="SA">영업</option>
-                    <option value="MK">마케팅</option>
-                    <option value="FI">재무</option>
-                    <option value="HR">인사</option>
-                    <option value="RD">연구개발</option>
+                    <option value="PR">생산(PR)</option>
+                    <option value="QC">품질 관리(QC)</option>
+                    <option value="SA">영업(SA)</option>
+                    <option value="MK">마케팅(MK)</option>
+                    <option value="FI">재무(FI)</option>
+                    <option value="HR">인사(HR)</option>
+                    <option value="RD">연구개발(RD)</option>
                 </select>
             </div>
 
-            <div id="selectAllContainer" style="display: none;">
-                <label>
-                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
-                </label>
-            </div>
+            <div id="employeeSection" style="display:none;">
+                <label for="idContainer">임원 리스트</label>
+                <button id="selectAllEmployeesButton" type="button">전체 선택</button>
 
-            <div id="idContainer" style="display: none;">
-                <!-- 직원 목록이 여기에 추가됩니다. -->
-            </div>
+                <div id="idContainer">
+                    <!-- 직원 목록이 여기에 추가됩니다. -->
+                </div>
 
-            <div>
-                <label id="selectedEmployeesLabel" style="display: none;">작성자 리스트</label>
+                <p>선택된 작성자</p>
+                <button id="deselectAllEmployeesButton" type="button">전체 해제</button>
+
                 <div id="selectedEmployees" class="selected-employees"></div>
             </div>
 

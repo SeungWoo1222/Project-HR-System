@@ -1,36 +1,67 @@
 //========================================결재 상태 변경 =================================================================
 
-// 결재 상태 변경 시 "거절"을 선택한 경우 거절사유를 적는 칸이 생김
-function toggleRejectionReason() {
-    var status = document.getElementById("status").value;
-    var rejectionReasonContainer = document.getElementById("rejectionReasonContainer");
-    if (status === "거절") {
+// 결재 상태 변경 시 "거절"을 선택한 경우 거절 사유를 적는 칸이 생김
+function toggleRejectionReason(status, rejectReason) {
+
+    const selectElement = document.getElementById(status);
+    const rejectionReasonContainer = document.getElementById(rejectReason);
+
+    console.log(selectElement);
+    console.log(rejectionReasonContainer);
+
+    // 요소가 존재하지 않으면 오류 메시지 출력
+    if (!selectElement || !rejectionReasonContainer) {
+        console.error("요소를 찾을 수 없습니다. 사용된 ID를 확인하세요.");
+        return;
+    }
+
+    // "거절"을 선택했을 때 거절 사유 입력란 표시
+    if (selectElement.value === "거절") {
         rejectionReasonContainer.style.display = "block";
-        rejectionReason.setAttribute("required", "required");
+        rejectionReasonContainer.querySelector('textarea').setAttribute("required", "required");
     } else {
         rejectionReasonContainer.style.display = "none";
-        rejectionReason.removeAttribute("required");
+        rejectionReasonContainer.querySelector('textarea').removeAttribute("required");
     }
 }
+
+//
+function toggleApprovalSection(formId) {
+    var approvalForm = document.getElementById(formId);
+    approvalForm.style.display = approvalForm.style.display === 'none' ? 'block' : 'none';
+}
+
 
 //========================================결재 상태 변경 =================================================================
 
 //========================================== 임원 선택 ==================================================================
-selectedEmployees = {}; // 선택된 임원들 목록 초기화 - 다른 부서 임원을 고르기 위한 변수
 
-//  부서 선택, 임원 전체선택 메소드 정의
+// 부서 선택 및 전체 선택 이벤트 리스너 초기화
 function initEventListeners() {
     const departmentSelect = document.getElementById('departmentId');
-    const selectAllCheckbox = document.getElementById('selectAllEmployeesCheckbox');
+    const selectAllButton = document.getElementById('selectAllEmployeesButton'); // 전체 선택 버튼
+    const deselectAllButton = document.getElementById('deselectAllEmployeesButton'); // 전체 해제 버튼
 
     departmentSelect.addEventListener('change', loadEmployeesByDepartment);
-    selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
-
+    if (selectAllButton) {
+        selectAllButton.addEventListener('click', selectAllEmployees); // 전체 선택 이벤트 리스너
+    }
+    if (deselectAllButton) {
+        deselectAllButton.addEventListener('click', deselectAllEmployees); // 전체 해제 이벤트 리스너
+    }
 }
 
 // 선택된 부서에 맞는 임원들 리스트를 반환해줌
 function loadEmployeesByDepartment() {
     const departmentId = document.getElementById('departmentId').value;
+
+    // 부서 선택 시 employeeSection을 보여줌
+    const employeeSection = document.getElementById('employeeSection');
+    if (departmentId) {
+        employeeSection.style.display = 'block';
+    } else {
+        employeeSection.style.display = 'none';
+    }
 
     fetch(`/api/employee/department/list/` + departmentId)
         .then(response => {
@@ -40,84 +71,85 @@ function loadEmployeesByDepartment() {
             return response.json();
         })
         .then(employeeList => {
-            const idContainer = document.getElementById('idContainer');
-            idContainer.innerHTML = '';
+            const availableContainer = document.getElementById('idContainer');
+            availableContainer.innerHTML = '';
 
             employeeList.forEach(employee => {
-                    const checkboxContainer = document.createElement('div');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'idCheckbox';
-                    // checkbox.name = 'id';
-                    checkbox.value = employee.employeeId;
-                    checkbox.dataset.name = employee.name;
-
-                    // 이미 선택된 임원들은 체크 상태 유지
-                    if (selectedEmployees[employee.employeeId]) {
-                        checkbox.checked = true;
-                    }
-
-                    checkbox.addEventListener('change', updateSelectedEmployees);
-
-                    const nameInput = document.createElement('input');
-                    nameInput.type = 'hidden';
-                    nameInput.className = 'nameInput';
-                    // nameInput.name = 'name';
-                    nameInput.value = employee.name;
-
-                    const label = document.createElement('label');
-                    label.textContent = employee.name;
-
-                    checkboxContainer.appendChild(checkbox);
-                    checkboxContainer.appendChild(label);
-                    checkboxContainer.appendChild(nameInput);
-                    idContainer.appendChild(checkboxContainer);
+                if (!selectedEmployees[employee.employeeId]) {
+                    const employeeItem = createEmployeeItem(employee.employeeId, employee.name, false);
+                    availableContainer.appendChild(employeeItem);
+                }
             });
-
-            // 임원 전체선택 체크박스를 보여줌
-            const selectAllContainer = document.getElementById('selectAllContainer');
-            if (selectAllContainer) {
-                selectAllContainer.style.display = 'block';
-            }
         })
         .catch(error => console.error('데이터를 읽어 올 수 없음', error));
 }
 
-// 임원 전체 선택
-function toggleSelectAllEmployees() {
-    const checkboxes = document.querySelectorAll('#idContainer input[type="checkbox"]');
-    const isChecked = document.getElementById('selectAllEmployeesCheckbox').checked;
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = isChecked;
-        checkbox.dispatchEvent(new Event('change'));
-    });
+// 임원 리스트 아이템 생성
+function createEmployeeItem(employeeId, employeeName, isSelected) {
+    const div = document.createElement('div');
+    div.className = 'employee-item';
+    div.textContent = employeeName;
+
+    const actionButton = document.createElement('button');
+    actionButton.dataset.id = employeeId; // 버튼에 data-id 속성을 추가
+    if (isSelected) {
+        actionButton.textContent = '해제';
+        actionButton.addEventListener('click', () => {
+            delete selectedEmployees[employeeId];
+            updateSelectedEmployees();
+        });
+    } else {
+        actionButton.textContent = '선택';
+        actionButton.addEventListener('click', () => {
+            selectedEmployees[employeeId] = employeeName;
+            updateSelectedEmployees();
+        });
+    }
+
+    div.appendChild(actionButton);
+    return div;
 }
 
-// 선택된 임원을 나열함
+// 선택된 임원들을 나열함
 function updateSelectedEmployees() {
     const selectedEmployeesContainer = document.getElementById('selectedEmployees');
+    const availableContainer = document.getElementById('idContainer');
+
     selectedEmployeesContainer.innerHTML = '';
+    availableContainer.innerHTML = '';
 
-    const selectedCheckboxes = document.querySelectorAll('#idContainer input[type="checkbox"]:checked');
-    selectedCheckboxes.forEach(checkbox => {
-        selectedEmployees[checkbox.value] = checkbox.dataset.name;
-    });
-
-    // 선택된 임원들을 다시 나열
+    // 선택된 임원 목록을 먼저 갱신
     Object.keys(selectedEmployees).forEach(id => {
-        const div = document.createElement('div');
-        div.className = 'selected-employee';
-        div.textContent = selectedEmployees[id];
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'x';
-        removeButton.addEventListener('click', () => {
-            delete selectedEmployees[id];
-            document.querySelector(`#idContainer input[value="${id}"]`).checked = false;
-            updateSelectedEmployees(); // 선택된 임원 목록 갱신
-        });
-        div.appendChild(removeButton);
-        selectedEmployeesContainer.appendChild(div);
+        const employeeItem = createEmployeeItem(id, selectedEmployees[id], true);
+        selectedEmployeesContainer.appendChild(employeeItem);
     });
+
+    // 임원 리스트를 갱신하여 중복 없이 남은 임원만 다시 나열
+    loadEmployeesByDepartment();
+}
+
+// 전체 선택 기능
+function selectAllEmployees() {
+    const employeeItems = document.querySelectorAll('#idContainer .employee-item'); // 임원 목록을 가져옴
+
+    employeeItems.forEach(item => {
+        const button = item.querySelector('button');
+        const employeeId = button.dataset.id; // 버튼에 설정된 data-id 속성값을 가져옴
+        const employeeName = item.textContent.replace('선택', '').trim();
+
+        // 이미 선택된 임원이 아니라면 선택된 목록에 추가
+        if (!selectedEmployees[employeeId]) {
+            selectedEmployees[employeeId] = employeeName;
+        }
+    });
+
+    updateSelectedEmployees();
+}
+
+// 전체 해제
+function deselectAllEmployees() {
+    selectedEmployees = {}; // 선택된 임원들 초기화
+    updateSelectedEmployees();
 }
 
 //=================================================== 임원 선택 =========================================================
@@ -231,6 +263,18 @@ function submitReport(event, url, redirectUrl) {
             }
         });
     }
-
-
 //========================================== 통계 관련 메소드 =================================================================
+//========================================== 날짜 설정 메소드 =================================================================
+function validateDateRange() {
+    console.log("날짜 유효성 검사 완료");
+    const startDate = document.getElementById('start').value;
+    const endDate = document.getElementById('end').value;
+
+    if (startDate && endDate && startDate > endDate) {
+        alert('시작 월은 종료 월보다 늦을 수 없습니다.');
+        return false; // 폼 제출을 막음
+    }
+
+    return true; // 폼 제출 허용
+}
+//========================================== 날짜 설정 메소드 =================================================================

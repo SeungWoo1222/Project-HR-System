@@ -16,11 +16,11 @@
 
 <div>
     <h1>결재 할 보고서 날짜 범위 설정</h1>
-    <form action="#" th:action="@{/admin/request/approvalDate}" method="get">
-        <label for="approvalStart">시작 월:</label>
-        <input type="month" id="approvalStart" name="approvalStart" required>
-        <label for="approvalEnd">종료 월:</label>
-        <input type="month" id="approvalEnd" name="approvalEnd" required>
+    <form action="#" th:action="@{/admin/request/approvalDate}" method="get" onsubmit="return validateDateRange()" >
+        <label for="start">시작 월:</label>
+        <input type="month" id="start" name="approvalStart" required>
+        <label for="end">종료 월:</label>
+        <input type="month" id="end" name="approvalEnd" required>
         <button type="submit">조회</button>
     </form>
 </div>
