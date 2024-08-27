@@ -17,7 +17,7 @@ public class EmployeeAdminApiController {
 
     // 재직 상태 수정하는 메소드
     @RequireHRPermission
-    @PatchMapping("/update/status/{employeeId}")
+    @PatchMapping("/{employeeId}/status")
     public ResponseEntity<String> updateEmployeeStatus(@PathVariable("employeeId") String employeeId,
                                                        @RequestParam("status") String status) {
         return ResponseEntity.ok(employeeService.updateStatus(employeeId, status));
@@ -25,14 +25,14 @@ public class EmployeeAdminApiController {
 
     // 사원 승진 처리하는 메소드
     @RequireHRPermission
-    @PatchMapping("/promote/{employeeId}")
+    @PatchMapping("/{employeeId}/promote")
     public ResponseEntity<String> promoteEmployee(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(employeeService.promoteEmployee(employeeId));
     }
 
     // 사원 영구 삭제
     @RequireHRPermission
-    @DeleteMapping("/delete/{employeeId}")
+    @DeleteMapping("/{employeeId}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(employeeService.deleteEmployee(employeeId));
     }

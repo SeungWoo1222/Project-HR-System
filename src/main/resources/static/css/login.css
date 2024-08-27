@@ -63,5 +63,47 @@ form {
     font-size: large;
 }
 
+/* remember-me style */
+.custom-checkbox {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 2px solid #18A8F1;
+    border-radius: 12px;
+    margin-right: 3px;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+}
+
+.custom-checkbox::after {
+    content: '';
+    width: 5px;
+    height: 10px;
+    border: solid #18A8F1;
+    border-width: 0 3px 3px 0;
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.remember-me input[type="checkbox"]:checked + .custom-checkbox::after {
+    opacity: 1;
+}
+
+.remember-me label {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox:hover {
+    background-color: #f0f0f0;
+}
 
 

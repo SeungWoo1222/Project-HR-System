@@ -21,8 +21,7 @@
 
 <div layout:fragment="~{content}">
   <div class="content">
-    <h2>사원 등록</h2>
-    <form th:action="@{/api/employee/registration}" onsubmit="submitInsertForm(event)" enctype="multipart/form-data">
+    <form th:action="@{/api/employee/register}" onsubmit="submitInsertForm(event)" enctype="multipart/form-data">
       <div class="form-group">
         <img id="employee-picture" class="employee-picture"/><br>
         <p>사진은 10MB까지 업로드 가능합니다.</p>
@@ -32,7 +31,7 @@
       </div>
       <div class="form-group">
         <label for="name">이름</label>
-        <input type="text" id="name" name="name">
+        <input type="text" id="name" name="name" maxlength="100">
       </div>
       <div class="form-group">
         <label for="birth">생년월일 (주민번호 앞자리)</label>
@@ -74,6 +73,19 @@
         <input type="text" id="detailAddressInput" name="detailAddressInput">
         <input type="text" id="extraAddress" placeholder="참고항목" readonly>
         <input type="hidden" id="detailAddress" name="detailAddress">
+      </div>
+      <div class="form-group">
+        <label>결혼 여부</label>
+        <input type="radio" id="marriedYes" name="maritalStatus" value="1" onchange="updateDependents()"> 기혼
+        <input type="radio" id="marriedNo" name="maritalStatus" value="0" onchange="updateDependents()"> 미혼
+      </div>
+      <div class="form-group">
+        <label for="numDependents">부양 가족 수</label> <span>(본인 포함)</span>
+        <input type="number" id="numDependents" name="numDependents" min="1" max="11" value="1">
+      </div>
+      <div class="form-group">
+        <label for="numChildren">8세 이상 20세 이하 자녀 수</label>
+        <input type="number" id="numChildren" name="numChildren" min="0" max="11" value="0">
       </div>
       <div class="form-group">
         <label for="department">부서</label>

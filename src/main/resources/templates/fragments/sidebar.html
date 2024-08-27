@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <script th:src="@{/js/layout.js}"></script>
@@ -11,24 +11,32 @@
     </ul>
 
     <div class="section-sidebar">
-        <p onclick="toggleMenu('attendance-section')">출퇴근 및 방문</p>
+        <p class="sidebar-category" onclick="toggleMenu('attendance-section')">출퇴근 및 방문</p>
         <ul id="attendance-section">
-            <li><a th:href="@{/attendance}"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 출퇴근</a>
+            <li>
+                <a th:href="@{/attendance}"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 출퇴근</a>
             </li>
-            <li><a th:href="@{/schedule}"><img src="/images/icons/location.png" alt="Schedule" width="20"> 방문 일정</a>
+            <li>
+                <a th:href="@{/schedule}"><img src="/images/icons/location.png" alt="Schedule" width="20"> 방문 일정</a>
             </li>
-            <li><a th:href="@{/leave}"><img src="/images/icons/leave.png" alt="Leave" width="20"> 휴가</a></li>
-            <li><a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a></li>
+            <li>
+                <a th:href="@{/leave}"><img src="/images/icons/leave.png" alt="Leave" width="20"> 휴가</a>
+            </li>
+            <li>
+                <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
+            </li>
         </ul>
     </div>
 
     <div class="section-sidebar">
-        <p onclick="toggleMenu('communication-section')">커뮤니케이션</p>
+        <p class="sidebar-category" onclick="toggleMenu('communication-section')">커뮤니케이션</p>
         <ul id="communication-section">
             <li><a th:href="@{/announcement}"><img src="/images/icons/announcement.png" alt="Announcement" width="20">
                 공지 및 설문</a></li>
-            <li><a th:href="@{/report/main}"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</a>
-                <ul class="submenu">
+            <li>
+                <p onclick="toggleSubmenu('report-submenu')"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</p>
+                <ul id="report-submenu" class="submenu">
+                    <li><a th:href="@{/report/main}">- 내 보고서 관리(임시)</a></li>
                     <li><a th:href="@{/report/showCreatePage}">- 보고서 작성</a></li>
                     <li><a th:href="@{/report/list}">- 작성한 보고서 조회</a></li>
                     <li><a th:href="@{/report/requestList}">- 작성 요청 조회</a></li>
@@ -47,21 +55,30 @@
     </div>
 
     <div class="section-sidebar">
-        <p onclick="toggleMenu('department-section')">부서</p>
+        <p class="sidebar-category" onclick="toggleMenu('department-section')">부서</p>
         <ul id="department-section" sec:authorize="isAuthenticated()">
             <!-- HR 부서 -->
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}"><img
-                    src="/images/icons/employee-management.png" alt="" width="20"> 사원 관리</a>
-                <ul class="submenu">
-                    <li><a th:href="@{/employee/list}">- 사원 조회</a></li>
-                    <li><a th:href="@{/employee/registration}">- 사원 등록 </a></li>
-                    <li><a th:href="@{/employee/resignation}">- 퇴사 관리</a></li>
+            <li sec:authorize="principal.department == 'HR'">
+                <p onclick="toggleSubmenu('employee-management-submenu')"><img src="/images/icons/employee-management.png" alt="" width="20"> 사원 관리</p>
+                <ul id="employee-management-submenu" class="submenu">
+                    <li><a th:href="@{/employee/list}">- 사원 목록</a></li>
+                    <li><a th:href="@{/employee/register}">- 사원 등록 </a></li>
+                    <li><a th:href="@{/resignation/management}">- 퇴사 사원 관리</a></li>
                 </ul>
             </li>
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img
-                    src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</a></li>
-            <li sec:authorize="principal.department == 'HR'"><a th:href="@{/employee/}"><img
-                    src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 보상 및 복리후생</a></li>
+            <li sec:authorize="principal.department == 'HR'">
+                <a th:href="@{/employee/}"><img src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</a>
+            </li>
+            <li sec:authorize="principal.department == 'HR'">
+                <p onclick="toggleSubmenu('compensation-and-benefits-submenu')"><img src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 급여 관리</a></p>
+                <ul id="compensation-and-benefits-submenu" class="submenu">
+                    <li><a th:href="@{/salary/list}">- 급여정보 목록</a></li>
+                    <li><a th:href="@{/salary/register}">- 급여정보 등록</a></li>
+                    <li><a th:href="@{/salary/payment}">- 급여 지급 내역</a></li>
+                    <li><a th:href="@{/salary/payment/list}">- 급여명세서 목록</a></li>
+                    <li><a th:href="@{/salary/payment/ratio}">- 급여 및 공제 비율</a></li>
+                </ul>
+            </li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img
                     src="/images/icons/performance-management.png" alt="" width="20"> 성과 관리</a></li>
             <li sec:authorize="principal.department == 'HR'"><a th:href="@{#}" class="disabled"><img
@@ -83,13 +100,14 @@
     </div>
 
     <div class="section-sidebar">
-        <p onclick="toggleMenu('management-section')">관리</p>
+        <p class="sidebar-category" onclick="toggleMenu('management-section')">관리</p>
         <ul id="management-section">
-            <li><a th:href="@{#}"><img src="/images/icons/myinfo.png" alt="MyInfo" width="20"> 내 정보</a>
-                <ul class="submenu">
+            <li>
+                <p onclick="toggleSubmenu('myinfo-submenu')"><img src="/images/icons/myinfo.png" alt="MyInfo" width="20" >내 정보</p>
+                <ul id="myinfo-submenu" class="submenu">
                     <li><a th:href="@{/common/myInfo}">- 내 정보 관리</a></li>
                     <li><a th:href="@{/auth/pwd-management}">- 비밀번호 관리</a></li>
-                    <li><a th:href="@{/salary/detail}">- 급여명세서</a></li>
+                    <li><a th:href="@{/salary/payment/myPayslips}">- 내 급여 관리</a></li>
                 </ul>
             </li>
             <li><a th:href="@{/members}"><img src="/images/icons/members.png" alt="Members" width="20"> 구성원</a></li>

@@ -12,23 +12,20 @@ public interface EmployeeService {
     Employee getEmployeeById(String employeeId);
     String getEmployeeNameById(String employeeId);
     Employee getEmployeeDetails(String employeeId);
-    PageResult<Employee> searchEmployees(PageRequest pageRequest);
+    PageResult<Employee> searchEmployees(PageRequest pageRequest, String department);
     List<Employee> getPreResignationEmployees();
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
     List<Employee> getEmployeesByDepartment(String departmentId);
 
     // == 등록 ==
-    String insertEmployee(Employee employee);
+    String insertEmployee(Employee employee, MultipartFile picture);
 
     // == 수정 ==
-    String updateEmployee(Employee employee);
+    String updateEmployee(Employee employee, MultipartFile picture);
     String updateStatus(String employeeId, String status);
     String promoteEmployee(String employeeId);
 
     // == 삭제 ==
     String deleteEmployee(String employeeId);
-
-    // == 기타 ==
-    void assignPictureFromUpload(Employee employee, MultipartFile file);
 }
