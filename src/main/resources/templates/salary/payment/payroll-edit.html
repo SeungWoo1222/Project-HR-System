@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<style>
+    #payroll-edit-form table input {
+        width: 90%;
+        text-align: center;
+    }
+</style>
+
+<form id="payroll-edit-form" th:action="@{/api/salary/payment/payroll}" onsubmit="submitUpdateForm(event)">
+    <h3>급여 비율 수정</h3>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>기본급</th>
+            <th>직책 수당</th>
+            <th>식대</th>
+            <th>교통비</th>
+            <th>개인 성과급</th>
+            <th>팀 성과급</th>
+            <th>명절 보너스</th>
+            <th>연말 보너스</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><input type="text" name="baseSalaryRatio" th:value="${payrollRatios.baseSalaryRatio}"/></td>
+            <td><input type="text" name="positionAllowanceRatio" th:value="${payrollRatios.positionAllowanceRatio}"/></td>
+            <td><input type="text" name="mealAllowanceRatio" th:value="${payrollRatios.mealAllowanceRatio}"/></td>
+            <td><input type="text" name="transportAllowanceRatio" th:value="${payrollRatios.transportAllowanceRatio}"/></td>
+            <td><input type="text" name="personalBonusRatio" th:value="${payrollRatios.personalBonusRatio}"/></td>
+            <td><input type="text" name="teamBonusRatio" th:value="${payrollRatios.teamBonusRatio}"/></td>
+            <td><input type="text" name="holidayBonusRatio" th:value="${payrollRatios.holidayBonusRatio}"/></td>
+            <td><input type="text" name="yearEndBonusRatio" th:value="${payrollRatios.yearEndBonusRatio}"/></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="btn-section">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" id="edit-payroll-ratio" class="btn">수정 완료</button>
+    </div>
+</form>
+</html>
+     

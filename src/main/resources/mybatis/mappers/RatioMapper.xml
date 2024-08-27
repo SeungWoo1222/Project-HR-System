@@ -37,13 +37,13 @@
     </select>
 
     <!-- 급여 비율 수정 -->
-    <update id="updatePayrollRatios" parameterType="Map">
+    <update id="updatePayrollRatios" parameterType="com.woosan.hr_system.salary.model.PayrollDetails">
         UPDATE payroll_ratios
         SET
             base_salary_ratio = #{baseSalaryRatio},
             position_allowance_ratio = #{positionAllowanceRatio},
-            meal_allowance_ratio = #{mealAllowance},
-            transport_allowance_ratio = #{transportAllowance},
+            meal_allowance_ratio = #{mealAllowanceRatio},
+            transport_allowance_ratio = #{transportAllowanceRatio},
             personal_bonus_ratio = #{personalBonusRatio},
             team_bonus_ratio = #{teamBonusRatio},
             holiday_bonus_ratio = #{holidayBonusRatio},
@@ -62,7 +62,7 @@
     </select>
 
     <!-- 공제 비율 수정 -->
-    <update id="updateDeductionRatios" parameterType="Map">
+    <update id="updateDeductionRatios" parameterType="com.woosan.hr_system.salary.model.DeductionDetails">
         UPDATE deduction_ratios
         SET
             local_income_tax_rate = #{localIncomeTaxRate},
@@ -72,7 +72,7 @@
             employment_insurance_rate = #{employmentInsuranceRate}
     </update>
 
-    <!--    -->
+    <!-- 소득세 조회 -->
     <select id="selectIncomeTax" parameterType="map" resultType="int">
         SELECT
             <choose>

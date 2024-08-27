@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder(toBuilder = true)
 public class DeductionDetails {
     private int taxableSalary;              // 비과세 미포함 월급
-    private int incomeTax;                  // 근로소득세 (소득세율표에 따라 설정) (1인 가구 기준, 공제율 100%)
+    private int incomeTax;                  // 근로소득세 (소득세율표에 따라 설정) (공제율 100%)
     private double localIncomeTaxRate;      // 지방소득세율 (소득세의 10%)
     private double nationalPensionRate;     // 국민연금 비율 (4.5%)
     private double healthInsuranceRate;     // 건강보험 비율 (3.545%)

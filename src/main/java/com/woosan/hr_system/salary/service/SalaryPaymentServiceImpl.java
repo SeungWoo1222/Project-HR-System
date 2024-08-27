@@ -4,8 +4,11 @@ import com.woosan.hr_system.auth.aspect.LogAfterExecution;
 import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.dao.SalaryDAO;
 import com.woosan.hr_system.salary.dao.SalaryPaymentDAO;
+import com.woosan.hr_system.salary.model.DeductionDetails;
+import com.woosan.hr_system.salary.model.PayrollDetails;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.search.PageRequest;
@@ -35,6 +38,8 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     private SalaryPaymentDAO salaryPaymentDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
+    @Autowired
+    private RatioDAO ratioDAO;
 
     @Override // 지급 ID를 이용한 특정 사원의 급여명세서 조회
     public SalaryPayment getPaymentById(int paymentId) {
@@ -200,7 +205,6 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     // Salary의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
     private void checkForPaymentChanges(SalaryPayment original, SalaryPayment updated) {
         if (updated.getRemarks().trim().isEmpty()) updated.setRemarks(null);
-        log.debug("remark: {}", updated.getRemarks());
 
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "baseSalary", "positionAllowance", "mealAllowance", "transportAllowance",
@@ -238,5 +242,40 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
                         id -> id,
                         paidSalaryIds::contains
                 ));
+    }
+
+    @LogBeforeExecution
+    @LogAfterExecution
+    @Override // 급여 비율 수정
+    public String updatePayrollRatios(PayrollDetails payrollRatios) {
+        // 변경사항 확인
+        checkForPayrollDetailsChanges(ratioDAO.selectPayrollRatios(), payrollRatios);
+        ratioDAO.updatePayrollRatios(payrollRatios);
+        return "급여 비율이 수정되었습니다.";
+    }
+    // PayrollDetails의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
+    private void checkForPayrollDetailsChanges(PayrollDetails original, PayrollDetails updated) {
+        Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
+                "baseSalaryRatio", "positionAllowanceRatio", "mealAllowanceRatio", "transportAllowanceRatio",
+                "personalBonusRatio", "teamBonusRatio", "holidayBonusRatio", "yearEndBonusRatio"
+        ));
+        commonService.processFieldChanges(original, updated, fieldsToCompare);
+    }
+
+    @LogBeforeExecution
+    @LogAfterExecution
+    @Override // 공제 비율 수정
+    public String updateDeductionRatios(DeductionDetails deductionRatios) {
+        // 변경사항 확인
+        checkForDeductionDetailsChanges(ratioDAO.selectDeductionRatios(), deductionRatios);
+        ratioDAO.updateDeductionRatios(deductionRatios);
+        return "공제 비율이 수정되었습니다.";
+    }
+    // DeductionDetails의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
+    private void checkForDeductionDetailsChanges(DeductionDetails original, DeductionDetails updated) {
+        Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
+                "localIncomeTaxRate", "nationalPensionRate", "healthInsuranceRate", "longTermCareRate", "employmentInsuranceRate"
+        ));
+        commonService.processFieldChanges(original, updated, fieldsToCompare);
     }
 }

@@ -3,6 +3,7 @@ package com.woosan.hr_system.salary.controller.view;
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.salary.service.SalaryPaymentService;
@@ -31,6 +32,8 @@ public class SalaryPaymentViewController {
     private SalaryService salaryService;
     @Autowired
     private SalaryPaymentService salaryPaymentService;
+    @Autowired
+    private RatioDAO ratioDAO;
 
     @RequireHRPermission
     @GetMapping()// 급여 지급 페이지 이동
@@ -87,6 +90,7 @@ public class SalaryPaymentViewController {
         return "salary/payment/pay-complete";
     }
 
+    @RequireHRPermission
     @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 페이지 이동
     public String viewPayslip(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회
@@ -103,6 +107,7 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslip-modal";
     }
 
+    @RequireHRPermission
     @GetMapping("/{paymentId}/print") // 특정 사원의 급여 지급 내역 출력 및 pdf 변환 페이지 이동
     public String viewPayslipPrint(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회
@@ -136,6 +141,7 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslip-edit";
     }
 
+    @RequireHRPermission
     @GetMapping("/employee/{employeeId}") // 특정 사원의 모든 급여 지급 내역 조회
     public String viewPayslipsByEmployeeId(@PathVariable String employeeId, Model model) {
         List<SalaryPayment> payslips = salaryPaymentService.getPaymentsByEmployeeId(employeeId);
@@ -160,5 +166,27 @@ public class SalaryPaymentViewController {
         model.addAttribute("keyword", keyword);
 
         return "salary/payment/list";
+    }
+
+    @RequireHRPermission
+    @GetMapping("/ratio") // 급여 및 공제 비율 조회
+    public String viewRatio(Model model) {
+        model.addAttribute("payrollRatios", ratioDAO.selectPayrollRatios());
+        model.addAttribute("deductionRatios", ratioDAO.selectDeductionRatios());
+        return "salary/payment/ratio";
+    }
+
+    @RequireHRPermission
+    @GetMapping("/payroll/edit") // 급여 비율 수정 페이지 이동
+    public String viewPayrollRatioEditForm(Model model) {
+        model.addAttribute("payrollRatios", ratioDAO.selectPayrollRatios());
+        return "salary/payment/payroll-edit";
+    }
+
+    @RequireHRPermission
+    @GetMapping("/deduction/edit") // 공제 비율 수정 페이지 이동
+    public String viewDeductionRatioEditForm(Model model) {
+        model.addAttribute("deductionRatios", ratioDAO.selectDeductionRatios());
+        return "salary/payment/deduction-edit";
     }
 }

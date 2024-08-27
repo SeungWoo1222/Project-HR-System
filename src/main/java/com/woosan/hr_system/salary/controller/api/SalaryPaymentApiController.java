@@ -2,6 +2,8 @@ package com.woosan.hr_system.salary.controller.api;
 
 import com.woosan.hr_system.auth.aspect.RequireHRPermission;
 import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
+import com.woosan.hr_system.salary.model.DeductionDetails;
+import com.woosan.hr_system.salary.model.PayrollDetails;
 import com.woosan.hr_system.salary.model.SalaryPayment;
 import com.woosan.hr_system.salary.service.SalaryPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +41,19 @@ public class SalaryPaymentApiController {
     @DeleteMapping("/{paymentId}") // 급여명세서 삭제
     ResponseEntity<String> deletePayment(@PathVariable("paymentId") int paymentId) {
         return ResponseEntity.ok(salaryPaymentService.removePayment(paymentId));
+    }
+
+    @RequireHRPermission
+    @RequireManagerPermission
+    @PutMapping("/payroll") // 급여 비율 수정
+    ResponseEntity<String> updatePayrollDetails(@ModelAttribute PayrollDetails payrollRatios) {
+        return ResponseEntity.ok(salaryPaymentService.updatePayrollRatios(payrollRatios));
+    }
+
+    @RequireHRPermission
+    @RequireManagerPermission
+    @PutMapping("/deduction") // 공제 비율 수정
+    ResponseEntity<String> updateDeductionDetails(@ModelAttribute DeductionDetails deductionRatios) {
+        return ResponseEntity.ok(salaryPaymentService.updateDeductionRatios(deductionRatios));
     }
 }
