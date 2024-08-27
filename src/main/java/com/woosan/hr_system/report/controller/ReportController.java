@@ -18,8 +18,6 @@ import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -99,9 +97,10 @@ public class ReportController {
     }
 
     // 보고서 생성
+    @ResponseBody
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createReport(@ModelAttribute Report report,
-                               @RequestParam(value="reportFiles", required=false) List<MultipartFile> reportDocuments) {
+    public ResponseEntity<String> createReport(@RequestPart(value="report") Report report,
+                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments) {
 
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -111,7 +110,7 @@ public class ReportController {
 
         if (reportDocuments == null || reportDocuments.isEmpty()) {
             reportService.createReport(report);
-        } else if (reportDocuments.size() > 1) {
+        } else {
             reportService.createReportWithFile(report, reportDocuments);
         }
         return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
@@ -127,11 +126,16 @@ public class ReportController {
         return "/report/write-from-request";
     }
 
-    @PostMapping("/writeFromRequest") // 요청 들어온 보고서 생성
+    // 요청 들어온 보고서 생성
+    @ResponseBody
+    @PostMapping(value = "/writeFromRequest", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> CreateReportFromRequest(
-                                          @ModelAttribute Report report,
-                                          @RequestParam(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                                          @RequestPart(value="report") Report report,
+                                          @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
                                           @RequestParam(value="requestId") int requestId) {
+        log.info("report : {}", report);
+        log.info("reportDocuments : {}", reportDocuments);
+        log.info("requestId : {}", requestId);
 
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         // 현재 로그인한 계정의 employeeId를 요청자(writer)로 설정
@@ -144,7 +148,7 @@ public class ReportController {
         if (reportDocuments == null || reportDocuments.isEmpty()) {
             int reportId = reportService.createReportFromRequest(report);
             requestService.updateReportId(requestId, reportId);
-        } else if (reportDocuments != null || !reportDocuments.isEmpty()) {
+        } else {
             int reportId = reportService.createReportFromRequestWithFile(report, reportDocuments);
             requestService.updateReportId(requestId, reportId);
         }
@@ -300,51 +304,36 @@ public class ReportController {
         return "report/edit";
     }
 
+    // 보고서 수정
     @Transactional
-    @PostMapping("/edit") // 보고서 수정
-    public String updateReport(@ModelAttribute Report report,
-                               @RequestParam(value = "reportFileList", required = false) List<MultipartFile> toUploadFileList,
-                               @RequestParam(value = "registeredFileIdList", required = false) List<String> registeredFileStringIdList) {
+    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
+    public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
+                               @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
+                               @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {
 
-        // List<String>을 List<Integer>로 변환
-        List<Integer> registeredFileIdList = new ArrayList<>();
-        if (registeredFileStringIdList != null) {
-            // JSON으로 변환된 문자열이 들어온 경우 이를 파싱
-            for (String fileIdString : registeredFileStringIdList) {
-                String parsedString = fileIdString.replaceAll("\\[", "").replaceAll("\\]", "")
-                        .replaceAll("\"", "").trim();
-                String[] fileIdArray = parsedString.split(",");
-                for (String fileId : fileIdArray) {
-                    registeredFileIdList.add(Integer.parseInt(fileId.trim()));
-                }
-            }
-        }
-
-        // 업로드된 파일이 없다면 기존의 파일 삭제
-        if (toUploadFileList == null || toUploadFileList.isEmpty()) {
-            for (int fileId : registeredFileIdList) {
-                reportFileService.deleteReportFile(report.getReportId(), fileId);
-            }
-        }
+        log.info("컨트롤러 - userSelectedFileIdList : {}", userSelectedFileIdList);
+        log.info("컨트롤러 - toUploadFileList : {}", toUploadFileList);
 
         // 요청 수정 권한이 있는지 확인
         UserSessionInfo userSessionInfo = new UserSessionInfo();
 
         // 현재 로그인한 사용자와 requester_id 비교
         if (report != null && report.getWriterId().equals(userSessionInfo.getCurrentEmployeeId())) {
-            reportService.updateReport(report, toUploadFileList, registeredFileIdList);
+            reportService.updateReport(report, toUploadFileList, userSelectedFileIdList);
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
-        return "report/report-list";
+        return ResponseEntity.ok("보고서 수정이 완료되었습니다.");
     }
 
 //=================================================수정 메소드============================================================
 //=================================================삭제 메소드============================================================
 
     // 보고서 삭제
+    @Transactional
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
+        log.info("컨트롤러 reportId : {}", reportId);
         // 보고서 삭제 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();

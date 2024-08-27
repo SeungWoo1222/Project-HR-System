@@ -42,14 +42,23 @@
     <!-- 요청 세부 조회 -->
     <select id="getRequestById" parameterType="int" resultType="com.woosan.hr_system.report.model.Request">
         SELECT request_id   AS requestId,
+               e.name AS requesterName,
                writer_id AS writerId,
                writer_name  AS writerName,
                due_date     AS dueDate,
                request_note AS requestNote,
                request_date AS requestDate,
                requester_id AS requesterId -- 요청 삭제 시 로그인한 id와 requesterId가 일치하는 지(삭제권한) 확인 용
-        FROM report_requests
+        FROM report_requests JOIN employees e ON (requester_id = e.employee_id)
         WHERE request_id = #{requestId}
+    </select>
+
+    <!-- reportId로 요청 조회 -->
+    <select id="getRequestByReportId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM report_requests
+        WHERE report_id = #{reportId}
     </select>
 
     <!--(STAFF) - 나에게 온 최근 5개 요청 조회-->

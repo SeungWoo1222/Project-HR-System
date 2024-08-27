@@ -46,6 +46,11 @@ public class RequestDAO {
         return sqlSession.selectList(NAMESPACE + "getMyRequests", requesterId);
     }
 
+    // reportId로 요청 조회
+    public int getRequestByReportId(int reportId) {
+        return sqlSession.selectOne(NAMESPACE + "getRequestByReportId", reportId);
+    }
+
     // 내게 온 요청 조회
     public List<Request> getMyPendingRequests(String writerId) {
         log.info("DAO writerId {}", writerId);

@@ -21,6 +21,8 @@ public interface RequestService {
     List<Request> getMyRequests(String requesterId);
     // 보고서 결재 처리
     void updateApprovalStatus(int reportId, String status, String rejectionReasont);
+    // reportId로 요청 조회
+    int getRequestByReportId(int reportId);
     // 요청 수정
     void updateRequest(Request request);
     // 요청 삭제

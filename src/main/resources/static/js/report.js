@@ -1,3 +1,5 @@
+// 전역변수
+selectedEmployees = {};
 //========================================결재 상태 변경 =================================================================
 
 // 결재 상태 변경 시 "거절"을 선택한 경우 거절 사유를 적는 칸이 생김
@@ -6,8 +8,6 @@ function toggleRejectionReason(status, rejectReason) {
     const selectElement = document.getElementById(status);
     const rejectionReasonContainer = document.getElementById(rejectReason);
 
-    console.log(selectElement);
-    console.log(rejectionReasonContainer);
 
     // 요소가 존재하지 않으면 오류 메시지 출력
     if (!selectElement || !rejectionReasonContainer) {
@@ -153,63 +153,62 @@ function deselectAllEmployees() {
 }
 
 //=================================================== 임원 선택 =========================================================
-//================================================= 파일 생성 관련 js ===================================================
-// 보고서 생성 시
-function submitReport(event, url, redirectUrl) {
-    event.preventDefault(); // 기본 폼 제출 방지
+//=================================================== 폼데이터 ==========================================================
+function validateReportForm(event) {
 
-    const form = document.getElementById('form');
-    const formData = new FormData(form); // 기존 폼 데이터 가져오기
+    event.preventDefault();
 
-    // filesArr에 저장된 파일들을 FormData에 추가
-    if (filesArr != null) {
-        filesArr.forEach((file, index) => {
-            if (!file.is_delete) { // 삭제된 파일 제외
-                formData.append('reportFiles', file);
-            }
-        });
-    }
-
-
+    let nameList;
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+    // 선택된 결재자를 nameList로 정의
     if (Object.keys(selectedEmployees).length > 0) {
-        const idList = Object.keys(selectedEmployees);
-        const nameList = Object.values(selectedEmployees);
-
-        // 숨겨진 필드에 값 설정
-        formData.set('idList', idList.join(','));
-        formData.set('nameList', nameList.join(','));
+        nameList = Object.values(selectedEmployees);
+    } else {
+    // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
+        nameList = document.getElementById('currentApproverName').value;
     }
 
-    // FormData의 모든 키-값 쌍을 출력합니다.
-    for (var pair of formData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
+    const completeDate = document.getElementById("completeDate").value;
+    const errorAlert = document.getElementById("error-alert");
+
+    if (errorAlert) {
+        errorAlert.textContent = "";
+    } else {
+        console.error("Error message element not found.");
     }
 
-
-    // AJAX를 사용하여 폼 데이터 전송
-    fetch(url, {  // 이 부분에서 '/report/write'로 전송
-        method: 'POST',
-        body: formData,
-    }).then(response => response.text().then(data => ({
-        status: response.status,
-        text: data
-    })))
-    .then(response => {
-        if (response.status === 200) {
-            alert("성공!");
-            window.location.href = redirectUrl; // 전달받은 URL로 리다이렉트
-        } else {
-            console.log(response.status);
-            console.log(response.text);
-        }
-    }).catch(error => {
-        console.error('폼 제출 오류:', error);
-        alert('폼 제출 중 오류가 발생했습니다.');
-    });
+    if (title === "") {
+        errorAlert.textContent = "제목을 입력해주세요.";
+        return false;
+    }
+    if (content === "") {
+        errorAlert.textContent = "내용을 입력해주세요.";
+        return false;
+    }
+    if (nameList.length === 0 && document.getElementById('currentApproverName') === null) {
+            errorAlert.textContent = "결재자를 선택해주세요.";
+            return false;
+    }
+    if (completeDate === "") {
+        errorAlert.textContent = "업무 완료 날짜를 입력해주세요";
+        return false;
+    }
+    return true;
 }
 
-//============================================= 파일 생성 관련 js =======================================================
+// form 제출 처리
+function handleReportForm(event) {
+    event.preventDefault();
 
+    const form = event.target.closest('form');
+    const actionUrl = document.getElementById('form').action;
+
+    return { form, actionUrl };
+}
+
+
+//=============================================== 폼데이터 ==============================================================
 //========================================== 통계 관련 메소드 ============================================================
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드

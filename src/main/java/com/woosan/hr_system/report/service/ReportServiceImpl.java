@@ -111,13 +111,13 @@ public class ReportServiceImpl implements ReportService {
     @Override // 요청 들어온 보고서 작성
     public int createReportFromRequest(Report report) {
         // approverName 설정
-        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
-        String approverName = employee.getName();
+//        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
+//        String approverName = employee.getName();
 
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
-        params.put("approverId", report.getApproverId());
-        params.put("approverName", approverName);
+        params.put("approverId", report.getIdList().get(0));
+        params.put("approverName", report.getNameList().get(0));
         params.put("title", report.getTitle());
         params.put("content", report.getContent());
         params.put("createdDate", report.getCreatedDate());
@@ -277,27 +277,27 @@ public class ReportServiceImpl implements ReportService {
 //=====================================================수정 메소드======================================================
     @Transactional
     @Override // 보고서 수정
-    public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList) {
+    public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> userSelectedFileIdList) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
-        List<Integer> reportIdList = new ArrayList<>();
+        List<Integer> createdReportIdList = new ArrayList<>();
+        List<Integer> existingFileIdList = reportFileService.getFileIdsByReportId(report.getReportId());
 
         // 결재자 수에 따른 처리
         if (report.getIdList().size() > 1) {
             // 결재자 수가 여러명으로 바뀐 경우
-            deleteReport(report.getReportId());
-
             report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
-            reportIdList = createReport(report); // 보고서 생성 후 reportId 반환
-
+            createdReportIdList = createReport(report); // 보고서 생성 후 reportId 반환
+            reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
+            deleteReport(report.getReportId());
         } else {
             report.setModifiedDate(userSessionInfo.getNow()); // 현재시간 설정
             report.setApproverId(report.getIdList().get(0));
             report.setApproverName(report.getNameList().get(0));
             reportDAO.updateReport(report);
-            reportIdList.add(report.getReportId()); // 조인테이블 수정
+            createdReportIdList.add(report.getReportId()); // 조인테이블 수정
+            reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
         }
 
-        reportFileService.updateReportFile(report, toUploadFileList, registeredFileIdList, reportIdList);
     }
 
     //=====================================================수정 메소드======================================================
@@ -312,7 +312,9 @@ public class ReportServiceImpl implements ReportService {
         reportDAO.deleteReport(reportId);
 
         // 요청 된 보고서라면 requset테이블의 reportId 삭제
-        requestService.deleteReportId(reportId);
+        if (requestService.getRequestByReportId(reportId) > 0){
+            requestService.deleteReportId(reportId);
+        }
 
         // 조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
         reportFileService.deleteReportFileByReportId(reportId);

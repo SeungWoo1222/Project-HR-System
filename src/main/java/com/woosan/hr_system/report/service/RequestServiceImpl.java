@@ -66,6 +66,11 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getMyPendingRequests(writerId);
     }
 
+    @Override // reportId로 요청 조회
+    public int getRequestByReportId(int reportId) {
+        return requestDAO.getRequestByReportId(reportId);
+    }
+
     @Override // 요청 검색
     public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
 
