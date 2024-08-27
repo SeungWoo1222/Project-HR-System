@@ -65,6 +65,8 @@ public class FileServiceImpl implements FileService {
         // 파일 업로드
         String storedFileName = uploadToS3(file);
 
+        log.info("Uploading file " + storedFileName + " to S3");
+
         return saveFileTransactionally(file, storedFileName, fileIdUsage);
     }
 
@@ -89,6 +91,7 @@ public class FileServiceImpl implements FileService {
     // 파일 정보 생성
     private File createFileInfo(MultipartFile file, String storedFileName, String fileIdUsage) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
+
         return new File(
                 file.getOriginalFilename(),
                 storedFileName,
@@ -146,6 +149,7 @@ public class FileServiceImpl implements FileService {
     @Transactional
     @Override
     public void deleteFile(int fileId) {
+        log.debug("fileServiceImpl.deleteFile로 오는 fileId : {}", fileId);
         // 파일 정보 조회
         File file = findFileById(fileId);
 
@@ -156,6 +160,7 @@ public class FileServiceImpl implements FileService {
         // S3에서 제거
         deleteFileFromS3(file);
     }
+
 
     private void deleteFileFromS3(File file) {
         String storedFileName = file.getStoredFileName();

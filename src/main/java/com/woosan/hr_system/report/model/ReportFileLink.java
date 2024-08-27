@@ -1,25 +1,15 @@
 package com.woosan.hr_system.report.model;
 
-import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReportFileLink {
     private int fileId;
-    private Long reportId;
-
-    public int getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(int fileId) {
-        this.fileId = fileId;
-    }
-
-    public Long getReportId() {
-        return reportId;
-    }
-
-    public void setReportId(Long reportId) {
-        this.reportId = reportId;
-    }
+    private int reportId;
 
 }

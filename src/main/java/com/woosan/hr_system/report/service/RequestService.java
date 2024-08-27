@@ -16,17 +16,24 @@ public interface RequestService {
     // 모든 요청 조회
 //    List<Request> getAllRequests();
     // 특정 요청 조회
-    Request getRequestById(Long requestId);
-    // 내가 쓴 요청 리스트 조회 (manager)
-    List<Request> getMyRequests(String employeeId, String requestStart , String requestEnd);
+    Request getRequestById(int requestId);
+    // 내가 쓴 요청 리스트 조회
+    List<Request> getMyRequests(String requesterId);
     // 보고서 결재 처리
-    void updateApprovalStatus(Long reportId, String status, String rejectionReasont);
+    void updateApprovalStatus(int reportId, String status, String rejectionReasont);
     // 요청 수정
     void updateRequest(Request request);
     // 요청 삭제
-    void deleteRequest(Long requestId);
+    void deleteRequest(int requestId);
+//====================================================나머지 메소드=======================================================
+    // 요청에 의한 보고서 생성 후 요청에 reportId 삽입
+    void updateReportId(int requestId, int reportId);
+    // 요청에 의한 보고서 삭제 시 reportId삭제
+    void deleteReportId(Integer reportId);
     // 나에게 온 요청 조회 (STAFF)
     List<Request> getMyPendingRequests(String writerId);
     // 페이지, 서칭 + 보고서 리스트 (STAFF)
     PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd);
+    // 페이지, 서칭 + 보고서 리스트 (MANAGER)
+    PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, String requestStart, String requestEnd);
 }

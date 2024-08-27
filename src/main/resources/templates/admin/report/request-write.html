@@ -1,50 +1,61 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='보고서 작성 요청')}">
 
 <th:block layout:fragment="css">
-<!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
+    <!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
 </th:block>
 
 <th:block layout:fragment="script">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/employee.js}"></script>
 </th:block>
 
-<h1>보고서 작성 요청</h1>
-<form id="form" th:action="@{/admin/request/write}" method="post" th:object="${request}" onsubmit="updateFormFields()">
-    <label for="departmentId">부서 선택:</label>
-    <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
-        <option value="" disabled selected>부서를 선택하세요</option>
-        <option value="PR">생산</option>
-        <option value="QC">품질 관리</option>
-        <option value="SA">영업</option>
-        <option value="MK">마케팅</option>
-        <option value="FI">재무</option>
-        <option value="HR">인사</option>
-        <option value="RD">연구개발</option>
-    </select><br>
+<div layout:fragment="~{content}">
+    <div class="content">
+        <h1>보고서 작성 요청</h1>
+        <form id="form" method="post" enctype="multipart/form-data" onsubmit="return false;">
 
-    <div id="selectAllContainer" style="display:none;">
-        <label>
-            <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
-        </label><br>
+            <label for="departmentId">부서 선택:</label>
+            <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
+                <option value="" disabled selected>부서를 선택하세요</option>
+                <option value="PR">생산</option>
+                <option value="QC">품질 관리</option>
+                <option value="SA">영업</option>
+                <option value="MK">마케팅</option>
+                <option value="FI">재무</option>
+                <option value="HR">인사</option>
+                <option value="RD">연구개발</option>
+            </select>
+
+            <div id="selectAllContainer" style="display:none;">
+                <label>
+                    <input type="checkbox" id="selectAllEmployeesCheckbox"> 부서 임원 전체 선택
+                </label>
+            </div>
+
+            <label for="idContainer">보고서 작성자</label>
+            <div id="idContainer">
+                <!-- 직원 목록이 여기에 추가됩니다. -->
+            </div>
+
+            <p>선택된 작성자</p>
+            <div id="selectedEmployees" class="selected-employees"></div>
+
+            <div>
+                <label for="dueDate">마감 기한:</label>
+                <input type="date" id="dueDate" name="dueDate" required>
+            </div>
+
+            <div>
+                <label for="requestNote">요청 사항:</label>
+                <textarea id="requestNote" name="requestNote" rows="10" required></textarea>
+            </div>
+
+            <button type="button" onclick="submitReport(event, '/admin/request/write', '/admin/request/requestList')">생성하기</button>
+        </form>
     </div>
-
-    <label for="idContainer">보고서 작성자</label>
-    <div id="idContainer">
-        <!-- 직원 목록이 여기에 추가됩니다. -->
-    </div>
-    <br>
-
-    <div id="selectedEmployees" class="selected-employees"></div>
-
-    <label for="dueDate">마감 기한:</label>
-    <input type="date" id="dueDate" name="dueDate" required><br>
-
-    <label for="requestNote">요청 사항:</label>
-    <textarea id="requestNote" name="requestNote" rows="10" required></textarea><br>
-
-    <button type="submit">생성하기</button>
-</form>
+</div>
 </html>

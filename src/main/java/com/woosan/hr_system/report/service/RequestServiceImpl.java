@@ -1,11 +1,11 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +23,11 @@ import java.util.HashMap;
 
 
 @Service
+@Slf4j
 public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private RequestDAO requestDAO;
-    @Autowired
-    private AuthService authService;
 
 //===================================================생성 메소드=======================================================
 
@@ -53,33 +52,13 @@ public class RequestServiceImpl implements RequestService {
 //===================================================조회 메소드=======================================================
 
     @Override // 요청 세부 조회
-    public Request getRequestById(Long requestId) {
+    public Request getRequestById(int requestId) {
         return requestDAO.getRequestById(requestId);
     }
 
     @Override  // 내가 쓴 요청 리스트 조회
-    public List<Request> getMyRequests(String employeeId, String requestStart, String requestEnd) {
-        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        YearMonth startYearMonth;
-        YearMonth endYearMonth;
-
-        // 현재 연월 가져오기
-        YearMonth currentYearMonth = YearMonth.now();
-
-        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
-        if (requestStart == null) {
-            startYearMonth = currentYearMonth;
-        } else {
-            startYearMonth = YearMonth.parse(requestStart, formatter);
-        }
-
-        if (requestEnd == null) {
-            endYearMonth = currentYearMonth;
-        } else {
-            endYearMonth = YearMonth.parse(requestEnd, formatter);
-        }
-        return requestDAO.getMyRequests(employeeId, startYearMonth, endYearMonth);
+    public List<Request> getMyRequests(String requesterId) {
+        return requestDAO.getMyRequests(requesterId);
     }
 
     @Override  // 내게 온 요청 리스트 조회
@@ -89,12 +68,45 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 검색
     public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
+
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (requestStart == null || requestEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            requestStart = formattedDate;
+            requestEnd = formattedDate;
+        }
+
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
         int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
 
         return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
+
+    @Override // 요청 검색
+    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, String requestStart, String requestEnd) {
+
+        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
+        if (requestStart == null || requestEnd == null) {
+            LocalDate currentMonth = LocalDate.now();
+            // 날짜 형태를 yyyy-mm으로 바꿔줌
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            String formattedDate = currentMonth.format(formatter);
+            requestStart = formattedDate;
+            requestEnd = formattedDate;
+        }
+
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        List<Request> requests = requestDAO.searchMyRequests(pageRequest.getKeyword(), pageRequest.getSize(), offset, requesterId, searchType, requestStart, requestEnd);
+        int total = requestDAO.countMyRequests(pageRequest.getKeyword(), requesterId, searchType, requestStart, requestEnd);
+
+        return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+
 
 //===================================================조회 메소드=======================================================
 
@@ -116,8 +128,19 @@ public class RequestServiceImpl implements RequestService {
         requestDAO.updateRequest(params);
     }
 
+    // 요청에 의한 보고서 생성 후 요청에 reportId 삽입
+    @Override
+    public void updateReportId(int requestId, int reportId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("requestId", requestId);
+        params.put("reportId", reportId);
+
+        requestDAO.updateReportId(params);
+    }
+
+
     @Override // 보고서 결재 처리
-    public void updateApprovalStatus(Long reportId, String status, String rejectionReason) {
+    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);
@@ -132,11 +155,18 @@ public class RequestServiceImpl implements RequestService {
 //===================================================삭제 메소드=======================================================
 
     @Override // 요청 삭제
-    public void deleteRequest(Long requestId) {
+    public void deleteRequest(int requestId) {
         // shared_trash 테이블에 삭제될 데이터들 삽입
         requestDAO.insertRequestIntoSharedTrash(requestId);
         requestDAO.deleteRequest(requestId);
     }
+
+    @Override // 요청에 의한 보고서 삭제시 reportId 삭제
+    public void deleteReportId(Integer reportId) {
+        requestDAO.deleteReportId(reportId);
+    }
+
+
 //===================================================삭제 메소드=======================================================
 
 

@@ -16,14 +16,6 @@ function toggleRejectionReason() {
 //========================================결재 상태 변경 =================================================================
 
 //========================================== 임원 선택 ==================================================================
-// 접속 URL기준으로 실행시킬 경우
-// document.addEventListener("DOMContentLoaded", function() {
-//     var currentUrl = window.location.pathname;
-//     if (currentUrl.includes('report/write')) {
-//         initEventListeners();
-//     }
-// });
-
 selectedEmployees = {}; // 선택된 임원들 목록 초기화 - 다른 부서 임원을 고르기 위한 변수
 
 //  부서 선택, 임원 전체선택 메소드 정의
@@ -31,25 +23,16 @@ function initEventListeners() {
     const departmentSelect = document.getElementById('departmentId');
     const selectAllCheckbox = document.getElementById('selectAllEmployeesCheckbox');
 
-    if (departmentSelect) {
-        departmentSelect.addEventListener('change', loadEmployeesByDepartment);
-    } else {
-        console.log("departmentSelect is null");
-    }
+    departmentSelect.addEventListener('change', loadEmployeesByDepartment);
+    selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
 
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
-    } else {
-        console.log("selectAllEmployeesCheckbox is null");
-    }
 }
 
 // 선택된 부서에 맞는 임원들 리스트를 반환해줌
 function loadEmployeesByDepartment() {
-    console.log("loadEmployeesByDepartment");
     const departmentId = document.getElementById('departmentId').value;
 
-    fetch(`/employee/list/${departmentId}`)
+    fetch(`/api/employee/department/list/` + departmentId)
         .then(response => {
             if (!response.ok) {
                 throw new Error('response 오류!');
@@ -61,16 +44,11 @@ function loadEmployeesByDepartment() {
             idContainer.innerHTML = '';
 
             employeeList.forEach(employee => {
-                if (employee === null) {
-                    console.error('Employee가 비어 있음', employee);
-                } else if (!employee.employeeId || !employee.name) {
-                    console.error('Employee는 있으나 요소가 없음', employee);
-                } else {
                     const checkboxContainer = document.createElement('div');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.className = 'idCheckbox';
-                    checkbox.name = 'id';
+                    // checkbox.name = 'id';
                     checkbox.value = employee.employeeId;
                     checkbox.dataset.name = employee.name;
 
@@ -84,7 +62,7 @@ function loadEmployeesByDepartment() {
                     const nameInput = document.createElement('input');
                     nameInput.type = 'hidden';
                     nameInput.className = 'nameInput';
-                    nameInput.name = 'name';
+                    // nameInput.name = 'name';
                     nameInput.value = employee.name;
 
                     const label = document.createElement('label');
@@ -94,7 +72,6 @@ function loadEmployeesByDepartment() {
                     checkboxContainer.appendChild(label);
                     checkboxContainer.appendChild(nameInput);
                     idContainer.appendChild(checkboxContainer);
-                }
             });
 
             // 임원 전체선택 체크박스를 보여줌
@@ -143,101 +120,117 @@ function updateSelectedEmployees() {
     });
 }
 
-//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
+//=================================================== 임원 선택 =========================================================
+//================================================= 파일 생성 관련 js ===================================================
+// 보고서 생성 시
+function submitReport(event, url, redirectUrl) {
+    event.preventDefault(); // 기본 폼 제출 방지
 
-function submitReport() {
     const form = document.getElementById('form');
-    let formData = new FormData(form); // 폼 전체 데이터를 가져옵니다.
+    const formData = new FormData(form); // 기존 폼 데이터 가져오기
 
-    const idList = Object.keys(selectedEmployees); // 선택된 임원 ID 목록
-    const nameList = Object.values(selectedEmployees); // 선택된 임원 이름 목록
-
-    // 파일이 있으면 FormData에 추가
-    const fileInput = document.querySelector("#reportDocuments");
-    if (fileInput.files.length > 0) {
-        for (let i = 0; i < fileInput.files.length; i++) {
-            formData.append("reportDocuments", fileInput.files[i]);
-        }
+    // filesArr에 저장된 파일들을 FormData에 추가
+    if (filesArr != null) {
+        filesArr.forEach((file, index) => {
+            if (!file.is_delete) { // 삭제된 파일 제외
+                formData.append('reportFiles', file);
+            }
+        });
     }
 
-    // idList와 nameList를 FormData에 추가
-    formData.append('idList', idList);
-    formData.append('nameList', nameList);
 
-    const actionUrl = '/report/write';  // 수정 후 폼의 액션 URL
+    if (Object.keys(selectedEmployees).length > 0) {
+        const idList = Object.keys(selectedEmployees);
+        const nameList = Object.values(selectedEmployees);
 
-    // Ajax 요청으로 데이터 전송
-    fetch(actionUrl, {
+        // 숨겨진 필드에 값 설정
+        formData.set('idList', idList.join(','));
+        formData.set('nameList', nameList.join(','));
+    }
+
+    // FormData의 모든 키-값 쌍을 출력합니다.
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
+
+    // AJAX를 사용하여 폼 데이터 전송
+    fetch(url, {  // 이 부분에서 '/report/write'로 전송
         method: 'POST',
-        body: formData
-    })
-        .then(response => response.text())
-        .then(result => {
-            console.log('Success:', result);
-            window.location.href = '/report/list'; // 성공 후 리다이렉션
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        body: formData,
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
+    .then(response => {
+        if (response.status === 200) {
+            alert("성공!");
+            window.location.href = redirectUrl; // 전달받은 URL로 리다이렉트
+        } else {
+            console.log(response.status);
+            console.log(response.text);
+        }
+    }).catch(error => {
+        console.error('폼 제출 오류:', error);
+        alert('폼 제출 중 오류가 발생했습니다.');
+    });
 }
-//===================================List 형식 요소들을 단일로 파라미터에 전송 ==============================================
-//========================================== 임원 선택 ==================================================================
+
+//============================================= 파일 생성 관련 js =======================================================
 
 //========================================== 통계 관련 메소드 ============================================================
 
 // 통계 - 선택된 임원 목록 중 임원을 삭제하는 메소드
-function removeWriter(button) {
-    console.log('Removing writer with ID:', button);
+    function removeWriter(button) {
 
-    // 선택된 임원 목록에서 해당 임원 삭제
-    var employeeId = button.getAttribute('data-employee-id');
-    console.log("Removing writer with employeeId:", employeeId);
+        // 선택된 임원 목록에서 해당 임원 삭제
+        var employeeId = button.getAttribute('data-employee-id');
 
-    // 부모 노드를 찾아서 삭제
-    var parentLi = button.parentNode;
-    parentLi.parentNode.removeChild(parentLi);
+        // 부모 노드를 찾아서 삭제
+        var parentLi = button.parentNode;
+        parentLi.parentNode.removeChild(parentLi);
 
-    // 선택된 임원 ID 목록 갱신
-    const remainingIds = [];
-    document.querySelectorAll('#selected-writers-list li button').forEach(button => {
-        remainingIds.push(button.getAttribute('data-employee-id'));
-        console.log(button.getAttribute('data-employee-id'));
-    });
+        // 선택된 임원 ID 목록 갱신
+        const remainingIds = [];
+        document.querySelectorAll('#selected-writers-list li button').forEach(button => {
+            remainingIds.push(button.getAttribute('data-employee-id'));
+        });
 
-    // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
-    if (remainingIds.length === 0) {
-        var ul = document.getElementById('selected-writers-list');
-        var allMembersLi = document.createElement("li");
-        allMembersLi.innerHTML = "<span>모든 임원</span>";
-        ul.appendChild(allMembersLi);
+        // 선택된 임원이 모두 제거된 경우 "모든 임원" 항목을 추가
+        if (remainingIds.length === 0) {
+            var ul = document.getElementById('selected-writers-list');
+            var allMembersLi = document.createElement("li");
+            allMembersLi.innerHTML = "<span>모든 임원</span>";
+            ul.appendChild(allMembersLi);
+        }
+
+        // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
+        updateChartWithSelectedWriters(remainingIds);
     }
 
-    // 서버에 갱신된 임원 목록을 전송하여 통계 데이터를 갱신
-    updateChartWithSelectedWriters(remainingIds);
-}
-
 // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
-function updateChartWithSelectedWriters(ids) {
-    $.ajax({
-        url: '/admin/request/updateStats',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(ids),
-        success: function (response) {
-            // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
-            var stats = JSON.parse(response.statsJson);
+    function updateChartWithSelectedWriters(ids) {
+        $.ajax({
+            url: '/admin/request/updateStats',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function (response) {
+                // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
+                var stats = JSON.parse(response.statsJson);
 
-            var data = google.visualization.arrayToDataTable(stats);
+                var data = google.visualization.arrayToDataTable(stats);
 
-            var options = {};
+                var options = {};
 
-            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
-            chart.draw(data, google.charts.Bar.convertOptions(options));
-        },
-        error: function (error) {
-            console.error('Error:', error);
-        }
-    });
-}
+                var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+
 
 //========================================== 통계 관련 메소드 =================================================================

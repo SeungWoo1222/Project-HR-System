@@ -39,8 +39,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
-        <h1>내 결재 목록</h1>
-        <button th:onclick="openModal('/admin/request/approvalDatePage')">날짜 범위 설정</button>
+        <h1>결재 미처리 보고서 목록</h1>
         <table class="list">
             <thead>
             <tr>
@@ -63,24 +62,25 @@
 
 
         <!-- 작성 요청 목록 -->
-        <h1>작성 요청 목록</h1>
-        <button th:onclick="openModal('/admin/request/requestDatePage')">날짜 범위 설정</button>
-        <button th:onclick="openModal('/admin/request/write')">작성 요청하기</button>
+        <h1>보고서 작성된 요청 목록</h1>
         <div class="list">
             <table>
                 <thead>
                 <tr>
-                    <th>보고서 작성자</th>
                     <th>작성된 보고서</th>
+                    <th>보고서 작성자</th>
                     <th>마감 일자</th>
                     <th>요청 일자</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
-                    th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
+                <tr th:each="request : ${requests}">
+                    <td>
+                        <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
+                           th:onclick="openModal('/report/' + this.getAttribute('reportId'))">조회</a>
+                        <a th:if="${request.reportId == null}" >없음</a>
+                    </td>
                     <td th:text="${request.writerName}"></td>
-                    <td th:text="${request.reportId}"></td>
                     <td th:text="${request.dueDate}"></td>
                     <td th:text="${request.requestDate}" class="dateTime" ></td>
                 </tr>
