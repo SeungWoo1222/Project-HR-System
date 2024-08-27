@@ -6,10 +6,6 @@ function submitUpdateForm(event) {
     const formData = new FormData(form);
     const actionUrl = form.action;
 
-    for (let [name, value] of formData.entries()) {
-        console.log(name + " : " + value);
-    }
-
     // 유효성 검사 - 빈 필드와 숫자 여부 확인
     let isValid = true;
     for (let [name, value] of formData.entries()) {

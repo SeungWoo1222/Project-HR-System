@@ -25,7 +25,7 @@
 
     <!-- 급여 ID를 이용한 특정 사원의 급여 정보 조회 -->
     <select id="selectSalaryById" parameterType="int" resultMap="SalaryResultMap">
-        SELECT * FROM salaries WHERE salary_id = #{salaryId}
+        SELECT * FROM salaries WHERE salary_id = #{salaryId} AND status = 1
     </select>
 
     <!-- 사원 ID를 이용한 특정 사원의 급여 정보 조회 -->
@@ -195,5 +195,10 @@
     <delete id="deleteSalary" parameterType="int">
         DELETE FROM salaries WHERE salary_id = #{salaryId}
     </delete>
+
+    <!-- 사원 계좌 정보 수정 -->
+    <update id="updateAccountInfo" parameterType="com.woosan.hr_system.salary.model.Salary">
+        UPDATE salaries SET bank = #{bank}, account_number = #{accountNumber} WHERE salary_id = #{salaryId}
+    </update>
 
 </mapper>

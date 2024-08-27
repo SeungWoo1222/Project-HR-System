@@ -67,4 +67,10 @@ public class SalaryViewController {
         model.addAttribute("salary", salaryInfo);
         return "salary/edit";
     }
+
+    @GetMapping("/{employeeId}/account/edit") // 계좌 정보 수정 페이지 이동
+    public String viewAccountEditForm(Model model, @PathVariable("employeeId") String employeeId) {
+        model.addAttribute("salaryInfo", salaryService.getSalaryByEmployeeId(employeeId));
+        return "salary/account-edit";
+    }
 }

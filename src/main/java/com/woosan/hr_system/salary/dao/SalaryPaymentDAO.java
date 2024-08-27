@@ -59,8 +59,8 @@ public class SalaryPaymentDAO {
     }
 
     // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int count(String keyword) {
-        return sqlSession.selectOne(NAMESPACE + "count", keyword);
+    public int countPayslips(String keyword) {
+        return sqlSession.selectOne(NAMESPACE + "countPayslips", keyword);
     }
 
     // 급여명세서 등록
@@ -80,5 +80,10 @@ public class SalaryPaymentDAO {
     // 급여명세서 삭제
     public void deletePayment(int paymentId) {
         sqlSession.delete(NAMESPACE + "deletePayment", paymentId);
+    }
+
+    // 내 급여명세서 개수 조회
+    public int countMyPayslips() {
+        return sqlSession.selectOne(NAMESPACE + "countMyPayslips");
     }
 }

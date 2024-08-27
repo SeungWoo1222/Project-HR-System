@@ -3,6 +3,7 @@ package com.woosan.hr_system.salary.model;
 import com.woosan.hr_system.employee.model.Department;
 import com.woosan.hr_system.employee.model.Position;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Salary { // 급여 정보
     private int salaryId;          // PK
     private String employeeId;     // FK, employees 테이블 참조

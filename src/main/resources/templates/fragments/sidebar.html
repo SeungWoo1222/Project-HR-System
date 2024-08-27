@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <script th:src="@{/js/layout.js}"></script>
@@ -88,7 +88,7 @@
                 <ul class="submenu">
                     <li><a th:href="@{/common/myInfo}">- 내 정보 관리</a></li>
                     <li><a th:href="@{/auth/pwd-management}">- 비밀번호 관리</a></li>
-                    <li><a th:href="@{/salary/detail}">- 급여명세서</a></li>
+                    <li><a th:href="@{/salary/payment/myPayslips}">- 내 급여 관리</a></li>
                 </ul>
             </li>
             <li><a th:href="@{/members}"><img src="/images/icons/members.png" alt="Members" width="20"> 구성원</a></li>

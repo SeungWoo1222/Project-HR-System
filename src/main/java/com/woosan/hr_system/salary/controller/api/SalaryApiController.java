@@ -21,6 +21,7 @@ public class SalaryApiController {
     }
 
     // 급여 정보 수정
+    @RequireHRPermission
     @PutMapping("/{employeeId}")
     ResponseEntity<String> updateSalaryInfo(@PathVariable String employeeId, @RequestBody Salary salary) {
         return ResponseEntity.ok(salaryService.updateSalary(salary, employeeId));
@@ -31,5 +32,13 @@ public class SalaryApiController {
     @DeleteMapping("/{salaryId}")
     ResponseEntity<String> deleteSalaryInfo(@PathVariable int salaryId) {
         return ResponseEntity.ok(salaryService.removeSalary(salaryId));
+    }
+
+    // 계좌 정보 수정
+    @PatchMapping("/{salaryId}")
+    ResponseEntity<String> updateAccountInfo(@PathVariable("salaryId") int salaryId,
+                                             @RequestParam("bank") String bank,
+                                             @RequestParam("accountNumber") String accountNumber) {
+        return ResponseEntity.ok(salaryService.updateAccountInfo(salaryId, bank, accountNumber));
     }
 }

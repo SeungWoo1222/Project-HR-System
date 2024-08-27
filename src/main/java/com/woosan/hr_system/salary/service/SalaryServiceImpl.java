@@ -147,4 +147,29 @@ public class SalaryServiceImpl implements SalaryService {
         salaryDAO.deleteSalary(salaryId);
         return "'" + salaryInfo.getName() + "' 사원의 급여 정보가 삭제되었습니다.";
     }
+
+    @LogBeforeExecution
+    @LogAfterExecution
+    @Override // 계좌 정보 수정
+    public String updateAccountInfo(int salaryId, String bank, String accountNumber) {
+        // 비교할 기존 객체와 새로운 객체 생성
+        Salary salaryInfo = getSalaryById(salaryId);
+        Salary updatedSalaryInfo = Salary.builder()
+                .salaryId(salaryId)
+                .bank(bank)
+                .accountNumber(accountNumber)
+                .build();
+
+        // 변경 사항 확인
+        checkAccountInfoChanges(salaryInfo, updatedSalaryInfo);
+        salaryDAO.updateAccountInfo(updatedSalaryInfo);
+        return "'" + salaryInfo.getName() + "' 사원의 계좌 정보('" + salaryInfo.getSalaryId() + "')가 수정되었습니다.";
+    }
+    // 계좌정보의 특정 필드만 비교하도록 필드 이름 Set으로 전달하는 메소드
+    private void checkAccountInfoChanges(Salary original, Salary updated) {
+        Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
+                "bank", "accountNumber"
+        ));
+        commonService.processFieldChanges(original, updated, fieldsToCompare);
+    }
 }

@@ -61,12 +61,19 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
-        int total = salaryPaymentDAO.count(pageRequest.getKeyword());
+        int total = salaryPaymentDAO.countPayslips(pageRequest.getKeyword());
 
         if (!payslips.isEmpty()) {
             // 급여명세서에 급여 정보 삽입
             setSalaryInfoToPayslips(payslips);
         }
+        return new PageResult<>(payslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 내 급여명세서 조회
+    public PageResult<SalaryPayment> searchMyPayslips(PageRequest pageRequest, String employeeId) {
+        List<SalaryPayment> payslips = getPaymentsByEmployeeId(employeeId);
+        int total = payslips.size();
         return new PageResult<>(payslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 

@@ -21,4 +21,5 @@ public interface SalaryService {
     String addSalary(Salary salary);
     String updateSalary(Salary salary, String employeeId);
     String removeSalary(int salaryId);
+    String updateAccountInfo(int salaryId, String bank, String accountNumber);
 }

@@ -102,4 +102,7 @@ public class SalaryDAO {
     public void deleteSalary(int salaryId) {
         sqlSession.delete(NAMESPACE + "deleteSalary", salaryId);
     }
+
+    // 계좌 정보 수정
+    public void updateAccountInfo(Salary accountInfo) { sqlSession.update(NAMESPACE + "updateAccountInfo", accountInfo); }
 }

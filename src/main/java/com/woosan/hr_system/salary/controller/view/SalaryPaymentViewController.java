@@ -12,6 +12,7 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,7 +91,6 @@ public class SalaryPaymentViewController {
         return "salary/payment/pay-complete";
     }
 
-    @RequireHRPermission
     @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 페이지 이동
     public String viewPayslip(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회
@@ -107,7 +107,6 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslip-modal";
     }
 
-    @RequireHRPermission
     @GetMapping("/{paymentId}/print") // 특정 사원의 급여 지급 내역 출력 및 pdf 변환 페이지 이동
     public String viewPayslipPrint(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회
@@ -125,6 +124,7 @@ public class SalaryPaymentViewController {
         return "salary/payment/payslip-print";
     }
 
+    @RequireHRPermission
     @GetMapping("/{paymentId}/edit") // 특정 사원의 급여 지급 수정 페이지 이동
     public String viewPayslipEditForm(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회
@@ -188,5 +188,27 @@ public class SalaryPaymentViewController {
     public String viewDeductionRatioEditForm(Model model) {
         model.addAttribute("deductionRatios", ratioDAO.selectDeductionRatios());
         return "salary/payment/deduction-edit";
+    }
+
+    @GetMapping("/myPayslips") // 내 급여명세서 조회
+    public String viewMyPayslips(@RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size,
+                                 Model model) {
+        // 내 급여 정보
+        String employeeId = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Integer> salaryIds = salaryService.getSalaryIdList(employeeId);
+        List<Salary> salaryList = salaryService.getSalariesByIds(salaryIds);
+        model.addAttribute("salaryList", salaryList);
+
+        // 내 급여명세서 검색 후 페이징
+        PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<SalaryPayment> pageResult = salaryPaymentService.searchMyPayslips(pageRequest, employeeId);
+
+        model.addAttribute("payslips", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+
+        return "salary/payment/payslips";
     }
 }

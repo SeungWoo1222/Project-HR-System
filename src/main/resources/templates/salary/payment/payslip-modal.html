@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <link rel="stylesheet" th:href="@{/css/salary/payslip.css}">
 
@@ -8,8 +8,8 @@
         <button type="button" class="btn" th:onclick="'window.open(\'/salary/payment/' + ${payslip.paymentId} + '/print\', \'_blank\')'">
             인쇄하기, PDF로 저장
         </button>
-        <div>
-            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제하기</button>
+        <div sec:authorize="principal.department == 'HR' and hasAnyRole('ROLE_MANAGER')">
+        <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제하기</button>
             <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정하기</button>
         </div>
     </div>

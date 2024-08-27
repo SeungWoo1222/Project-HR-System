@@ -12,8 +12,8 @@ public class PageRequest {
     private int size;
     private String keyword;
 
-//    public PageRequest() {
-//        this.page = 0;
-//        this.size = 10;
-//    }
+    public PageRequest(int page, int size) {
+        this.page = page;
+        this.size = size;
+    }
 }
