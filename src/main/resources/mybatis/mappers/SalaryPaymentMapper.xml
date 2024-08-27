@@ -113,7 +113,7 @@
         AND compensation_month = #{yearMonth}
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 모든 급여명세서 - 검색어에 해당하는 데이터 결과 조회 -->
     <select id="searchPayslips" parameterType="map" resultMap="SalaryPaymentResultMap">
         SELECT sp.*, s.name
         FROM salary_payments sp
@@ -160,8 +160,8 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
-    <select id="count" parameterType="string" resultType="int">
+    <!-- 모든 급여명세서 - 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="countPayslips" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM salary_payments sp
         JOIN salaries s ON sp.salary_id = s.salary_id

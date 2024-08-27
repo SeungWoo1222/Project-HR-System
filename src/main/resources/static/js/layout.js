@@ -49,3 +49,11 @@ function toggleMenu(sectionId) {
     // 토글 상태를 로컬 저장소에 저장
     localStorage.setItem(sectionId, section.style.display);
 }
+function toggleSubmenu(sectionId) {
+    var section = document.getElementById(sectionId);
+    if (section.style.display === "none" || section.style.display === "") {
+        section.style.display = "block";
+    } else {
+        section.style.display = "none";
+    }
+}

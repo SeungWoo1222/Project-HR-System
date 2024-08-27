@@ -49,7 +49,7 @@ public class SalaryPaymentDAO {
                 Map.of("salaryIdList", salaryIdList, "yearMonth", yearMonth));
     }
 
-    // 모든 급여명세서 정보 검색과 페이징 로직
+    // 모든 급여명세서 - 검색어에 해당하는 데이터 결과 조회
     public List<SalaryPayment> searchPayslips(String keyword, int pageSize, int offset) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -58,7 +58,7 @@ public class SalaryPaymentDAO {
         return sqlSession.selectList(NAMESPACE + "searchPayslips", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    // 모든 급여명세서 - 검색어에 해당하는 전체 데이터 개수 조회
     public int countPayslips(String keyword) {
         return sqlSession.selectOne(NAMESPACE + "countPayslips", keyword);
     }

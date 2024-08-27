@@ -37,12 +37,18 @@ body {
 
 /* Sidebar styles */
 .sidebar {
-    width: 200px;
+    width: 150px;
     padding: 20px;
+}
+
+.sidebar p {
+    margin: 0;
+    padding: 0;
 }
 
 .section-sidebar {
     border-top: 2px solid #f1f1f1;
+    cursor: pointer;
 }
 
 .sidebar ul, .section-sidebar ul {
@@ -51,14 +57,14 @@ body {
     margin: 0;
 }
 
-.section-sidebar p {
+.section-sidebar .sidebar-category {
     padding: 5px;
     margin: 7px 0 5px;
     color: #727272;
     font-size: 14px;
 }
 
-.section-sidebar p:hover {
+.section-sidebar .sidebar-category:hover {
     background-color: #E1F4FD;
     border-radius: 4px;
     transition: background-color 0.3s ease;
@@ -70,7 +76,7 @@ body {
     display: block;
 }
 
-.sidebar ul li a, .section-sidebar ul li a {
+.sidebar ul li a, .section-sidebar ul li p {
     text-decoration: none;
     color: #333;
     display: flex;
@@ -79,7 +85,7 @@ body {
     box-sizing: border-box;
 }
 
-.sidebar ul li a img, .section-sidebar ul li a img {
+.sidebar ul li a img, .section-sidebar ul li p img {
     margin-right: 10px;
 }
 
@@ -90,9 +96,9 @@ body {
     margin-top: 0px !important;
 }
 
-.sidebar ul li:hover > .submenu, .section-sidebar ul li:hover > .submenu {
-    display: block;
-}
+/*.sidebar ul li:hover > .submenu, .section-sidebar ul li:hover > .submenu {*/
+/*    display: block;*/
+/*}*/
 
 .sidebar ul li:hover, .section-sidebar ul li:hover {
     background-color: #E1F4FD;
@@ -102,12 +108,12 @@ body {
 
 .submenu li {
     height: auto;
-    padding: 3px 0 !important;
-    margin: 0 !important;
+    padding: 0 !important;
+    margin: 3px 0 !important;
 }
 
 .submenu li a {
-    padding: 3px 10px;
+    padding: 4px 0 4px 10px;
     font-size: 15px;
     display: block;
 }
@@ -118,8 +124,7 @@ body {
     transition: background-color 0.3s ease;
 }
 
-/* Submenu styles */
-.active a {
+.sidebar .active {
     background-color: #A1DBF9 !important;
     border-radius: 4px;
 }
@@ -249,7 +254,7 @@ body {
 }
 
 /* Input File styles */
-.input-file-btn{
+.input-file-btn {
     width : 280px;
     font-size: 13px;
     padding: 10px;
