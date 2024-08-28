@@ -113,7 +113,7 @@ public class ReportController {
         } else {
             reportService.createReportWithFile(report, reportDocuments);
         }
-        return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
+        return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동

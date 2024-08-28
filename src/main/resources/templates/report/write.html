@@ -24,7 +24,7 @@
             const { form, actionUrl } = handleReportForm(event);
             const formData = new FormData();
 
-            // FormData 객체에 employee 필드를 추가
+            // FormData 객체에 report 필드를 추가
             const report = {
                 title: form.title.value,
                 content: form.content.value,
@@ -42,20 +42,6 @@
                     }
                 });
             }
-
-            // FormData 객체를 반복하여 key와 value를 출력
-            formData.forEach((value, key) => {
-                if (value instanceof Blob) {
-                    // Blob 객체의 내용을 출력
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        console.log(`${key}: ${e.target.result}`); // Blob의 내용을 출력
-                    };
-                    reader.readAsText(value); // Blob을 텍스트로 읽음
-                } else {
-                    console.log(`${key}: ${value}`);
-                }
-            });
 
             // 데이터를 서버로 전송
             fetch(actionUrl, {

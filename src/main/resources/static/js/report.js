@@ -197,6 +197,42 @@ function validateReportForm(event) {
     return true;
 }
 
+function validateRequestForm(event) {
+    event.preventDefault();
+
+    const requestNote = document.getElementById("requestNote").value.trim();
+    // 선택된 결재자를 nameList로 정의
+    let nameList;
+    if (Object.keys(selectedEmployees).length > 0) {
+        nameList = Object.values(selectedEmployees);
+    } else {
+        // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
+        nameList = document.getElementById('currentApproverName').value;
+    }
+    const dueDate = document.getElementById("dueDate").value;
+    const errorAlert = document.getElementById("error-alert");
+
+    if (errorAlert) {
+        errorAlert.textContent = "";
+    } else {
+        console.error("Error message element not found.");
+    }
+
+    if (nameList.length === 0) {
+        errorAlert.textContent = "결재자를 선택해주세요.";
+        return false;
+    }
+    if (dueDate === "") {
+        errorAlert.textContent = "마감일자를 입력해주세요.";
+        return false;
+    }
+    if (requestNote === "") {
+        errorAlert.textContent = "요청사항을 입력해주세요.";
+        return false;
+    }
+    return true;
+}
+
 // form 제출 처리
 function handleReportForm(event) {
     event.preventDefault();

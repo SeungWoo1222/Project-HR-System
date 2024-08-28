@@ -48,7 +48,20 @@
                     document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);
                     fileNo++;
                 });
+            });
+            // 페이지에서 나갈 시 뜨는 경고문
+            function handleBeforeUnload(e) {
+                e.preventDefault();
+                e.returnValue = '사이트에서 나가시겠습니까? 변경사항이 저장되지 않을 수 있습니다.';
+                return e.returnValue;
+            }
 
+            // 이벤트 등록
+            window.addEventListener('beforeunload', handleBeforeUnload);
+
+            // 보고서 수정 버튼 클릭 시 이벤트 제거
+            $('#updateReportButton').on('click', function() {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
             });
         });
 
@@ -76,7 +89,7 @@
             const { form, actionUrl } = handleReportForm(event);
             const formData = new FormData();
 
-            // FormData 객체에 employee 필드를 추가
+            // FormData 객체에 report 필드를 추가
             const idList = Object.keys(selectedEmployees).length === 0
                 ? [document.getElementById('currentApproverId').value]
                 : Object.keys(selectedEmployees);
@@ -84,14 +97,6 @@
             const nameList = Object.keys(selectedEmployees).length === 0
                 ? [document.getElementById('currentApproverName').value]
                 : Object.values(selectedEmployees);
-
-            console.log("reportId", document.getElementById('reportId').value);
-            console.log("writerId", document.getElementById('writerId').value);
-            console.log("title", document.getElementById('title').value);
-            console.log("content", document.getElementById('content').value);
-            console.log("completeDate", document.getElementById('completeDate').value);
-
-
 
             const report = {
                 reportId: document.getElementById('reportId').value,
@@ -169,21 +174,13 @@
                     alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
                 });
         }
+
+
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-
-        <!-- 테스트용 reportId와 fileId 표시 -->
-        <h1>Report ID: <span th:text="${report.reportId}"></span></h1>
-        <h1>File IDs:</h1>
-        <ul>
-            <li th:each="file : ${files}">
-                <h1 th:text="${file.fileId}"></h1>
-            </li>
-        </ul>
-
         <h1>보고서 수정</h1>
         <form id="form" th:action="@{/report/edit}" method="post" enctype="multipart/form-data" onsubmit="return false">
             <input id="reportId" type="hidden" th:value="${report.reportId}">
@@ -272,7 +269,7 @@
                     <div class="file-list"></div>
                 </div>
             <div id="error-alert"></div>
-            <button type="button" onclick="updateReportForm(event)">보고서 수정</button>
+            <button id="updateReportButton" type="button" onclick="updateReportForm(event)">수정하기</button>
         </form>
     </div>
 </div>

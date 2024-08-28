@@ -107,13 +107,13 @@ public class ExecutiveController {
     // 요청 생성
     @RequireManagerPermission
     @PostMapping("/write")
-    public String createRequest(@ModelAttribute Request request) {
+    public ResponseEntity<String> createRequest(@RequestBody Request request) {
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String requesterId = userSessionInfo.getCurrentEmployeeId();
         request.setRequesterId(requesterId);
         requestService.createRequest(request);
-        return "redirect:/admin/request/requestList";
+        return ResponseEntity.ok("요청 작성이 완료되었습니다.");
     }
 //=====================================================생성 메소드========================================================
 
@@ -312,17 +312,14 @@ public class ExecutiveController {
 
     @RequireManagerPermission
     @PostMapping("/edit") // 요청 수정
-    public String updateRequest(@ModelAttribute Request request) {
-        // 요청 수정 권한이 있는지 확인
+    public ResponseEntity<String> updateRequest(@RequestBody Request request) {
+        // ↓ 요청 수정 권한이 있는지 확인 ↓
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String currentId = userSessionInfo.getCurrentEmployeeId();
 
-        // 요청 ID로 요청 조회
-        Request requestForCheck = requestService.getRequestById(request.getRequestId());
-
         // 현재 로그인한 사용자와 requester_id 비교
-        if (requestForCheck != null && requestForCheck.getRequesterId().equals(currentId)) {
+        if (request.getRequesterId() != null && request.getRequesterId().equals(currentId)) {
             // 작성자가 여러명이라면 현재 수정 중인 요청을 삭제하고 새로운 요청 생성
             if (request.getIdList().size() > 1) {
                 requestService.deleteRequest(request.getRequestId());
@@ -334,8 +331,7 @@ public class ExecutiveController {
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
-
-        return "redirect:/admin/request/requestList";
+        return ResponseEntity.ok("요청 수정이 완료되었습니다.");
     }
 
     @RequireManagerPermission
