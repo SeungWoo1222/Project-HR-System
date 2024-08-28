@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <script th:src="@{/js/layout.js}"></script>
-</head>
-<body>
 <div class="sidebar" th:fragment="sidebar">
     <ul>
         <li><a th:href="@{/common/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
+        <li id="notification-li"><p onclick="toggleNotificationBox()"><img src="/images/icons/notification.png" alt="Home" width="20">수신함</p></li>
     </ul>
 
     <div class="section-sidebar">
@@ -119,5 +115,4 @@
             로그아웃</a></li>
     </ul>
 </div>
-</body>
 </html>

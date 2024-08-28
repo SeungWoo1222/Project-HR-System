@@ -53,7 +53,16 @@ function toggleSubmenu(sectionId) {
     var section = document.getElementById(sectionId);
     if (section.style.display === "none" || section.style.display === "") {
         section.style.display = "block";
+
     } else {
         section.style.display = "none";
     }
+}
+
+// 알림 수신함 여닫기
+function toggleNotificationBox() {
+    var notificationBox = document.getElementById("notification-box");
+    notificationBox.classList.toggle("open");
+    var notificationList = document.getElementById("notification-li");
+    notificationList.classList.toggle("active");
 }

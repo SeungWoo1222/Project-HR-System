@@ -26,7 +26,8 @@
             <!-- 기본 컨텐츠 영역 -->
         </div>
     </div>
-    <div></div>
+    <!-- 알림 수신함 -->
+    <div th:replace="~{fragments/notification-box :: notification-box}"></div>
 </div>
 
 <!-- 모달 HTML 구조 -->
@@ -100,8 +101,6 @@
             modal.style.display = "none";
         }
     }
-
-
 </script>
 
 </body>

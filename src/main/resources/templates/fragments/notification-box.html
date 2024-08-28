@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div id="notification-box" class="notification-box" th:fragment="notification-box">
+    <div class="notification-box-header">
+        <h4>알림 수신함</h4>
+        <div class="btn-area">
+            <button type="button" class="image-btn">
+                <img src="/images/icons/check-all-notification.png" width="28" title="알림 모두 읽기" alt=""/>
+            </button>
+            <button type="button" class="image-btn">
+                <img src="/images/icons/delete-all-notification.png" width="28" title="알림 모두 삭제" alt=""/>
+            </button>
+        </div>
+    </div>
+    <div class="notification-box-content">
+        <div class="empty-notification" th:if="${notificationList == null}">
+            <img src="/images/icons/no-message.png" width="60" alt=""/>
+            <p class="empty-message">알림을 모두 확인했습니다.</p>
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>
+</html>
