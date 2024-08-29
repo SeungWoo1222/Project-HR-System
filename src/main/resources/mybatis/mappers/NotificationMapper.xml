@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woosan.hr_system.notification.dao.NotificationDAO">
+    <resultMap id="NotificationResultMap" type="com.woosan.hr_system.notification.model.Notification">
+        <id property="notificationId" column="notification_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="message" column="message"/>
+        <result property="url" column="url"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="readStatus" column="read_status"/>
+        <result property="readAt" column="read_at"/>
+    </resultMap>
+
+    <!-- 내 알림 조회 -->
+    <select id="selectAllNotification" parameterType="String" resultMap="NotificationResultMap">
+        SELECT *
+        FROM notifications
+        WHERE employee_id = #{employeeId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 단일 알림 생성 -->
+    <insert id="insertNotification" parameterType="com.woosan.hr_system.notification.model.Notification">
+        INSERT INTO notifications (employee_id, message, url)
+        VALUES (#{employeeId}, #{message}, #{url})
+    </insert>
+
+    <!-- 다수 알림 생성 (List를 통한) -->
+    <insert id="insertNotificationsByList" parameterType="List">
+        INSERT INTO notifications (employee_id, message, url)
+        VALUES
+        <foreach collection="list" item="notification" separator=",">
+            (#{notification.employeeId}, #{notification.message}, #{notification.url})
+        </foreach>
+    </insert>
+
+    <!-- 부서 알림 생성 -->
+    <insert id="insertDepartmentNotifications" parameterType="Map">
+        INSERT INTO notifications (employee_id, message, url)
+        SELECT employee_id, #{message}, #{url}
+        FROM employees
+        WHERE department_id = #{department}
+    </insert>
+
+    <!-- 직급 알림 생성 -->
+    <insert id="insertPositionNotifications" parameterType="Map">
+        <choose>
+            <!-- 직급이 STAFF일 경우 -->
+            <when test="position == 'STAFF'">
+                INSERT INTO notifications (employee_id, message, url)
+                SELECT employee_id, #{message}, #{url}
+                FROM employees
+                WHERE position_id IN ('사원', '대리', '과장')
+            </when>
+            <!-- 직급이 MANAGER일 경우 -->
+            <when test="position == 'MANAGER'">
+                INSERT INTO notifications (employee_id, message, url)
+                SELECT employee_id, #{message}, #{url}
+                FROM employees
+                WHERE position_id IN ('차장', '부장', '사장')
+            </when>
+        </choose>
+    </insert>
+
+    <!-- 내 알림 삭제 -->
+    <delete id="deleteNotification" parameterType="int">
+        DELETE FROM notifications
+        WHERE notification_id = #{notificationId}
+    </delete>
+
+    <!-- 내 모든 알림 삭제 -->
+    <delete id="deleteAllNotification" parameterType="String">
+        DELETE FROM notifications
+        WHERE employee_id = #{employeeId}
+    </delete>
+
+    <!-- 내 알림 읽음 처리 -->
+    <update id="markAsRead" parameterType="int">
+        UPDATE notifications
+        SET read_status = TRUE, read_at = NOW()
+        WHERE notification_id = #{notificationId} AND read_status = FALSE;
+    </update>
+
+    <!-- 내 모든 알림 읽음 처리 -->
+    <update id="markAsReadAll" parameterType="String">
+        UPDATE notifications
+        SET read_status = TRUE, read_at = NOW()
+        WHERE employee_id = #{employeeId} AND read_status = FALSE
+    </update>
+
+    <!-- 2주일 지난 읽음 처리된 알림들 자동 삭제 -->
+    <delete id="deleteOldNotifications">
+        DELETE FROM notifications
+        WHERE read_status = TRUE AND read_at &lt; NOW() - INTERVAL 14 DAY
+    </delete>
+</mapper>
