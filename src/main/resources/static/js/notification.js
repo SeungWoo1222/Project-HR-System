@@ -1,3 +1,8 @@
+// 페이지 로드 시 읽지 않은 메세지 조회
+document.addEventListener("DOMContentLoaded", function() {
+    fetchUnreadNotificationCount();
+});
+
 // 알림 수신함 여닫기
 function toggleNotificationBox() {
     var notificationBox = document.getElementById("notification-box");

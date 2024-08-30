@@ -51,6 +51,7 @@ img {
     padding: 20px;
     background: white;
     z-index: 20;
+    flex-shrink: 0;
 }
 
 .sidebar p {
