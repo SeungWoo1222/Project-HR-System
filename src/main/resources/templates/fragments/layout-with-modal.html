@@ -8,6 +8,14 @@
     <link rel="stylesheet" th:href="@{/css/layout.css}">
     <script th:src="@{/js/layout.js}"></script>
 
+    <link rel="stylesheet" th:href="@{/css/notification.css}">
+    <script th:src="@{/js/notification.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchUnreadNotificationCount();
+        });
+    </script>
+
     <link rel="stylesheet" th:href="@{/css/modal.css}">
 
     <!-- 각 페이지의 script가 작성될 위치 -->

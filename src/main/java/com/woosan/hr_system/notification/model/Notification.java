@@ -17,6 +17,7 @@ public class Notification {
     private String message;
     private String url;
     private LocalDateTime createdAt;
+    private String relativeTime;
     private Boolean readStatus;
     private LocalDateTime readAt;
 }

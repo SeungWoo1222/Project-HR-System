@@ -20,6 +20,10 @@ public class NotificationDAO {
     public List<Notification> selectAllNotification(String employeeId) {
         return sqlSession.selectList(NAMESPACE + "selectAllNotification", employeeId);
     }
+    // 읽지 않은 알림 개수 조회
+    public int selectUnreadCount(String employeeId) {
+        return sqlSession.selectOne(NAMESPACE + "selectUnreadCount", employeeId);
+    }
     // 단일 알림 생성
     public void insertNotification(Notification notification) {
         sqlSession.insert(NAMESPACE + "insertNotification", notification);

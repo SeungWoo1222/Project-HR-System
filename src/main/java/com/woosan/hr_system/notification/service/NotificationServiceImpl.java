@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +32,35 @@ public class NotificationServiceImpl implements NotificationService {
     public List<Notification> getAllNotification() {
         // 현재 로그인한 사원 ID 가져오기
         String employeeId = authService.getAuthenticatedUser().getUsername();
-        return notificationDAO.selectAllNotification(employeeId);
+        // 내 모든 알림 조회
+        List<Notification> notificationList = notificationDAO.selectAllNotification(employeeId);
+        // 상대 시간 계산 후 반환
+        return notificationList.stream().peek(notification -> {
+            String relativeTime = calculateRelativeTime(notification.getCreatedAt());
+            notification.setRelativeTime(relativeTime);
+        }).toList();
+    }
+
+    // 상대 시간 계산
+    private String calculateRelativeTime(LocalDateTime createdAt) {
+        Duration duration = Duration.between(createdAt, LocalDateTime.now());
+
+        if (duration.toDays() > 0) {
+            return duration.toDays() + "일 전";
+        } else if (duration.toHours() > 0) {
+            return duration.toHours() + "시간 전";
+        } else if (duration.toMinutes() > 0) {
+            return duration.toMinutes() + "분 전";
+        } else {
+            return "방금 전";
+        }
+    }
+
+    @Override // 읽지 않은 알림 개수 조회
+    public int getUnreadCount() {
+        // 현재 로그인한 사원 ID 가져오기
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+        return notificationDAO.selectUnreadCount(employeeId);
     }
 
     @Override // 단일 알림 생성
@@ -132,7 +162,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     // 2주일 지난 읽음 처리된 알림들 자동 삭제
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
-    private void cleanUpOldNotifications() {
+    public void cleanUpOldNotifications() {
         int deletedCount = notificationDAO.deleteOldNotifications();
         log.info("2주일이 지난 읽음 처리된 알림들 {}건을 자동으로 삭제하였습니다.", deletedCount);
     }

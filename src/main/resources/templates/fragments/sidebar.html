@@ -3,7 +3,12 @@
 <div class="sidebar" th:fragment="sidebar">
     <ul>
         <li><a th:href="@{/common/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
-        <li id="notification-li"><p onclick="toggleNotificationBox()"><img src="/images/icons/notification.png" alt="Home" width="20">수신함</p></li>
+        <li id="notification-li">
+            <div onclick="toggleNotificationBox()">
+                <p><img src="/images/icons/notification.png" alt="Home" width="20">수신함</p>
+                <div class="notification-badge" style="display: none;">0</div>
+            </div>
+        </li>
     </ul>
 
     <div class="section-sidebar">

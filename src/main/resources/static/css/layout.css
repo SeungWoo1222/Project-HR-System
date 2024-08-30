@@ -14,7 +14,6 @@ img {
     -ms-user-select: none;
 }
 
-
 .container {
     display: flex;
     flex-direction: column;
@@ -89,7 +88,7 @@ img {
     display: block;
 }
 
-.sidebar ul li a, .sidebar ul li p,.section-sidebar ul li p {
+.sidebar ul li a, .sidebar ul #notification-li div p,.section-sidebar ul li p {
     text-decoration: none;
     color: #333;
     display: flex;
@@ -98,8 +97,24 @@ img {
     box-sizing: border-box;
 }
 
-.sidebar ul li a img, .sidebar ul li p img, .section-sidebar ul li p img {
+.sidebar ul li a img, .sidebar ul #notification-li div p img, .section-sidebar ul li p img {
     margin-right: 10px;
+}
+
+/* #notification-li styles */
+.sidebar ul #notification-li div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.notification-badge {
+    font-size: 11px;
+    text-align: center;
+    font-weight: bold;
+    padding: 3px;
+    background: #FF0000;
+    border-radius: 5px;
+    color: white;
 }
 
 /* Submenu styles */
@@ -315,59 +330,6 @@ img {
     margin-bottom: 20px;
 }
 
-/* Notification Styles */
-.notification-box {
-    position: absolute;
-    padding: 10px;
-    top: 58px;
-    left: -230px; /* 초기 위치를 화면 바깥으로 설정 */
-    width: 200px;
-    height: calc(100vh - 82px);
-    overflow-y: auto;
-    background-color: white;
-    border-top: 2px solid #f1f1f1;
-    border-left: 2px solid #f1f1f1;
-    border-bottom: 2px solid #f1f1f1;
-    border-right: 2px solid #e9e9e9;
-    z-index: 10;
-    transition: transform 0.3s ease-in-out;
-}
-.notification-box.open {
-    transform: translateX(420px);
-}
 
-.notification-box-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #f1f1f1;
-    padding: 10px 0 10px 0;
-    margin-bottom: 20px;
-}
-
-.notification-box-header h4 {
-    margin: 0;
-}
-
-.notification-box .btn-area {
-    display: flex;
-    flex-direction: row;
-    gap: 10px
-}
-
-.empty-notification {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.empty-message {
-    color: #B1B1B1;
-    font-size: 16px;
-    text-align: center;
-    margin-top: 20px;
-    font-style: italic;
-}
 
 

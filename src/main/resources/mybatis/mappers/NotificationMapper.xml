@@ -21,6 +21,13 @@
         ORDER BY created_at DESC
     </select>
 
+    <!-- 읽지 않은 알림 개수 조회 -->
+    <select id="selectUnreadCount" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM notifications
+        WHERE employee_id = #{employeeId} AND read_status = FALSE
+    </select>
+
     <!-- 단일 알림 생성 -->
     <insert id="insertNotification" parameterType="com.woosan.hr_system.notification.model.Notification">
         INSERT INTO notifications (employee_id, message, url)
