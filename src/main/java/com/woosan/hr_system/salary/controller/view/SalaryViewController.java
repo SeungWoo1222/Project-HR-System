@@ -1,6 +1,6 @@
 package com.woosan.hr_system.salary.controller.view;
 
-import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.service.SalaryService;

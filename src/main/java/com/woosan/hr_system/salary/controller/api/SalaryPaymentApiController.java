@@ -1,7 +1,7 @@
 package com.woosan.hr_system.salary.controller.api;
 
-import com.woosan.hr_system.auth.aspect.RequireHRPermission;
-import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
+import com.woosan.hr_system.aspect.RequireHRPermission;
+import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.salary.model.DeductionDetails;
 import com.woosan.hr_system.salary.model.PayrollDetails;
 import com.woosan.hr_system.salary.model.SalaryPayment;

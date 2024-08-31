@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.auth.aspect.LogAfterExecution;
-import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
+import com.woosan.hr_system.aspect.LogAfterExecution;
+import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
