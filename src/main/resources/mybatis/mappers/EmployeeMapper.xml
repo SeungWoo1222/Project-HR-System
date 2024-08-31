@@ -240,4 +240,11 @@
         FROM employees
         WHERE employee_id = #{employeeId}
     </select>
+
+    <!-- 부서와 직급을 이용한 사원 조회 -->
+    <select id="selectEmployeesByDepartmentAndPosition" parameterType="map" resultMap="EmployeeResultMap">
+        SELECT *
+        FROM employees
+        WHERE department_id = #{department} AND position_id = #{position}
+    </select>
 </mapper>

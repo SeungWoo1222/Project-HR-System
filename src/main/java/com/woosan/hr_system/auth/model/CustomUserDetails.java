@@ -10,14 +10,16 @@ public class CustomUserDetails implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private final String username;
+    private final String name;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
     private final String department;
     private final boolean isAccountNonLocked;
     private final boolean isAccountNonExpired;
 
-    public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities, String department, boolean isAccountNonLocked, boolean isAccountNonExpired) {
+    public CustomUserDetails(String username, String name, String password, Collection<? extends GrantedAuthority> authorities, String department, boolean isAccountNonLocked, boolean isAccountNonExpired) {
         this.username = username;
+        this.name = name;
         this.password = password;
         this.authorities = authorities;
         this.department = department;
@@ -27,6 +29,14 @@ public class CustomUserDetails implements UserDetails {
 
     public String getDepartment() {
         return department;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNameWithId() {
+        return name + "(" + username + ")";
     }
 
     @Override

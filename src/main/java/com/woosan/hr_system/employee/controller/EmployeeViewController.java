@@ -46,8 +46,8 @@ public class EmployeeViewController {
     }
 
     @RequireHRPermission
-    @GetMapping("/{employeeId}") // 사원 정보 상세 조회
-    public String viewEmployee(@PathVariable("employeeId") String employeeId, Model model) {
+    @GetMapping("/{employeeId}") // 사원 정보 상세 조회 - modal
+    public String viewEmployeeModal(@PathVariable("employeeId") String employeeId, Model model) {
         // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
@@ -56,6 +56,19 @@ public class EmployeeViewController {
         model.addAttribute("pictureUrl", pictureUrl);
         return "employee/detail";
     }
+
+    @RequireHRPermission
+    @GetMapping("/{employeeId}/detail") // 사원 정보 상세 조회 - page
+    public String viewEmployeePage(@PathVariable("employeeId") String employeeId, Model model) {
+        // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
+        model.addAttribute("employee", employee);
+
+        String pictureUrl = fileService.getUrl(employee.getPicture());
+        model.addAttribute("pictureUrl", pictureUrl);
+        return "employee/detail2";
+    }
+
     @RequireHRPermission
     @GetMapping("/list/{departmentId}")
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {

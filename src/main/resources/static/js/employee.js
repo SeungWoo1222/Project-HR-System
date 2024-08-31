@@ -371,7 +371,13 @@ function submitResignationForm(event) {
 }
 
 // AJAX PUT 요청 - 퇴사 수정
-function submitUpdateResignationForm(event) {
+function submitUpdateResignationForm(event, employeeId) {
+    // 확인 메세지
+    const confirmMessage = "'" + employeeId + "'사원의 퇴사 정보를 수정하시겠습니까?";
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+
     // 유효성 검사 실행
     if (!validateResignationForm(event)) {
         return;
@@ -416,7 +422,7 @@ function submitUpdateResignationForm(event) {
     }
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
+    fetch(actionUrl  + employeeId, {
         method: 'PUT',
         body: formData
     })
@@ -428,7 +434,7 @@ function submitUpdateResignationForm(event) {
             console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text); // 성공 메시지 알림
-                window.location.href = '/employee/resignation';
+                window.location.href = '/employee/' + employeeId + '/detail';
             } else if (response.status === 404) {
                 alert(response.text); // 404 오류 메세지 알림
             } else if (response.status === 400) {

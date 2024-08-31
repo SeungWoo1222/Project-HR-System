@@ -56,8 +56,8 @@ function updateUnreadNotificationCount(count) {
 
 // 알림 URL 이동
 function openNotificationUrl(url, notificationId, readStatus) {
-    // URL 새 탭 열기
-    window.open(url);
+    // URL로 이동
+    window.location.href = url;
     // 알림 읽음 처리
     readNotification(notificationId, readStatus);
 }

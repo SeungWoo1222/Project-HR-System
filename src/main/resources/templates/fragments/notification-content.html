@@ -14,7 +14,7 @@
            'openNotificationUrl(\''+ ${notification.url} + '\', ' + ${notification.notificationId} + ', ' + ${notification.readStatus} + ')' :
            'readNotification(' + ${notification.notificationId} + ', ' + ${notification.readStatus} + ')'">
         <span class="marker"></span>
-        <span class="message" th:text="${notification.message}">알림 메시지</span>
+        <span class="message" th:utext="${notification.message}">알림 메시지</span>
         <span class="relative-time" th:text="${notification.relativeTime}"></span>
         <img src="/images/icons/delete.png" alt="삭제" class="delete-icon" th:onclick="'deleteNotification(' + ${notification.notificationId} + ')'"/>
       </div>

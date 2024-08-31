@@ -86,7 +86,9 @@ public class ResignationServiceImpl implements ResignationService {
 
         // 퇴사 정보 등록
         resignationDAO.insertResignation(resignation);
-        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원이 퇴사 처리되었습니다.";
+
+        String message = "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원이 퇴사 처리되었습니다.";
+        return message;
     }
 
     @Transactional

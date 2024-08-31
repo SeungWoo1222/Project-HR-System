@@ -74,21 +74,6 @@
     align-items: center;
 }
 
-.notification-item:hover {
-    background-color: #E1F4FD;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-.notification-item:hover .relative-time {
-    display: none;
-}
-
-.notification-item:hover .delete-icon {
-    display: inline-block;
-}
-
 /* 마커 스타일 */
 .notification-item .marker {
     background-color: #18A8F1;
@@ -115,7 +100,7 @@
 /* 메시지 스타일 */
 .notification-item .message {
     flex-grow: 1;
-    font-size: 15px;
+    font-size: 14px;
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -145,3 +130,25 @@
     transform: scale(1.2);
 }
 
+/* notification-item hover */
+.notification-item:hover {
+    background-color: #E1F4FD;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.notification-item:hover .relative-time {
+    display: none;
+}
+
+.notification-item:hover .delete-icon {
+    display: inline-block;
+}
+
+.notification-item:hover .message {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    white-space: normal;
+    height: auto;
+}
