@@ -74,7 +74,7 @@
         ORDER BY r.request_date desc LIMIT 5;
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 내게 온 요청 검색(STAFF) -->
     <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
         r.request_id AS requestId,
@@ -87,22 +87,22 @@
         FROM report_requests r
         JOIN employees e ON r.requester_id = e.employee_id
         <where>
-            <if test="writerId != null and requesterId != ''"> r.writer_id = #{writerId} </if>
+            writer_id = #{writerId}
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (r.request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (e.name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(r.due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(r.due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
         ORDER BY r.request_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <!-- 내게 온 요청 검색(STAFF) -->
     <select id="count" parameterType="map" resultType="int">
         SELECT COUNT(writer_id) FROM report_requests JOIN employees e ON requester_id = employee_id
         <where>
@@ -117,13 +117,13 @@
                 e.name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 내가 쓴 요청 검색(MANAGER) -->
     <select id="searchMyRequests" parameterType="map" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
         request_id AS requestId,
@@ -134,26 +134,26 @@
         request_note AS requestNote
         FROM report_requests
         <where>
-            <if test="writerId != null and requesterId != ''"> requester_id = #{requesterId} </if>
-            <if test="keyword != null and keyword != '' and searchType == 1">
+            requester_id = #{requesterId}
+        <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (writer_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
         ORDER BY request_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <!-- 내가 쓴 요청 검색 개수 조회(MANAGER) -->
     <select id="countMyRequests" parameterType="map" resultType="int">
         SELECT COUNT(requester_id) FROM report_requests
         <where>
-            requester_id = #{requester_id}
+            requester_id = #{requesterId}
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 request_note LIKE CONCAT('%', #{keyword}, '%')
@@ -164,8 +164,8 @@
                 writer_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>

@@ -25,32 +25,8 @@
 <!--============================================== 생성 SQL문 =======================================================-->
 <!--============================================== 조회 SQL문 =======================================================-->
     <!-- 모든 보고서 조회 (결재가필요한 보고서 조회, 내가 쓴 보고서 조회에 사용) -->
-    <select id="getAllReports" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
-        SELECT
-        r.report_id AS reportId,
-        r.writer_id AS writerId,
-        e.name AS writerName,
-        r.title,
-        -- r.content,
-        r.created_date AS createdDate,
-        -- r.modified_date AS modifiedDate,
-        r.approver_id AS approverId,
-        r.approver_name AS approverName,
-        r.status
-        -- r.reject_reason AS rejectReason
-        FROM reports r
-        JOIN employees e ON r.writer_id = e.employee_id
-        <where>
-            <if test="approverId != null">
-                r.approver_id = #{approverId}
-            </if>
-            <if test="startYearMonth != null and endYearMonth != null">
-                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startYearMonth} AND #{endYearMonth}
-            </if>
-            <if test="writerId != null">
-                AND r.writer_id = #{writerId}
-            </if>
-        </where>
+    <select id="getAllReports" parameterType="string" resultType="com.woosan.hr_system.report.model.Report">
+        SELECT * FROM reports WHERE writer_id = #{employeeId}
     </select>
 
     <!-- 보고서 세부 조회 -->
@@ -90,17 +66,13 @@
                 )
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
-                AND (
-                approver_name LIKE CONCAT('%', #{keyword}, '%')
-                )
+                AND (approver_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="keyword != null and keyword != '' and searchType == 3">
-                AND (
-                status LIKE CONCAT('%', #{keyword}, '%')
-                )
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
-            <if test="reportStart != null and reportEnd != null">
-                AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            <if test="approvalStatus != null and approvalStatus != ''" >
+                AND status = #{approvalStatus}
             </if>
         </where>
         ORDER BY created_date DESC
@@ -123,13 +95,11 @@
                 approver_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="keyword != null and keyword != '' and searchType == 3">
-                AND (
-                status LIKE CONCAT('%', #{keyword}, '%')
-                )
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
-            <if test="reportStart != null and reportEnd != null">
-                AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            <if test="approvalStatus != null and approvalStatus != ''" >
+                AND status = #{approvalStatus}
             </if>
         </where>
     </select>
@@ -158,13 +128,11 @@
                 e.name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="keyword != null and keyword != '' and searchType == 3">
-                AND (
-                r.status LIKE CONCAT('%', #{keyword}, '%')
-                )
+            <if test="approvalStatus != null and approvalStatus != ''" >
+                AND r.status = #{approvalStatus}
             </if>
-            <if test="reportStart != null and reportEnd != null">
-                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
         ORDER BY r.created_date DESC
@@ -187,13 +155,11 @@
                 e.name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="keyword != null and keyword != '' and searchType == 3">
-                AND (
-                r.status LIKE CONCAT('%', #{keyword}, '%')
-                )
+            <if test="approvalStatus != null and approvalStatus != ''" >
+                AND r.status = #{approvalStatus}
             </if>
-            <if test="reportStart != null and reportEnd != null">
-                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{reportStart} AND #{reportEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(r.created_date, '%Y-%m') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>

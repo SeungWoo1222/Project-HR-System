@@ -7,25 +7,25 @@ import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 import com.woosan.hr_system.report.model.Report;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ReportService {
 //======================================================생성============================================================
     // 보고서 생성
     List<Integer> createReport(Report report);
-
     // 보고서 + 파일 생성
     void createReportWithFile(Report report, List<MultipartFile> reportDocuments);
-
-    //요청들어온 보고서 생성
+    // 요청 들어온 보고서 생성
     int createReportFromRequest(Report report);
-
+    // 요청 들어온 보고서 + 파일 생성
     int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments);
 
 //======================================================생성============================================================
 //======================================================조회============================================================
     // 모든 리포트 조회
-    List<Report> getAllReports(String reportStart, String reportEnd, String employeeId);
+    List<Report> getAllReports(String employeeId);
 
     // 특정 리포트 조회
     Report getReportById(int reportId);
@@ -34,10 +34,10 @@ public interface ReportService {
     List<Report> getRecentReports(String writerId);
 
     // 내가 쓴 보고서 페이징, 검색 + 보고서 조회
-    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd);
+    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
 
-    // 결재 할 보고서 페이징, 검색 + 보고서 조회
-    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String reportStart, String reportEnd);
+    // 결재 할 보고서 페이징, 검색 + 보고서 조회 (MANAGER)
+    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
 
     // 결재 미처리 보고서 조회(MANAGER)
     List<Report> getUnprocessedReports(String approverId);

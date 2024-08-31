@@ -18,6 +18,7 @@ import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,10 +66,6 @@ public class ReportController {
         // 내게 온 요청 조회(최근 5개 요청)
         List<Request> requests = requestService.getMyPendingRequests(writerId);
         model.addAttribute("requests", requests);
-
-        for (Request request : requests) {
-            log.info("request: {}", request.getReportId());
-        }
 
         // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
         String statisticStart = (String) session.getAttribute("staffStatisticStart");
@@ -133,10 +132,6 @@ public class ReportController {
                                           @RequestPart(value="report") Report report,
                                           @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
                                           @RequestParam(value="requestId") int requestId) {
-        log.info("report : {}", report);
-        log.info("reportDocuments : {}", reportDocuments);
-        log.info("requestId : {}", requestId);
-
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         // 현재 로그인한 계정의 employeeId를 요청자(writer)로 설정
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -173,24 +168,22 @@ public class ReportController {
         return "/report/report-view";
     }
 
-    @GetMapping("/list") // 보고서 리스트 페이지
-    public String showReportList(HttpSession session,
-                                 @RequestParam(name = "page", defaultValue = "1") int page,
+    // 내가 작성한 보고서 리스트
+    @GetMapping("/list")
+    public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
+                                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
 
-        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
-        String reportStart = (String) session.getAttribute("staffReportStart");
-        String reportEnd = (String) session.getAttribute("staffReportEnd");
-
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Report> pageResult = reportService.searchReports(pageRequest, writerId, searchType, reportStart, reportEnd);
-
+        PageResult<Report> pageResult = reportService.searchReports(pageRequest, writerId, searchType, approvalStatus, startDate, endDate);
 
         model.addAttribute("reports", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -202,25 +195,22 @@ public class ReportController {
         return "report/report-list";
     }
 
-    @GetMapping("/requestList") // 요청 리스트 페이지
-    public String showRequestList(HttpSession session,
-                                  @RequestParam(name = "page", defaultValue = "1") int page,
+    // 내게 온 요청 리스트
+    @GetMapping("/requestList")
+    public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                   @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                   Model model) {
 
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
 
-        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
-        String requestStart = (String) session.getAttribute("staffRequestStart");
-        String requestEnd = (String) session.getAttribute("staffRequestEnd");
-
-
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, requestStart, requestEnd);
+        PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, startDate, endDate);
 
 
         model.addAttribute("requests", pageResult.getData());
@@ -231,39 +221,6 @@ public class ReportController {
         model.addAttribute("searchType", searchType);
 
         return "report/request-list";
-    }
-
-    // 내가 작성한 보고서 날짜 설정 페이지 이동
-    @GetMapping("/reportDate")
-    public String showReportDatePage() {
-        return "report/report-date";
-    }
-
-    // 내가 작성한 보고서 날짜 설정
-    @PostMapping("/reportDate")
-    public String setReportDateRange(@RequestParam(name = "reportStart") String reportStart,
-                                     @RequestParam(name = "reportEnd") String reportEnd,
-                                     HttpSession session) {
-        session.setAttribute("staffReportStart", reportStart);
-        session.setAttribute("staffReportEnd", reportEnd);
-        return "redirect:/report/list";
-    }
-
-    // 나에게 온 요청 날짜 설정 페이지 이동
-    @GetMapping("/requestDate")
-    public String showRequestDatePage() {
-        return "/report/request-date";
-    }
-
-    // 나에게 온 요청 날짜 설정
-    @PostMapping("/requestDate")
-    public String setRequestDateRange(@RequestParam(name = "requestStart") String requestStart,
-                                      @RequestParam(name = "requestEnd") String requestEnd,
-                                      HttpSession session) {
-
-        session.setAttribute("staffRequestStart", requestStart);
-        session.setAttribute("staffRequestEnd", requestEnd);
-        return "redirect:/report/requestList";
     }
 
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
@@ -310,10 +267,6 @@ public class ReportController {
     public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {
-
-        log.info("컨트롤러 - userSelectedFileIdList : {}", userSelectedFileIdList);
-        log.info("컨트롤러 - toUploadFileList : {}", toUploadFileList);
-
         // 요청 수정 권한이 있는지 확인
         UserSessionInfo userSessionInfo = new UserSessionInfo();
 
@@ -333,7 +286,6 @@ public class ReportController {
     @Transactional
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
-        log.info("컨트롤러 reportId : {}", reportId);
         // 보고서 삭제 권한이 있는지 확인
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();

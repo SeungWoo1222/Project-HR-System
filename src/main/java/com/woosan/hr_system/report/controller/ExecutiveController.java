@@ -20,11 +20,13 @@ import com.woosan.hr_system.upload.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,24 +120,22 @@ public class ExecutiveController {
 //=====================================================생성 메소드========================================================
 
 //=====================================================조회 메소드========================================================
+    // 내가 작성한 요청 리스트
     @GetMapping("/requestList")
-    public String showRequestList(HttpSession session,
-                                 @RequestParam(name = "page", defaultValue = "1") int page,
+    public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
+        log.info("컨트롤러로 오는 size : {}", size);
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String requesterId = userSessionInfo.getCurrentEmployeeId();
 
-        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
-        String requestStart = (String) session.getAttribute("requestStart");
-        String requestEnd = (String) session.getAttribute("requestEnd");
-
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Request> pageResult = requestService.searchMyRequests(pageRequest, requesterId, searchType, requestStart, requestEnd);
-
+        PageResult<Request> pageResult = requestService.searchMyRequests(pageRequest, requesterId, searchType, startDate, endDate);
 
         model.addAttribute("requests", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -147,23 +147,23 @@ public class ExecutiveController {
         return "/admin/report/request-list";
     }
 
+    // 내가 결재할 보고서 목록
     @GetMapping("toApproveReportList")
-    public String showReportList(HttpSession session,
-                                 @RequestParam(name = "page", defaultValue = "1") int page,
+    public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
+                                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
+        log.info("toApproveReportList 컨트롤러 도착");
+        // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String approverId = userSessionInfo.getCurrentEmployeeId();
 
-        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
-        String reportStart = (String) session.getAttribute("approvalStart");
-        String reportEnd = (String) session.getAttribute("approvalEnd");
-
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Report> pageResult = reportService.toApproveSearchReports(pageRequest, approverId, searchType, reportStart, reportEnd);
+        PageResult<Report> pageResult = reportService.toApproveSearchReports(pageRequest, approverId, searchType, approvalStatus, startDate, endDate);
 
 
         model.addAttribute("reports", pageResult.getData());
@@ -257,45 +257,6 @@ public class ExecutiveController {
         response.put("statsJson", statsJson);
         return response;
     }
-
-    // 내 결재 목록 날짜 범위설정 페이지 이동
-    @RequireManagerPermission
-    @GetMapping("/approvalDatePage")
-    public String showApprovalDatePage() {
-        return "admin/report/report-approval-date";
-    }
-
-    // 내 결재 목록 조회 + 날짜 범위 설정
-    @RequireManagerPermission
-    @GetMapping("/approvalDate")
-    public String setApprovalListDateRange(@RequestParam(name = "approvalStart") String approvalStart,
-                                           @RequestParam(name = "approvalEnd") String approvalEnd,
-                                           HttpSession session) {
-        session.setAttribute("approvalStart", approvalStart);
-        session.setAttribute("approvalEnd", approvalEnd);
-        return "redirect:/admin/request/toApproveReportList";
-    }
-
-    // 내가 쓴 작성 요청목록 날짜 범위설정 페이지 이동
-    @RequireManagerPermission
-    @GetMapping("/requestDatePage")
-    public String showRequestDatePage() {
-        return "admin/report/request-date";
-    }
-
-    // 내 결재 목록 조회 + 날짜 범위 설정
-    @RequireManagerPermission
-    @GetMapping("/requestDate")
-    public String setRequestListDateRange(@RequestParam(name = "requestStart") String requestStart,
-                                          @RequestParam(name = "requestEnd") String requestEnd,
-                                          HttpSession session) {
-        session.setAttribute("requestStart", requestStart);
-        session.setAttribute("requestEnd", requestEnd);
-        return "redirect:/admin/request/requestList";
-    }
-
-
-
 //====================================================조회 메소드========================================================
 //====================================================수정 메소드========================================================
     @RequireManagerPermission
