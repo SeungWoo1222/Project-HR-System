@@ -200,9 +200,9 @@ public class ReportServiceImpl implements ReportService {
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
+    // 결재할 보고서 검색
     @Override
     public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
-
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -215,20 +215,8 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
-
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (statisticStart == null || statisticStart.trim().isEmpty() ||
-                statisticEnd == null || statisticEnd.trim().isEmpty()) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            statisticStart = formattedDate;
-            statisticEnd = formattedDate;
-        }
-
-        return reportDAO.getReportStats(statisticStart, statisticEnd, writerIdList);
+    public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
+        return reportDAO.getReportStats(startDate, endDate, writerIdList);
     }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================

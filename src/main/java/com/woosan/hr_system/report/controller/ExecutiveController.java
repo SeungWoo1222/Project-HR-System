@@ -53,8 +53,11 @@ public class ExecutiveController {
     // main 페이지
     @RequireManagerPermission
     @GetMapping("/main")
-    public String getMainPage(HttpSession session, Model model) throws JsonProcessingException {
-
+    public String getMainPage(@RequestParam(name = "idList", required = false) List<String> writerIdList,
+                              @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                              @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                              Model model) throws JsonProcessingException {
+        log.info("컨트롤러 - 시작날짜 {}, 마지막날짜 {}, IDList{}", startDate, endDate, writerIdList);
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String employeeId = userSessionInfo.getCurrentEmployeeId();
@@ -68,12 +71,7 @@ public class ExecutiveController {
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
-        // 보고서 통계
-        String statisticStart = (String) session.getAttribute("statisticStart");
-        String statisticEnd = (String) session.getAttribute("statisticEnd");
-        List<String> writerIdList = (List<String>) session.getAttribute("idList");
-
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, writerIdList);
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerIdList);
 
         // 선택된 임원 목록 조회
         List<Employee> selectedWriters = new ArrayList<>();
@@ -157,14 +155,12 @@ public class ExecutiveController {
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        log.info("toApproveReportList 컨트롤러 도착");
         // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String approverId = userSessionInfo.getCurrentEmployeeId();
 
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Report> pageResult = reportService.toApproveSearchReports(pageRequest, approverId, searchType, approvalStatus, startDate, endDate);
-
 
         model.addAttribute("reports", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -198,49 +194,27 @@ public class ExecutiveController {
         return "admin/report/report-view";
     }
 
-    @GetMapping("/statistic") // 통계 날짜, 임원 설정 페이지 이동
-    public String showStatisticPage(Model model) {
-        List<Employee> employees = employeeDAO.getAllEmployees();
-        model.addAttribute("employees", employees); // employees 목록 추가
-        return "/admin/report/statistic";
-    }
-
-    @RequireManagerPermission
-    @PostMapping("/stats") // 통계 날짜, 임원 설정
-    public String getReportStats(@RequestParam(name = "statisticStart") String statisticStart,
-                                 @RequestParam(name = "statisticEnd") String statisticEnd,
-                                 @RequestParam(required = false, name = "idList") List<String> idList,
-                                 HttpSession session) {
-
-        System.out.println("idList" + idList);
-
-        // 날짜 설정
-        session.setAttribute("statisticStart", statisticStart);
-        session.setAttribute("statisticEnd", statisticEnd);
-
-        // 임원 설정
-        session.setAttribute("idList", idList);
-
-        return "redirect:/admin/request/main";
-    }
-
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
     @ResponseBody
     @RequireManagerPermission
     @PostMapping("/updateStats")
-    public Map<String, Object> updateStats(HttpSession session, @RequestBody List<String> ids) throws JsonProcessingException {
-        String statisticStart = (String) session.getAttribute("statisticStart");
-        String statisticEnd = (String) session.getAttribute("statisticEnd");
+    public Map<String, Object> updateStats(@RequestBody Map<String, Object> payload)
+                                            throws JsonProcessingException {
+        List<String> writerIdList = (List<String>) payload.get("idList");
+        LocalDate startDate = null;
+        LocalDate endDate = null;
 
-        // 삭제된 임원 외 임원들을 다시 session에 등록
-        session.setAttribute("idList", ids);
-
-        if (ids.isEmpty()) {
-            session.removeAttribute("idList");
+        // startDate 및 endDate가 null이 아니면 파싱
+        if (payload.get("startDate") != null) {
+            startDate = LocalDate.parse((String) payload.get("startDate"));
+        }
+        if (payload.get("endDate") != null) {
+            endDate = LocalDate.parse((String) payload.get("endDate"));
         }
 
+        log.info("업데이트 요청 수신 - 시작 날짜: {}, 종료 날짜: {}, 선택된 임원 목록: {}", startDate, endDate, writerIdList);
         // 통계 데이터 조회
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, ids);
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerIdList);
         return prepareStatsResponse(stats);
     }
 

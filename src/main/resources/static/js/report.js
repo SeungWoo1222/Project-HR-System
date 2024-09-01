@@ -514,7 +514,7 @@ function updateRequestForm(event) {
         });
 }
 
-// 내가 작서한 보고서(STAFF), 결재할 보고서(MANAGER) - 검색 시
+// 내가 작성한 보고서(STAFF), 결재할 보고서(MANAGER) - 검색 시
 function submitReportSearchForm(event) {
     event.preventDefault();  // 기본 폼 제출 방지
 
@@ -591,6 +591,73 @@ function submitRequestSearchForm(event) {
     // 데이터를 서버로 GET 요청 전송
     window.location.href = `${actionUrl}?${params.toString()}`;
 }
+
+// 내가 쓴 보고서 통계(STAFF)
+function submitReportStatisticForm(event) {
+    event.preventDefault();  // 기본 폼 제출 방지
+
+    const form = event.target.closest('form'); // 이벤트가 발생한 폼 요소를 가져옴
+    const actionUrl = form.action; // 폼의 action 속성을 가져옴
+
+    const searchDateOption = document.getElementById('searchDate').value;
+    const dateRange = getDateRangeByOption(searchDateOption);
+
+    let startDate = dateRange.startDate;
+    let endDate = dateRange.endDate;
+
+    const params = new URLSearchParams({
+    });
+
+    if (searchDateOption === 'custom') {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+    }
+
+    if (startDate && endDate) {
+        params.append('startDate', startDate);
+        params.append('endDate', endDate);
+    }
+
+    // 데이터를 서버로 GET 요청 전송
+    window.location.href = `${actionUrl}?${params.toString()}`;
+}
+
+// SATFF들의 보고서 통계 조회 (MANAGER)
+function submitReportStatisticFormByManager(event) {
+    event.preventDefault();  // 기본 폼 제출 방지
+
+    const form = event.target.closest('form'); // 이벤트가 발생한 폼 요소를 가져옴
+    const actionUrl = form.action; // 폼의 action 속성을 가져옴
+
+    const searchDateOption = document.getElementById('searchDate').value;
+    const dateRange = getDateRangeByOption(searchDateOption);
+
+    let startDate = dateRange.startDate;
+    let endDate = dateRange.endDate;
+
+    const params = new URLSearchParams({
+        idList: Object.keys(selectedEmployees),
+        nameList: Object.values(selectedEmployees),
+    });
+
+    if (searchDateOption === 'custom') {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+    }
+
+    if (startDate && endDate) {
+        params.append('startDate', startDate);
+        params.append('endDate', endDate);
+    }
+
+    params.forEach((value, key) => {
+        console.log(key, value);
+    })
+
+    // 데이터를 서버로 GET 요청 전송
+    window.location.href = `${actionUrl}?${params.toString()}`;
+}
+
 
 
 //=============================================== formData 전송 =========================================================
@@ -685,17 +752,25 @@ function removeWriter(button) {
 
 // main.html에 통계를 다시 갱신하는 매소드(임원 삭제 후)
 function updateChartWithSelectedWriters(ids) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const startDate = urlParams.get('startDate') || null;
+    const endDate = urlParams.get('endDate') || null;
+
+    const payload = {
+        idList: ids,
+        startDate: startDate,
+        endDate: endDate
+    };
+
     $.ajax({
         url: '/admin/request/updateStats',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(ids),
+        data: JSON.stringify(payload),
         success: function (response) {
             // 갱신된 통계 데이터를 이용하여 차트를 다시 그리기
             var stats = JSON.parse(response.statsJson);
-
             var data = google.visualization.arrayToDataTable(stats);
-
             var options = {};
 
             var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
@@ -709,9 +784,8 @@ function updateChartWithSelectedWriters(ids) {
 //========================================== 통계 관련 메소드 =================================================================
 //========================================== 날짜 설정 메소드 =================================================================
 function validateDateRange() {
-    console.log("날짜 유효성 검사 완료");
-    const startDate = document.getElementById('start').value;
-    const endDate = document.getElementById('end').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
 
     if (startDate && endDate && startDate > endDate) {
         alert('시작 월은 종료 월보다 늦을 수 없습니다.');

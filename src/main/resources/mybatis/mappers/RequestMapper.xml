@@ -98,7 +98,7 @@
                 AND DATE_FORMAT(r.due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY r.request_date DESC
+        ORDER BY r.due_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
@@ -145,7 +145,7 @@
                 AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY request_date DESC
+        ORDER BY due_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 

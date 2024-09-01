@@ -48,7 +48,7 @@ public class ReportDAO {
 
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
+    public List<ReportStat> getReportStats(LocalDate statisticStart, LocalDate statisticEnd, List<String> writerIdList) {
         Map<String, Object> params = new HashMap<>();
         params.put("statisticStart", statisticStart);
         params.put("statisticEnd", statisticEnd);
@@ -72,7 +72,7 @@ public class ReportDAO {
     }
 
 
-        // 검색과 페이징 로직
+    // 내가 쓴 보고서 검색
     public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -87,7 +87,7 @@ public class ReportDAO {
         return sqlSession.selectList(NAMESPACE + "search", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    // 내가 쓴 보고서 검색
     public int count(String keyword, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -99,7 +99,7 @@ public class ReportDAO {
         return sqlSession.selectOne(NAMESPACE + "count", params);
     }
 
-    // 검색과 페이징 로직
+    // 결재할 보고서 검색
     public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
@@ -114,7 +114,7 @@ public class ReportDAO {
         return sqlSession.selectList(NAMESPACE + "toApproveSearch", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
+    // 결재할 보고서 검색
     public int toApproveCount(String keyword, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);

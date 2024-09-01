@@ -43,7 +43,7 @@ public interface ReportService {
     List<Report> getUnprocessedReports(String approverId);
 
     // 보고서 통계 조회
-    List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList);
+    List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList);
 
 //======================================================조회============================================================
 //======================================================수정============================================================

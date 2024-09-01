@@ -52,8 +52,10 @@ public class ReportController {
     private ReportFileService reportFileService;
 
     @GetMapping("/main") // main 페이지 이동
-    public String getMainPage(HttpSession session,
+    public String getMainPage(@RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                              @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               Model model) throws JsonProcessingException {
+
 
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -67,12 +69,8 @@ public class ReportController {
         List<Request> requests = requestService.getMyPendingRequests(writerId);
         model.addAttribute("requests", requests);
 
-        // 설정된 조회 기간을 가져옴(없다면 현재 달에 쓰인 보고서를 보여줌)
-        String statisticStart = (String) session.getAttribute("staffStatisticStart");
-        String statisticEnd = (String) session.getAttribute("staffStatisticEnd");
-
-        List<String> employeeIds = Collections.singletonList(writerId); // employeeId를 List<String>으로 변환 후 전달
-        List<ReportStat> stats = reportService.getReportStats(statisticStart, statisticEnd, employeeIds);
+        List<String> employeeIds = Collections.singletonList(writerId); // writerId를 List<String>으로 변환 후 전달
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate, employeeIds);
 
         // 통계 View 관련 로직
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환

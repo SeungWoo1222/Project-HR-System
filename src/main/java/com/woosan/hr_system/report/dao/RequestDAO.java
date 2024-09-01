@@ -77,8 +77,8 @@ public class RequestDAO {
         params.put("keyword", keyword);
         params.put("searchType", searchType);
         params.put("writerId", writerId);
-        params.put("requestStart", startDate);
-        params.put("requestEnd", endDate);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "count", params);
     }
 

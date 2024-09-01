@@ -16,6 +16,16 @@
 
           // searchDate 선택 시 사용자 지정 날짜 필드 토글
           document.getElementById('searchDate').addEventListener('change', toggleCustomDateFields);
+
+          // 폼 제출 시 유효성 검사와 검색을 동시에 실행
+          const form = document.getElementById('form');
+          form.addEventListener('submit', function(event) {
+              if (!validateDateRange()) {
+                  event.preventDefault();  // 유효성 검사가 실패하면 폼 제출을 막음
+              } else {
+                  submitReportSearchForm(event);  // 유효성 검사가 성공하면 검색 수행
+              }
+          });
       });
   </script>
 </th:block>
@@ -40,7 +50,7 @@
 
           <fieldset>
               <legend>검색 옵션</legend>
-              <label for="searchDate">기간:</label>
+              <label for="searchDate">작성 기간:</label>
               <select id="searchDate">
                   <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
                   <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
@@ -75,7 +85,7 @@
               <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
           </fieldset>
 
-          <button type="submit" onclick="submitReportSearchForm(event)">검색</button>
+          <button type="submit">검색</button>
       </form>
 
     </div>
