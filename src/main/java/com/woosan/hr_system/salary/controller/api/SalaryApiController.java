@@ -1,6 +1,6 @@
 package com.woosan.hr_system.salary.controller.api;
 
-import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.service.SalaryService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -62,6 +62,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return new CustomUserDetails(
                 employee.getEmployeeId(),
+                employee.getName(),
                 password.getPassword(),
                 authorities,
                 employee.getDepartment().name(), // 이미 권한에 설정해두어서 삭제해도 되지만 승우 코드와 프론트쪽에서 검사 때문에 일단 남겨둠

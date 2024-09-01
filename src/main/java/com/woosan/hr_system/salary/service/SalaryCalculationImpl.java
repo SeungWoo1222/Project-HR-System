@@ -1,8 +1,8 @@
 package com.woosan.hr_system.salary.service;
 
 import com.github.usingsky.calendar.KoreanLunarCalendar;
-import com.woosan.hr_system.auth.aspect.LogAfterExecution;
-import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
+import com.woosan.hr_system.aspect.LogAfterExecution;
+import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.model.DeductionDetails;

@@ -5,10 +5,19 @@ body {
     box-sizing: border-box;
 }
 
+img {
+    user-drag: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 .container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 /* Header styles */
@@ -37,8 +46,12 @@ body {
 
 /* Sidebar styles */
 .sidebar {
+    position: relative;
     width: 150px;
     padding: 20px;
+    background: white;
+    z-index: 20;
+    flex-shrink: 0;
 }
 
 .sidebar p {
@@ -76,7 +89,7 @@ body {
     display: block;
 }
 
-.sidebar ul li a, .section-sidebar ul li p {
+.sidebar ul li a, .sidebar ul #notification-li div p,.section-sidebar ul li p {
     text-decoration: none;
     color: #333;
     display: flex;
@@ -85,8 +98,24 @@ body {
     box-sizing: border-box;
 }
 
-.sidebar ul li a img, .section-sidebar ul li p img {
+.sidebar ul li a img, .sidebar ul #notification-li div p img, .section-sidebar ul li p img {
     margin-right: 10px;
+}
+
+/* #notification-li styles */
+.sidebar ul #notification-li div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.notification-badge {
+    font-size: 11px;
+    text-align: center;
+    font-weight: bold;
+    padding: 3px;
+    background: #FF0000;
+    border-radius: 5px;
+    color: white;
 }
 
 /* Submenu styles */
@@ -200,6 +229,10 @@ body {
 }
 
 /* Button styles */
+/* 버튼에는 btn 클래스를 추가해주세요. */
+/* a에는 a-btn 클래스를 추가해주세요.  */
+/* 파일 버튼은 label에 input-file-btn 클래스를 추가해주세요. */
+/* 이미지 버튼에는 image-btn 클래스를 추가해주세요. */
 .btn {
     padding: 10px;
     background-color: #cfedfc;
@@ -234,26 +267,6 @@ body {
     color: white;
 }
 
-/* Error Message styles */
-.error-message {
-    color: #ff0000;
-    text-align: left;
-    margin-bottom: 15px;
-}
-
-/* Table styles */
- .list tbody tr:hover {
-     background-color: #C3E8FB;
- }
-
- /* Text styles */
-.disabled {
-    text-decoration: line-through !important;
-    pointer-events: none;
-    color: gray !important;
-}
-
-/* Input File styles */
 .input-file-btn {
     width : 280px;
     font-size: 13px;
@@ -270,7 +283,42 @@ body {
     color: white;
 }
 
+.image-btn {
+    background-color: white;
+    padding: 1px 2px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.image-btn:hover {
+    background-color: #EDEDED;
+}
+
+/* Error Message styles */
+/* 에러메세지에 error-message 클래스를 추가해주세요. */
+.error-message {
+    color: #ff0000;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+/* Table styles */
+/* 테이블에 list 클래스를 추가해주세요. */
+ .list tbody tr:hover {
+     background-color: #C3E8FB;
+ }
+
+ /* Text styles */
+.disabled {
+    text-decoration: line-through !important;
+    pointer-events: none;
+    color: gray !important;
+}
+
 /* Hidden Styles */
+/* hidden 클래스를 추가해주세요. */
 .hidden {
     display: none;
 }
@@ -282,3 +330,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
 }
+
+
+
+

@@ -50,6 +50,11 @@ public class EmployeeDAO {
     // 사원 가족 정보 조회
     public Map<String, Integer> selectFamilyInfoById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectFamilyInfoById", employeeId);}
 
+    // 부서와 직급을 이용한 사원 조회
+    public List<Employee> selectEmployeesByDepartmentAndPosition(Map<String, Object> map) {
+        return sqlSession.selectList(NAMESPACE + "selectEmployeesByDepartmentAndPosition", map);
+    }
+
     // 사원 정보 등록
     public void insertEmployee(Employee employee) { sqlSession.insert(NAMESPACE + "insertEmployee", employee); }
 

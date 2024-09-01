@@ -1,6 +1,6 @@
 package com.woosan.hr_system.resignation.controller;
 
-import com.woosan.hr_system.auth.aspect.RequireHRPermission;
+import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.resignation.service.ResignationService;

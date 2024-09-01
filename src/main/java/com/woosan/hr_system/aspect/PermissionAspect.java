@@ -1,4 +1,4 @@
-package com.woosan.hr_system.auth.aspect;
+package com.woosan.hr_system.aspect;
 
 import com.woosan.hr_system.auth.service.AuthService;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,13 +13,13 @@ public class PermissionAspect { // 권한 관리를 위한 AOP Aspect
     private AuthService authService;
 
     // Manager 권한 확인
-    @Before("@annotation(com.woosan.hr_system.auth.aspect.RequireManagerPermission)")
+    @Before("@annotation(com.woosan.hr_system.aspect.RequireManagerPermission)")
     public void verifyManagerPermission() {
         authService.verifyManagerPermission();
     }
 
     // HR 부서 권한 확인
-    @Before("@annotation(com.woosan.hr_system.auth.aspect.RequireHRPermission)")
+    @Before("@annotation(com.woosan.hr_system.aspect.RequireHRPermission)")
     public void verifyHRPermissions() {
         authService.verifyDepartment("HR");
     }

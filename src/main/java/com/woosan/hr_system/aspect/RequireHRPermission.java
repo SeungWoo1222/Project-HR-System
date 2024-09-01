@@ -1,4 +1,4 @@
-package com.woosan.hr_system.auth.aspect;
+package com.woosan.hr_system.aspect;
 
 import java.lang.annotation.*;
 

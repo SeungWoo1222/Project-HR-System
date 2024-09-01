@@ -17,6 +17,8 @@ public interface EmployeeService {
     List<Employee> getResignedEmployees();
     List<Employee> getPreDeletionEmployees();
     List<Employee> getEmployeesByDepartment(String departmentId);
+    List<Employee> getEmployeesByDepartmentAndPosition(String department, String position);
+    List<String> convertEmployeesToIdList(List<Employee> employeeList);
 
     // == 등록 ==
     String insertEmployee(Employee employee, MultipartFile picture);

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="empty-notification" th:if="${notificationList.isEmpty()}" data-empty="true">
+  <img src="/images/icons/no-message.png" width="60" alt=""/>
+  <p class="empty-message">알림 수신함이 비어 있습니다!</p>
+</div>
+
+<div th:if="${!notificationList.isEmpty()}" data-empty="false">
+  <ul>
+    <li th:each="notification : ${notificationList}">
+      <div class="notification-item" th:classappend="${notification.readStatus} ? 'read' : 'unread'"
+           th:attrappend="onclick=${notification.url != null} ?
+           'openNotificationUrl(\''+ ${notification.url} + '\', ' + ${notification.notificationId} + ', ' + ${notification.readStatus} + ')' :
+           'readNotification(' + ${notification.notificationId} + ', ' + ${notification.readStatus} + ')'">
+        <span class="marker"></span>
+        <span class="message" th:utext="${notification.message}">알림 메시지</span>
+        <span class="relative-time" th:text="${notification.relativeTime}"></span>
+        <img src="/images/icons/delete.png" alt="삭제" class="delete-icon" th:onclick="'deleteNotification(' + ${notification.notificationId} + ')'"/>
+      </div>
+    </li>
+  </ul>
+</div>
+
+</html>

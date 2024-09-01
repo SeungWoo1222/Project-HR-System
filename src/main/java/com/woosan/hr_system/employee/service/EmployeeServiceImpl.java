@@ -1,7 +1,7 @@
 package com.woosan.hr_system.employee.service;
 
-import com.woosan.hr_system.auth.aspect.LogAfterExecution;
-import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
+import com.woosan.hr_system.aspect.LogAfterExecution;
+import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
@@ -10,6 +10,7 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.resignation.service.ResignationService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
@@ -37,6 +38,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private FileService fileService;
     @Autowired
     private ResignationService resignationService;
+    @Autowired
+    private NotificationService notificationService;
 
     private static final int MAX_POSITION_RANK = 5;
     private static final String RESIGNED_STATUS = "퇴사";
@@ -117,6 +120,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> getEmployeesByDepartment(String departmentId) {
         return employeeDAO.getEmployeesByDepartment(departmentId);
     }
+
+    @Override // 부서와 직급을 이용한 사원 조회
+    public List<Employee> getEmployeesByDepartmentAndPosition(String department, String position) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("department", department);
+        map.put("position", position);
+        return employeeDAO.selectEmployeesByDepartmentAndPosition(map);
+    }
+
+    @Override // 사원리스트 -> 사원 ID 리스트로 변경
+    public List<String> convertEmployeesToIdList(List<Employee> employeeList) {
+        return employeeList.stream()
+                .map(Employee::getEmployeeId)
+                .toList();
+    }
     // ============================================= 조회 관련 로직 end-point =============================================
 
     // ============================================ 등록 관련 로직 start-point ============================================
@@ -145,7 +163,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 첫 비밀번호 생년월일로 설정
         authService.insertPassword(employeeId, employee.getBirth());
 
-        return "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
+        // HR 차장에게 알림 전송 후 메세지 반환
+        String message = "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
+        sendNotificationToHRManager(message, "/employee/" + employee.getEmployeeId() + "/detail", "차장");
+        return message;
     }
 
     // 사원 등록 필수 필드 검증
@@ -246,7 +267,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 재직 상태 수정
         employeeDAO.updateStatus(params);
-        return "'" + getEmployeeNameById(employeeId) + "' 사원의 재직 상태가 '" + status + "'으로 변경되었습니다.";
+
+        // HR 부장에게 알림 전송 후 메세지 반환
+        String message = "'" + getEmployeeNameById(employeeId) + "' 사원의 재직 상태가 '" + status + "'으로 변경되었습니다.";
+        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        return message;
     }
 
     @LogBeforeExecution
@@ -271,7 +296,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 사원 승진 처리
         employeeDAO.updatePosition(params);
-        return "'" + getEmployeeNameById(employeeId) + "' 사원이 '" + positionToBePromoted + "'으로 승진하였습니다.";
+
+        // HR 부장에게 알림 전송 후 메세지 반환
+        String message = "'" + getEmployeeNameById(employeeId) + "' 사원이 '" + positionToBePromoted + "'으로 승진하였습니다.";
+        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        return message;
     }
     // ============================================ 수정 관련 로직 end-point ============================================
 
@@ -295,7 +324,11 @@ public class EmployeeServiceImpl implements EmployeeService {
             fileService.deleteFile(employee.getPicture());
             authService.deletePassword(employeeId);
             employeeDAO.deleteEmployee(employeeId);
-            return "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
+
+            // HR 부장에게 알림 전송 후 메세지 반환
+            String message = "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
+            sendNotificationToHRManager(message, null, "부장");
+            return message;
         } else {
             throw new IllegalArgumentException("사원이 퇴사 후 1년이 지나지 않았습니다.");
         }
@@ -307,5 +340,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     private void assignPictureFromUpload(Employee employee, MultipartFile picture) {
         int fileId = fileService.uploadingFile(picture, "employee");
         employee.assignPicture(fileId);
+    }
+
+    // 인사과(HR) 관리자에게 알림 전송
+    private void sendNotificationToHRManager(String message, String url, String position) {
+        // HR 관리자 검색하여 ID 리스트로 변환
+        List<String> managerIdList = convertEmployeesToIdList(getEmployeesByDepartmentAndPosition("HR", position));
+        // 알림 전송
+        notificationService.createNotifications(managerIdList, message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(), url);
     }
 }
