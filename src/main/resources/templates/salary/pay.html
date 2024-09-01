@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='급여 지급 내역 조회')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/salary/pay.css}" rel="stylesheet">
+    <link th:href="@{/css/pagination.css}" rel="stylesheet">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/salary/list.js}"></script>
+    <script th:src="@{/js/salary/pay.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="search-container">
+            <form id="pageSizeForm" th:action="@{/salary/payment}" method="get">
+                <input type="hidden" name="page" th:value="1"/>
+                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                    <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">10개씩 보기</option>
+                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                </select>
+                <input type="hidden" name="keyword" th:value="${keyword}"/>
+                <input type="hidden" name="department" th:value="${department}">
+                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+            </form>
+            <form id="yearMonthForm" th:action="@{/salary/payment}" method="get">
+                <div class="month-nav">
+                    <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+                    <span class="current-month" th:text="${yearmonth}"></span>
+                    <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+                </div>
+                <input type="hidden" name="page" value="1">
+                <input type="hidden" name="size" th:value="${pageSize}"/>
+                <input type="hidden" name="keyword" th:value="${keyword}"/>
+                <input type="hidden" name="department" th:value="${department}">
+                <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
+            </form>
+            <form th:action="@{/salary/payment}" method="get">
+                <input type="hidden" name="page" value="1">
+                <input type="hidden" name="size" th:value="${pageSize}"/>
+                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                <input type="hidden" name="department" th:value="${department}">
+                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
+        <form th:action="@{/salary/payment}" method="get" id="department-nav">
+            <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
+            <label for="all" class="radio-btn">전체 부서</label>
+
+            <input type="radio" id="HR" class="hidden" name="department" value="HR" th:checked="${department == 'HR'}" onclick="this.form.submit()">
+            <label for="HR" class="radio-btn">HR(인사)</label>
+
+            <input type="radio" id="FI" class="hidden" name="department" value="FI" th:checked="${department == 'FI'}" onclick="this.form.submit()">
+            <label for="FI" class="radio-btn">FI(재무)</label>
+
+            <input type="radio" id="SA" class="hidden" name="department" value="SA" th:checked="${department == 'SA'}" onclick="this.form.submit()">
+            <label for="SA" class="radio-btn">SA(영업)</label>
+
+            <input type="radio" id="MK" class="hidden" name="department" value="MK" th:checked="${department == 'MK'}" onclick="this.form.submit()">
+            <label for="MK" class="radio-btn">MK(마케팅)</label>
+
+            <input type="radio" id="PR" class="hidden" name="department" value="PR" th:checked="${department == 'PR'}" onclick="this.form.submit()">
+            <label for="PR" class="radio-btn">PR(생산)</label>
+
+            <input type="radio" id="QC" class="hidden" name="department" value="QC" th:checked="${department == 'QC'}" onclick="this.form.submit()">
+            <label for="QC" class="radio-btn">QC(품질관리)</label>
+
+            <input type="radio" id="RD" class="hidden" name="department" value="RD" th:checked="${department == 'RD'}" onclick="this.form.submit()">
+            <label for="RD" class="radio-btn">RD(연구개발)</label>
+
+            <input type="hidden" name="page" th:value="1"/>
+            <input type="hidden" name="size" th:value="${pageSize}"/>
+            <input type="hidden" name="keyword" th:value="${keyword}"/>
+            <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+        </form>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th style="font-size: 20px">☑︎</th>
+                <th>급여 ID</th>
+                <th>사원 ID</th>
+                <th>이름</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>연봉</th>
+                <th>등록된 날짜</th>
+                <th>지급 여부</th>
+                <th>사원 정보</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${salaries.isEmpty()}">
+                <td colspan="12" style="text-align: center; padding: 20px;">
+                    조회된 급여 지급내역이 없습니다. 다른 검색 조건을 시도해보세요.
+                </td>
+            </tr>
+            <tr th:each="salary : ${salaries}" th:data-salary-id="${salary.salaryId}" onclick="toggleCheckbox(this)">
+                <td>
+                    <label th:if="${paymentStatus[salary.salaryId] == false}">
+                        <input type="checkbox" class="pay-checkbox" th:data-salary-id="${salary.salaryId}">
+                    </label>
+                </td>
+                <td th:text="${salary.salaryId}">급여 ID</td>
+                <td th:text="${salary.employeeId}">사원 ID</td>
+                <td th:text="${salary.name}">이름</td>
+                <td th:text="${salary.department.name}">부서</td>
+                <td th:text="${salary.position.name}">직급</td>
+                <td th:text="${salary.bank}">은행</td>
+                <td th:text="${salary.accountNumber}">계좌번호</td>
+                <td th:text="${salary.annualSalary}" class="annualSalary">연봉</td>
+                <td th:text="${salary.createdAt}">등록된 날짜</td>
+                <td th:text="${paymentStatus[salary.salaryId] ? '지급 완료' : '미지급'}"
+                    th:classappend="${paymentStatus[salary.salaryId] ? 'true' : 'false'}"></td>
+                <td>
+                    <button type="button" th:employeeId="${salary.employeeId}" onclick="openEmployeeDetailModal(event, this)">상세 보기</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination-container" th:if="${totalPages > 0}">
+            <div class="pagination">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
+                </span>
+                <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                    <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                        </span>
+                </div>
+                <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
+                </span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn" th:onclick="submitSelectedSalaries()">급여 지급</button>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

@@ -8,12 +8,14 @@
         <link rel="stylesheet" th:href="@{/css/layout.css}">
         <script th:src="@{/js/layout.js}"></script>
 
+        <link rel="stylesheet" th:href="@{/css/notification.css}">
+        <script th:src="@{/js/notification.js}"></script>
+
         <!-- 각 페이지의 script가 작성될 위치 -->
         <th:block layout:fragment="script"></th:block>
 
         <!-- 각 페이지의 css가 작성될 위치 -->
         <th:block layout:fragment="css"></th:block>
-
     </head>
 
     <body>
@@ -25,6 +27,8 @@
                     <!-- 기본 컨텐츠 영역 -->
                 </div>
             </div>
+            <!-- 알림 수신함 -->
+            <div th:replace="~{fragments/notification-box :: notification-box}"></div>
         </div>
     </body>
 </html>

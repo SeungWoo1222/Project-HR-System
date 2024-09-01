@@ -15,6 +15,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -37,6 +38,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // AWS
 	implementation 'software.amazon.awssdk:s3:2.20.64' // AWS S3
 
+	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리
+
 	// lombok plugin
 	implementation('org.projectlombok:lombok')
 	annotationProcessor('org.projectlombok:lombok')
@@ -51,6 +54,8 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
 tasks.named('test') {

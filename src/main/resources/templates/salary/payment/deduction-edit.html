@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<style>
+    #deduction-edit-form table input {
+        width: 90%;
+        text-align: center;
+    }
+</style>
+
+<form id="deduction-edit-form" th:action="@{/api/salary/payment/deduction}" onsubmit="submitUpdateForm(event)">
+    <h3>공제 비율 수정</h3>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>근로소득세</th>
+            <th>지방소득세</th>
+            <th>국민연금</th>
+            <th>건강보험</th>
+            <th>장기요양보험</th>
+            <th>고용보험</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="text-align: center"> - </td>
+            <td><input type="text" name="localIncomeTaxRate" th:value="${deductionRatios.localIncomeTaxRate}"/></td>
+            <td><input type="text" name="nationalPensionRate" th:value="${deductionRatios.nationalPensionRate}"/></td>
+            <td><input type="text" name="healthInsuranceRate" th:value="${deductionRatios.healthInsuranceRate}"/></td>
+            <td><input type="text" name="longTermCareRate" th:value="${deductionRatios.longTermCareRate}"/></td>
+            <td><input type="text" name="employmentInsuranceRate" th:value="${deductionRatios.employmentInsuranceRate}"/></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="btn-section">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" id="edit-deduction-ratio" class="btn">수정 완료</button>
+    </div>
+</form>
+</html>

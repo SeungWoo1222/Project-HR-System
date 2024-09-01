@@ -14,6 +14,15 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const loginForm = document.getElementById('login-form');
+            const usernameInput = document.getElementById('username');
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+
+            // 페이지 로드 시 저장된 아이디가 있으면 자동으로 입력
+            if (localStorage.getItem('rememberedUserId')) {
+                usernameInput.value = localStorage.getItem('rememberedUserId');
+                rememberMeCheckbox.checked = true;
+            }
+
             if (loginForm) {
                 loginForm.addEventListener('submit', submitForm);
             }
@@ -71,6 +80,14 @@
             })
                 .then(response => {
                     if (response.ok) {
+                        // 로그인 성공 시, "아이디 기억하기" 체크박스 상태 확인
+                        const rememberMeCheckbox = document.getElementById('rememberMe');
+                        if (rememberMeCheckbox.checked) {
+                            localStorage.setItem('rememberedUserId', document.getElementById('username').value);
+                        } else {
+                            localStorage.removeItem('rememberedUserId');
+                        }
+                        // 홈페이지로 이동
                         window.location.href = "/common/home";
                     } else {
                         return response.json().then(data => {
@@ -97,6 +114,12 @@
                     </div>
                     <div class="form-group">
                         <input type="password" id="password" name="password" placeholder="비밀번호">
+                    </div>
+                    <div class="form-group remember-me">
+                        <label>
+                            <input type="checkbox" id="rememberMe" class="hidden">
+                            <span class="custom-checkbox"></span> 아이디 기억하기
+                        </label>
                     </div>
                     <div id="error-message" class="error-message">
                         <span th:if="${error}" th:text="${message}"></span>

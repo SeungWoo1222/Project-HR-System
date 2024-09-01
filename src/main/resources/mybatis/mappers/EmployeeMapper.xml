@@ -17,9 +17,12 @@
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
         <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
         <result property="remainingLeave" column="remaining_leave"/>
-        <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
+        <result property="picture" column="picture"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="numDependents" column="num_dependents"/>
+        <result property="numChildren" column="num_children"/>
     </resultMap>
 
     <resultMap id="EmployeeWithResignationResultMap" type="com.woosan.hr_system.employee.model.Employee">
@@ -36,9 +39,12 @@
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
         <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
         <result property="remainingLeave" column="remaining_leave"/>
-        <result property="picture" column="picture"/>
         <result property="lastModified" column="last_modified"/>
         <result property="modifiedBy" column="modified_by"/>
+        <result property="picture" column="picture"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="numDependents" column="num_dependents"/>
+        <result property="numChildren" column="num_children"/>
         <association property="resignation" javaType="com.woosan.hr_system.resignation.model.Resignation">
             <id property="employeeId" column="employee_id"/>
             <result property="resignationDate" column="resignation_date"/>
@@ -87,8 +93,8 @@
 
     <!-- 사원 등록 -->
     <insert id="insertEmployee">
-        INSERT INTO employees (employee_id, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by)
-        VALUES (#{employeeId}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy})
+        INSERT INTO employees (employee_id, name, birth, resident_registration_number, phone, email, address, detail_address, hire_date, status, department_id, position_id, picture, remaining_leave, last_modified, modified_by, marital_status, num_dependents, num_children)
+        VALUES (#{employeeId}, #{name}, #{birth}, #{residentRegistrationNumber}, #{phone}, #{email}, #{address}, #{detailAddress}, #{hireDate}, #{status}, #{department}, #{position}, #{picture}, #{remainingLeave}, #{lastModified}, #{modifiedBy}, #{maritalStatus}, #{numDependents}, #{numChildren})
     </insert>
 
     <!-- 사원 정보 수정 -->
@@ -108,7 +114,10 @@
             remaining_leave=#{remainingLeave},
             last_modified=#{lastModified},
             modified_by=#{modifiedBy},
-            picture=#{picture}
+            picture=#{picture},
+            marital_status=#{maritalStatus},
+            num_dependents=#{numDependents},
+            num_children=#{numChildren}
         WHERE employee_id=#{employeeId}
     </update>
 
@@ -149,8 +158,8 @@
           AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
-    <select id="search" parameterType="map" resultMap="EmployeeResultMap">
+    <!-- 모든 사원 정보 - 검색어와 부서에 해당하는 데이터 결과 조회 -->
+    <select id="searchEmployees" parameterType="map" resultMap="EmployeeResultMap">
         SELECT * FROM employees
         <where>
             <if test="keyword != null and keyword != ''">
@@ -172,13 +181,16 @@
                 modified_by LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
+            <if test="department != null and department != ''">
+                AND department_id = #{department}
+            </if>
         </where>
         ORDER BY hire_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
-    <select id="count" parameterType="string" resultType="int">
+    <!-- 모든 사원 정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회 -->
+    <select id="countEmployees" parameterType="map" resultType="int">
         SELECT COUNT(*) FROM employees
         <where>
             <if test="keyword != null and keyword != ''">
@@ -200,6 +212,9 @@
                 modified_by LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
+            <if test="department != null and department != ''">
+                AND department_id = #{department}
+            </if>
         </where>
     </select>
 
@@ -218,4 +233,18 @@
         SET position_id = #{positionId}
         WHERE employee_id = #{employeeId}
     </update>
+
+    <!-- 사원 가족 정보 조회 -->
+    <select id="selectFamilyInfoById" parameterType="String" resultType="Map">
+        SELECT num_dependents, num_children
+        FROM employees
+        WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 부서와 직급을 이용한 사원 조회 -->
+    <select id="selectEmployeesByDepartmentAndPosition" parameterType="map" resultMap="EmployeeResultMap">
+        SELECT *
+        FROM employees
+        WHERE department_id = #{department} AND position_id = #{position}
+    </select>
 </mapper>

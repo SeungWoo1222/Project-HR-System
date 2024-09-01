@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" th:href="@{/css/salary/payslip.css}">
+
+<div class="payslip-container" id="payslip-container">
+    <form onsubmit="submitUpdateForm(event)">
+        <div class="btn-container">
+            <button type="reset" class="btn">초기화</button>
+            <p style="padding: 6px 0 0 0; margin: 0; color: red">공제 내역과 합계액들은 수정 후에 업데이트됩니다.</p>
+            <button type="submit" class="btn">수정 완료</button>
+        </div>
+        <div class="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>
+        <div>
+            <input type="hidden" name="paymentId" th:value="${payslip.paymentId}"/>
+            <input type="hidden" name="salaryId" th:value="${payslip.salaryId}"/>
+            <input type="hidden" name="compensationMonth" th:value="${payslip.compensationMonth}"/>
+            <input type="hidden" name="paymentDate" th:value="${payslip.paymentDate}"/>
+        </div>
+        <table class="header">
+            <tbody style="width: 100%">
+                <tr>
+                    <td style="width: 12.5%;">사원 ID</td>
+                    <td style="width: 12.5%;" th:text="${payslip.salary?.employeeId}"></td>
+                    <td style="width: 10%;">이름</td>
+                    <td style="width: 11%;" id="name" th:text="${employee.name}"></td>
+                    <td style="width: 12.5%;">생년월일</td>
+                    <td style="width: 14%;" th:text="${employee.birth}"></td>
+                    <td style="width: 12.5%;">지급일</td>
+                    <td style="width: 15%;" th:text="${payslip.paymentDate}"></td>
+                </tr>
+                <tr>
+                    <td style="width: 12.5%;">부서</td>
+                    <td style="width: 12.5%;" th:text="${payslip.salary?.department}"></td>
+                    <td style="width: 10%;">직급</td>
+                    <td style="width: 11%;" th:text="${payslip.salary?.position}"></td>
+                    <td style="width: 12.5%;">계좌은행</td>
+                    <td style="width: 14%" th:text="${payslip.salary?.bank}"></td>
+                    <td style="width: 12.5%;">계좌번호</td>
+                    <td style="width: 15%;" th:text="${payslip.salary?.accountNumber}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="details">
+            <tr class="section-title">
+                <td colspan="2">지급내역</td>
+                <td colspan="2">공제내역</td>
+            </tr>
+            <tr>
+                <td class="totals">급여항목</td>
+                <td class="totals">금액</td>
+                <td class="totals">공제항목</td>
+                <td class="totals">금액</td>
+            </tr>
+            <tr>
+                <td>기본급</td>
+                <td>
+                    <input type="text" name="baseSalary" class="right" th:value="${payslip.baseSalary}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td>근로소득세</td>
+                <td class="right" th:text="${#numbers.formatInteger(payslip.incomeTax, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td>직책수당</td>
+                <td>
+                    <input type="text" name="positionAllowance" class="right" th:value="${payslip.positionAllowance}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td>지방소득세</td>
+                <td class="right" th:text="${#numbers.formatInteger(payslip.localIncomeTax, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td>식대</td>
+                <td>
+                    <input type="text" name="mealAllowance" class="right" th:value="${payslip.mealAllowance}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td>국민연금</td>
+                <td class="right" th:text="${#numbers.formatInteger(payslip.nationalPension, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td>교통비</td>
+                <td>
+                    <input type="text" name="transportAllowance" class="right" th:value="${payslip.transportAllowance}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td>건강보험</td>
+                <td class="right" th:text="${#numbers.formatInteger(payslip.healthInsurance, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td>개인 성과급</td>
+                <td>
+                    <input type="text" name="personalBonus" class="right" th:value="${payslip.personalBonus}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+
+                <td>고용보험</td>
+                <td class="right" th:text="${#numbers.formatInteger(payslip.employmentInsurance, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td>팀 성과급</td>
+                <td>
+                    <input type="text" name="teamBonus" class="right" th:value="${payslip.teamBonus}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td class="center">-</td>
+                <td class="center">-</td>
+            </tr>
+            <tr>
+                <td>명절 보너스</td>
+                <td>
+                    <input type="text" name="holidayBonus" class="right" th:value="${payslip.holidayBonus}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td class="center">-</td>
+                <td class="center">-</td>
+            </tr>
+            <tr>
+                <td>연말 보너스</td>
+                <td>
+                    <input type="text" name="yearEndBonus" class="right" th:value="${payslip.yearEndBonus}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td class="center">-</td>
+                <td class="center">-</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="totals">총 액 계</td>
+                <td colspan="2" class="totals">공제액 계</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
+                <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}"></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="totals">비고</td>
+                <td colspan="2" class="section-title">실수령액</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="text" name="remarks" class="center" th:value="${payslip.remarks}">
+                </td>
+                <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" style="font-weight: bold"></td>
+            </tr>
+        </table>
+
+        <table class="summary">
+            <tr>
+                <td class="section-title" style="width: 20%;">근로일수</td>
+                <td class="section-title" style="width: 20%;">총 근로시간수</td>
+                <td class="section-title" style="width: 20%;">연장근로시간수</td>
+                <td class="section-title" style="width: 20%;">휴일근로시간수</td>
+                <td class="section-title" style="width: 20%;">총 액</td>
+            </tr>
+            <tr>
+                <td class="center"></td>
+                <td class="center"></td>
+                <td>
+                    <input type="text" name="" class="center" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td>
+                    <input type="text" name="" class="center" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </td>
+                <td class="right"></td>
+            </tr>
+        </table>
+
+        <table class="calculation">
+            <tr class="section-title">
+                <td>구분</td>
+                <td>계산방법</td>
+                <td>구분</td>
+                <td>계산방법</td>
+            </tr>
+            <tr>
+                <td class="left">기본급</td>
+                <td>(연봉x70%) / 12</td>
+                <td class="left">근로소득세</td>
+                <td>간이세액표 적용</td>
+            </tr>
+            <tr>
+                <td class="left">직책수당</td>
+                <td>(연봉x10%) / 12</td>
+                <td class="left">지방소득세</td>
+                <td>소득세x10%</td>
+            </tr>
+            <tr>
+                <td class="left">식대</td>
+                <td>(연봉x5%) / 12</td>
+                <td class="left">국민연금</td>
+                <td>과세대상급여x4.5%</td>
+            </tr>
+            <tr>
+                <td class="left">교통비</td>
+                <td>(연봉x5%) / 12</td>
+
+                <td class="left">건강보험</td>
+                <td>과세대상급여x3.545%</td>
+            </tr>
+            <tr>
+                <td class="left">개인 성과급</td>
+                <td>(연봉x2.5%)</td>
+                <td class="left">장기요양보험</td>
+                <td>과세대상급여x0.4591%</td>
+            </tr>
+            <tr>
+                <td class="left">팀 성과급</td>
+                <td>(연봉x1.25%)</td>
+                <td class="left">고용보험</td>
+                <td>과세대상급여x0.9%</td>
+            </tr>
+            <tr>
+                <td class="left">보너스</td>
+                <td>명절 : (연봉x1.25%)<br>연말 : (연봉x2.5%)</td>
+                <td class="left">추가 근로수당</td>
+                <td></td>
+            </tr>
+        </table>
+    </form>
+</div>
+</html>

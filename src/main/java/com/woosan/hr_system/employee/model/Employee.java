@@ -14,24 +14,27 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Employee {
-    private String employeeId;
-    private String name;
-    private String birth;
-    private String residentRegistrationNumber;
-    private String phone;
-    private String email;
-    private String address;
-    private String detailAddress;
-    private Department department;
-    private Position position;
-    private LocalDate hireDate;
-    private String status;
-    private int remainingLeave;
-    private LocalDateTime lastModified;
-    private String modifiedBy;
-    private int picture;
-    private Resignation resignation;
-    private Password password;
+    private String employeeId;                  // 사원 ID
+    private String name;                        // 이름
+    private String birth;                       // 생년월일
+    private String residentRegistrationNumber;  // 주민등록번호 뒷자리
+    private String phone;                       // 핸드폰 번호
+    private String email;                       // 이메일
+    private String address;                     // 도로명 주소
+    private String detailAddress;               // 상세 주소
+    private Department department;              // 부서
+    private Position position;                  // 직급
+    private LocalDate hireDate;                 // 입사일
+    private String status;                      // 재직 상태
+    private int remainingLeave;                 // 잔여 연차
+    private LocalDateTime lastModified;         // 마지막 수정일시
+    private String modifiedBy;                  // 마지막 수정자
+    private int picture;                        // 사원 사진 fileID
+    private Boolean maritalStatus;              // 결혼 여부
+    private int numDependents;                  // 부양 가족 수
+    private int numChildren;                    // 8세 이상 20세 이하 자녀 수
+    private Resignation resignation;            // 퇴사 정보
+    private Password password;                  // 비밀번호 정보
 
     public void registerNewEmployee(Employee employee, String employeeId) {
         this.employeeId = employeeId;
@@ -48,6 +51,9 @@ public class Employee {
         this.status = "재직";
         this.remainingLeave = 11; // 기본 연차 11일 설정
         this.picture = employee.getPicture();
+        this.maritalStatus = employee.getMaritalStatus();
+        this.numDependents = employee.getNumDependents();
+        this.numChildren = employee.getNumChildren();
     }
 
     // 사원 아이디 생성
