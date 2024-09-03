@@ -164,7 +164,7 @@ function validateReportForm(event) {
     if (Object.keys(selectedEmployees).length > 0) {
         nameList = Object.values(selectedEmployees);
     } else {
-    // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
+        // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
         nameList = document.getElementById('currentApproverName').value;
     }
 
@@ -186,8 +186,8 @@ function validateReportForm(event) {
         return false;
     }
     if (nameList.length === 0 && document.getElementById('currentApproverName') === null) {
-            errorAlert.textContent = "결재자를 선택해주세요.";
-            return false;
+        errorAlert.textContent = "결재자를 선택해주세요.";
+        return false;
     }
     if (completeDate === "") {
         errorAlert.textContent = "업무 완료 날짜를 입력해주세요";

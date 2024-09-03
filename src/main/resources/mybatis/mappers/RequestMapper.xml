@@ -64,6 +64,7 @@
     <!--(STAFF) - 나에게 온 최근 5개 요청 조회-->
     <select id="getRecentRequests" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
+            r.request_id AS requestId,
             r.report_id AS reportId,
             e.name AS requesterName,
             r.due_date AS dueDate,

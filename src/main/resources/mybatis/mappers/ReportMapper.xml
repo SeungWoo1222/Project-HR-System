@@ -191,7 +191,8 @@
             r.approver_name AS approverName,
             r.status
         FROM reports r JOIN employees e ON employee_id = writer_id
-        WHERE r.approver_id = #{approverId} AND r.status = '미처리';
+        WHERE r.approver_id = #{approverId} AND r.status = '미처리'
+        ORDER BY r.created_date;
     </select>
 
     <!-- 보고서 통계 조회 -->

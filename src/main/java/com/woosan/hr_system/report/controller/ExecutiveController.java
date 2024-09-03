@@ -94,6 +94,7 @@ public class ExecutiveController {
 
         return "admin/report/main";
     }
+
 //=====================================================생성 메소드========================================================
     @RequireManagerPermission
     @GetMapping("/write") // 요청 생성 페이지 이동

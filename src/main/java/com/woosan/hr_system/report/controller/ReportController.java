@@ -117,10 +117,13 @@ public class ReportController {
     public String showCreateFromRequestPage(@RequestParam("requestId") int requestId,
                                             Model model) {
 
+        log.info("컨트롤러 - requestId {}", requestId);
         Request request = requestService.getRequestById(requestId);
+
+        log.info("reuqeerName씨발 쳐 알아멀ㄱ어러ㅏ 좁ㅇ신씨발 컴퓨터 존나 좆같네 {}", request.getRequesterName());
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
-        return "/report/write-from-request";
+        return "report/write-from-request";
     }
 
     // 요청 들어온 보고서 생성
@@ -219,22 +222,6 @@ public class ReportController {
         model.addAttribute("searchType", searchType);
 
         return "report/request-list";
-    }
-
-    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
-    public String showStatisticPage() {
-        return "report/statistic";
-    }
-
-    @GetMapping("/stats") // 통계 날짜 설정
-    public String getReportStats(@RequestParam(name = "startDate") String statisticStart,
-                                 @RequestParam(name = "endDate") String statisticEnd,
-                                 HttpSession session) {
-        // 날짜 설정
-        session.setAttribute("staffStatisticStart", statisticStart);
-        session.setAttribute("staffStatisticEnd", statisticEnd);
-
-        return "redirect:/report/main";
     }
 
 
