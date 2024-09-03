@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>급여명세서</title>
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/salary/payslip.css}">
+    <style>
+        p {
+            margin: 0;
+        }
+        .header {
+            padding: 0 0 5px 0;
+        }
+        .last-word {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .appreciation-message {
+            display: flex;
+            justify-content: left;
+            flex-grow: 1;
+        }
+        .company-signature {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .signature {
+            margin-left: 5px;
+            width: 30px;
+            height: 30px;
+        }
+        @page {
+            size: A4;
+        }
+        @media print {
+            .payslip-container {
+                border: 0;
+                padding: 5mm;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script th:src="@{/js/salary/payslip-print.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function saveAsPDF() {
+                // 버튼을 숨깁니다.
+                const button = document.querySelector('.no-print');
+                button.style.display = 'none';
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const element = document.getElementById('payslip-container');
+
+                html2canvas(element, { scale: 2 }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 210; // A4 width in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width; // Calculate image height to maintain aspect ratio
+
+                    if (imgHeight > 297) {
+                        // If the content is taller than the A4 page, scale it down to fit on one page
+                        const scaleRatio = 297 / imgHeight;
+                        const scaledWidth = imgWidth * scaleRatio;
+                        const scaledHeight = imgHeight * scaleRatio;
+                        doc.addImage(imgData, 'PNG', 0, 0, scaledWidth, scaledHeight);
+                    } else {
+                        // If the content fits on one page, no scaling is needed
+                        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    }
+
+                    doc.save(document.getElementById('title').innerText + '(' + document.getElementById('name').innerText + ').pdf');
+
+                    // PDF가 저장된 후 버튼을 다시 표시합니다.
+                    button.style.display = 'block';
+                });
+            }
+
+            function printPayslip() {
+                window.print();
+            }
+
+            // saveAsPDF 함수 전역으로 선언
+            window.saveAsPDF = saveAsPDF;
+            window.printPayslip = printPayslip;
+        });
+    </script>
+</head>
+
+<body>
+<div class="payslip-container" id="payslip-container">
+    <div class="buttons no-print">
+        <button class="btn" onclick="saveAsPDF()">PDF로 저장</button>
+        <button class="btn" onclick="printPayslip()">인쇄하기</button>
+    </div>
+    <div class="title" id="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>
+    <table class="header">
+        <tbody style="width: 100%">
+            <tr>
+                <td style="width: 12.5%;">사원 ID</td>
+                <td style="width: 12.5%;" th:text="${payslip.salary?.employeeId}"></td>
+                <td style="width: 10%;">이름</td>
+                <td style="width: 11%;" id="name" th:text="${employee.name}"></td>
+                <td style="width: 12.5%;">생년월일</td>
+                <td style="width: 14%;" th:text="${employee.birth}"></td>
+                <td style="width: 12.5%;">지급일</td>
+                <td style="width: 15%;" th:text="${payslip.paymentDate}"></td>
+            </tr>
+            <tr>
+                <td style="width: 12.5%;">부서</td>
+                <td style="width: 12.5%;" th:text="${payslip.salary?.department}"></td>
+                <td style="width: 10%;">직급</td>
+                <td style="width: 11%;" th:text="${payslip.salary?.position}"></td>
+                <td style="width: 12.5%;">계좌은행</td>
+                <td style="width: 14%" th:text="${payslip.salary?.bank}"></td>
+                <td style="width: 12.5%;">계좌번호</td>
+                <td style="width: 15%;" th:text="${payslip.salary?.accountNumber}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="details">
+        <tr class="section-title">
+            <td colspan="2">지급내역</td>
+            <td colspan="2">공제내역</td>
+        </tr>
+        <tr>
+            <td class="totals">급여항목</td>
+            <td class="totals">금액</td>
+            <td class="totals">공제항목</td>
+            <td class="totals">금액</td>
+        </tr>
+        <tr>
+            <td>기본급</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.baseSalary, 3, 'COMMA')}"></td>
+            <td>근로소득세</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.incomeTax, 3, 'COMMA')}"></td>
+        </tr>
+        <tr>
+            <td>직책수당</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.positionAllowance, 3, 'COMMA')}"></td>
+            <td>지방소득세</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.localIncomeTax, 3, 'COMMA')}"></td>
+        </tr>
+        <tr>
+            <td>식대</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.mealAllowance, 3, 'COMMA')}"></td>
+            <td>국민연금</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.nationalPension, 3, 'COMMA')}"></td>
+        </tr>
+        <tr>
+            <td>교통비</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.transportAllowance, 3, 'COMMA')}"></td>
+            <td>건강보험</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.healthInsurance, 3, 'COMMA')}"></td>
+        </tr>
+        <tr>
+            <td th:if="${payslip.personalBonus != null} and ${payslip.teamBonus == null}">개인 성과급</td>
+            <td class="right" th:if="${payslip.personalBonus != null} and ${payslip.teamBonus == null}" th:text="${#numbers.formatInteger(payslip.personalBonus, 3, 'COMMA')}"></td>
+
+            <td th:if="${payslip.personalBonus == null} and ${payslip.teamBonus != null}">팀 성과급</td>
+            <td class="right" th:if="${payslip.personalBonus == null} and ${payslip.teamBonus != null}" th:text="${#numbers.formatInteger(payslip.teamBonus, 3, 'COMMA')}"></td>
+
+            <td th:if="${payslip.personalBonus != null} and ${payslip.teamBonus != null}">개인 및 팀 성과급</td>
+            <td class="right" th:if="${payslip.personalBonus != null} and ${payslip.teamBonus != null}" th:text="${#numbers.formatInteger(payslip.personalBonus, 3, 'COMMA')} + ' / ' + ${#numbers.formatInteger(payslip.teamBonus, 3, 'COMMA')}"></td>
+
+            <td th:if="${payslip.personalBonus == null} and ${payslip.teamBonus == null}">성과급</td>
+            <td class="right" th:if="${payslip.personalBonus == null} and ${payslip.teamBonus == null}"></td>
+
+            <td>고용보험</td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.employmentInsurance, 3, 'COMMA')}"></td>
+        </tr>
+        <tr th:if="${payslip.holidayBonus != null} and ${payslip.yearEndBonus != null}">
+            <td th:if="${payslip.holidayBonus != null}">명절 보너스</td>
+            <td class="right" th:if="${payslip.holidayBonus != null}" th:text="${#numbers.formatInteger(payslip.holidayBonus, 3, 'COMMA')}"></td>
+
+            <td th:if="${payslip.yearEndBonus != null}">연말 보너스</td>
+            <td class="right" th:if="${payslip.yearEndBonus != null}" th:text="${#numbers.formatInteger(payslip.yearEndBonus, 3, 'COMMA')}"></td>
+
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="totals">총 액 계</td>
+            <td colspan="2" class="totals">공제액 계</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
+            <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}"></td>
+        </tr>
+        <tr>
+            <td colspan="4" class="section-title">실수령액</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="right" th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}"></td>
+        </tr>
+    </table>
+
+    <table class="summary">
+        <tr>
+            <td class="section-title">근로일수</td>
+            <td class="section-title">총 근로시간수</td>
+            <td class="section-title">연장근로시간수</td>
+            <td class="section-title">휴일근로시간수</td>
+            <td class="section-title">총 액</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="right" th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
+        </tr>
+    </table>
+
+    <table class="calculation">
+        <tr class="section-title">
+            <td>구분</td>
+            <td>계산방법</td>
+            <td>구분</td>
+            <td>계산방법</td>
+        </tr>
+        <tr>
+            <td class="left">기본급</td>
+            <td>(연봉x70%) / 12</td>
+            <td class="left">근로소득세</td>
+            <td>간이세액표 적용</td>
+        </tr>
+        <tr>
+            <td class="left">직책수당</td>
+            <td>(연봉x10%) / 12</td>
+            <td class="left">지방소득세</td>
+            <td>소득세x10%</td>
+        </tr>
+        <tr>
+            <td class="left">식대</td>
+            <td>(연봉x5%) / 12</td>
+            <td class="left">국민연금</td>
+            <td>과세대상급여x4.5%</td>
+        </tr>
+        <tr>
+            <td class="left">교통비</td>
+            <td>(연봉x5%) / 12</td>
+
+            <td class="left">건강보험</td>
+            <td>과세대상급여x3.545%</td>
+        </tr>
+        <tr>
+            <td class="left">개인 성과급</td>
+            <td>(연봉x2.5%)</td>
+            <td class="left">장기요양보험</td>
+            <td>과세대상급여x0.4591%</td>
+        </tr>
+        <tr>
+            <td class="left">팀 성과급</td>
+            <td>(연봉x1.25%)</td>
+            <td class="left">고용보험</td>
+            <td>과세대상급여x0.9%</td>
+        </tr>
+        <tr>
+            <td class="left">보너스</td>
+            <td>명절 : (연봉x1.25%)<br>연말 : (연봉x2.5%)</td>
+            <td class="left">추가 근로수당</td>
+            <td></td>
+        </tr>
+    </table>
+    <div class="last-word">
+        <div class="appreciation-message">
+            <p>귀하의 노고에 감사드립니다.</p>
+        </div>
+        <div class="company-signature">
+            <p>주식회사 하루하루</p>
+            <img class="signature" src="/images/icons/signature.png">
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+.month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.nav-btn {
+    width: 20px;
+    height: 20px;
+    border: 8px solid #18a8f1;
+    border-width: 0 8px 8px 0;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: border-color 0.3s ease;
+    transform: rotate(45deg);
+}
+
+.nav-btn.prev {
+    transform: rotate(135deg);
+}
+
+.nav-btn.prev:hover {
+    border-color: #0c7bb3;
+}
+
+.nav-btn.next {
+    transform: rotate(-45deg);
+}
+
+.nav-btn.next:hover {
+    border-color: #0c7bb3;
+}
+
+.current-month {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}

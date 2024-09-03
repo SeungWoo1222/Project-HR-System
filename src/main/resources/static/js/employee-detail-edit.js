@@ -1,12 +1,12 @@
 // 사원 정보 수정 페이지 이동 메소드
 function editEmployee(button) {
     var employeeId = button.getAttribute('employeeId');
-    window.location.href = '/employee/edit/detail/' + employeeId;
+    window.location.href = '/employee/' + employeeId + '/edit';
 }
 // 퇴사 사원 정보 수정 페이지 이동 메소드
 function editResignedEmployee(button) {
     var employeeId = button.getAttribute('employeeId');
-    window.location.href = '/employee/edit/resignation/' + employeeId;
+    window.location.href = '/resignation/' + employeeId + '/edit';
 }
 
 // 계정 잠금과 잠금 해제하는 메소드들
@@ -24,7 +24,7 @@ function lockAccount(button) {
 }
 function setAccountLock(confirmMessage, employeeId, name) {
     if (confirm(confirmMessage)) {
-        fetch('/api/employee/set/accountLock/' + employeeId, {
+        fetch('/api/employee/' + employeeId + '/accountLock', {
             method: 'PATCH'
         })
             .then(response => {
@@ -96,7 +96,7 @@ function promoteEmployee(button) {
 
     var confirmMessage = "'" + name + "' 사원의 현재 직급은 '" + position + "'입니다.\n" + "해당 사원의 직급을 승진 처리하시겠습니까?";
     if (confirm(confirmMessage)) {
-        fetch('/api/admin/employee/promote/' + employeeId, {
+        fetch('/api/admin/employee/' + employeeId + '/promote', {
             method: 'PATCH',
         })
             .then(response => {

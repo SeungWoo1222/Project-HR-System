@@ -2,11 +2,10 @@ package com.woosan.hr_system.report.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woosan.hr_system.auth.aspect.RequireManagerPermission;
+import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;

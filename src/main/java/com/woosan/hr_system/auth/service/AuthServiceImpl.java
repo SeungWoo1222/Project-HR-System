@@ -1,7 +1,7 @@
 package com.woosan.hr_system.auth.service;
 
-import com.woosan.hr_system.auth.aspect.LogAfterExecution;
-import com.woosan.hr_system.auth.aspect.LogBeforeExecution;
+import com.woosan.hr_system.aspect.LogAfterExecution;
+import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
