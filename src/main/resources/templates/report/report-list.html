@@ -12,26 +12,23 @@
     <script th:src="@{/js/report.js}"></script>
     <script th:src="@{/js/employee.js}"></script>
     <script>
-        function toggleSearchField() {
-            const searchType = document.getElementById('searchType').value;
-            const keywordField = document.getElementById('keywordField');
-            const approvalStatus = document.getElementById('approvalStatus');
-
-            if (searchType == 3) {
-                keywordField.style.display = 'none';
-                keywordField.name = ''; // 폼 전송 시 전송되지 않도록 name 제거
-                approvalStatus.style.display = 'block';
-            } else {
-                keywordField.style.display = 'block';
-                keywordField.name = 'keyword'; // 폼 전송 시 전송되도록 name 추가
-                approvalStatus.style.display = 'none';
-            }
-        }
-
-        // 페이지 로드 시 초기 상태 설정
         document.addEventListener("DOMContentLoaded", function () {
             updateDateTimeElements();
-            toggleSearchField();
+            toggleCustomDateFields();
+
+            // searchDate 선택 시 사용자 지정 날짜 필드 토글
+            document.getElementById('searchDate').addEventListener('change', toggleCustomDateFields);
+
+            // 폼 제출 시 유효성 검사와 검색을 동시에 실행
+            const form = document.getElementById('form');
+            form.addEventListener('submit', function(event) {
+                if (!validateDateRange()) {
+                    event.preventDefault();  // 유효성 검사가 실패하면 폼 제출을 막음
+                } else {
+                    submitReportSearchForm(event);  // 유효성 검사가 성공하면 검색 수행
+                }
+            });
+
         });
     </script>
 </th:block>
@@ -39,28 +36,62 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <h1>내가 쓴 보고서 목록</h1>
-        <button th:onclick="openModal('/report/reportDate')">날짜 검색</button>
         <div>
-            <form th:action="@{/report/list}" method="get">
+            <form id="form" th:action="@{/report/list}" method="get">
                 <input type="hidden" name="page" value="1"/>
                 <input type="hidden" name="size" th:value="${pageSize}"/>
-                <select name="searchType" id="searchType" onchange="toggleSearchField()">
-                    <option th:value="1" th:text="'제목+내용'" th:selected="${searchType == 1}">제목+내용</option>
-                    <option th:value="2" th:text="'보고서 결재자'" th:selected="${searchType == 2}">보고서 결재자</option>
-                    <option th:value="3" th:text="'결재 상태'" th:selected="${searchType == 3}">결재 상태</option>
-                </select>
 
-                <!-- 검색어 입력 필드 -->
-                <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                <fieldset>
+                    <legend>보기 옵션</legend>
+                    <label for="size">보기:</label>
+                    <select id="size" name="size" onchange="submitReportSearchForm(event)">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="40" th:text="'40개씩 보기'" th:selected="${pageSize == 40}">40개씩 보기</option>
+                    </select>
+                </fieldset>
 
-                <!-- 결재 상태 라디오 버튼 -->
-                <div id="approvalStatus" style="display:none;">
-                    <label><input type="radio" name="keyword" value="승인" th:checked="${keyword == '승인'}"> 승인</label>
-                    <label><input type="radio" name="keyword" value="거절" th:checked="${keyword == '거절'}"> 거절</label>
-                    <label><input type="radio" name="keyword" value="미처리" th:checked="${keyword == '미처리'}"> 미처리</label>
-                </div>
+                <fieldset>
+                    <legend>검색 옵션</legend>
+                    <label for="searchDate">작성 기간:</label>
+                    <select id="searchDate">
+                        <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
+                        <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
+                        <option th:value="month" th:text="'1개월'" th:selected="${searchDate == 'month'}">1개월</option>
+                        <option th:value="sixMonth" th:text="'6개월'" th:selected="${searchDate == 'sixMonth'}">6개월</option>
+                        <option th:value="year" th:text="'1년'" th:selected="${searchDate == 'year'}">1년</option>
+                        <option th:value="custom" th:text="'사용자 지정'" th:selected="${searchDate == 'custom'}">사용자 지정</option>
+                    </select>
+
+                    <div id="customDateRange" style="display: none;">
+                        <label for="startDate">시작 날짜:</label>
+                        <input type="date" id="startDate" name="startDate" th:value="${startDate}"/>
+
+                        <label for="endDate">종료 날짜:</label>
+                        <input type="date" id="endDate" name="endDate" th:value="${endDate}"/>
+                    </div>
+
+                    <label for="approvalStatus">결재 상태:</label>
+                    <select name="approvalStatus" id="approvalStatus">
+                        <option th:value="null" th:text="'전체 결재상태'" th:selected="${searchStatus == null}">전체 결재상태</option>
+                        <option th:value="미처리" th:text="'미처리'" th:selected="${searchStatus == '미처리'}">미처리</option>
+                        <option th:value="승인" th:text="'승인'" th:selected="${searchStatus == '승인'}">승인</option>
+                        <option th:value="거절" th:text="'거절'" th:selected="${searchStatus == '거절'}">거절</option>
+                    </select>
+
+                    <label for="searchType">검색 유형:</label>
+                    <select name="searchType" id="searchType">
+                        <option th:value="1" th:text="'제목+내용'" th:selected="${searchType == 1}">제목+내용</option>
+                        <option th:value="2" th:text="'보고서 결재자'" th:selected="${searchType == 2}">보고서 결재자</option>
+                    </select>
+
+                    <label for="keywordField">검색어:</label>
+                    <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                </fieldset>
+
                 <button type="submit">검색</button>
             </form>
+
         </div>
         <table class="list">
             <thead>

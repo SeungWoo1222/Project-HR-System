@@ -17,11 +17,11 @@
 <div>
     <h1>작성 요청 날짜 범위설정</h1>
     <h2>마감일의 범위를 설정합니다.</h2>
-    <form action="#" th:action="@{/report/requestDate}" method="post">
-        <label for="requestStart">시작 월:</label>
-        <input type="month" id="requestStart" name="requestStart" required>
-        <label for="requestEnd">종료 월:</label>
-        <input type="month" id="requestEnd" name="requestEnd" required>
+    <form action="#" th:action="@{/report/requestDate}" method="post" onsubmit="return validateDateRange()">
+        <label for="start">시작 월:</label>
+        <input type="month" id="start" name="requestStart" required>
+        <label for="end">종료 월:</label>
+        <input type="month" id="end" name="requestEnd" required>
         <button type="submit">조회</button>
     </form>
 </div>

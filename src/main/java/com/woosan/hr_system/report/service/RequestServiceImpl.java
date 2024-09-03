@@ -61,47 +61,35 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getMyRequests(requesterId);
     }
 
-    @Override  // 내게 온 요청 리스트 조회
+    @Override  // 나에게 온 최근 5개 요청 조회(STAFF)
     public List<Request> getMyPendingRequests(String writerId) {
         return requestDAO.getMyPendingRequests(writerId);
     }
 
-    @Override // 요청 검색
-    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, String requestStart, String requestEnd) {
+    @Override // reportId로 요청 조회
+    public int getRequestByReportId(int reportId) {
+        return requestDAO.getRequestByReportId(reportId);
+    }
 
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (requestStart == null || requestEnd == null) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            requestStart = formattedDate;
-            requestEnd = formattedDate;
-        }
+    @Override // 내게 온 요청 검색 (STAFF)
+    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, LocalDate startDate, LocalDate endDate) {
 
         int offset = pageRequest.getPage() * pageRequest.getSize();
-        List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, requestStart, requestEnd);
-        int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, requestStart, requestEnd);
+        List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, startDate, endDate);
+        int total = requestDAO.count(pageRequest.getKeyword(), writerId, searchType, startDate, endDate);
 
         return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-    @Override // 요청 검색
-    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, String requestStart, String requestEnd) {
+    @Override // 내가 작성한 요청 검색
+    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, LocalDate startDate, LocalDate endDate) {
 
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (requestStart == null || requestEnd == null) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            requestStart = formattedDate;
-            requestEnd = formattedDate;
-        }
-
+        // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
-        List<Request> requests = requestDAO.searchMyRequests(pageRequest.getKeyword(), pageRequest.getSize(), offset, requesterId, searchType, requestStart, requestEnd);
-        int total = requestDAO.countMyRequests(pageRequest.getKeyword(), requesterId, searchType, requestStart, requestEnd);
+        // 범위에 속하는 보고서를 검색함
+        List<Request> requests = requestDAO.searchMyRequests(pageRequest.getKeyword(), pageRequest.getSize(), offset, requesterId, searchType, startDate, endDate);
+        // 범위에 속하는 보고서 개수를 세서 페이징
+        int total = requestDAO.countMyRequests(pageRequest.getKeyword(), requesterId, searchType, startDate, endDate);
 
         return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

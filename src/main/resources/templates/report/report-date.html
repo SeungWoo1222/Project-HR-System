@@ -15,12 +15,12 @@
 </th:block>
 
 <div>
-    <h1>작성 요청 목록 날짜 범위설정</h1>
-    <form action="#" th:action="@{/report/reportDate}" method="post">
-        <label for="reportStart">시작 월:</label>
-        <input type="month" id="reportStart" name="reportStart" required>
-        <label for="reportEnd">종료 월:</label>
-        <input type="month" id="reportEnd" name="reportEnd" required>
+    <h1>보고서 목록 날짜 범위설정</h1>
+    <form action="#" th:action="@{/report/reportDate}" method="post" onsubmit="return validateDateRange()">
+        <label for="start">시작 월:</label>
+        <input type="month" id="start" name="reportStart" required>
+        <label for="end">종료 월:</label>
+        <input type="month" id="end" name="reportEnd" required>
         <button type="submit">조회</button>
     </form>
 </div>

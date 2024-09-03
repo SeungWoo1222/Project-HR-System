@@ -14,6 +14,20 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             updateDateTimeElements();
+            toggleCustomDateFields();
+
+            // searchDate 선택 시 사용자 지정 날짜 필드 토글
+            document.getElementById('searchDate').addEventListener('change', toggleCustomDateFields);
+
+            // 폼 제출 시 유효성 검사와 검색을 동시에 실행
+            const form = document.getElementById('form');
+            form.addEventListener('submit', function(event) {
+                if (!validateDateRange()) {
+                    event.preventDefault();  // 유효성 검사가 실패하면 폼 제출을 막음
+                } else {
+                    submitReportStatisticForm(event);  // 유효성 검사가 성공하면 검색 수행
+                }
+            });
         });
     </script>
 
@@ -92,8 +106,27 @@
             <!-- 보고서 통계 -->
             <div>
                 <h1>보고서 통계</h1>
-                <button th:onclick="openModal('/report/statistic')">날짜 설정</button>
+                <form id="form" th:action="@{/report/main}" method="get">
+                <select id="searchDate">
+                    <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
+                    <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
+                    <option th:value="month" th:text="'1개월'" th:selected="${searchDate == 'month'}">1개월</option>
+                    <option th:value="sixMonth" th:text="'6개월'" th:selected="${searchDate == 'sixMonth'}">6개월</option>
+                    <option th:value="year" th:text="'1년'" th:selected="${searchDate == 'year'}">1년</option>
+                    <option th:value="custom" th:text="'사용자 지정'" th:selected="${searchDate == 'custom'}">사용자 지정</option>
+                </select>
+
+                <div id="customDateRange" style="display: none;">
+                    <label for="startDate">시작 날짜:</label>
+                    <input type="date" id="startDate" th:value="${startDate}"/>
+
+                    <label for="endDate">종료 날짜:</label>
+                    <input type="date" id="endDate" th:value="${endDate}"/>
+                </div>
+                    <button type="submit">검색</button>
+                </form>
             </div>
+
             <!-- 구글 차트 통계 추가 -->
             <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
 

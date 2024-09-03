@@ -22,7 +22,10 @@
             <p th:text="'마감 기한 : ' + ${request.dueDate}"></p>
             <p th:text="'요청 일자 : ' + ${request.requestDate} " class="dateTime" ></p>
 
-            <a th:href="@{'/admin/request/edit?requestId=' + ${request.requestId}}">수정</a>
+            <form th:action="@{'/admin/request/edit'}" method="get" style="display:inline;">
+                <input type="hidden" name="requestId" th:value="${request.requestId}">
+                <button type="submit" onclick="return confirm('요청을 수정 하시겠습니까?');">수정</button>
+            </form>
 
             <form th:action="@{'/admin/request/delete/' + ${request.requestId}}" method="post" style="display:inline;">
                 <input type="hidden" name="_method" value="delete">

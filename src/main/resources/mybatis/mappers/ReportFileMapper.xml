@@ -21,7 +21,7 @@
         WHERE report_id = #{reportId};
     </select>
 
-    <select id="getReportIdByFileId" parameterType="int" resultType="int">
+    <select id="getReportIdsByFileId" parameterType="int" resultType="int">
         SELECT
             report_id AS reportId
         FROM report_files

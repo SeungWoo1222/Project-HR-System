@@ -12,11 +12,11 @@
 <div>
     <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
     <h1>날짜 범위 입력</h1>
-    <form action="#" th:action="@{/report/stats}" method="get">
-        <label for="startDate">시작 월:</label>
-        <input type="month" id="startDate" name="startDate" required>
-        <label for="endDate">종료 월:</label>
-        <input type="month" id="endDate" name="endDate" required>
+    <form action="#" th:action="@{/report/stats}" method="get" onsubmit="return validateDateRange()">
+        <label for="start">시작 월:</label>
+        <input type="month" id="start" name="startDate" required>
+        <label for="end">종료 월:</label>
+        <input type="month" id="end" name="endDate" required>
         <button type="submit">통계 조회</button>
     </form>
 </div>

@@ -110,14 +110,10 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 요청 들어온 보고서 작성
     public int createReportFromRequest(Report report) {
-        // approverName 설정
-        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
-        String approverName = employee.getName();
-
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
-        params.put("approverId", report.getApproverId());
-        params.put("approverName", approverName);
+        params.put("approverId", report.getIdList().get(0));
+        params.put("approverName", report.getNameList().get(0));
         params.put("title", report.getTitle());
         params.put("content", report.getContent());
         params.put("createdDate", report.getCreatedDate());
@@ -168,28 +164,8 @@ public class ReportServiceImpl implements ReportService {
 //=====================================================생성 메소드======================================================
 //=====================================================조회 메소드======================================================
     @Override // 모든 보고서 조회
-    public List<Report> getAllReports(String reportStart, String reportEnd, String employeeId) {
-        // 입력된 날짜를 파싱하기 위한 DateTimeFormatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        YearMonth startYearMonth;
-        YearMonth endYearMonth;
-
-        // 현재 연월 가져오기
-        YearMonth currentYearMonth = YearMonth.now();
-
-        // startDate와 endDate가 null인지 확인하고 현재 연월로 설정
-        if (reportStart == null) {
-            startYearMonth = currentYearMonth;
-        } else {
-            startYearMonth = YearMonth.parse(reportStart, formatter);
-        }
-
-        if (reportEnd == null) {
-            endYearMonth = currentYearMonth;
-        } else {
-            endYearMonth = YearMonth.parse(reportEnd, formatter);
-        }
-        return reportDAO.getAllReports(employeeId, startYearMonth, endYearMonth);
+    public List<Report> getAllReports(String employeeId) {
+        return reportDAO.getAllReports(employeeId);
     }
 
     @Override // 특정 보고서 조회
@@ -212,92 +188,61 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override // 보고서 검색
-    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String reportStart, String reportEnd) {
-
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (reportStart == null || reportEnd == null) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            reportStart = formattedDate;
-            reportEnd = formattedDate;
-        }
+    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
 
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
-        List<Report> reports = reportDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, reportStart, reportEnd);
+        List<Report> reports = reportDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, approvalStatus, startDate, endDate);
         // 범위에 속하는 보고서 개수를 세서 페이징
-        int total = reportDAO.count(pageRequest.getKeyword(), writerId, searchType, reportStart, reportEnd);
+        int total = reportDAO.count(pageRequest.getKeyword(), writerId, searchType, approvalStatus, startDate, endDate);
 
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
+    // 결재할 보고서 검색
     @Override
-    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String reportStart, String reportEnd) {
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (reportStart == null || reportEnd == null) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            reportStart = formattedDate;
-            reportEnd = formattedDate;
-        }
-
+    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
-        List<Report> reports = reportDAO.toApproveSearch(pageRequest.getKeyword(), pageRequest.getSize(), offset, approverId, searchType, reportStart, reportEnd);
+        List<Report> reports = reportDAO.toApproveSearch(pageRequest.getKeyword(), pageRequest.getSize(), offset, approverId, searchType, approvalStatus, startDate, endDate);
         // 범위에 속하는 보고서 개수를 세서 페이징
-        int total = reportDAO.toApproveCount(pageRequest.getKeyword(), approverId, searchType, reportStart, reportEnd);
+        int total = reportDAO.toApproveCount(pageRequest.getKeyword(), approverId, searchType, approvalStatus, startDate, endDate);
 
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
 
     @Override // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
-
-        // 설정된 보고서 날짜범위가 없다면 현재 달을 기준으로 보여줌
-        if (statisticStart == null || statisticStart.trim().isEmpty() ||
-                statisticEnd == null || statisticEnd.trim().isEmpty()) {
-            LocalDate currentMonth = LocalDate.now();
-            // 날짜 형태를 yyyy-mm으로 바꿔줌
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            String formattedDate = currentMonth.format(formatter);
-            statisticStart = formattedDate;
-            statisticEnd = formattedDate;
-        }
-
-        return reportDAO.getReportStats(statisticStart, statisticEnd, writerIdList);
+    public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
+        return reportDAO.getReportStats(startDate, endDate, writerIdList);
     }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
     @Transactional
     @Override // 보고서 수정
-    public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList) {
+    public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> userSelectedFileIdList) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
-        List<Integer> reportIdList = new ArrayList<>();
+        List<Integer> createdReportIdList = new ArrayList<>();
+        List<Integer> existingFileIdList = reportFileService.getFileIdsByReportId(report.getReportId());
 
         // 결재자 수에 따른 처리
         if (report.getIdList().size() > 1) {
             // 결재자 수가 여러명으로 바뀐 경우
-            deleteReport(report.getReportId());
-
             report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
-            reportIdList = createReport(report); // 보고서 생성 후 reportId 반환
-
+            createdReportIdList = createReport(report); // 보고서 생성 후 reportId 반환
+            reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
+            deleteReport(report.getReportId());
         } else {
             report.setModifiedDate(userSessionInfo.getNow()); // 현재시간 설정
             report.setApproverId(report.getIdList().get(0));
             report.setApproverName(report.getNameList().get(0));
             reportDAO.updateReport(report);
-            reportIdList.add(report.getReportId()); // 조인테이블 수정
+            createdReportIdList.add(report.getReportId()); // 조인테이블 수정
+            reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
         }
 
-        reportFileService.updateReportFile(report, toUploadFileList, registeredFileIdList, reportIdList);
     }
 
     //=====================================================수정 메소드======================================================
@@ -312,7 +257,9 @@ public class ReportServiceImpl implements ReportService {
         reportDAO.deleteReport(reportId);
 
         // 요청 된 보고서라면 requset테이블의 reportId 삭제
-        requestService.deleteReportId(reportId);
+        if (requestService.getRequestByReportId(reportId) > 0){
+            requestService.deleteReportId(reportId);
+        }
 
         // 조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
         reportFileService.deleteReportFileByReportId(reportId);
