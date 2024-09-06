@@ -55,6 +55,12 @@ function validateForm(event) {
         errorMessage.textContent = "이메일 도메인을 선택해주세요.";
         return false;
     }
+    if (emailDomain === 'custom') {
+        if (document.getElementById("customEmailDomain").value.trim() === "") {
+            errorMessage.textContent = "이메일 도메인을 입력해주세요.";
+            return false;
+        }
+    }
     if (address === "") {
         errorMessage.textContent = "주소를 입력해주세요.";
         return false;
