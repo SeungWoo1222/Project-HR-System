@@ -1,4 +1,4 @@
-package com.woosan.hr_system.upload.service;
+package com.woosan.hr_system.file.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;

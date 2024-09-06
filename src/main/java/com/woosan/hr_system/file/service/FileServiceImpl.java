@@ -1,11 +1,11 @@
-package com.woosan.hr_system.upload.service;
+package com.woosan.hr_system.file.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
 import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
 import com.woosan.hr_system.exception.file.FileProcessingException;
-import com.woosan.hr_system.upload.dao.FileDAO;
-import com.woosan.hr_system.upload.model.File;
+import com.woosan.hr_system.file.dao.FileDAO;
+import com.woosan.hr_system.file.model.File;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.woosan.hr_system.resignation.dao;
 
 import com.woosan.hr_system.resignation.model.ResignationFile;
-import com.woosan.hr_system.upload.model.File;
+import com.woosan.hr_system.file.model.File;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

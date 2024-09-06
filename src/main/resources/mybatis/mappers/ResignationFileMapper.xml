@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.woosan.hr_system.resignation.dao.ResignationFileDAO">
 
-    <resultMap id="FileResultMap" type="com.woosan.hr_system.upload.model.File">
+    <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
         <id property="fileId" column="file_id"/>
         <result property="originalFileName" column="original_file_name"/>
         <result property="storedFileName" column="stored_file_name"/>

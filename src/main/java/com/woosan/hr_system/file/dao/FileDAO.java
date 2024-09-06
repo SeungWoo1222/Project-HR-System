@@ -1,6 +1,6 @@
-package com.woosan.hr_system.upload.dao;
+package com.woosan.hr_system.file.dao;
 
-import com.woosan.hr_system.upload.model.File;
+import com.woosan.hr_system.file.model.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class FileDAO {
     @Autowired
     private SqlSession sqlSession;
 
-    private static final String NAMESPACE = "com.woosan.hr_system.upload.dao.FileDAO.";
+    private static final String NAMESPACE = "com.woosan.hr_system.file.dao.FileDAO.";
 
     // 모든 파일 정보 조회
     public List<File> getAllFiles() {
