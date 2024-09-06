@@ -3,14 +3,17 @@ package com.woosan.hr_system.employee.controller;
 import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.upload.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -52,8 +55,8 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
+
         return "employee/detail";
     }
 
@@ -64,8 +67,8 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
+
         return "employee/detail2";
     }
 
@@ -88,8 +91,11 @@ public class EmployeeViewController {
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
+        // 파일 관련 정보 모델에 추가
+        int fileId = employee.getPicture();
+        model.addAttribute("pictureUrl", fileService.getUrl(fileId));
+        model.addAttribute("originalFileName", fileService.getFileInfo(fileId).getOriginalFileName());
+
         return "employee/edit";
     }
 }

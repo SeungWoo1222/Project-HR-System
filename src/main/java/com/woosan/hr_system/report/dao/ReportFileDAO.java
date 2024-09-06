@@ -2,7 +2,7 @@ package com.woosan.hr_system.report.dao;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.report.model.ReportFileLink;
-import com.woosan.hr_system.upload.model.File;
+import com.woosan.hr_system.file.model.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;

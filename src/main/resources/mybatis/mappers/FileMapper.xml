@@ -18,16 +18,8 @@
 
     <!-- 파일 ID 리스트로 파일들 정보 조회 -->
     <select id="selectFileListById" parameterType="list" resultType="com.woosan.hr_system.upload.model.File">
-        SELECT
-        file_id AS fileId,
-        original_file_name AS originalFileName,
-        stored_file_name AS storedFileName,
-        file_size AS fileSize,
-        upload_date AS uploadDate,
-        uploaded_by AS uploadedBy,
-        file_id_usage AS fileIdUsage
-        FROM files WHERE file_id IN
-        <foreach item="fileId" collection="fileIdList" open="(" separator="," close=")">
+        SELECT * FROM files WHERE file_id IN
+        <foreach item="fileId" collection="list" open="(" separator="," close=")">
             #{fileId}
         </foreach>
     </select>

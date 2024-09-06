@@ -1,4 +1,4 @@
-package com.woosan.hr_system.upload.model;
+package com.woosan.hr_system.file.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

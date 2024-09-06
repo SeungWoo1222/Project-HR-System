@@ -14,7 +14,7 @@ import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.resignation.service.ResignationService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.upload.service.FileService;
+import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
