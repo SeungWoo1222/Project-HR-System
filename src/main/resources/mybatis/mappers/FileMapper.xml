@@ -49,4 +49,10 @@
         DELETE FROM files WHERE file_id = #{fileId}
     </delete>
 
+    <!-- 파일 중복 검사 -->
+    <select id="isDuplicateExist" parameterType="com.woosan.hr_system.upload.model.File" resultType="int">
+        SELECT COUNT(*) FROM files
+        WHERE original_file_name = #{originalFileName} AND file_size = #{fileSize}
+    </select>
+
 </mapper>
