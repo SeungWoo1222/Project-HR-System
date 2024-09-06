@@ -119,14 +119,12 @@ function promoteEmployee(button) {
                 }));
             })
             .then(response => {
-                console.log('서버 응답 데이터 :', response.text);
+                const errorStatuses = [400, 403, 500];
                 if (response.status === 200) {
                     alert(response.text); // 성공 메시지 알림
                     window.location.href = '/employee/list';
-                } else if (response.status === 400) {
-                    alert(response.text); // 400 오류 메시지 알림
-                } else if (response.status === 500) {
-                    alert(response.text); // 500 오류 메시지 알림
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text); // 오류 메세지 알림
                 } else {
                     alert('사원의 승진 처리 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
                 }
