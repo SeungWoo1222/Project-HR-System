@@ -15,7 +15,6 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;

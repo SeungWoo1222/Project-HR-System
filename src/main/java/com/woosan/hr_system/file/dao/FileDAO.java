@@ -31,7 +31,7 @@ public class FileDAO {
     // 파일 ID 리스트 파일 정보 조회
     public List<File> getFileListById(List<Integer> fileIdList) {
         Map<String, Object> params = new HashMap<>();
-        params.put("fileIdList", fileIdList);
+        params.put("list", fileIdList);
         return sqlSession.selectList(NAMESPACE + "selectFileListById", params);
     }
 
