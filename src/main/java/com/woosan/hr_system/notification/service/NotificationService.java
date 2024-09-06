@@ -17,4 +17,5 @@ public interface NotificationService {
     void readAllNotification();
     void removeNotification(int notificationId);
     void removeAllNotification();
+    void removeAllNotification(String employeeId);
 }
