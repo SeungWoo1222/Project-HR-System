@@ -160,6 +160,12 @@ public class NotificationServiceImpl implements NotificationService {
         notificationDAO.deleteAllNotification(employeeId);
     }
 
+    @Override // 사원의 모든 알림 삭제
+    public void removeAllNotification(String employeeId) {
+        // 모든 알림 삭제
+        notificationDAO.deleteAllNotification(employeeId);
+    }
+
     // 2주일 지난 읽음 처리된 알림들 자동 삭제
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     public void cleanUpOldNotifications() {

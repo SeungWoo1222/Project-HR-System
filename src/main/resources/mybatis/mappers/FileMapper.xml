@@ -3,21 +3,32 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.upload.dao.FileDAO">
+<mapper namespace="com.woosan.hr_system.file.dao.FileDAO">
+    <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
+        <id column="file_id" property="fileId"/>
+        <result column="original_file_name" property="originalFileName"/>
+        <result column="stored_file_name" property="storedFileName"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="upload_date" property="uploadDate"/>
+        <result column="uploaded_by" property="uploadedBy"/>
+        <result column="file_id_usage" property="fileIdUsage"/>
+    </resultMap>
 
     <!-- 파일 정보 삽입 -->
-    <insert id="insertFile" parameterType="com.woosan.hr_system.upload.model.File" useGeneratedKeys="true" keyProperty="fileId">
+    <insert id="insertFile" parameterType="com.woosan.hr_system.file.model.File" useGeneratedKeys="true" keyProperty="fileId">
         INSERT INTO files (original_file_name, stored_file_name, file_size, upload_date, uploaded_by, file_id_usage)
         VALUES (#{originalFileName}, #{storedFileName}, #{fileSize}, #{uploadDate}, #{uploadedBy}, #{fileIdUsage})
     </insert>
 
     <!-- 파일 ID로 파일 정보 조회 -->
-    <select id="selectFileById" parameterType="int" resultType="com.woosan.hr_system.upload.model.File">
-        SELECT * FROM files WHERE file_id = #{fileId}
+    <select id="selectFileById" parameterType="int" resultMap="FileResultMap">
+        SELECT *
+        FROM files
+        WHERE file_id = #{fileId}
     </select>
 
     <!-- 파일 ID 리스트로 파일들 정보 조회 -->
-    <select id="selectFileListById" parameterType="list" resultType="com.woosan.hr_system.upload.model.File">
+    <select id="selectFileListById" parameterType="list" resultMap="FileResultMap">
         SELECT
         file_id AS fileId,
         original_file_name AS originalFileName,
@@ -40,12 +51,12 @@
     </select>
 
     <!-- 모든 파일 정보 조회 -->
-    <select id="selectAllFiles" resultType="com.woosan.hr_system.upload.model.File">
+    <select id="selectAllFiles" resultMap="FileResultMap">
         SELECT * FROM files
     </select>
 
     <!-- 파일 정보 업데이트 -->
-    <update id="updateFile" parameterType="com.woosan.hr_system.upload.model.File">
+    <update id="updateFile" parameterType="com.woosan.hr_system.file.model.File">
         UPDATE files
         SET stored_file_name = #{storedFileName},
             file_id_usage = #{fileIDUsage}
@@ -56,5 +67,11 @@
     <delete id="deleteFile" parameterType="int">
         DELETE FROM files WHERE file_id = #{fileId}
     </delete>
+
+    <!-- 파일 중복 검사 -->
+    <select id="isDuplicateExist" parameterType="com.woosan.hr_system.file.model.File" resultType="int">
+        SELECT COUNT(*) FROM files
+        WHERE original_file_name = #{originalFileName} AND file_size = #{fileSize}
+    </select>
 
 </mapper>

@@ -23,6 +23,8 @@ function lockAccount(button) {
     setAccountLock(confirmMessage, employeeId, name);
 }
 function setAccountLock(confirmMessage, employeeId, name) {
+    event.preventDefault();
+
     if (confirm(confirmMessage)) {
         fetch('/api/employee/' + employeeId + '/accountLock', {
             method: 'PATCH'
@@ -53,9 +55,17 @@ function setAccountLock(confirmMessage, employeeId, name) {
 
 // 재직상태 변경하는 메소드
 function updateStatus(event) {
+    event.preventDefault();
+
     const form = event.target.closest('form');
     const formData = new FormData(form);
+    const originalStatus = formData.get('originalStatus');
     const statusToBeUpdated = formData.get("status");
+
+    if (statusToBeUpdated === originalStatus) {
+        alert("변경사항이 없습니다.")
+        return;
+    }
 
     var confirmMessage = "재직 상태를 '" + statusToBeUpdated + "'으로 변경하시겠습니까?";
     const actionUrl = form.action;
@@ -84,12 +94,15 @@ function updateStatus(event) {
             .catch(error => {
                 console.error('Error :', error.message);
                 alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+                window.location.href = '/employee/list';
             });
     }
 }
 
 // 사원 승진 처리하는 메소드
 function promoteEmployee(button) {
+    event.preventDefault();
+
     const employeeId = button.getAttribute('employeeId');
     const name = button.getAttribute('name');
     const position = button.getAttribute('position');
@@ -106,12 +119,12 @@ function promoteEmployee(button) {
                 }));
             })
             .then(response => {
-                console.log('서버 응답 데이터 :', response.text);
+                const errorStatuses = [400, 403, 500];
                 if (response.status === 200) {
                     alert(response.text); // 성공 메시지 알림
                     window.location.href = '/employee/list';
-                } else if (response.status === 500) {
-                    alert(response.text); // 500 오류 메시지 알림
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text); // 오류 메세지 알림
                 } else {
                     alert('사원의 승진 처리 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
                 }

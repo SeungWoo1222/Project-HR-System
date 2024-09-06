@@ -27,7 +27,7 @@
             <div id="file-area">
                 <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
                 <p>사진은 10MB까지 업로드 가능합니다.</p>
-                <span id="file-name" th:text="${fileInfo.originalFileName}"></span>
+                <span id="file-name" th:text="${originalFileName}"></span>
                 <label for="picture" class="input-file-btn">사진 업로드</label>
                 <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
                 <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">

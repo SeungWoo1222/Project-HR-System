@@ -1,7 +1,6 @@
 package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.aspect.RequireHRPermission;
-import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,7 @@ public class EmployeeAdminViewController {
     @RequireHRPermission
     @GetMapping("/{employeeId}/status/edit")
     public String employeeStatus(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        model.addAttribute("employee", employee);
+        model.addAttribute("employee", employeeService.getEmployeeById(employeeId));
         return "employee/status";
     }
 }

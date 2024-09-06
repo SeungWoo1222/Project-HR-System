@@ -127,10 +127,10 @@
     </delete>
 
     <!-- 올해 입사한 사람의 수 조회 -->
-    <select id="countEmployeesByCurrentYear" resultType="int">
+    <select id="countEmployeesByYear" resultType="int">
         SELECT COUNT(*)
         FROM employees
-        WHERE YEAR(hire_date) = YEAR(CURDATE())
+        WHERE YEAR(hire_date) = #{year}
     </select>
 
     <!-- 퇴사 예정인 사원 정보 조회 -->

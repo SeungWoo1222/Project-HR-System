@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -25,8 +26,8 @@ public class EmployeeApiController {
     // 사원 신규 등록
     @RequireHRPermission
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
-                                                   @RequestPart(value = "picture", required = false) MultipartFile picture) {
+    public ResponseEntity<Map<String, Object>> registerEmployee(@RequestPart("employee") Employee employee,
+                                                                @RequestPart("picture") MultipartFile picture) {
         // 사원 등록
         return ResponseEntity.ok(employeeService.insertEmployee(employee, picture));
     }
@@ -49,7 +50,6 @@ public class EmployeeApiController {
     // 부서 id를 이용한 해당 부서 사원 조회
     @GetMapping("/department/list/{departmentId}")
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
-        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
-        return employeeList;
+        return employeeService.getEmployeesByDepartment(departmentId);
     }
 }

@@ -57,11 +57,12 @@ public class Employee {
     }
 
     // 사원 아이디 생성
-    public String createEmployeeId(Employee employee, int currentYearEmpolyeesCount) {
+    public String createEmployeeId(Employee employee, int numberOfEmployees) {
         // 형식 : AABBCCC (부서 코드, 입사년도, 해당 년도 입사 순서)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String BB = employee.getHireDate().format(formatter).substring(2, 4);
-        String CCC = String.format("%03d", currentYearEmpolyeesCount + 1);
+        String CCC = String.format("%03d", numberOfEmployees + 1);
+
         return employee.getDepartment() + BB + CCC;
     }
 

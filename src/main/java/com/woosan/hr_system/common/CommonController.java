@@ -3,7 +3,7 @@ package com.woosan.hr_system.common;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
-import com.woosan.hr_system.upload.service.FileService;
+import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

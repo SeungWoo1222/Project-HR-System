@@ -6,6 +6,7 @@ import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EmployeeService {
     // == 조회 ==
@@ -21,7 +22,7 @@ public interface EmployeeService {
     List<String> convertEmployeesToIdList(List<Employee> employeeList);
 
     // == 등록 ==
-    String insertEmployee(Employee employee, MultipartFile picture);
+    Map<String, Object> insertEmployee(Employee employee, MultipartFile picture);
 
     // == 수정 ==
     String updateEmployee(Employee employee, MultipartFile picture);
