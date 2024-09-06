@@ -15,7 +15,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -176,6 +178,9 @@ public class FileServiceImpl implements FileService {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new FileBadRequestException("파일 크기가 10MB를 초과합니다.\n파일을 확인해주세요.");
         }
+        if (isDuplicateExist(file)) {
+            throw new FileBadRequestException("이미 존재하는 파일입니다.\n다른 파일을 업로드해주세요.");
+        }
     }
 
     @Override // 업로드 파일 개수 확인
@@ -185,6 +190,13 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    // 파일 중복 검사
+    private boolean isDuplicateExist(MultipartFile file) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("originalFileName", file.getOriginalFilename());
+        map.put("fileSize", file.getSize());
+        return fileDAO.isDuplicateExist(map) != 0;
+    }
     // ==================================================== 유효성 검사 ===================================================
 }
 

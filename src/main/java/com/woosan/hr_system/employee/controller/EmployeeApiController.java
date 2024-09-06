@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.auth.service.AuthService;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,6 @@ public class EmployeeApiController {
     private EmployeeService employeeService;
     @Autowired
     private AuthService authService;
-    @Autowired
-    private EmployeeDAO employeeDAO;
 
     // 사원 신규 등록
     @RequireHRPermission
