@@ -2,6 +2,7 @@ package com.woosan.hr_system.employee.controller;
 
 import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ public class EmployeeApiController {
     private EmployeeService employeeService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private EmployeeDAO employeeDAO;
 
     // 사원 신규 등록
     @RequireHRPermission
@@ -49,7 +52,6 @@ public class EmployeeApiController {
     // 부서 id를 이용한 해당 부서 사원 조회
     @GetMapping("/department/list/{departmentId}")
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
-        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
-        return employeeList;
+        return employeeService.getEmployeesByDepartment(departmentId);
     }
 }

@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 .requestMatchers("/**").hasAnyRole("STAFF", "MANAGER")
 
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
-                        //      .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
+//                              .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근 허용
                 )
 
                 // 폼 기반 인증 설정
