@@ -31,8 +31,8 @@ public class ReportFileDAO {
         return sqlSession.selectList(NAMESPACE + "getFileIdsByReportId", reportId);
     }
 
-    public int getReportIdByFileId(int fileId) {
-        return sqlSession.selectOne(NAMESPACE + "getReportIdByFileId", fileId);
+    public List<Integer> getReportIdsByFileId(int fileId) {
+        return sqlSession.selectList(NAMESPACE + "getReportIdsByFileId", fileId);
     }
 
     public void deleteReportFileByReportId(int reportId) {

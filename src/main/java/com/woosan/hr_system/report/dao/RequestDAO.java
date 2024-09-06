@@ -46,59 +46,64 @@ public class RequestDAO {
         return sqlSession.selectList(NAMESPACE + "getMyRequests", requesterId);
     }
 
+    // reportId로 요청 조회
+    public int getRequestByReportId(int reportId) {
+        return sqlSession.selectOne(NAMESPACE + "getRequestByReportId", reportId);
+    }
+
     // 내게 온 요청 조회
     public List<Request> getMyPendingRequests(String writerId) {
         log.info("DAO writerId {}", writerId);
         return sqlSession.selectList(NAMESPACE + "getRecentRequests", writerId);
     }
 
-    // 검색과 페이징 로직
-    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  int searchType, String requestStart, String requestEnd) {
+    // 내게 온 요청 검색(STAFF)
+    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  int searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("writerId", writerId);
         params.put("searchType", searchType);
-        params.put("requestStart", requestStart);
-        params.put("requestEnd", requestEnd);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         return sqlSession.selectList(NAMESPACE + "search", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int count(String keyword, String writerId, int searchType, String requestStart, String requestEnd) {
+    // 내게 온 요청 검색(STAFF)
+    public int count(String keyword, String writerId, int searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
         params.put("writerId", writerId);
-        params.put("requestStart", requestStart);
-        params.put("requestEnd", requestEnd);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "count", params);
     }
 
-    // 검색과 페이징 로직
-    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  int searchType, String requestStart, String requestEnd) {
+    // 내가 작성한 요청 검색
+    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  int searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("requesterId", requesterId);
         params.put("searchType", searchType);
-        params.put("requestStart", requestStart);
-        params.put("requestEnd", requestEnd);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         return sqlSession.selectList(NAMESPACE + "searchMyRequests", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int countMyRequests(String keyword, String requesterId, int searchType, String requestStart, String requestEnd) {
+    // 내가 작성한 요청 검색
+    public int countMyRequests(String keyword, String requesterId, int searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
         params.put("requesterId", requesterId);
-        params.put("requestStart", requestStart);
-        params.put("requestEnd", requestEnd);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "countMyRequests", params);
     }
 

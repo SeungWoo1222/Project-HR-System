@@ -43,12 +43,12 @@
 
         <form th:action="@{'/report/edit'}" method="get" style="display:inline;">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
-            <button type="submit">수정</button>
+            <button type="submit" onclick="return confirm('보고서를 수정 하시겠습니까?');">수정</button>
         </form>
         <form th:action="@{'/report/delete/' + ${report.reportId}}" method="post" style="display:inline;">
             <input type="hidden" name="_method" value="delete">
             <input type="hidden" name="reportId" th:value="${report.reportId}">
-            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제하시겠습니까?');">삭제</button>
+            <button type="submit" onclick="return confirm('정말 이 보고서를 삭제 하시겠습니까?');">삭제</button>
         </form>
 
         <button onclick="closeModal()">목록으로</button>

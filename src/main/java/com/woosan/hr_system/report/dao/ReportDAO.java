@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +36,8 @@ public class ReportDAO {
 //=====================================================조회 메소드======================================================
 
     // 모든 보고서 조회
-    public List<Report> getAllReports(String employeeId, YearMonth startYearMonth, YearMonth endYearMonth) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", employeeId);
-        params.put("startYearMonth", startYearMonth);
-        params.put("endYearMonth", endYearMonth);
-        return sqlSession.selectList(NAMESPACE + "getAllReports", params);
+    public List<Report> getAllReports(String employeeId) {
+        return sqlSession.selectList(NAMESPACE + "getAllReports", employeeId);
     }
 
 
@@ -51,7 +48,7 @@ public class ReportDAO {
 
 
     // 보고서 통계 조회
-    public List<ReportStat> getReportStats(String statisticStart, String statisticEnd, List<String> writerIdList) {
+    public List<ReportStat> getReportStats(LocalDate statisticStart, LocalDate statisticEnd, List<String> writerIdList) {
         Map<String, Object> params = new HashMap<>();
         params.put("statisticStart", statisticStart);
         params.put("statisticEnd", statisticEnd);
@@ -75,53 +72,57 @@ public class ReportDAO {
     }
 
 
-        // 검색과 페이징 로직
-    public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType, String reportStart, String reportEnd) {
+    // 내가 쓴 보고서 검색
+    public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("writerId", writerId);
         params.put("searchType", searchType);
-        params.put("reportStart", reportStart);
-        params.put("reportEnd", reportEnd);
+        params.put("approvalStatus", approvalStatus);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         return sqlSession.selectList(NAMESPACE + "search", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int count(String keyword, String writerId, int searchType, String reportStart, String reportEnd) {
+    // 내가 쓴 보고서 검색
+    public int count(String keyword, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
+        params.put("approvalStatus", approvalStatus);
         params.put("writerId", writerId);
-        params.put("reportStart", reportStart);
-        params.put("reportEnd", reportEnd);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "count", params);
     }
 
-    // 검색과 페이징 로직
-    public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, int searchType, String reportStart, String reportEnd) {
+    // 결재할 보고서 검색
+    public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("approverId", approverId);
         params.put("searchType", searchType);
-        params.put("reportStart", reportStart);
-        params.put("reportEnd", reportEnd);
+        params.put("approvalStatus", approvalStatus);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         return sqlSession.selectList(NAMESPACE + "toApproveSearch", params);
     }
 
-    // 검색어에 해당하는 전체 데이터의 개수 세는 로직
-    public int toApproveCount(String keyword, String approverId, int searchType, String reportStart, String reportEnd) {
+    // 결재할 보고서 검색
+    public int toApproveCount(String keyword, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
-        params.put("searchType", searchType);
         params.put("approverId", approverId);
-        params.put("reportStart", reportStart);
-        params.put("reportEnd", reportEnd);
+        params.put("searchType", searchType);
+        params.put("approvalStatus", approvalStatus);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "toApproveCount", params);
     }
 

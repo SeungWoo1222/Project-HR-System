@@ -42,14 +42,23 @@
     <!-- 요청 세부 조회 -->
     <select id="getRequestById" parameterType="int" resultType="com.woosan.hr_system.report.model.Request">
         SELECT request_id   AS requestId,
+               e.name AS requesterName,
                writer_id AS writerId,
                writer_name  AS writerName,
                due_date     AS dueDate,
                request_note AS requestNote,
                request_date AS requestDate,
                requester_id AS requesterId -- 요청 삭제 시 로그인한 id와 requesterId가 일치하는 지(삭제권한) 확인 용
-        FROM report_requests
+        FROM report_requests JOIN employees e ON (requester_id = e.employee_id)
         WHERE request_id = #{requestId}
+    </select>
+
+    <!-- reportId로 요청 조회 -->
+    <select id="getRequestByReportId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM report_requests
+        WHERE report_id = #{reportId}
     </select>
 
     <!--(STAFF) - 나에게 온 최근 5개 요청 조회-->
@@ -65,7 +74,7 @@
         ORDER BY r.request_date desc LIMIT 5;
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 내게 온 요청 검색(STAFF) -->
     <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
         r.request_id AS requestId,
@@ -78,22 +87,22 @@
         FROM report_requests r
         JOIN employees e ON r.requester_id = e.employee_id
         <where>
-            <if test="writerId != null and requesterId != ''"> r.writer_id = #{writerId} </if>
+            writer_id = #{writerId}
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (r.request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (e.name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(r.due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(r.due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY r.request_date DESC
+        ORDER BY r.due_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <!-- 내게 온 요청 검색(STAFF) -->
     <select id="count" parameterType="map" resultType="int">
         SELECT COUNT(writer_id) FROM report_requests JOIN employees e ON requester_id = employee_id
         <where>
@@ -108,13 +117,13 @@
                 e.name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>
 
-    <!-- 검색어에 해당하는 데이터 결과 조회 -->
+    <!-- 내가 쓴 요청 검색(MANAGER) -->
     <select id="searchMyRequests" parameterType="map" resultType="com.woosan.hr_system.report.model.Request">
         SELECT
         request_id AS requestId,
@@ -125,26 +134,26 @@
         request_note AS requestNote
         FROM report_requests
         <where>
-            <if test="writerId != null and requesterId != ''"> requester_id = #{requesterId} </if>
-            <if test="keyword != null and keyword != '' and searchType == 1">
+            requester_id = #{requesterId}
+        <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (writer_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY request_date DESC
+        ORDER BY due_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <!-- 내가 쓴 요청 검색 개수 조회(MANAGER) -->
     <select id="countMyRequests" parameterType="map" resultType="int">
         SELECT COUNT(requester_id) FROM report_requests
         <where>
-            requester_id = #{requester_id}
+            requester_id = #{requesterId}
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 request_note LIKE CONCAT('%', #{keyword}, '%')
@@ -155,8 +164,8 @@
                 writer_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="requestStart != null and requestEnd != null">
-                AND DATE_FORMAT(due_date, '%Y-%m') BETWEEN #{requestStart} AND #{requestEnd}
+            <if test="startDate != null and endDate != null">
+                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>
