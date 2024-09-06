@@ -29,7 +29,7 @@ public class EmployeeApiController {
     @RequireHRPermission
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestPart("employee") Employee employee,
-                                                   @RequestPart(value = "picture", required = false) MultipartFile picture) {
+                                                   @RequestPart("picture") MultipartFile picture) {
         // 사원 등록
         return ResponseEntity.ok(employeeService.insertEmployee(employee, picture));
     }
