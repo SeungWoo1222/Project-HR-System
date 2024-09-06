@@ -142,7 +142,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @LogAfterExecution
     @Transactional
     @Override // 사원 정보 등록
-    public String insertEmployee(Employee employee, MultipartFile picture) {
+    public Map<String, Object> insertEmployee(Employee employee, MultipartFile picture) {
         // 업로드 후 사진 파일ID 할당
         if (picture == null || picture.isEmpty()) { throw new IllegalArgumentException("사원 사진이 업로드되지 않았습니다.\n사진을 업로드한 후 다시 시도해 주세요."); }
         assignPictureFromUpload(employee, picture);
@@ -167,7 +167,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         // HR 차장에게 알림 전송 후 메세지 반환
         String message = "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
         sendNotificationToHRManager(message, "/employee/" + employee.getEmployeeId() + "/detail", "차장");
-        return message;
+
+        // 메세지와 사원 아이디 반환
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("message", message);
+        responseData.put("employeeId", employee.getEmployeeId());
+        return responseData;
     }
 
     // 사원 등록 필수 필드 검증

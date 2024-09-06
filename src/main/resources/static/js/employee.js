@@ -217,25 +217,38 @@ function submitInsertForm(event) {
         method: 'POST',
         body: formData
     })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = "/employee/list";
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
+            if (response.ok) {
+                // 성공 시에는 JSON 데이터를 처리
+                return response.json().then(data => ({
+                    status: response.status,
+                    data: data
+                }));
             } else {
-                alert('사원 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
+                // 오류 시에는 텍스트 메시지 처리
+                return response.text().then(text => ({
+                    status: response.status,
+                    text: text
+                }));
+            }
+        })
+        .then(response => {
+            if (response.status === 200) {
+                alert(response.data.message); // 성공 메시지 알림
+                console.log(response.data.employeeId);
+                if (confirm("급여 정보를 등록하시겠습니까?\n확인을 누르면 등록 페이지로 이동합니다.")) {
+                    window.location.href = "/salary/register?employeeId=" + response.data.employeeId;
+                } else {
+                    window.location.href = "/employee/" + response.data.employeeId + "/detail";
+                }
+            } else {
+                const errorStatuses = [400, 403, 404, 500];
+                if (errorStatuses.includes(response.status)) {
+                    alert(response.text); // 오류 메세지 알림
+                } else {
+                    alert('사원 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
             }
         })
         .catch(error => {
