@@ -23,6 +23,8 @@ function lockAccount(button) {
     setAccountLock(confirmMessage, employeeId, name);
 }
 function setAccountLock(confirmMessage, employeeId, name) {
+    event.preventDefault();
+
     if (confirm(confirmMessage)) {
         fetch('/api/employee/' + employeeId + '/accountLock', {
             method: 'PATCH'
@@ -53,9 +55,17 @@ function setAccountLock(confirmMessage, employeeId, name) {
 
 // 재직상태 변경하는 메소드
 function updateStatus(event) {
+    event.preventDefault();
+
     const form = event.target.closest('form');
     const formData = new FormData(form);
+    const originalStatus = formData.get('originalStatus');
     const statusToBeUpdated = formData.get("status");
+
+    if (statusToBeUpdated === originalStatus) {
+        alert("변경사항이 없습니다.")
+        return;
+    }
 
     var confirmMessage = "재직 상태를 '" + statusToBeUpdated + "'으로 변경하시겠습니까?";
     const actionUrl = form.action;
@@ -84,12 +94,15 @@ function updateStatus(event) {
             .catch(error => {
                 console.error('Error :', error.message);
                 alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+                window.location.href = '/employee/list';
             });
     }
 }
 
 // 사원 승진 처리하는 메소드
 function promoteEmployee(button) {
+    event.preventDefault();
+
     const employeeId = button.getAttribute('employeeId');
     const name = button.getAttribute('name');
     const position = button.getAttribute('position');
