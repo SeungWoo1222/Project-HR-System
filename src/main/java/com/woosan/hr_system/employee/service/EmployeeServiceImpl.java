@@ -325,10 +325,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         LocalDate now = LocalDate.now();
 
         if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
-            resignationService.deleteResignation(employeeId);
-            fileService.deleteFile(employee.getPicture());
-            authService.deletePassword(employeeId);
-            employeeDAO.deleteEmployee(employeeId);
+            resignationService.deleteResignation(employeeId); // 퇴사 정보 삭제
+            fileService.deleteFile(employee.getPicture()); // 사원 사진 삭제
+            authService.deletePassword(employeeId); // 사원 비밀번호 정보 삭제
+            notificationService.removeAllNotification(employeeId); // 사원 모든 알림 삭제
+            employeeDAO.deleteEmployee(employeeId); // 사원 정보 삭제
 
             // HR 부장에게 알림 전송 후 메세지 반환
             String message = "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
