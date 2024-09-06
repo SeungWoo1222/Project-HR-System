@@ -151,7 +151,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         verifyRegisterEmployeeFields(employee);
 
         // 사원 아이디 생성 후 중복 체크
-        String employeeId = createEmployeeId(employee);
+        int year = employee.getHireDate().getYear();
+        String employeeId = createEmployeeId(employee, year);
         verifyDuplicateId(employeeId);
 
         // 사원 아이디, 재직 상태, 기본 연차 설정
@@ -191,9 +192,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     // 사원 아이디 생성
-    private String createEmployeeId(Employee employee) {
-        int currentYearEmpolyeesCount = employeeDAO.countEmployeesByCurrentYear();
-        return employee.createEmployeeId(employee, currentYearEmpolyeesCount);
+    private String createEmployeeId(Employee employee, int year) {
+        return employee.createEmployeeId(employee, employeeDAO.countEmployeesByYear(year));
     }
 
     // 사원 아이디 중복 체크

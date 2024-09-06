@@ -45,7 +45,7 @@ public class EmployeeDAO {
     public List<Employee> getPreDeletionEmployees() { return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees"); };
 
     // 이번 년도 입사한 사람의 수 조회
-    public int countEmployeesByCurrentYear() { return sqlSession.selectOne(NAMESPACE + "countEmployeesByCurrentYear"); };
+    public int countEmployeesByYear(int year) { return sqlSession.selectOne(NAMESPACE + "countEmployeesByYear", year); };
 
     // 사원 가족 정보 조회
     public Map<String, Integer> selectFamilyInfoById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "selectFamilyInfoById", employeeId);}
