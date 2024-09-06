@@ -123,6 +123,8 @@ function promoteEmployee(button) {
                 if (response.status === 200) {
                     alert(response.text); // 성공 메시지 알림
                     window.location.href = '/employee/list';
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
                 } else if (response.status === 500) {
                     alert(response.text); // 500 오류 메시지 알림
                 } else {
