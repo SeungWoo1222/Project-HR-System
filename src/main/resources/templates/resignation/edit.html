@@ -111,13 +111,13 @@
                 <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
             </tr>
         </table>
-        <form th:action="@{/api/employee/update/resignation/}" enctype="multipart/form-data" th:onsubmit="submitUpdateResignationForm(event, [[${employee.employeeId}]])">
+        <form th:action="@{/api/resignation/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data" onsubmit="submitUpdateResignationForm(event)">
             <table th:if="${employee.status} == '퇴사'">
+                <input type="hidden" name="employeeId" th:value="${employee.employeeId}"/>
                 <div class="file-area">
                     <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다..</p>
                     <label for="resignationDocuments" class="input-file-btn">문서 업로드</label>
                     <input type="file" id="resignationDocuments" class="hidden" name="resignationDocuments" onchange="addFile(this)" multiple/>
-<!--                    <input type="hidden" id="registeredDocuments" th:value="${employee.resignation?.resignationDocuments}"/>-->
                     <div class="file-list"></div>
                 </div>
                 <tr>
@@ -165,7 +165,7 @@
             </table>
             <div id="error-message" class="error-message"></div>
             <div class="btn-area">
-                <button type="submit" class="btn" data-url="/employee/list">퇴사 정보 수정</button>
+                <button type="submit" class="btn">퇴사 정보 수정</button>
                 <button type="button" class="btn" th:onclick="'window.location.href=\'/resignation/management\''">수정 취소</button>
                 <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
             </div>
