@@ -13,8 +13,9 @@
         var fileList = /*[[${fileList}]]*/ [];
         /*]]>*/
     </script>
-    <script th:src="@{/js/employee.js}"></script>
-    <script th:src="@{/js/emloyee-detail-edit.js}"></script>
+    <script th:src="@{/js/common/file.js}"></script>
+    <script th:src="@{/js/common/format.js}"></script>
+    <script th:src="@{/js/employee/resignation.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             updateDateTimeElements();
@@ -165,7 +166,7 @@
             <div id="error-message" class="error-message"></div>
             <div class="btn-area">
                 <button type="submit" class="btn" data-url="/employee/list">퇴사 정보 수정</button>
-                <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/resignation\''">수정 취소</button>
+                <button type="button" class="btn" th:onclick="'window.location.href=\'/resignation/management\''">수정 취소</button>
                 <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
             </div>
         </form>

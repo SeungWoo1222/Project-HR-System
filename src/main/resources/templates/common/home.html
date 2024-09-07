@@ -7,7 +7,7 @@
 
 <th:block layout:fragment="script">
     <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
-    <script th:src="@{/js/pwd.js}"/></script>
+    <script th:src="@{/js/common/pwd.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const message = document.getElementById('message').value;

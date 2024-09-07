@@ -9,8 +9,10 @@
 
 <th:block layout:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script th:src="@{/js/daum-postcode-API.js}"></script>
-    <script th:src="@{/js/employee.js}"></script>
+    <script th:src="@{/js/common/daum-postcode-API.js}"></script>
+    <script th:src="@{/js/common/file.js}"></script>
+    <script th:src="@{/js/employee/employee.js}"></script>
+    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             separateEmail();
