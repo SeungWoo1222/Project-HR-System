@@ -3,7 +3,6 @@ package com.woosan.hr_system.salary.service;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.exception.salary.SalaryNotFoundException;
 import com.woosan.hr_system.salary.dao.SalaryDAO;
@@ -29,8 +28,6 @@ public class SalaryServiceImpl implements SalaryService {
     private CommonService commonService;
     @Autowired
     private SalaryDAO salaryDAO;
-    @Autowired
-    private EmployeeDAO employeeDAO;
 
     // Salary 객체 Null 검사
     private void checkForNull(Salary salary, Object id) {
@@ -46,9 +43,7 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override // 사원 ID를 이용한 특정 사원의 급여 정보 조회
     public Salary getSalaryByEmployeeId(String employeeId) {
-        Salary salaryInfo = salaryDAO.selectSalaryByEmployeeId(employeeId);
-        checkForNull(salaryInfo, employeeId);
-        return salaryInfo;
+        return salaryDAO.selectSalaryByEmployeeId(employeeId);
     }
 
     @Override // 사원 ID를 이용한 특정 사원의 급여 ID 리스트 조회

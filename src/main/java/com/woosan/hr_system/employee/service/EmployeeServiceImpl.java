@@ -10,11 +10,13 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.resignation.service.ResignationService;
+import com.woosan.hr_system.salary.model.Salary;
+import com.woosan.hr_system.salary.service.SalaryService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -38,6 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private FileService fileService;
     @Autowired
     private ResignationService resignationService;
+    @Autowired
+    private SalaryService salaryService;
     @Autowired
     private NotificationService notificationService;
 
@@ -64,11 +68,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    @Override // id를 이용한 특정 사원 정보 조회 (비밀번호 정보, 퇴사 정보 포함)
+    @Override // id를 이용한 특정 사원 정보 조회 (비밀번호 정보, 급여 정보, 퇴사 정보 포함)
     public Employee getEmployeeDetails(String employeeId) {
         Employee employee = findEmployeeById(employeeId);
         // 비밀번호 정보 조회 및 설정
         verifyAndSetPasswordInfo(employee);
+        // 급여 정보 조회 및 설정
+        verifyAndSetSalaryInfo(employee);
         // 퇴사 정보 조회 및 설정
         verifyAndSetResignationInfo(employee);
         return employee;
@@ -79,6 +85,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         String employeeId = employee.getEmployeeId();
         Password passwordInfo = authService.getPasswordInfoById(employeeId);
         employee.setPassword(passwordInfo);
+    }
+
+    // 사원 급여 정보 확인 후 설정하는 메소드
+    private void verifyAndSetSalaryInfo(Employee employee) {
+        String employeeId = employee.getEmployeeId();
+        Salary salaryInfo = salaryService.getSalaryByEmployeeId(employeeId);
+        employee.setSalary(salaryInfo);
     }
 
     // 사원 퇴사 정보 확인 후 설정하는 메소드
