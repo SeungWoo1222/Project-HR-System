@@ -76,6 +76,7 @@ function readNotification(notificationId, readStatus) {
         .then(response => {
             if (response.ok) {
                 fetchNotifications(); // 알림 전체 새로고침
+                fetchUnreadNotificationCount();
             } else {
                 alert('알림을 읽음 처리 중 오류가 발생하였습니다.');
             }
@@ -88,82 +89,75 @@ function readNotification(notificationId, readStatus) {
 
 // 모든 알림 읽음 처리
 function readAllNotification() {
-    // 읽음 처리 전 확인
-    let message = '모든 알림을 읽음 처리하시겠습니까?'
-
-    if (!confirm(message)) return;
-
     // 읽음 처리
-    fetch('/notification/all', {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            if (response.ok) {
-                fetchNotifications(); // 알림 전체 새로고침
-            } else {
-                alert('모든 알림을 읽음 처리 중 오류가 발생하였습니다.');
+    if (confirm('모든 알림을 읽음 처리하시겠습니까?')) {
+        fetch('/notification/all', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => {
+                if (response.ok) {
+                    fetchNotifications(); // 알림 전체 새로고침
+                    fetchUnreadNotificationCount();
+                } else {
+                    alert('모든 알림을 읽음 처리 중 오류가 발생하였습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 알림 삭제 처리
 function deleteNotification(notificationId) {
-    // 삭제 처리 전 확인
-    let message = '해당 알림을 삭제 처리하시겠습니까?'
-
-    if (!confirm(message)) return;
-
-    console.log(notificationId)
-
-    fetch('/notification/' + notificationId, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            if (response.ok) {
-                fetchNotifications(); // 알림 전체 새로고침
-            } else {
-                alert('알림을 삭제 처리 중 오류가 발생하였습니다.');
+    event.stopPropagation();
+    if (confirm('해당 알림을 삭제 처리하시겠습니까?')) {
+        fetch('/notification/' + notificationId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => {
+                if (response.ok) {
+                    fetchNotifications(); // 알림 전체 새로고침
+                    fetchUnreadNotificationCount();
+                } else {
+                    alert('알림을 삭제 처리 중 오류가 발생하였습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 모든 알림 삭제 처리
 function deleteAllNotification() {
-    // 삭제 처리 전 확인
-    let message = '모든 알림을 삭제 처리하시겠습니까?'
-
-    if (!confirm(message)) return;
-
     // 읽음 처리
-    fetch('/notification/all', {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            if (response.ok) {
-                fetchNotifications(); // 알림 전체 새로고침
-            } else {
-                alert('모든 알림을 삭제 처리 중 오류가 발생하였습니다.');
+    if (!confirm('모든 알림을 삭제 처리하시겠습니까?')) {
+        fetch('/notification/all', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => {
+                if (response.ok) {
+                    fetchNotifications(); // 알림 전체 새로고침
+                    fetchUnreadNotificationCount();
+                } else {
+                    alert('모든 알림을 삭제 처리 중 오류가 발생하였습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }

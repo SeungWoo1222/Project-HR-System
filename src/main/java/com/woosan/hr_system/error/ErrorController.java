@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/error")
 public class ErrorController {
 
+    @RequestMapping("/employee-error")
+    public String handleEmployeeNotFound() {
+        return "/error/employee-error";
+    }
+
     @RequestMapping("/404")
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound() {

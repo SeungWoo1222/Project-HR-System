@@ -40,8 +40,10 @@ public class GlobalExceptionHandler {
 
     // 404 Not Found 처리
     @ExceptionHandler(EmployeeNotFoundException.class)
-    public ResponseEntity<String> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ModelAndView handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("redirect:/error/employee-error");
+        return mav;
     }
     @ExceptionHandler(PasswordNotFoundException.class)
     public ResponseEntity<String> handlePasswordNotFoundException(PasswordNotFoundException ex) {
