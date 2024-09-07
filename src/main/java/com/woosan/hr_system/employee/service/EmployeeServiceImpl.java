@@ -179,7 +179,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 차장에게 알림 전송 후 메세지 반환
         String message = "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employee.getEmployeeId() + "/detail", "차장");
+        sendNotification(message, "/employee/" + employee.getEmployeeId() + "/detail", "HR", "차장");
 
         // 메세지와 사원 아이디 반환
         Map<String, Object> responseData = new HashMap<>();
@@ -288,7 +288,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 부장에게 알림 전송 후 메세지 반환
         String message = "'" + getEmployeeNameById(employeeId) + "' 사원의 재직 상태가 '" + status + "'으로 변경되었습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        sendNotification(message, "/employee/" + employeeId + "/detail", "HR", "부장");
         return message;
     }
 
@@ -317,7 +317,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 부장에게 알림 전송 후 메세지 반환
         String message = "'" + getEmployeeNameById(employeeId) + "' 사원이 '" + positionToBePromoted + "'으로 승진하였습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        sendNotification(message, "/employee/" + employeeId + "/detail", "HR", "부장");
         return message;
     }
     // ============================================ 수정 관련 로직 end-point ============================================
@@ -346,7 +346,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             // HR 부장에게 알림 전송 후 메세지 반환
             String message = "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
-            sendNotificationToHRManager(message, null, "부장");
+            sendNotification(message, null, "HR","부장");
             return message;
         } else {
             throw new IllegalArgumentException("사원이 퇴사 후 1년이 지나지 않았습니다.");
@@ -361,11 +361,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.assignPicture(fileId);
     }
 
-    // 인사과(HR) 관리자에게 알림 전송
-    private void sendNotificationToHRManager(String message, String url, String position) {
-        // HR 관리자 검색하여 ID 리스트로 변환
-        List<String> managerIdList = convertEmployeesToIdList(getEmployeesByDepartmentAndPosition("HR", position));
+    // 해당 부서의 직급에게 알림 전송
+    private void sendNotification(String message, String url, String department, String position) {
+        // 해당 부서와 직급 검색하여 ID 리스트로 변환
+        List<String> managerIdList = convertEmployeesToIdList(getEmployeesByDepartmentAndPosition(department, position));
         // 알림 전송
-        notificationService.createNotifications(managerIdList, message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(), url);
+        if (!managerIdList.isEmpty()) {
+            notificationService.createNotifications(managerIdList, message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(), url);
+        }
     }
 }
