@@ -26,15 +26,13 @@ function submitPassword(event) {
             text: data
         })))
         .then(response => {
-            console.log('서버 응답 데이터 : ', response.text);
+            const errorStatuses = [400, 401, 404];
             if (response.status === 200) {
                 window.location.href = response.text;
-            } else if (response.status === 404) {
-                errorMessage.textContent = response.text;
-            } else if (response.status === 400) {
+            } else if (errorStatuses.includes(response.status)) {
                 errorMessage.textContent = response.text;
             } else {
-                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다.\n관리자에게 문의해주세요.\");";
+                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다. 관리자에게 문의해주세요.";
             }
         })
         .catch(error => {
