@@ -201,4 +201,8 @@
         UPDATE salaries SET bank = #{bank}, account_number = #{accountNumber} WHERE salary_id = #{salaryId}
     </update>
 
+    <!-- 사원 급여 정보 사용 중지 -->
+    <update id="deactivateSalary" parameterType="int">
+        UPDATE salaries SET status = 0 WHERE salary_id = #{salaryId}
+    </update>
 </mapper>
