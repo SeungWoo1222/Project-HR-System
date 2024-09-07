@@ -66,6 +66,9 @@ public class EmployeeDAO {
     // 사원 재직 상태 수정
     public void updateStatus(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updateStatus", params); }
 
+    // 사원 재직 상태 퇴사로 수정
+    public void updateStatusToResignation(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updateStatusToResignation", params); }
+
     // 사원 직급 +1으로 수정 - 승진
     public void updatePosition(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updatePosition",params); }
 
