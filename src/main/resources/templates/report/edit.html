@@ -9,8 +9,8 @@
 
 <th:block layout:fragment="script">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/js/report.js}"></script>
-    <script th:src="@{/js/report-file.js}"></script>
+    <script th:src="@{/js/report/report.js}"></script>
+    <script th:src="@{/js/report/report-file.js}"></script>
     <script>
         $(document).ready(function () {
             initializeRegisteredFiles(); // 기존에 있는 파일을 IdList에 추가

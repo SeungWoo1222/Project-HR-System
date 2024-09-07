@@ -8,8 +8,9 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/employee.js}"></script>
-    <script th:src="@{/js/employee-detail-edit.js}"></script>
+    <script th:src="@{/js/employee/employee.js}"></script>
+    <script th:src="@{/js/employee/employee-detail-edit.js}"></script>
+    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             updateDateTimeElements();
