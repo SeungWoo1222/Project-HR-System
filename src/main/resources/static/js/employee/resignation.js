@@ -101,7 +101,13 @@ function submitResignationForm(event) {
 }
 
 // AJAX PUT 요청 - 퇴사 수정
-function submitUpdateResignationForm(event, employeeId) {
+function submitUpdateResignationForm(event) {
+    event.preventDefault();
+
+    // form 제출 처리
+    const { form, actionUrl } = handleFormSubmit(event);
+    const employeeId = form.employeeId.value;
+
     // 확인 메세지
     const confirmMessage = "'" + employeeId + "'사원의 퇴사 정보를 수정하시겠습니까?";
     if (!confirm(confirmMessage)) {
@@ -113,11 +119,8 @@ function submitUpdateResignationForm(event, employeeId) {
         return;
     }
 
-    // form 제출 처리
-    const { form, actionUrl } = handleFormSubmit(event);
-    const formData = new FormData();
-
     // FormData 객체에 resignation 필드를 추가
+    const formData = new FormData();
     const resignation = {
         resignationDate: form.resignationDate.value,
         resignationReason: form.resignationReason.value,
@@ -146,13 +149,8 @@ function submitUpdateResignationForm(event, employeeId) {
         }
     }
 
-    // FormData에 담긴 데이터 콘솔에 출력
-    for (let pair of formData.entries()) {
-        console.log(pair[0] + ':', pair[1]);
-    }
-
     // 데이터를 서버로 전송
-    fetch(actionUrl  + employeeId, {
+    fetch(actionUrl, {
         method: 'PUT',
         body: formData
     })

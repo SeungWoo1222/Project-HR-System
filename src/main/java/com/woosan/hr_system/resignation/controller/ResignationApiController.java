@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/api/resignation")
 public class ResignationApiController {
 
     @Autowired
@@ -25,7 +25,7 @@ public class ResignationApiController {
 
     // 사원 퇴사 처리
     @RequireHRPermission
-    @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                                  @RequestPart("resignation") Resignation resignation,
                                                  @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
@@ -43,7 +43,7 @@ public class ResignationApiController {
 
     // 사원 퇴사 정보 수정
     @RequireHRPermission
-    @PutMapping(value = "/update/resignation/{employeeId}", consumes = "multipart/form-data")
+    @PutMapping(value = "/{employeeId}", consumes = "multipart/form-data")
     public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
                                                         @RequestPart("resignation") Resignation resignation,
                                                         @RequestPart(value = "oldFileIdList", required = false) List<Integer> oldFileIdList,
