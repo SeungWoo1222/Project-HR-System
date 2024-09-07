@@ -79,10 +79,21 @@ public class ResignationServiceImpl implements ResignationService {
     @LogAfterExecution
     @Transactional
     @Override // 사원 퇴사 처리 로직
-    public String resignEmployee(String employeeId, Resignation resignation) {
+    public String resignEmployee(String employeeId, Resignation resignation, MultipartFile[] resignationDocuments) {
+        // 퇴사 문서 파일 업로드
+        if (resignationDocuments != null && resignationDocuments.length > 0) {
+            uploadNewFiles(employeeId, resignationDocuments);
+        }
+
         // 퇴사 처리 할 resignation 객체 초기화
         UserSessionInfo processInfo = new UserSessionInfo();
         resignation.initializeResignationDetails(employeeId, resignation, processInfo.getCurrentEmployeeId(), processInfo.getNow());
+
+        // 재직 상태 - 퇴사 처리
+        Map<String, Object> params = new HashMap<>();
+        params.put("employeeId", employeeId);
+        params.put("status", "퇴사");
+        employeeDAO.updateStatusToResignation(params);
 
         // 퇴사 정보 등록
         resignationDAO.insertResignation(resignation);
