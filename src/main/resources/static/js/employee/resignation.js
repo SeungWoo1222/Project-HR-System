@@ -71,48 +71,42 @@ function submitResignationForm(event) {
     }
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.reload();
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('사원 퇴사처리 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
-            }
+    if (confirm("해당 사원을 퇴사 처리하시겠습니까?")) {
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.reload();
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('사원 퇴사처리 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // AJAX PUT 요청 - 퇴사 수정
 function submitUpdateResignationForm(event) {
-    event.preventDefault();
-
     // form 제출 처리
     const { form, actionUrl } = handleFormSubmit(event);
     const employeeId = form.employeeId.value;
-
-    // 확인 메세지
-    const confirmMessage = "'" + employeeId + "'사원의 퇴사 정보를 수정하시겠습니까?";
-    if (!confirm(confirmMessage)) {
-        return;
-    }
 
     // 유효성 검사 실행
     if (!validateResignationForm(event)) {
@@ -150,33 +144,35 @@ function submitUpdateResignationForm(event) {
     }
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'PUT',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/employee/' + employeeId + '/detail';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('퇴사 정보 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
-            }
+    if (confirm("사원의 퇴사 정보를 수정하시겠습니까?")) {
+        fetch(actionUrl, {
+            method: 'PUT',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.href = '/employee/' + employeeId + '/detail';
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('퇴사 정보 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // AJAX DELETE 요청
@@ -186,11 +182,9 @@ function submitDelete(event) {
     let employeeId = button.getAttribute('employeeId');
     let employeeName = button.getAttribute('employeeName');
 
-    var confirmMessage = '\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?';
-
     let actionUrl = '/api/admin/employee/' + employeeId;
 
-    if (confirm(confirmMessage)) {
+    if (confirm('\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?')) {
         fetch(actionUrl, {
             method: 'DELETE'
         })
