@@ -21,126 +21,149 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <img class="employee-picture" th:src="${pictureUrl}"/>
-        <table>
-            <tr>
-                <th>사원 ID</th>
-                <td th:text="${employee.employeeId}"></td>
-            </tr>
-            <tr>
-                <th>이름</th>
-                <td th:text="${employee.name}"></td>
-            </tr>
-            <tr>
-                <th>주민등록번호</th>
-                <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
-            </tr>
-            <tr>
-                <th>전화번호</th>
-                <td th:text="${employee.phone}"></td>
-            </tr>
-            <tr>
-                <th>이메일</th>
-                <td th:text="${employee.email}"></td>
-            </tr>
-            <tr>
-                <th>주소</th>
-                <td th:text="${employee.address}"></td>
-            </tr>
-            <tr>
-                <th>상세 주소</th>
-                <td th:text="${employee.detailAddress}"></td>
-            </tr>
-            <tr>
-                <th>결혼 관계</th>
-                <td th:text="${employee.maritalStatus == 1 ? '기혼' : '미혼'}"></td>
-            </tr>
-            <tr>
-                <th>부양 가족 수</th>
-                <td th:text="${employee.numDependents}"></td>
-            </tr>
-            <tr>
-                <th>자녀 수 (8~20세)</th>
-                <td th:text="${employee.numChildren}"></td>
-            </tr>
-            <tr>
-                <th>부서</th>
-                <td th:text="${employee.department.name}"></td>
-            </tr>
-            <tr>
-                <th>직급</th>
-                <td th:text="${employee.position.name}"></td>
-            </tr>
-            <tr>
-                <th>입사 날짜</th>
-                <td th:text="${employee.hireDate}"></td>
-            </tr>
-            <tr>
-                <th>재직 상태</th>
-                <td th:text="${employee.status}"></td>
-            </tr>
-            <tr>
-                <th>남은 연차</th>
-                <td th:text="${employee.remainingLeave}"></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>사원 정보 수정자</th>
-                <td th:text="${employee.modifiedBy}"></td>
-            </tr>
-            <tr>
-                <th>사원 정보 수정일시</th>
-                <td th:text="${employee.lastModified}" class="dateTime"></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>비밀번호</th>
-                <td th:text="${employee.password?.password}"></td>
-            </tr>
-            <tr>
-                <th>비밀번호 강도</th>
-                <td th:text="${employee.password?.strength}"></td>
-            </tr>
-            <tr>
-                <th>비밀번호 오류 횟수</th>
-                <td th:text="${employee.password?.passwordCount}"></td>
-            </tr>
-            <tr>
-                <th>비밀번호 수정자</th>
-                <td th:text="${employee.password?.modifiedBy}"></td>
-            </tr>
-            <tr>
-                <th>비밀번호 수정일시</th>
-                <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
-            </tr>
-        </table>
-        <table th:if="${employee.status} == '퇴사'">
-            <tr>
-                <th>퇴사일</th>
-                <td th:text="${employee.resignation?.resignationDate}"></td>
-            </tr>
-            <tr>
-                <th>퇴사 사유</th>
-                <td th:text="${employee.resignation?.getResignationReason()}"></td>
-            </tr>
-            <tr>
-                <th>퇴사 코드</th>
-                <td th:text="${employee.resignation?.codeNumber}"></td>
-            </tr>
-            <tr>
-                <th>구체적 사유</th>
-                <td th:text="${employee.resignation?.specificReason}"></td>
-            </tr>
-            <tr>
-                <th>퇴사 처리한 사원 ID</th>
-                <td th:text="${employee.resignation?.getProcessedBy()}"></td>
-            </tr>
-            <tr>
-                <th>퇴사 처리 일시</th>
-                <td th:text="${employee.resignation?.getProcessedDate()}" class="dateTime"></td>
-            </tr>
-        </table>
+        <div>
+            <h3>사원 정보</h3>
+            <table>
+                <tr>
+                    <th>사원 ID</th>
+                    <td th:text="${employee.employeeId}"></td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td th:text="${employee.name}"></td>
+                </tr>
+                <tr>
+                    <th>주민등록번호</th>
+                    <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
+                </tr>
+                <tr>
+                    <th>전화번호</th>
+                    <td th:text="${employee.phone}"></td>
+                </tr>
+                <tr>
+                    <th>이메일</th>
+                    <td th:text="${employee.email}"></td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td th:text="${employee.address + ', ' + employee.detailAddress}"></td>
+                </tr>
+                <tr>
+                    <th>결혼 관계</th>
+                    <td th:text="${employee.maritalStatus == 1 ? '기혼' : '미혼'}"></td>
+                </tr>
+                <tr>
+                    <th>부양 가족 수</th>
+                    <td th:text="${employee.numDependents}"></td>
+                </tr>
+                <tr>
+                    <th>자녀 수 (8~20세)</th>
+                    <td th:text="${employee.numChildren}"></td>
+                </tr>
+                <tr>
+                    <th>부서와 직급</th>
+                    <td th:text="${employee.department + ' / ' + employee.position}"></td>
+                </tr>
+                <tr>
+                    <th>입사 날짜</th>
+                    <td th:text="${employee.hireDate}"></td>
+                </tr>
+                <tr>
+                    <th>재직 상태</th>
+                    <td th:text="${employee.status}"></td>
+                </tr>
+                <tr>
+                    <th>남은 연차</th>
+                    <td th:text="${employee.remainingLeave}"></td>
+                </tr>
+                <tr>
+                    <th>사원 정보 수정자</th>
+                    <td th:text="${employee.modifiedBy}"></td>
+                </tr>
+                <tr>
+                    <th>사원 정보 수정일시</th>
+                    <td th:text="${employee.lastModified}" class="dateTime"></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <h3>급여 정보</h3>
+            <table th:if="${employee.salary == null}">
+                <td>현재 등록된 급여 정보가 없습니다.</td>
+            </table>
+            <table th:if="${employee.salary != null}">
+                <tr>
+                    <th>급여 ID</th>
+                    <td th:text="${employee.salary?.salaryId}"></td>
+                </tr>
+                <tr>
+                    <th>계좌 번호</th>
+                    <td th:text="${employee.salary?.bank + ' ' + employee.salary?.accountNumber}"></td>
+                </tr>
+                <tr>
+                    <th>연봉</th>
+                    <td th:text="${#numbers.formatInteger(employee.salary?.annualSalary, 3 ,'COMMA')}"></td>
+                </tr>
+                <tr>
+                    <th>등록된 날짜</th>
+                    <td th:text="${employee.salary?.createdAt}"></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <h3>비밀번호 정보</h3>
+            <table>
+                <tr>
+                    <th>비밀번호</th>
+                    <td th:text="${employee.password?.password}"></td>
+                </tr>
+                <tr>
+                    <th>비밀번호 강도</th>
+                    <td th:text="${employee.password?.strength}"></td>
+                </tr>
+                <tr>
+                    <th>비밀번호 오류 횟수</th>
+                    <td th:text="${employee.password?.passwordCount}"></td>
+                </tr>
+                <tr>
+                    <th>비밀번호 수정자</th>
+                    <td th:text="${employee.password?.modifiedBy}"></td>
+                </tr>
+                <tr>
+                    <th>비밀번호 수정일시</th>
+                    <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
+                </tr>
+            </table>
+        </div>
+        <div th:if="${employee.status} == '퇴사'">
+            <h3>퇴사 정보</h3>
+            <table>
+                <tr>
+                    <th>퇴사일</th>
+                    <td th:text="${employee.resignation?.resignationDate}"></td>
+                </tr>
+                <tr>
+                    <th>퇴사 사유</th>
+                    <td th:text="${employee.resignation?.getResignationReason()}"></td>
+                </tr>
+                <tr>
+                    <th>퇴사 코드</th>
+                    <td th:text="${employee.resignation?.codeNumber}"></td>
+                </tr>
+                <tr>
+                    <th>구체적 사유</th>
+                    <td th:text="${employee.resignation?.specificReason}"></td>
+                </tr>
+                <tr>
+                    <th>퇴사 처리한 사원 ID</th>
+                    <td th:text="${employee.resignation?.getProcessedBy()}"></td>
+                </tr>
+                <tr>
+                    <th>퇴사 처리 일시</th>
+                    <td th:text="${employee.resignation?.getProcessedDate()}" class="dateTime"></td>
+                </tr>
+            </table>
+        </div>
         <div>
             <button type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editEmployee(this)">사원 정보 수정</button>
             <button th:if="${employee.status} == '퇴사'" type="button" class="btn" th:employeeId="${employee.employeeId}" onclick="editResignedEmployee(this)">퇴사 정보 수정</button>
