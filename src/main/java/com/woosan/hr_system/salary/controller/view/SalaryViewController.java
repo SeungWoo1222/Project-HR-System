@@ -1,6 +1,7 @@
 package com.woosan.hr_system.salary.controller.view;
 
 import com.woosan.hr_system.aspect.RequireHRPermission;
+import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.salary.model.Salary;
 import com.woosan.hr_system.salary.service.SalaryService;
@@ -23,6 +24,8 @@ import java.util.List;
 public class SalaryViewController {
     @Autowired
     private SalaryService salaryService;
+    @Autowired
+    private EmployeeDAO employeeDAO;
 
     @RequireHRPermission
     @GetMapping("/list") // 모든 급여 정보 페이지 이동
@@ -55,8 +58,7 @@ public class SalaryViewController {
         if (employeeId != null) {
             model.addAttribute("selectedEmployeeId", employeeId);
         }
-        List<Employee> employeeListWithoutSalaryInfo = salaryService.getEmployeeList();
-        model.addAttribute("employeeList", employeeListWithoutSalaryInfo);
+        model.addAttribute("employeeList", employeeDAO.getAllEmployees());
         return "salary/register";
     }
 

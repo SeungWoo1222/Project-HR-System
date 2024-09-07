@@ -101,6 +101,11 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryDAO.selectSalariesByIds(salaryIdList);
     }
 
+    @Override // 등록 전 사용 중인 급여 정보 확인
+    public Salary hasSalaryInfo(String employeeId) {
+        return salaryDAO.selectSalaryByEmployeeId(employeeId);
+    }
+
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 사원 급여 정보 등록
@@ -166,5 +171,11 @@ public class SalaryServiceImpl implements SalaryService {
                 "bank", "accountNumber"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
+    }
+
+    @Override // 급여 정보 사용 중지
+    public String deactivateSalary(int salaryId) {
+        salaryDAO.deactivateSalary(salaryId);
+        return "'" + salaryId + "'급여 정보가 사용 중지되었습니다.";
     }
 }

@@ -18,8 +18,10 @@ public interface SalaryService {
     List<Salary> getAllSalaries();
     List<Salary> getSalariesByIds(List<Integer> salaryIdList);
     List<Salary> fetchSalaryListByIds(String salaryIds);
+    Salary hasSalaryInfo(String employeeId);
     String addSalary(Salary salary);
     String updateSalary(Salary salary, String employeeId);
     String removeSalary(int salaryId);
     String updateAccountInfo(int salaryId, String bank, String accountNumber);
+    String deactivateSalary(int salaryId);
 }

@@ -93,26 +93,74 @@ function submitForm(event) {
 
     const actionUrl = form.action;
     if (confirm("사원의 급여 정보를 등록하시겠습니까?")) {
-        fetch(actionUrl, {
-            method: 'POST',
-            body: formData
+        // 급여 정보 확인
+        fetch('/api/salary/check/' + form.employeeId.value, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
-            .then(response => response.text().then(data => ({
-                status: response.status,
-                text: data
-            })))
-            .then(response => {
-                if (response.status === 200) {
-                    alert(response.text);
-                    window.location.href = "/salary/list";
+            .then(response => response.json().then(data => ({ status: response.status, data })))  // 응답과 데이터를 함께 반환
+            .then(({ status, data }) => {
+                // 서버 응답 확인
+                if (status === 200) {
+                    // 급여 정보가 존재할 경우
+                    if (confirm(data.message + "\n급여 정보를 새로 등록하시겠습니까?\n새로 등록 시 이전 급여 정보는 사용 중지 처리됩니다.")) {
+                        // 급여 정보 사용 중지
+                        const salaryId = data.salaryInfo.salaryId;
+                        fetch('/api/salary/deactivate/' + salaryId, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(patchResponse => {
+                                if (patchResponse.ok) {
+                                    alert("이전 급여 정보가 사용 중지되었습니다.");
+                                    // 새로운 급여 정보 등록
+                                    registerSalary(actionUrl, formData);
+                                } else {
+                                    alert("급여 정보 사용 중지에 실패했습니다.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('급여 정보 사용 중지 중 오류가 발생했습니다. 관리자에게 문의하세요.');
+                            });
+                    }
                 } else {
-                    alert('급여 정보 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                    window.location.reload();
+                    // 급여 정보가 없을 경우 - 급여 정보 등록
+                    registerSalary(actionUrl, formData);
                 }
             })
             .catch(error => {
-                console.error('Error :', error.message);
-                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+                console.error('Error:', error);
+                alert('오류가 발생하였습니다. 관리자에게 문의하세요.');
             });
     }
+}
+
+// 급여 정보 등록
+function registerSalary(actionUrl, formData) {
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            if (response.status === 200) {
+                alert(response.text);
+                window.location.href = "/salary/list";
+            } else {
+                alert('급여 정보 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        });
 }
