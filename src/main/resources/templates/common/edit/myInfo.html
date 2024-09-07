@@ -29,7 +29,7 @@
             <div id="file-area">
                 <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
                 <p>사진은 10MB까지 업로드 가능합니다.</p>
-                <span id="file-name" th:text="${employee.picture}"></span>
+                <span id="file-name" th:text="${originalFileName}"></span>
                 <label for="picture" class="input-file-btn">사진 업로드</label>
                 <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
                 <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">
@@ -90,6 +90,27 @@
                         <input type="text" id="detailAddressInput" name="detailAddressInput" th:value="${employee.detailAddress}">
                         <input type="text" id="extraAddress" placeholder="참고항목" readonly>
                         <input type="hidden" id="detailAddress" name="detailAddress" th:value="${employee.detailAddress}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>결혼 관계</th>
+                    <td>
+                        <input type="radio" id="marriedYes" name="maritalStatus" value="1"
+                               th:checked="${employee.maritalStatus == true}" onchange="updateDependents()"> 기혼
+                        <input type="radio" id="marriedNo" name="maritalStatus" value="0"
+                               th:checked="${employee.maritalStatus == false}" onchange="updateDependents()"> 미혼
+                    </td>
+                </tr>
+                <tr>
+                    <th>부양 가족 수</th>
+                    <td>
+                        <input type="number" id="numDependents" name="numDependents" min="1" max="11" th:value="${employee.numDependents}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>자녀 수 (8~20세)</th>
+                    <td>
+                        <input type="number" id="numChildren" name="numChildren" min="0" max="11" th:value="${employee.numChildren}">
                     </td>
                 </tr>
                 <tr>

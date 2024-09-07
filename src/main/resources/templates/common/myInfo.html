@@ -50,6 +50,18 @@
                 <td th:text="${employee.detailAddress}">상세 주소</td>
             </tr>
             <tr>
+                <th>결혼 관계</th>
+                <td th:text="${employee.maritalStatus == 1 ? '기혼' : '미혼'}"></td>
+            </tr>
+            <tr>
+                <th>부양 가족 수</th>
+                <td th:text="${employee.numDependents}"></td>
+            </tr>
+            <tr>
+                <th>자녀 수 (8~20세)</th>
+                <td th:text="${employee.numChildren}"></td>
+            </tr>
+            <tr>
                 <th>부서</th>
                 <td th:text="${employee.department.name}">부서</td>
             </tr>
