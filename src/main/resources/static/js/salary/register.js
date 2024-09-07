@@ -92,25 +92,27 @@ function submitForm(event) {
     formData.set("annualSalary", annualSalary);
 
     const actionUrl = form.action;
-    fetch(actionUrl, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            if (response.status === 200) {
-                alert(response.text);
-                window.location.href = "/salary/list";
-            } else {
-                alert('급여 정보 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm("사원의 급여 정보를 등록하시겠습니까?")) {
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.href = "/salary/list";
+                } else {
+                    alert('급여 정보 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
