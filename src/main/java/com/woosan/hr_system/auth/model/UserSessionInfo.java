@@ -11,7 +11,8 @@ public class UserSessionInfo {
     private LocalDateTime now;
 
     public UserSessionInfo() {
-        this.currentEmployeeId = SecurityContextHolder.getContext().getAuthentication().getName();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        this.currentEmployeeId = userDetails.getNameWithId();
         this.now = LocalDateTime.now();
     }
 }
