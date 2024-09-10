@@ -22,7 +22,10 @@ public class ResignationDAO {
     public Resignation getResignedEmployee(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getResignedEmployee" ,employeeId); }
 
     // 퇴사 사원 정보 등록
-    public void insertResignation(Resignation resignation) { sqlSession.insert(NAMESPACE + "insertResignation", resignation); }
+    public void insertResignation(Resignation resignation) {
+        sqlSession.insert(NAMESPACE + "insertResignation", resignation);
+        sqlSession.update(NAMESPACE + "processResignation", resignation.getEmployeeId());
+    }
 
     // 퇴사 사원 정보 수정
     public void updateResignation(Resignation resignation) { sqlSession.update(NAMESPACE + "updateResignation", resignation); }
