@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woosan.hr_system.vacation.dao.VacationDAO">
+    <resultMap id="VacationResultMap" type="com.woosan.hr_system.vacation.model.Vacation">
+        <id property="vacationId" column="vacation_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="startAt" column="start_at"/>
+        <result property="endAt" column="end_at"/>
+        <result property="vacationType" column="vacation_type"/>
+        <result property="reason" column="reason"/>
+        <result property="usedDays" column="used_days"/>
+        <result property="approvalStatus" column="approval_status"/>
+        <result property="processingBy" column="processing_by"/>
+        <result property="processingAt" column="processing_at"/>
+    </resultMap>
+
+    <!-- 아이디를 이용한 휴가 정보 조회 -->
+    <select id="selectVacationById" parameterType="int" resultMap="VacationResultMap">
+        SELECT * FROM vacation WHERE vacation_id = #{vacationId}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 정보 조회 -->
+    <select id="selectVacationByEmployeeId" parameterType="string" resultMap="VacationResultMap">
+        SELECT * FROM vacation WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 해당 부서의 모든 휴가 정보 조회 -->
+    <select id="selectVacationByDepartmentId" parameterType="list" resultMap="VacationResultMap">
+        SELECT * FROM vacation
+        WHERE employee_id IN
+        <foreach item="employeeId" collection="list" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </select>
+
+    <!-- 휴가 등록 -->
+    <insert id="insertVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        INSERT INTO vacation (employee_id, start_at, end_at, vacation_type, reason, used_days)
+        value (#{employeeId}, #{startAt}, #{endAt}, #{vacationType}, #{reason}, #{usedDays})
+    </insert>
+
+    <!-- 휴가 수정 -->
+    <update id="updateVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE vacation
+        SET
+            start_at = #{startAt},
+            end_at = #{endAt},
+            vacation_type = #{vacationType},
+            reason = #{reason},
+            used_days = #{usedDays},
+            approval_status = #{approvalStatus},
+            processing_by = #{processingBy},
+            processing_at = #{processingAt}
+        WHERE vacation_id = #{vacationId}
+    </update>
+
+    <!-- 휴가 승인 상태 업데이트 -->
+    <update id="approveVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE vacation
+        SET
+            approval_status = #{approvalStatus},
+            processing_by = #{processingBy},
+            processing_at = #{processingAt}
+        WHERE vacation_id = #{vacationId};
+    </update>
+
+    <!-- 잔여 연차 차감 -->
+    <update id="updateRemainingLeave" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE employees
+        SET remaining_leave = remaining_leave - #{usedDays}
+        WHERE employee_id = #{employeeId};
+    </update>
+</mapper>
