@@ -25,12 +25,12 @@ public class VacationDAO {
     }
 
     // 해당 부서의 모든 휴가 정보 조회
-    public List<Vacation> selectVacationByDepartmentId(String departmentId) {
-        return sqlSession.selectList(NAMESPACE + "selectVacationByDepartmentId", departmentId);
+    public List<Vacation> selectVacationByDepartmentId(List<String> employeeIdList) {
+        return sqlSession.selectList(NAMESPACE + "selectVacationByDepartmentId", employeeIdList);
     }
 
     // 휴가 등록
-    public void createVacation(Vacation vacation) {
+    public void insertVacation(Vacation vacation) {
         sqlSession.insert(NAMESPACE + "insertVacation", vacation);
     }
 
@@ -42,5 +42,6 @@ public class VacationDAO {
     // 휴가 처리
     public void approveVacation(Vacation updatedVacation) {
         sqlSession.update(NAMESPACE + "approveVacation", updatedVacation);
+        sqlSession.update(NAMESPACE + "updateRemainingLeave", updatedVacation);
     }
 }

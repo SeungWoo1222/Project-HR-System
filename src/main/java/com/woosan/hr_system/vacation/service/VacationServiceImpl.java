@@ -5,6 +5,7 @@ import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.vacation.dao.VacationDAO;
 import com.woosan.hr_system.vacation.model.Vacation;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -48,7 +52,11 @@ public class VacationServiceImpl implements VacationService {
 
     @Override // 해당 부서의 모든 휴가 정보 조회
     public List<Vacation> getVacationByDepartmentId(String departmentId) {
-        return vacationDAO.selectVacationByDepartmentId(departmentId);
+        List<Employee> employeeList = employeeDAO.getEmployeesByDepartment(departmentId);
+        List<String> employeeIdList = employeeList.stream()
+                .map(Employee::getEmployeeId)
+                .toList();
+        return vacationDAO.selectVacationByDepartmentId(employeeIdList);
     }
 
     @Transactional
@@ -57,7 +65,7 @@ public class VacationServiceImpl implements VacationService {
     @Override // 휴가 신청
     public String requestVacation(Vacation vacation) {
         // 휴가 등록
-        vacationDAO.createVacation(vacation);
+        vacationDAO.insertVacation(vacation);
 
         // 알림 전송 후 메세지 반환
         String message = "'" + employeeDAO.getEmployeeName(vacation.getEmployeeId()) + "' 사원이 "
