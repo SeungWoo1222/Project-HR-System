@@ -8,8 +8,8 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/pwd.js}"/></script>
-    <script th:src="@{/js/employee.js}"></script>
+    <script th:src="@{/js/common/pwd.js}"></script>
+    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             updateDateTimeElements();
@@ -48,6 +48,18 @@
             <tr>
                 <th>상세 주소</th>
                 <td th:text="${employee.detailAddress}">상세 주소</td>
+            </tr>
+            <tr>
+                <th>결혼 관계</th>
+                <td th:text="${employee.maritalStatus == 1 ? '기혼' : '미혼'}"></td>
+            </tr>
+            <tr>
+                <th>부양 가족 수</th>
+                <td th:text="${employee.numDependents}"></td>
+            </tr>
+            <tr>
+                <th>자녀 수 (8~20세)</th>
+                <td th:text="${employee.numChildren}"></td>
             </tr>
             <tr>
                 <th>부서</th>

@@ -27,6 +27,10 @@ public class EmployeeDAO {
     // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId); }
 
+    // id를 이용한 특정 사원의 모든 정보 조회
+    public Employee getEmployeeDetails(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeDetails", employeeId); }
+
+    // id를 이용한 특정 사원의 이름 조회
     public String getEmployeeName(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeName", employeeId); }
 
     // 사원 번호 중복 조회
@@ -65,6 +69,9 @@ public class EmployeeDAO {
 
     // 사원 재직 상태 수정
     public void updateStatus(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updateStatus", params); }
+
+    // 사원 재직 상태 퇴사로 수정
+    public void updateStatusToResignation(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updateStatusToResignation", params); }
 
     // 사원 직급 +1으로 수정 - 승진
     public void updatePosition(Map<String, Object> params) { sqlSession.update(NAMESPACE + "updatePosition",params); }

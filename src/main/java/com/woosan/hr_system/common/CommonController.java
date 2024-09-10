@@ -40,8 +40,7 @@ public class CommonController {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
 
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
+        model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
         return "/common/myInfo";
     }
 
@@ -50,8 +49,11 @@ public class CommonController {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
 
-        String pictureUrl = fileService.getUrl(employee.getPicture());
-        model.addAttribute("pictureUrl", pictureUrl);
+        // 파일 관련 정보 모델에 추가
+        int fileId = employee.getPicture();
+        model.addAttribute("pictureUrl", fileService.getUrl(fileId));
+        model.addAttribute("originalFileName", fileService.getFileInfo(fileId).getOriginalFileName());
+
         return "/common/edit/myInfo";
     }
 }

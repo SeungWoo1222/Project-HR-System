@@ -10,11 +10,13 @@ import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.resignation.service.ResignationService;
+import com.woosan.hr_system.salary.model.Salary;
+import com.woosan.hr_system.salary.service.SalaryService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -38,6 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private FileService fileService;
     @Autowired
     private ResignationService resignationService;
+    @Autowired
+    private SalaryService salaryService;
     @Autowired
     private NotificationService notificationService;
 
@@ -64,11 +68,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    @Override // id를 이용한 특정 사원 정보 조회 (비밀번호 정보, 퇴사 정보 포함)
+    @Override // id를 이용한 특정 사원 정보 조회 (비밀번호 정보, 급여 정보, 퇴사 정보 포함)
     public Employee getEmployeeDetails(String employeeId) {
         Employee employee = findEmployeeById(employeeId);
         // 비밀번호 정보 조회 및 설정
         verifyAndSetPasswordInfo(employee);
+        // 급여 정보 조회 및 설정
+        verifyAndSetSalaryInfo(employee);
         // 퇴사 정보 조회 및 설정
         verifyAndSetResignationInfo(employee);
         return employee;
@@ -79,6 +85,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         String employeeId = employee.getEmployeeId();
         Password passwordInfo = authService.getPasswordInfoById(employeeId);
         employee.setPassword(passwordInfo);
+    }
+
+    // 사원 급여 정보 확인 후 설정하는 메소드
+    private void verifyAndSetSalaryInfo(Employee employee) {
+        String employeeId = employee.getEmployeeId();
+        Salary salaryInfo = salaryService.getSalaryByEmployeeId(employeeId);
+        employee.setSalary(salaryInfo);
     }
 
     // 사원 퇴사 정보 확인 후 설정하는 메소드
@@ -166,7 +179,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 차장에게 알림 전송 후 메세지 반환
         String message = "'" + employee.getName() + "' 사원이 신규 등록되었습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employee.getEmployeeId() + "/detail", "차장");
+        sendNotification(message, "/employee/" + employee.getEmployeeId() + "/detail", "HR", "차장");
 
         // 메세지와 사원 아이디 반환
         Map<String, Object> responseData = new HashMap<>();
@@ -275,7 +288,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 부장에게 알림 전송 후 메세지 반환
         String message = "'" + getEmployeeNameById(employeeId) + "' 사원의 재직 상태가 '" + status + "'으로 변경되었습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        sendNotification(message, "/employee/" + employeeId + "/detail", "HR", "부장");
         return message;
     }
 
@@ -304,7 +317,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // HR 부장에게 알림 전송 후 메세지 반환
         String message = "'" + getEmployeeNameById(employeeId) + "' 사원이 '" + positionToBePromoted + "'으로 승진하였습니다.";
-        sendNotificationToHRManager(message, "/employee/" + employeeId + "/detail", "부장");
+        sendNotification(message, "/employee/" + employeeId + "/detail", "HR", "부장");
         return message;
     }
     // ============================================ 수정 관련 로직 end-point ============================================
@@ -333,7 +346,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             // HR 부장에게 알림 전송 후 메세지 반환
             String message = "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
-            sendNotificationToHRManager(message, null, "부장");
+            sendNotification(message, null, "HR","부장");
             return message;
         } else {
             throw new IllegalArgumentException("사원이 퇴사 후 1년이 지나지 않았습니다.");
@@ -348,11 +361,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.assignPicture(fileId);
     }
 
-    // 인사과(HR) 관리자에게 알림 전송
-    private void sendNotificationToHRManager(String message, String url, String position) {
-        // HR 관리자 검색하여 ID 리스트로 변환
-        List<String> managerIdList = convertEmployeesToIdList(getEmployeesByDepartmentAndPosition("HR", position));
+    // 해당 부서의 직급에게 알림 전송
+    private void sendNotification(String message, String url, String department, String position) {
+        // 해당 부서와 직급 검색하여 ID 리스트로 변환
+        List<String> managerIdList = convertEmployeesToIdList(getEmployeesByDepartmentAndPosition(department, position));
         // 알림 전송
-        notificationService.createNotifications(managerIdList, message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(), url);
+        if (!managerIdList.isEmpty()) {
+            notificationService.createNotifications(managerIdList, message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(), url);
+        }
     }
 }

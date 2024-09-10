@@ -35,27 +35,29 @@ function submitUpdateForm(event) {
     }
     if (!isValid) return;
 
-    fetch(actionUrl, {
-        method: 'PUT',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text);
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text);
-            } else {
-                alert('비율 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
-            }
+    if (confirm("해당 비율을 수정하시겠습니까?")) {
+        fetch(actionUrl, {
+            method: 'PUT',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    alert(response.text);
+                } else {
+                    alert('비율 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }

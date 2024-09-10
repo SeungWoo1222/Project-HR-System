@@ -2,6 +2,7 @@ package com.woosan.hr_system.employee.model;
 
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.resignation.model.Resignation;
+import com.woosan.hr_system.salary.model.Salary;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,8 +34,9 @@ public class Employee {
     private Boolean maritalStatus;              // 결혼 여부
     private int numDependents;                  // 부양 가족 수
     private int numChildren;                    // 8세 이상 20세 이하 자녀 수
-    private Resignation resignation;            // 퇴사 정보
     private Password password;                  // 비밀번호 정보
+    private Salary salary;                      // 급여 정보
+    private Resignation resignation;            // 퇴사 정보
 
     public void registerNewEmployee(Employee employee, String employeeId) {
         this.employeeId = employeeId;

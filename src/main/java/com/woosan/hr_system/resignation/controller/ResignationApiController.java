@@ -1,7 +1,6 @@
 package com.woosan.hr_system.resignation.controller;
 
 import com.woosan.hr_system.aspect.RequireHRPermission;
-import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.resignation.service.ResignationService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,35 +14,24 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/api/resignation")
 public class ResignationApiController {
-
     @Autowired
     private ResignationService resignationService;
-    @Autowired
-    private EmployeeService employeeService;
 
     // 사원 퇴사 처리
     @RequireHRPermission
-    @PostMapping(value = "/resign/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> resignEmployee(@PathVariable("employeeId") String employeeId,
                                                  @RequestPart("resignation") Resignation resignation,
                                                  @RequestPart(value = "resignationDocuments", required = false) MultipartFile[] resignationDocuments) {
-        // 퇴사 문서 파일 업로드
-        if (resignationDocuments != null && resignationDocuments.length > 0) {
-            resignationService.uploadNewFiles(employeeId, resignationDocuments);
-        }
-
-        // 재직 상태 - 퇴사 처리
-        employeeService.updateStatus(employeeId, "퇴사");
-
         // 사원 퇴사 처리
-        return ResponseEntity.ok(resignationService.resignEmployee(employeeId, resignation));
+        return ResponseEntity.ok(resignationService.resignEmployee(employeeId, resignation, resignationDocuments));
     }
 
     // 사원 퇴사 정보 수정
     @RequireHRPermission
-    @PutMapping(value = "/update/resignation/{employeeId}", consumes = "multipart/form-data")
+    @PutMapping(value = "/{employeeId}", consumes = "multipart/form-data")
     public ResponseEntity<String> updateResignationInfo(@PathVariable("employeeId") String employeeId,
                                                         @RequestPart("resignation") Resignation resignation,
                                                         @RequestPart(value = "oldFileIdList", required = false) List<Integer> oldFileIdList,

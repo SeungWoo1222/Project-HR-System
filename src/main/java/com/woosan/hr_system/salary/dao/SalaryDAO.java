@@ -105,4 +105,7 @@ public class SalaryDAO {
 
     // 계좌 정보 수정
     public void updateAccountInfo(Salary accountInfo) { sqlSession.update(NAMESPACE + "updateAccountInfo", accountInfo); }
+
+    // 사원 급여 정보 사용 중지
+    public void deactivateSalary(int salaryId) { sqlSession.update(NAMESPACE + "deactivateSalary", salaryId); }
 }

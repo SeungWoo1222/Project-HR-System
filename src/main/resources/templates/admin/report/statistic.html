@@ -2,16 +2,11 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<th:block layout:fragment="css">
-<!--    <link rel="stylesheet" th:href="@{/css/layout.css}"> &lt;!&ndash; 외부 CSS는 이렇게 &ndash;&gt;-->
-    <style>
-        /*// 여기에 CSS를 입력*/
-    </style>
-</th:block>
+<th:block layout:fragment="css"></th:block>
 
 <th:block layout:fragment="script">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/report/report.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             initEventListeners();

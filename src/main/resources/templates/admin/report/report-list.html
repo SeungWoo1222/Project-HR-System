@@ -3,12 +3,11 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout-with-modal :: layout(title='작성한 보고서 조회')}">
 
-<th:block layout:fragment="css">
-</th:block>
+<th:block layout:fragment="css"></th:block>
 
 <th:block layout:fragment="script">
-  <script th:src="@{/js/report.js}"></script>
-  <script th:src="@{/js/employee.js}"></script>
+  <script th:src="@{/js/report/report.js}"></script>
+  <script th:src="@{/js/common/format.js}"></script>
   <script>
       document.addEventListener("DOMContentLoaded", function () {
           updateDateTimeElements();

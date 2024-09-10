@@ -6,8 +6,9 @@
 <th:block layout:fragment="css"></th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/employee.js}"></script>
-    <script th:src="@{/js/employee-detail-edit.js}"></script>
+    <script th:src="@{/js/common/file.js}"></script>
+    <script th:src="@{/js/employee/resignation.js}"></script>
+    <script th:src="@{/js/employee/employee-detail-edit.js}"></script>
     <script>
         function openResignationProcessModal(event, button) {
             event.stopPropagation();
