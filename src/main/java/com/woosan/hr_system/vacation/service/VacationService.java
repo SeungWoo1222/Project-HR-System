@@ -8,8 +8,7 @@ public interface VacationService {
     Vacation getVacationById(int vacationId);
     List<Vacation> getVacationByEmployeeId(String employeeId);
     List<Vacation> getVacationByDepartmentId(String departmentId);
-    List<Vacation> getAllVacation();
-    String addVacation(Vacation vacation);
-    String updateVacation(Vacation vacation);
-    String approveVacation(int vacationId, String status);
+    String requestVacation(Vacation vacation);
+    String editVacation(Vacation vacation);
+    String processVacation(int vacationId, String status);
 }
