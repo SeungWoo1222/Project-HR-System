@@ -6,6 +6,8 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.dao.VacationDAO;
 import com.woosan.hr_system.vacation.model.Vacation;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -46,8 +45,18 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override // 해당 사원의 모든 휴가 정보 조회
-    public List<Vacation> getVacationByEmployeeId(String employeeId) {
-        return vacationDAO.selectVacationByEmployeeId(employeeId);
+    public PageResult<Vacation> getVacationByEmployeeId(PageRequest pageRequest, String employeeId) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("employeeId", employeeId);
+
+        List<Vacation> vacationList = vacationDAO.selectVacationByEmployeeId(params);  // 검색 결과 데이터
+        int total = vacationList.size(); // 검색 결과 개수
+
+        return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // 해당 부서의 모든 휴가 정보 조회

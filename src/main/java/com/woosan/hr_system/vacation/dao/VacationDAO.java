@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -20,8 +21,8 @@ public class VacationDAO {
     }
 
     // 해당 사원의 모든 휴가 정보 조회
-    public List<Vacation> selectVacationByEmployeeId(String employeeId) {
-        return sqlSession.selectList(NAMESPACE + "selectVacationByEmployeeId", employeeId);
+    public List<Vacation> selectVacationByEmployeeId(HashMap<String, Object> params) {
+        return sqlSession.selectList(NAMESPACE + "selectVacationByEmployeeId", params);
     }
 
     // 해당 부서의 모든 휴가 정보 조회

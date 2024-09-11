@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='휴가 신청')}">
+
+<th:block layout:fragment="css">
+<!--    <link rel="stylesheet" th:href="@{/css/request.css}"/>-->
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/vacation/request.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <form action="/api/vacation" onsubmit="submitInsertForm(event, 'employee')">
+            <div class="form-group">
+                <input type="hidden" name="employeeId" th:value="${employee.employeeId}" readonly/>
+            </div>
+            <div class="form-group">
+                <label for="vacationType">휴가 유형</label>
+                <select id="vacationType" name="vacationType" onchange="updateFormVisibility()">
+                    <option value="" disabled selected>선택해주세요.</option>
+                    <option value="오전 반차">오전 반차</option>
+                    <option value="오후 반차">오후 반차</option>
+                    <option value="연차">연차</option>
+                    <option value="기타 휴가">기타 휴가</option>
+                </select>
+            </div>
+            <div class="form-group" style="display: none">
+                <label for="dateAt">휴가일</label>
+                <input type="date" id="dateAt" onchange="setDateAt()"/>
+            </div>
+            <div class="form-group">
+                <label for="startAt">휴가 시작일</label>
+                <input type="date" id="startAt" name="startAt" oninput="calculateUsedDays()"/>
+            </div>
+            <div class="form-group">
+                <label for="endAt">휴가 종료일</label>
+                <input type="date" id="endAt" name="endAt" oninput="calculateUsedDays()"/>
+            </div>
+            <div class="form-group">
+                <label for="reason">휴가 사유</label>
+                <textarea id="reason" name="reason" rows="2" placeholder="휴가 사유를 입력해주세요."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="remainingLeave">잔여 연차</label>
+                <input type="text" id="remainingLeave" th:value="${employee.remainingLeave}" readonly/>
+            </div>
+            <div class="form-group">
+                <label for="usedDays">연차 사용 일수</label>
+                <input type="text" id="usedDays" name="usedDays" readonly/>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <div>
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">휴가 신청</button>
+            </div>
+        </form>
+    </div>
+</div>
