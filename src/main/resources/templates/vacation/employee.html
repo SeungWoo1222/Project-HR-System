@@ -1,10 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='휴가 내역 조회')}">
 
-</body>
-</html>
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/request.css}"/>-->
+    <link rel="stylesheet" th:href="@{/css/pagination.css}"/>
+    <style>
+        .list tbody tr:hover {
+            cursor: pointer;
+        }
+        .pending {
+            color: #18a8f1;
+            font-weight: bold;
+        }
+        .approved {
+            color: green;
+            font-weight: bold;
+        }
+        .rejected {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+<!--    <script th:src="@{/js/vacation/request.js}"></script>-->
+    <script th:src="@{/js/common/format.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateDateTimeElements();
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="search-container">
+            <form th:action="@{/vacation/employee}" method="get" id="pageSizeForm">
+                <input type="hidden" name="page" th:value="1"/>
+                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                </select>
+            </form>
+            <div>
+                <h3>잔여 연차 : <span th:text="${remainingLeave}"></span>일</h3>
+            </div>
+        </div>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th>휴가 ID</th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>사용 연차</th>
+                <th>휴가 유형</th>
+                <th>휴가 사유</th>
+                <th>승인 상태</th>
+                <th>처리 사원</th>
+                <th>처리 일시</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${vacationList.isEmpty()}">
+                <td colspan="10" style="text-align: center; padding: 20px;">
+                    조회된 휴가 내역이 없습니다.
+                </td>
+            </tr>
+            <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId'))">
+                <td th:text="${vacation.vacationId}">휴가 ID</td>
+                <td th:text="${vacation.startAt}" class="dateTime">시작일</td>
+                <td th:text="${vacation.endAt}" class="dateTime">종료일</td>
+                <td th:text="${vacation.usedDays}">사용 연차</td>
+                <td th:text="${vacation.vacationType}">휴가 유형</td>
+                <td th:text="${vacation.reason}">휴가 사유</td>
+                <td th:text="${vacation.approvalStatus}"
+                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'pending' :
+                                    (${vacation.approvalStatus == '승인'} ? 'approved' :
+                                    (${vacation.approvalStatus == '거절'} ? 'rejected' : ''))">승인 상태</td>
+                <td th:text="${vacation.processingBy}">처리 사원</td>
+                <td th:text="${vacation.processingAt}">처리 일시</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination" th:if="${totalPages > 0}">
+        <span th:if="${currentPage > 1}">
+            <a th:href="@{'/vacation/employee?page=' + (${currentPage - 1}) + '&size=' + ${pageSize}}">
+                <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+            </a>
+        </span>
+            <div class="page-area">
+            <span th:if="${totalPages <= 5}">
+                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a th:href="@{'/vacation/employee?page=' + ${i} + '&size=' + ${pageSize}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+            </span>
+                <span th:if="${totalPages > 5}">
+                <span th:each="i : ${#numbers.sequence(
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                    <a th:href="@{'/vacation/employee?page=' + ${i} + '&size=' + ${pageSize}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+            </span>
+            </div>
+            <span th:if="${currentPage < totalPages}">
+            <a th:href="@{'/vacation/employee?page=' + (${currentPage + 1}) + '&size=' + ${pageSize}}">
+                <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+            </a>
+        </span>
+        </div>
+    </div>
+</div>
