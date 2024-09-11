@@ -34,7 +34,6 @@ public class EmployeeViewController {
                                @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                 @RequestParam(name = "department", defaultValue = "") String department,
                                Model model) {
-        // 매개변수 값 로그에 출력
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Employee> pageResult = employeeService.searchEmployees(pageRequest, department);
 

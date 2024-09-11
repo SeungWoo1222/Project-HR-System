@@ -22,8 +22,10 @@
     </select>
 
     <!-- 해당 사원의 모든 휴가 정보 조회 -->
-    <select id="selectVacationByEmployeeId" parameterType="string" resultMap="VacationResultMap">
+    <select id="selectVacationByEmployeeId" parameterType="map" resultMap="VacationResultMap">
         SELECT * FROM vacation WHERE employee_id = #{employeeId}
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 해당 부서의 모든 휴가 정보 조회 -->

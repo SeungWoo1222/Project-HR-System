@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,5 +52,18 @@ public class EmployeeApiController {
     @GetMapping("/department/list/{departmentId}")
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
         return employeeService.getEmployeesByDepartment(departmentId);
+    }
+
+    // 사원의 잔여 연차 정보 조회
+    @GetMapping("/{employeeId}/remainingLeave")
+    public ResponseEntity<Map<String, Object>> getRemainingLeave(@PathVariable("employeeId") String employeeId) {
+        // 사원 정보 조회
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        // 잔여 연차 정보를 Map에 담아 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("remainingLeave", employee.getRemainingLeave());
+
+        return ResponseEntity.ok(response);
     }
 }
