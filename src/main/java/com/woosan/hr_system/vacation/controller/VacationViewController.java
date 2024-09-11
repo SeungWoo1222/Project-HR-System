@@ -34,7 +34,10 @@ public class VacationViewController {
 
     @GetMapping("/{vacationId}") // 휴가 정보 상세 조회
     public String viewVacationInfo(@PathVariable("vacationId") int vacationId, Model model) {
-        model.addAttribute("vacationInfo", vacationService.getVacationById(vacationId));
+        Vacation vacationInfo = vacationService.getVacationById(vacationId);
+        model.addAttribute("vacationInfo", vacationInfo);
+        model.addAttribute("employeeInfo",
+                employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
         return "/vacation/detail";
     }
 

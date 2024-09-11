@@ -11,6 +11,7 @@
         <result property="vacationType" column="vacation_type"/>
         <result property="reason" column="reason"/>
         <result property="usedDays" column="used_days"/>
+        <result property="createdAt" column="created_at"/>
         <result property="approvalStatus" column="approval_status"/>
         <result property="processingBy" column="processing_by"/>
         <result property="processingAt" column="processing_at"/>
