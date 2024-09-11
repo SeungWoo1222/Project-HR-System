@@ -33,7 +33,7 @@ public class VacationViewController {
     }
 
     @GetMapping("/{vacationId}") // 휴가 정보 상세 조회
-    public String viewVacationInfo(@PathVariable int vacationId, Model model) {
+    public String viewVacationInfo(@PathVariable("vacationId") int vacationId, Model model) {
         model.addAttribute("vacationInfo", vacationService.getVacationById(vacationId));
         return "/vacation/detail";
     }
@@ -42,14 +42,19 @@ public class VacationViewController {
     public String viewEmployeeVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
                                            @RequestParam(name = "size", defaultValue = "10") int size,
                                            Model model) {
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+        model.addAttribute("remainingLeave", employeeDAO.getEmployeeById(employeeId).getRemainingLeave());
+
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Vacation> pageResult = vacationService.getVacationByEmployeeId
-                (pageRequest, authService.getAuthenticatedUser().getUsername());
+                (pageRequest, employeeId);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
+
+
         return "/vacation/employee";
     }
 
