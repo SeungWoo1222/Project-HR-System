@@ -19,6 +19,7 @@ public class Vacation {
     private String vacationType;
     private String reason;
     private float usedDays;
+    private LocalDateTime createdAt;
     private String approvalStatus;
     private String processingBy;
     private LocalDateTime processingAt;

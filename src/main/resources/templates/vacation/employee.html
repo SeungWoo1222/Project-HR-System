@@ -4,7 +4,6 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='휴가 내역 조회')}">
 
 <th:block layout:fragment="css">
-    <!--    <link rel="stylesheet" th:href="@{/css/request.css}"/>-->
     <link rel="stylesheet" th:href="@{/css/pagination.css}"/>
     <style>
         .list tbody tr:hover {
@@ -26,7 +25,6 @@
 </th:block>
 
 <th:block layout:fragment="script">
-<!--    <script th:src="@{/js/vacation/request.js}"></script>-->
     <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
