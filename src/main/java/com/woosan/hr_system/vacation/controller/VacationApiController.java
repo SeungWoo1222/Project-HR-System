@@ -40,10 +40,10 @@ public class VacationApiController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @PatchMapping // 휴가 처리
-    public ResponseEntity<String> processVacation(@RequestParam("vacationId") int vacationId,
-                                                  @RequestParam("status") String status) {
-        return ResponseEntity.ok(vacationService.processVacation(vacationId, status));
+    @PatchMapping("/{vacationId}")// 휴가 처리
+    public ResponseEntity<String> processVacation(@PathVariable("vacationId") int vacationId,
+                                                  @RequestBody Map<String, String> requestBody) {
+        return ResponseEntity.ok(vacationService.processVacation(vacationId, requestBody.get("status")));
     }
 
     @DeleteMapping("/{vacationId}") // 휴가 삭제

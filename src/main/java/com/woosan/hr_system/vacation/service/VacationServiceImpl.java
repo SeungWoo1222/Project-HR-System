@@ -153,9 +153,14 @@ public class VacationServiceImpl implements VacationService {
         Vacation vacationInfo = findVacationById(vacationId);
         if (!vacationInfo.getApprovalStatus().equals("미처리")) throw new IllegalArgumentException("이미 처리된 휴가입니다.");
 
+        // 휴가 승인 시 잔여 연차 확인
+        float remainingLeave = employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()).getRemainingLeave();
+        if (vacationInfo.getApprovalStatus().equals("승인") && remainingLeave - vacationInfo.getUsedDays() < 0)
+            throw new IllegalArgumentException("연차 사용 일수가 잔여 연차보다 많습니다.");
+
         // 휴가 객체 빌더패턴으로 새로 생성
         String processor = authService.getAuthenticatedUser().getNameWithId();
-        Vacation updatedVacation = Vacation.builder()
+        Vacation updatedVacation = vacationInfo.toBuilder()
                 .approvalStatus(status)
                 .processingBy(processor)
                 .processingAt(LocalDateTime.now())

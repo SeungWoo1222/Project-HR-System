@@ -48,7 +48,10 @@ public class VacationDAO {
     // 휴가 처리
     public void approveVacation(Vacation updatedVacation) {
         sqlSession.update(NAMESPACE + "approveVacation", updatedVacation);
-        sqlSession.update(NAMESPACE + "updateRemainingLeave", updatedVacation);
+        // 휴가 승인 처리 시 연차 차감
+        if (updatedVacation.getApprovalStatus().equals("승인")) {
+            sqlSession.update(NAMESPACE + "updateRemainingLeave", updatedVacation);
+        }
     }
 
     // 휴가 삭제

@@ -215,3 +215,36 @@ function deleteVacation(vacationId) {
             });
     }
 }
+
+// AJAX PATCH 요청 - 휴가 처리
+function processVacation(vacationId, approvalStatus) {
+    if (confirm('휴가(\'' + vacationId +  '\')를 '+ approvalStatus + '하시겠습니까?')) {
+        fetch('/api/vacation/' + vacationId, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: approvalStatus })
+        })
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('휴가 처리 중 오류가 발생하였습니다.\n재신청 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
+}

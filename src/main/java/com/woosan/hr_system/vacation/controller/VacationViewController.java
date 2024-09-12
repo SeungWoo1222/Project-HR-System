@@ -57,6 +57,15 @@ public class VacationViewController {
         return "/vacation/detail";
     }
 
+    @GetMapping("/{vacationId}/process") // 휴가 정보 상세 조회 (처리 기능 추가)
+    public String viewVacationProcess(@PathVariable("vacationId") int vacationId, Model model) {
+        Vacation vacationInfo = vacationService.getVacationById(vacationId);
+        model.addAttribute("vacationInfo", vacationInfo);
+        model.addAttribute("employeeInfo",
+                employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
+        return "/vacation/detail-process";
+    }
+
     @GetMapping("/employee") // 해당 사원의 모든 휴가 정보 조회
     public String viewEmployeeVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
                                            @RequestParam(name = "size", defaultValue = "10") int size,
