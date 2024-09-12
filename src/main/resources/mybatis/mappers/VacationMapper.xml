@@ -30,12 +30,18 @@
     </select>
 
     <!-- 해당 부서의 모든 휴가 정보 조회 -->
-    <select id="selectVacationByDepartmentId" parameterType="list" resultMap="VacationResultMap">
-        SELECT * FROM vacation
+    <select id="selectVacationByDepartmentId" parameterType="map" resultMap="VacationResultMap">
+        SELECT *
+        FROM vacation
         WHERE employee_id IN
-        <foreach item="employeeId" collection="list" open="(" separator="," close=")">
+        <foreach item="employeeId" collection="employeeIdList" open="(" separator="," close=")">
             #{employeeId}
         </foreach>
+        <if test="status != null and status != ''">
+            AND approval_status = #{status}
+        </if>
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 휴가 등록 -->

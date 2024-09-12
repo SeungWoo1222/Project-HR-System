@@ -26,8 +26,8 @@ public class VacationDAO {
     }
 
     // 해당 부서의 모든 휴가 정보 조회
-    public List<Vacation> selectVacationByDepartmentId(List<String> employeeIdList) {
-        return sqlSession.selectList(NAMESPACE + "selectVacationByDepartmentId", employeeIdList);
+    public List<Vacation> selectVacationByDepartmentId(HashMap<String, Object> params) {
+        return sqlSession.selectList(NAMESPACE + "selectVacationByDepartmentId", params);
     }
 
     // 휴가 등록
