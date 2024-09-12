@@ -14,7 +14,7 @@ function validateForm() {
     const endAt = document.getElementById("endAt").value;
     const usedDays = document.getElementById("usedDays").value;
     const reason = document.getElementById("reason").value;
-    const remainingLeave = document.getElementById("remainingLeave").value;
+    const remainingLeave = document.getElementById("remainingLeave").textContent;
 
     // 휴가 유형 체크
     if (!vacationType) {
@@ -168,8 +168,8 @@ function submitUpdateForm(event) {
             })
             .then(response => {
                 if (response.status === 200) {
-                    alert(response.text);
-                    window.location.href = data.url;
+                    alert(response.data.message);
+                    window.location.href = response.data.url;
                 } else {
                     const errorStatuses = [400, 403, 404, 500];
                     if (errorStatuses.includes(response.status)) {
