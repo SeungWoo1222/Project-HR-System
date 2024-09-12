@@ -33,10 +33,11 @@ public class SalaryViewController {
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                   @RequestParam(name = "department", defaultValue = "") String department,
+                                  @RequestParam(name = "status", defaultValue = "") String status,
                                   Model model) {
         // 검색 후 페이징
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Salary> pageResult = salaryService.searchSalaries(pageRequest, department);
+        PageResult<Salary> pageResult = salaryService.searchSalaries(pageRequest, department, status);
 
         model.addAttribute("salaries", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -44,6 +45,7 @@ public class SalaryViewController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("department", department);
+        model.addAttribute("status", status);
 
         // 급여정보 미등록 사원 목록
         List<Employee> employeesWithoutSalary = salaryService.getEmployeeList();
