@@ -103,13 +103,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override // 모든 사원 정보 조회
-    public PageResult<Employee> searchEmployees(PageRequest pageRequest, String department) {
+    public PageResult<Employee> searchEmployees(PageRequest pageRequest, String department, String status) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 검색 결과 데이터
-        List<Employee> employees = employeeDAO.searchEmployees(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
+        List<Employee> employees = employeeDAO.searchEmployees(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, status);
         // 검색 결과 총 개수
-        int total = employeeDAO.countEmployees(pageRequest.getKeyword(), department);
+        int total = employeeDAO.countEmployees(pageRequest.getKeyword(), department, status);
 
         return new PageResult<>(employees, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
