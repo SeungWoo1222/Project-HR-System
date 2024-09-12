@@ -79,7 +79,7 @@
                     조회된 휴가 내역이 없습니다.
                 </td>
             </tr>
-            <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId'))">
+            <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId') + '/process')">
                 <td th:text="${vacation.vacationId}">휴가 ID</td>
                 <td th:text="${vacation.startAt}" class="dateTime">시작일</td>
                 <td th:text="${vacation.endAt}" class="dateTime">종료일</td>
@@ -91,7 +91,7 @@
                                     (${vacation.approvalStatus == '승인'} ? 'approved' :
                                     (${vacation.approvalStatus == '거절'} ? 'rejected' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>
-                <td th:text="${vacation.processingAt}">처리 일시</td>
+                <td th:text="${vacation.processingAt}" class="dateTime">처리 일시</td>
             </tr>
             </tbody>
         </table>

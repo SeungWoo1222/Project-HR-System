@@ -83,7 +83,7 @@
                                     (${vacation.approvalStatus == '승인'} ? 'approved' :
                                     (${vacation.approvalStatus == '거절'} ? 'rejected' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>
-                <td th:text="${vacation.processingAt}">처리 일시</td>
+                <td th:text="${vacation.processingAt}" class="dateTime">처리 일시</td>
             </tr>
             </tbody>
         </table>
