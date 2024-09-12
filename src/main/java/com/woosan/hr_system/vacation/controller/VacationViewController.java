@@ -49,23 +49,29 @@ public class VacationViewController {
         model.addAttribute("remainingLeave", employeeDAO.getEmployeeById(employeeId).getRemainingLeave());
 
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.getVacationByEmployeeId
-                (pageRequest, employeeId);
+        PageResult<Vacation> pageResult = vacationService.getVacationByEmployeeId(pageRequest, employeeId);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
-
-
         return "/vacation/employee";
     }
 
     @RequireManagerPermission
     @GetMapping("/department") // 해당 부서의 모든 휴가 정보 조회
-    public String viewDepartmentVacationInfo(Model model) {
-        model.addAttribute("vacationList",
-                vacationService.getVacationByDepartmentId(authService.getAuthenticatedUser().getDepartment()));
+    public String viewDepartmentVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
+                                             @RequestParam(name = "size", defaultValue = "10") int size,
+                                             @RequestParam(name = "status", defaultValue = "") String status,
+                                             Model model) {
+        PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Vacation> pageResult = vacationService.getVacationByDepartmentId(pageRequest, authService.getAuthenticatedUser().getDepartment(), status);
+
+        model.addAttribute("vacationList", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("status", status);
         return "/vacation/department";
     }
 
