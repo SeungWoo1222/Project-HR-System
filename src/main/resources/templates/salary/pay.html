@@ -41,14 +41,17 @@
                 <input type="hidden" name="department" th:value="${department}">
                 <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
             </form>
-            <form th:action="@{/salary/payment}" method="get">
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                <button type="submit">검색</button>
-            </form>
+            <div class="search-option">
+                <form th:action="@{/salary/payment}" method="get">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                    <button type="submit">검색</button>
+                </form>
+                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/payment'"/>
+            </div>
         </div>
         <form th:action="@{/salary/payment}" method="get" id="department-nav">
             <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
