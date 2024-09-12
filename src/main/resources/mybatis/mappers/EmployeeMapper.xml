@@ -184,6 +184,9 @@
             <if test="department != null and department != ''">
                 AND department_id = #{department}
             </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
         </where>
         ORDER BY hire_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
@@ -215,6 +218,9 @@
             <if test="department != null and department != ''">
                 AND department_id = #{department}
             </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
         </where>
     </select>
 
@@ -224,13 +230,6 @@
         SET status = #{status},
             last_modified = #{lastModified},
             modified_by = #{modifiedBy}
-        WHERE employee_id = #{employeeId}
-    </update>
-
-    <!-- 사원 재직 상태 퇴사로 수정 -->
-    <update id="updateStatusToResignation" parameterType="map">
-        UPDATE employees
-        SET status = #{status}
         WHERE employee_id = #{employeeId}
     </update>
 

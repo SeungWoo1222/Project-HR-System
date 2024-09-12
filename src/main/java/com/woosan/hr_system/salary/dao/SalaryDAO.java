@@ -40,20 +40,22 @@ public class SalaryDAO {
     }
 
     // 모든 급여정보 - 검색어와 부서에 해당하는 데이터 결과 조회
-    public List<Salary> searchSalaries(String keyword, int pageSize, int offset, String department) {
+    public List<Salary> searchSalaries(String keyword, int pageSize, int offset, String department, String status) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("department", department);
+        params.put("status", status);
         return sqlSession.selectList(NAMESPACE + "searchSalaries", params);
     }
 
     // 모든 급여정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회
-    public int countSalaries(String keyword, String department) {
+    public int countSalaries(String keyword, String department, String status) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("department", department);
+        params.put("status", status);
         return sqlSession.selectOne(NAMESPACE + "countSalaries", params);
     }
 

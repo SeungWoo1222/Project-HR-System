@@ -52,4 +52,10 @@ public class EmployeeApiController {
     public List<Employee> getEmployeesByDepartment(@PathVariable("departmentId") String departmentId) {
         return employeeService.getEmployeesByDepartment(departmentId);
     }
+
+    // 사원 정보 조회
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<Employee> getEmployeeInfo(@PathVariable("employeeId") String employeeId) {
+        return ResponseEntity.ok(employeeService.getEmployeeById(employeeId));
+    }
 }

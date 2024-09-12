@@ -57,15 +57,15 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
-    public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department) {
+    public PageResult<Salary> searchSalaries(PageRequest pageRequest, String department, String status) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
 
         // 검색 결과 데이터
-        List<Salary> salaries = salaryDAO.searchSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department);
+        List<Salary> salaries = salaryDAO.searchSalaries(pageRequest.getKeyword(), pageRequest.getSize(), offset, department, status);
 
         // 검색 결과 총 개수
-        int total = salaryDAO.countSalaries(pageRequest.getKeyword(), department);
+        int total = salaryDAO.countSalaries(pageRequest.getKeyword(), department, status);
 
         return new PageResult<>(salaries, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

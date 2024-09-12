@@ -89,12 +89,6 @@ public class ResignationServiceImpl implements ResignationService {
         UserSessionInfo processInfo = new UserSessionInfo();
         resignation.initializeResignationDetails(employeeId, resignation, processInfo.getCurrentEmployeeId(), processInfo.getNow());
 
-        // 재직 상태 - 퇴사 처리
-        Map<String, Object> params = new HashMap<>();
-        params.put("employeeId", employeeId);
-        params.put("status", "퇴사");
-        employeeDAO.updateStatusToResignation(params);
-
         // 퇴사 정보 등록
         resignationDAO.insertResignation(resignation);
 

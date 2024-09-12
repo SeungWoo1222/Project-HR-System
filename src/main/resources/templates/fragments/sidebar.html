@@ -21,7 +21,11 @@
                 <a th:href="@{/schedule}"><img src="/images/icons/location.png" alt="Schedule" width="20"> 방문 일정</a>
             </li>
             <li>
-                <a th:href="@{/leave}"><img src="/images/icons/leave.png" alt="Leave" width="20"> 휴가</a>
+                <p onclick="toggleSubmenu('my-vacation-submenu')"><img src="/images/icons/leave.png" alt="Leave" width="20">휴가</p>
+                <ul id="my-vacation-submenu" class="submenu">
+                    <li><a th:href="@{/vacation/employee}">- 휴가 내역</a></li>
+                    <li><a th:href="@{/vacation/{employeeId}/request(employeeId=${#authentication.principal.username})}">- 휴가 신청</a></li>
+                </ul>
             </li>
             <li>
                 <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
@@ -43,7 +47,8 @@
                     <li><a th:href="@{/report/requestList}">- 작성 요청 조회</a></li>
                 </ul>
             </li>
-            <li><a sec:authorize="hasRole('ROLE_MANAGER')" th:href="@{/admin/request/main}">
+            <li>
+                <a sec:authorize="hasRole('ROLE_MANAGER')" th:href="@{/admin/request/main}">
                 <img src="/images/icons/report.png" alt="Report" width="20"> 보고서 요청</a>
                 <ul class="submenu">
                     <li><a th:href="@{/admin/request/write}">- 요청 작성</a></li>
@@ -68,7 +73,11 @@
                 </ul>
             </li>
             <li sec:authorize="principal.department == 'HR'">
-                <a th:href="@{/employee/}"><img src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</a>
+                <p onclick="toggleSubmenu('vacation-submenu')"><img src="/images/icons/leave-management.png" alt="" width="20"> 휴가 관리</p>
+                <ul id="vacation-submenu" class="submenu">
+                    <li><a th:href="@{/vacation/list}">- 휴가 목록</a></li>
+                    <li><a th:href="@{/vacation/request}">- 휴가 등록</a></li>
+                </ul>
             </li>
             <li sec:authorize="principal.department == 'HR'">
                 <p onclick="toggleSubmenu('compensation-and-benefits-submenu')"><img src="/images/icons/compensation-and-benefits.png" alt="" width="20"> 급여 관리</a></p>
@@ -111,7 +120,12 @@
                     <li><a th:href="@{/salary/payment/myPayslips}">- 내 급여 관리</a></li>
                 </ul>
             </li>
-            <li><a th:href="@{/members}"><img src="/images/icons/members.png" alt="Members" width="20"> 구성원</a></li>
+            <li>
+                <p onclick="toggleSubmenu('members-submenu')"><img src="/images/icons/members.png" alt="Members" width="20">부서 관리</p>
+                <ul id="members-submenu" class="submenu">
+                    <li><a th:href="@{/vacation/department}">- 휴가 관리</a></li>
+                </ul>
+            </li>
         </ul>
     </div>
 

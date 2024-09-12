@@ -1,3 +1,21 @@
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-option {
+    display: flex;
+    align-items:center;
+    gap: 5px;
+}
+
+.search-option .image-btn {
+    width: 25px;
+    padding: 2px;
+}
+
 .pagination-container {
     display: flex;
     justify-content: space-between;

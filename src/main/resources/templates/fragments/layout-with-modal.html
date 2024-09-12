@@ -54,6 +54,11 @@
         // 컨텐츠 로드
         fetch(contentUrl)
             .then(response => {
+                if (response.status === 400) {
+                    response.text().then(errorMessage => {
+                        alert(errorMessage);
+                    });
+                }
                 if (response.status === 404) {
                     return fetch('/error/modal/404').then(res => res.text());
                 }

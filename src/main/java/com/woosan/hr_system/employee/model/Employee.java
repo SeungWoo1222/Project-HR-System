@@ -27,7 +27,7 @@ public class Employee {
     private Position position;                  // 직급
     private LocalDate hireDate;                 // 입사일
     private String status;                      // 재직 상태
-    private int remainingLeave;                 // 잔여 연차
+    private float remainingLeave;               // 잔여 연차
     private LocalDateTime lastModified;         // 마지막 수정일시
     private String modifiedBy;                  // 마지막 수정자
     private int picture;                        // 사원 사진 fileID
@@ -51,7 +51,7 @@ public class Employee {
         this.position = employee.getPosition();
         this.hireDate = employee.getHireDate();
         this.status = "재직";
-        this.remainingLeave = 11; // 기본 연차 11일 설정
+        this.remainingLeave = 11.0f; // 기본 연차 11일 설정
         this.picture = employee.getPicture();
         this.maritalStatus = employee.getMaritalStatus();
         this.numDependents = employee.getNumDependents();

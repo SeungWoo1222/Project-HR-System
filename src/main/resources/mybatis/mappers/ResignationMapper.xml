@@ -25,11 +25,18 @@
         SELECT * FROM resignation
     </select>
 
-    <!-- 새로운 퇴직 사원 정보 삽입 -->
+    <!-- 새로운 퇴직 사원 정보 등록 -->
     <insert id="insertResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
         INSERT INTO resignation (employee_id, resignation_reason, code_number, specific_reason, resignation_date, processed_by, processed_date)
         VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{processedBy}, #{processedDate})
     </insert>
+
+    <!-- 사원 재직상태 퇴사 처리-->
+    <update id="processResignation" parameterType="string">
+        UPDATE employees
+        SET status = '퇴사'
+        WHERE employee_id = #{employeeId}
+    </update>
 
     <!-- 퇴직 사원 정보 업데이트 -->
     <update id="updateResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
