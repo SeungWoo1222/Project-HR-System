@@ -1,77 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <style>
-        .vacation-form-container {
-            line-height: 1.6;
-            width: 210mm;
-            margin: 0 auto;
-            padding: 15mm;
-            box-sizing: border-box;
-            border: 1px solid #000;
-            font-family: Arial, sans-serif;
-        }
 
-        .btn-container {
-            display: flex;
-            justify-content: end;
-            gap: 10px;
-        }
-
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-weight: bold;
-            text-align: center;
-            background-color: #f0f0f0;
-        }
-
-        .details, .employee-details {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-
-        .details td, .employee-details td {
-            border: 1px solid #000;
-            padding: 8px;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        .submission-declaration {
-            text-align: center;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .applicant-signature {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            align-items: end;
-            font-size: 17px;
-        }
-
-        .company-signature {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-        }
-        .company-signature p {
-            font-size: 30px;
-        }
-        .signature {
-            margin-left: 5px;
-            width: 50px;
-            height: 50px;
-        }
-    </style>
 <div class="vacation-form-container">
     <div class="btn-container">
         <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
@@ -136,7 +65,6 @@
     <div class="applicant-signature">
         <span th:text="${#temporals.format(vacationInfo.createdAt, 'yyyy년 MM월 dd일')}"></span>
         <span style="font-size:20px;">신청인 : <span th:text="${employeeInfo.name}" style="margin-right: 7px"></span>(인)</span>
-
     </div>
     <div class="company-signature">
         <p>주식회사 하루하루</p>

@@ -132,4 +132,17 @@ public class VacationServiceImpl implements VacationService {
         String message = "휴가('" + vacationId + "')가 " + status + "되었습니다.";
         return message;
     }
+
+    @Override // 휴가 삭제
+    public String deleteVacation(int vacationId) {
+        // 휴가 정보가 존재하는 지 확인
+        findVacationById(vacationId);
+
+        // 휴가 정보 삭제
+        vacationDAO.deleteVacation(vacationId);
+
+        // 알림 전송 후 메세지 반환
+        String message = "휴가 정보('" + vacationId + "')가 삭제되었습니다.";
+        return message;
+    }
 }

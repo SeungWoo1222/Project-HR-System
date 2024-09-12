@@ -13,4 +13,5 @@ public interface VacationService {
     String requestVacation(Vacation vacation);
     String editVacation(Vacation vacation);
     String processVacation(int vacationId, String status);
+    String deleteVacation(int vacationId);
 }
