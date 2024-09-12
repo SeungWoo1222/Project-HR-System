@@ -77,20 +77,22 @@ public class EmployeeDAO {
     public void deleteEmployee(String employeeId) { sqlSession.delete(NAMESPACE + "deleteEmployee", employeeId); }
 
     // 모든 사원 정보 - 검색어와 부서에 해당하는 데이터 결과 조회
-    public List<Employee> searchEmployees(String keyword, int pageSize, int offset, String department) {
+    public List<Employee> searchEmployees(String keyword, int pageSize, int offset, String department, String status) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
         params.put("offset", offset);
         params.put("department", department);
+        params.put("status", status);
         return sqlSession.selectList(NAMESPACE + "searchEmployees", params);
     }
 
     // 모든 사원 정보 - 검색어와 부서에 해당하는 전체 데이터 개수 조회
-    public int countEmployees(String keyword, String department) {
+    public int countEmployees(String keyword, String department, String status) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("department", department);
+        params.put("status", status);
         return sqlSession.selectOne(NAMESPACE + "countEmployees", params);
     }
 }

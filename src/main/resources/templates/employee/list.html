@@ -25,14 +25,32 @@
                 </select>
                 <input type="hidden" name="keyword" th:value="${keyword}"/>
                 <input type="hidden" name="department" th:value="${department}">
+                <input type="hidden" name="status" th:value="${status}">
             </form>
-            <form th:action="@{/employee/list}" method="get">
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <button type="submit">검색</button>
-            </form>
+            <div class="search-option">
+                <form th:action="@{/employee/list}" method="get" id="statusForm">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <select name="status" onchange="document.getElementById('statusForm').submit()">
+                        <option value="" th:selected="${status == ''}" disabled>재직 상태</option>
+                        <option th:value="재직" th:text="재직" th:selected="${status == '재직'}">재직</option>
+                        <option th:value="휴직" th:text="휴직" th:selected="${status == '휴직'}">휴직</option>
+                        <option th:value="퇴사" th:text="퇴사" th:selected="${status == '퇴사'}">퇴사</option>
+                        <option th:value="퇴사예정" th:text="퇴사예정" th:selected="${status == '퇴사예정'}">퇴사 예정</option>
+                    </select>
+                </form>
+                <form th:action="@{/employee/list}" method="get">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <button type="submit">검색</button>
+                </form>
+                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/employee/list'"/>
+            </div>
         </div>
         <form th:action="@{/employee/list}" method="get" id="department-nav">
             <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
@@ -62,6 +80,7 @@
             <input type="hidden" name="page" th:value="1"/>
             <input type="hidden" name="size" th:value="${pageSize}"/>
             <input type="hidden" name="keyword" th:value="${keyword}"/>
+            <input type="hidden" name="status" th:value="${status}">
         </form>
         <table border="1" class="list">
             <thead>
@@ -100,14 +119,14 @@
         </table>
         <div class="pagination" th:if="${totalPages > 0}">
             <span th:if="${currentPage > 1}">
-                <a th:href="@{'/employee/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department}}">
+                <a th:href="@{'/employee/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
             <div class="page-area">
                 <span th:if="${totalPages <= 5}">
                     <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                        <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}+ '&department=' + ${department}}"
+                        <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
                            th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                     </span>
                 </span>
@@ -115,13 +134,13 @@
                     <span th:each="i : ${#numbers.sequence(
                                     currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
                                     currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                        <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}+ '&department=' + ${department}}"
+                        <a th:href="@{'/employee/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
                            th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                     </span>
                 </span>
             </div>
             <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/employee/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}+ '&department=' + ${department}}">
+                <a th:href="@{'/employee/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>
