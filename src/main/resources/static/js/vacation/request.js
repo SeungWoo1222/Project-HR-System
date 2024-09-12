@@ -1,22 +1,22 @@
 // 휴가 유형에 따른 폼 노출 조정 함수
 function updateFormVisibility() {
     const vacationTypeSelect = document.getElementById("vacationType");
-    const dateAtGroup = document.querySelector(".form-group #dateAt").parentElement;
-    const startAtGroup = document.querySelector(".form-group #startAt").parentElement;
-    const endAtGroup = document.querySelector(".form-group #endAt").parentElement;
+    const dateAt = document.getElementById("dateAt");
+    const startAt = document.getElementById("startAt");
+    const endAt = document.getElementById("endAt");
 
     const selectedValue = vacationTypeSelect.value;
 
     if (selectedValue === "오전 반차" || selectedValue === "오후 반차") {
         // 반차 선택 시
-        dateAtGroup.style.display = "block";
-        startAtGroup.style.display = "none";
-        endAtGroup.style.display = "none";
+        dateAt.style.display = "block";
+        startAt.style.display = "none";
+        endAt.style.display = "none";
     } else {
         // 연차 또는 기타 휴가 선택 시
-        dateAtGroup.style.display = "none";
-        startAtGroup.style.display = "block";
-        endAtGroup.style.display = "block";
+        dateAt.style.display = "none";
+        startAt.style.display = "block";
+        endAt.style.display = "block";
     }
 }
 
@@ -162,18 +162,21 @@ function calculateUsedDays() {
     }
 }
 
-// 사원이 선택되면 서버로 API 요청해서 잔여 연차를 받아와서 업데이트
+// 사원이 선택되면 서버로 API 요청해서 사원 정보를 받아와서 업데이트
 function fetchEmployeeInfo(employeeId) {
-    fetch(`/api/employee/` + employeeId + '/remainingLeave')
+    fetch(`/api/employee/` + employeeId)
         .then(response => {
             if (!response.ok) {
-                alert('잔여 연차 정보를 불러오는데 실패했습니다.');
+                alert('사원 정보를 불러오는데 실패했습니다.');
             }
             return response.json();
         })
-        .then(data => {
-            // 잔여 연차 값을 input 필드에 업데이트
-            document.getElementById("remainingLeave").value = data.remainingLeave;
+        .then(employee => {
+            // 사원 정보를 input 필드에 업데이트
+            document.getElementById("department").textContent = employee.department;
+            document.getElementById("position").textContent = employee.position;
+            document.getElementById("phone").textContent = employee.phone;
+            document.getElementById("remainingLeave").textContent = employee.remainingLeave;
         })
         .catch(error => {
             console.error('Error :', error.message);

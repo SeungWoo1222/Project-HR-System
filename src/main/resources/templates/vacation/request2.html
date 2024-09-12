@@ -4,10 +4,11 @@
       layout:decorate="~{fragments/layout :: layout(title='휴가 등록')}">
 
 <th:block layout:fragment="css">
-<!--    <link rel="stylesheet" th:href="@{/css/request.css}"/>-->
+    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}"/>
 </th:block>
 
 <th:block layout:fragment="script">
+    <script th:src="@{/js/vacation/ajax.js}"></script>
     <script th:src="@{/js/vacation/request.js}"></script>
     <script>
         // 사원 선택 시 이벤트 핸들러 설정
@@ -29,61 +30,89 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <form action="/api/vacation" onsubmit="submitInsertForm(event, 'HR')">
-            <div class="form-group">
-                <label for="employeeId">휴가 신청 사원</label>
-                <select id="employeeId" name="employeeId">
-                    <option value="" disabled selected>선택해주세요.</option>
-                    <option th:each="employee : ${employeeList}"
-                            th:value="${employee.employeeId}"
-                            th:text="${employee.name} + '(' +  ${employee.employeeId} + ')'"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="vacationType">휴가 유형</label>
-                <select id="vacationType" name="vacationType" onchange="updateFormVisibility()">
-                    <option value="" disabled selected>선택해주세요.</option>
-                    <option value="오전 반차">오전 반차</option>
-                    <option value="오후 반차">오후 반차</option>
-                    <option value="연차">연차</option>
-                    <option value="병가">병가</option>
-                    <option value="출산 휴가">출산 휴가</option>
-                    <option value="배우자 출산 휴가">배우자 출산 휴가</option>
-                    <option value="생리 휴가">생리 휴가</option>
-                    <option value="가족 돌봄 휴가">가족 돌봄 휴가</option>
-                    <option value="경조사 휴가">경조사 휴가</option>
-                    <option value="기타 휴가">기타 휴가</option>
-                </select>
-            </div>
-            <div class="form-group" style="display: none">
-                <label for="dateAt">휴가일</label>
-                <input type="date" id="dateAt" onchange="setDateAt()"/>
-            </div>
-            <div class="form-group">
-                <label for="startAt">휴가 시작일</label>
-                <input type="date" id="startAt" name="startAt" oninput="calculateUsedDays()"/>
-            </div>
-            <div class="form-group">
-                <label for="endAt">휴가 종료일</label>
-                <input type="date" id="endAt" name="endAt" oninput="calculateUsedDays()"/>
-            </div>
-            <div class="form-group">
-                <label for="reason">휴가 사유</label>
-                <textarea id="reason" name="reason" rows="2" placeholder="휴가 사유를 입력해주세요."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="remainingLeave">잔여 연차</label>
-                <input type="text" id="remainingLeave" readonly/>
-            </div>
-            <div class="form-group">
-                <label for="usedDays">연차 사용 일수</label>
-                <input type="text" id="usedDays" name="usedDays" readonly/>
-            </div>
-            <div id="error-message" class="error-message"></div>
-            <div>
-                <button type="reset" class="btn">초기화</button>
-                <button type="submit" class="btn">휴가 등록</button>
-            </div>
-        </form>
+        <div class="vacation-request-container">
+            <form action="/api/vacation" onsubmit="submitInsertForm(event, 'HR')">
+                <div class="vacation-header">
+                    <div id="error-message" class="error-message"></div>
+                    <div class="btn-container">
+                        <button type="reset" class="btn">초기화</button>
+                        <button type="submit" class="btn">휴가 등록</button>
+                    </div>
+                </div>
+                <div class="title">휴가 신청서</div>
+                <table class="employee-details">
+                    <tr>
+                        <td class="section-title">휴가 신청 사원</td>
+                        <td class="section-title">부서</td>
+                        <td class="section-title">직급</td>
+                        <td class="section-title">연락처</td>
+                        <td class="section-title">잔여 연차</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="employeeId" name="employeeId">
+                                <option value="" disabled selected>선택해주세요.</option>
+                                <option th:each="employee : ${employeeList}"
+                                        th:value="${employee.employeeId}"
+                                        th:text="${employee.name} + '(' +  ${employee.employeeId} + ')'"></option>
+                            </select>
+                        </td>
+                        <td id="department"></td>
+                        <td id="position"></td>
+                        <td id="phone"></td>
+                        <td id="remainingLeave"></td>
+                    </tr>
+                </table>
+                <table class="details">
+                    <tr>
+                        <td class="section-title">휴가 유형</td>
+                        <td>
+                            <select id="vacationType" name="vacationType" onchange="updateFormVisibility()">
+                                <option value="" disabled selected>선택해주세요.</option>
+                                <option value="오전 반차">오전 반차</option>
+                                <option value="오후 반차">오후 반차</option>
+                                <option value="연차">연차</option>
+                                <option value="병가">병가</option>
+                                <option value="출산 휴가">출산 휴가</option>
+                                <option value="배우자 출산 휴가">배우자 출산 휴가</option>
+                                <option value="생리 휴가">생리 휴가</option>
+                                <option value="가족 돌봄 휴가">가족 돌봄 휴가</option>
+                                <option value="경조사 휴가">경조사 휴가</option>
+                                <option value="기타 휴가">기타 휴가</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">사용 일수</td>
+                        <td>
+                            <input type="text" id="usedDays" name="usedDays" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">휴가 시작일</td>
+                        <td colspan="2">
+                            <div class="date-td">
+                                <input type="date" id="dateAt" onchange="setDateAt()" style="display: none;"/>
+                                <input type="date" id="startAt" name="startAt" oninput="calculateUsedDays()"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title" colspan="1">휴가 종료일</td>
+                        <td colspan="2">
+                            <div class="date-td">
+                                <input type="date" id="endAt" name="endAt" oninput="calculateUsedDays()"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title" style="height: 80px">휴가 사유</td>
+                        <td>
+                            <textarea id="reason" name="reason" placeholder="휴가 사유를 입력해주세요."></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
     </div>
 </div>

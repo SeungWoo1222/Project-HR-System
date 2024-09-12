@@ -1,4 +1,4 @@
-.vacation-form-container {
+.vacation-detail-container {
     line-height: 1.6;
     width: 210mm;
     margin: 0 auto;
@@ -6,6 +6,17 @@
     box-sizing: border-box;
     border: 1px solid #000;
     font-family: Arial, sans-serif;
+}
+
+.vacation-request-container {
+    line-height: 1.6;
+    width: 210mm;
+}
+
+.vacation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .btn-container {
@@ -45,6 +56,12 @@ textarea {
     padding: 8px;
     white-space: nowrap;
     text-align: center;
+}
+
+.date-td {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .submission-declaration {
