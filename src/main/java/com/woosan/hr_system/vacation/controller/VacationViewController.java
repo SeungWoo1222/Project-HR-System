@@ -28,7 +28,23 @@ public class VacationViewController {
     private EmployeeDAO employeeDAO;
 
     @GetMapping("/list") // 모든 휴가 조회
-    public String viewVacationList(Model model) {
+    public String viewVacationList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                   @RequestParam(name = "size", defaultValue = "10") int size,
+                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                   @RequestParam(name = "department", defaultValue = "") String department,
+                                   @RequestParam(name = "status", defaultValue = "") String status,
+                                   Model model) {
+        PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
+        PageResult<Vacation> pageResult = vacationService.searchVacation(pageRequest, department, status);
+
+        model.addAttribute("vacationList", pageResult.getData());
+        model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("department", department);
+        model.addAttribute("status", status);
+
         return "vacation/list";
     }
 

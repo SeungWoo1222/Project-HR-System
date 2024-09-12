@@ -22,6 +22,35 @@
         SELECT * FROM vacation WHERE vacation_id = #{vacationId}
     </select>
 
+    <!-- 검색 조건에 맞는 휴가 정보 조회 -->
+    <select id="searchVacation" parameterType="map" resultMap="VacationResultMap">
+        SELECT * FROM vacation
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                vacation_id LIKE CONCAT('%', #{keyword}, '%') OR
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                start_at LIKE CONCAT('%', #{keyword}, '%') OR
+                end_at LIKE CONCAT('%', #{keyword}, '%') OR
+                vacation_type LIKE CONCAT('%', #{keyword}, '%') OR
+                reason LIKE CONCAT('%', #{keyword}, '%') OR
+                used_days LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                processingBy LIKE CONCAT('%', #{keyword}, '%') OR
+                processingAt LIKE CONCAT('%', #{keyword}, '%') OR
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND LEFT(employee_id, 2) = #{department}
+            </if>
+            <if test="status != null and status != ''">
+                AND approval_status = #{status}
+            </if>
+        </where>
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
     <!-- 해당 사원의 모든 휴가 정보 조회 -->
     <select id="selectVacationByEmployeeId" parameterType="map" resultMap="VacationResultMap">
         SELECT * FROM vacation WHERE employee_id = #{employeeId}

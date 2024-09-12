@@ -20,6 +20,11 @@ public class VacationDAO {
         return sqlSession.selectOne(NAMESPACE + "selectVacationById", vacationId);
     }
 
+    // 검색 조건에 맞는 휴가 정보 조회
+    public List<Vacation> searchVacation(HashMap<String, Object> params) {
+        return sqlSession.selectList(NAMESPACE + "searchVacation", params);
+    }
+
     // 해당 사원의 모든 휴가 정보 조회
     public List<Vacation> selectVacationByEmployeeId(HashMap<String, Object> params) {
         return sqlSession.selectList(NAMESPACE + "selectVacationByEmployeeId", params);

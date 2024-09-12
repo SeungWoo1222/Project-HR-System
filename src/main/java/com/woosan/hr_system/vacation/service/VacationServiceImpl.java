@@ -44,6 +44,24 @@ public class VacationServiceImpl implements VacationService {
         return vacationInfo;
     }
 
+    @Override // 모든 휴가 정보 조회
+    public PageResult<Vacation> searchVacation(PageRequest pageRequest, String department, String status) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("keyword", pageRequest.getKeyword());
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("status", status);
+
+        // 휴가 정보 조회
+        List<Vacation> vacationList = vacationDAO.searchVacation(params);
+        int total = vacationList.size(); // 검색 결과 개수
+
+        return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
     @Override // 해당 사원의 모든 휴가 정보 조회
     public PageResult<Vacation> getVacationByEmployeeId(PageRequest pageRequest, String employeeId) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
@@ -161,4 +179,5 @@ public class VacationServiceImpl implements VacationService {
         String message = "휴가 정보('" + vacationId + "')가 삭제되었습니다.";
         return message;
     }
+
 }
