@@ -52,10 +52,7 @@
             end_at = #{endAt},
             vacation_type = #{vacationType},
             reason = #{reason},
-            used_days = #{usedDays},
-            approval_status = #{approvalStatus},
-            processing_by = #{processingBy},
-            processing_at = #{processingAt}
+            used_days = #{usedDays}
         WHERE vacation_id = #{vacationId}
     </update>
 
@@ -75,4 +72,9 @@
         SET remaining_leave = remaining_leave - #{usedDays}
         WHERE employee_id = #{employeeId};
     </update>
+
+    <!-- 휴가 삭제 -->
+    <delete id="deleteVacation" parameterType="int">
+        DELETE FROM vacation WHERE vacation_id = #{vacationId}
+    </delete>
 </mapper>

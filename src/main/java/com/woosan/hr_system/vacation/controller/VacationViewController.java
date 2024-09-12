@@ -84,7 +84,10 @@ public class VacationViewController {
 
     @GetMapping("/{vacationId}/edit") // 휴가 수정 페이지 이동
     public String viewEditForm(@PathVariable("vacationId") int vacationId, Model model) {
-        model.addAttribute("vacationInfo", vacationService.getVacationById(vacationId));
+        Vacation vacationInfo = vacationService.getVacationById(vacationId);
+        model.addAttribute("vacationInfo", vacationInfo);
+        model.addAttribute("employeeInfo",
+                employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
         return "/vacation/edit";
     }
 }

@@ -45,4 +45,9 @@ public class VacationDAO {
         sqlSession.update(NAMESPACE + "approveVacation", updatedVacation);
         sqlSession.update(NAMESPACE + "updateRemainingLeave", updatedVacation);
     }
+
+    // 휴가 삭제
+    public void deleteVacation(int vacationId) {
+        sqlSession.delete(NAMESPACE + "deleteVacation", vacationId);
+    }
 }
