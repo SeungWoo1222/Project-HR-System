@@ -1,5 +1,6 @@
 package com.woosan.hr_system.report.service;
 
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
@@ -53,7 +54,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 세부 조회
     public Request getRequestById(int requestId) {
-        return requestDAO.getRequestById(requestId);
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
+        Request request = checkRequestAuthorization(requestId, currentEmployeeId);
+        return request;
     }
 
     @Override  // 내가 쓴 요청 리스트 조회
@@ -72,7 +76,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 내게 온 요청 검색 (STAFF)
-    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate) {
 
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, startDate, endDate);
@@ -82,7 +86,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 내가 작성한 요청 검색
-    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate) {
 
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -125,19 +129,6 @@ public class RequestServiceImpl implements RequestService {
 
         requestDAO.updateReportId(params);
     }
-
-
-    @Override // 보고서 결재 처리
-    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
-        // report 객체 설정
-        Report report = new Report();
-        report.setReportId(reportId);
-        report.setStatus(status);
-        report.setRejectReason(rejectionReason);
-
-        requestDAO.updateApprovalStatus(report);
-    }
-
 //===================================================수정 메소드=======================================================
 
 //===================================================삭제 메소드=======================================================
@@ -153,9 +144,23 @@ public class RequestServiceImpl implements RequestService {
     public void deleteReportId(Integer reportId) {
         requestDAO.deleteReportId(reportId);
     }
-
-
 //===================================================삭제 메소드=======================================================
+//===================================================기타 메소드=======================================================
+    // 요청에 대한 접근 권한이 있는지 확인
+    public Request checkRequestAuthorization(int requestId, String currentEmployeeId) {
+            Request request = requestDAO.getRequestById(requestId); // 요청 세부 정보 가져오기
+            if (request == null) {
+                throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+            }
+
+            // 작성자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
+            if (!request.getRequesterId().equals(currentEmployeeId)) {
+                throw new SecurityException("권한이 없습니다.");
+            }
+
+            return request; // 요청 정보 반환
+        }
+//===================================================기타 메소드=======================================================
 
 
 }

@@ -219,7 +219,6 @@
     </select>
 <!--============================================== 조회 SQL문 =======================================================-->
 <!--============================================== 수정 SQL문 =======================================================-->
-
     <!-- 보고서 수정 -->
     <update id="updateReport" parameterType="com.woosan.hr_system.report.model.Report">
         UPDATE reports
@@ -231,7 +230,13 @@
             modified_date = #{modifiedDate}
         WHERE report_id = #{reportId}
     </update>
-
+    <!-- 보고서 결재처리 -->
+    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
+        UPDATE reports
+        SET status        = #{status},
+            reject_reason = #{rejectReason}
+        WHERE report_id = #{reportId}
+    </update>
 <!--============================================== 수정 SQL문 =======================================================-->
 <!--============================================== 삭제 SQL문 =======================================================-->
 

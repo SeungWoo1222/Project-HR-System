@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woosan.hr_system.schedule.dao.ScheduleDAO">
+    <resultMap id="scheduleResultMap" type="com.woosan.hr_system.schedule.model.Schedule">
+        <id property="taskId" column="task_id" />
+        <result property="memberId" column="member_id" />
+        <result property="taskName" column="task_name" />
+        <result property="content" column="content" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="createdDate" column="created_date" />
+        <result property="projectId" column="project_id" />
+        <result property="mapId" column="map_id" />
+    </resultMap>
+
+    <!-- Create -->
+    <insert id="createSchedule">
+        INSERT INTO schedules (member_id, task_name, content, start_time, end_time, status, project_id, map_id)
+        VALUES (#{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, '미완료', #{projectId}, #{mapId})
+    </insert>
+
+    <!-- Read by ID -->
+    <select id="getScheduleById" resultMap="scheduleResultMap">
+        SELECT * FROM schedules WHERE task_id = #{taskId}
+    </select>
+
+    <!-- Read all -->
+    <select id="getAllSchedules" resultMap="scheduleResultMap">
+        SELECT * FROM schedules
+    </select>
+
+    <!-- Update -->
+    <update id="updateSchedule">
+        UPDATE schedules
+        SET member_id = #{memberId},
+            task_name = #{taskName},
+            content = #{content},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            status = #{status},
+            project_id = #{projectId},
+            map_id = #{mapId}
+        WHERE task_id = #{taskId}
+    </update>
+
+    <!-- Delete -->
+    <delete id="deleteSchedule">
+        DELETE FROM schedules WHERE task_id = #{taskId}
+    </delete>
+</mapper>

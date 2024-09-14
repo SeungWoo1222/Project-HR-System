@@ -73,7 +73,7 @@ public class ReportDAO {
 
 
     // 내가 쓴 보고서 검색
-    public List<Report> search(String keyword, int pageSize, int offset, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public List<Report> search(String keyword, int pageSize, int offset, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -88,7 +88,7 @@ public class ReportDAO {
     }
 
     // 내가 쓴 보고서 검색
-    public int count(String keyword, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public int count(String keyword, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
@@ -100,7 +100,7 @@ public class ReportDAO {
     }
 
     // 결재할 보고서 검색
-    public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -115,7 +115,7 @@ public class ReportDAO {
     }
 
     // 결재할 보고서 검색
-    public int toApproveCount(String keyword, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public int toApproveCount(String keyword, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("approverId", approverId);
@@ -128,26 +128,24 @@ public class ReportDAO {
 
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
-
     // 보고서 수정
     public void updateReport(Report report) {
         sqlSession.update(NAMESPACE + "updateReport", report);
     }
-
-
+    // 보고서 결재 처리
+    public void updateApprovalStatus(Report report) {
+        sqlSession.update(NAMESPACE + "updateApprovalStatus", report);
+    }
 //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================
-
     // 보고서 삭제
     public void deleteReport(int reportId) {
         sqlSession.delete(NAMESPACE + "deleteReport", reportId);
     }
-
     // shared_trash(휴지통)에 삭제 데이터들 삽입
     public void insertReportIntoSharedTrash(int reportId) {
         sqlSession.insert(NAMESPACE + "insertReportIntoSharedTrash", reportId);
     }
-
 //=====================================================삭제 메소드======================================================
 
 

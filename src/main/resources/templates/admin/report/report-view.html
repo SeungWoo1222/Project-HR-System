@@ -41,7 +41,7 @@
         <!-- 결재 상태가 미처리인 경우 결재 상태 변경 폼을 바로 표시 -->
         <div th:if="${report.status == '미처리'}">
             <!-- 결재 상태 변경 기능 시작 -->
-            <form th:action="@{/admin/request/approve}" method="post">
+            <form id="approvalForm1" th:action="@{/admin/request/approve}">
                 <input type="hidden" name="reportId" th:value="${report.reportId}" />
                 <div>
                     <label for="statusSelect1">결재 상태:</label>
@@ -54,7 +54,7 @@
                     <label for="rejectionReason1">거절 사유:</label>
                     <textarea id="rejectionReason1" name="rejectionReason"></textarea>
                 </div>
-                <button type="submit" > 결재 완료 </button>
+                <button type="button" onclick="updateReportApprove(event)"> 결재 완료 </button>
             </form>
             <!-- 결재 상태 변경 기능 끝 -->
         </div>
@@ -64,7 +64,7 @@
             <button type="button" onclick="toggleApprovalSection('approvalForm2')">결재 상태 변경</button>
 
             <!-- 결재 상태 변경 폼은 기본적으로 숨김 -->
-            <form id="approvalForm2" th:action="@{/admin/request/approve}" method="post" style="display: none;">
+            <form id="approvalForm2" th:action="@{/admin/request/approve}" style="display: none;">
                 <input type="hidden" name="reportId" th:value="${report.reportId}" />
                 <div>
                     <label for="statusSelect2">결재 상태:</label>
@@ -77,7 +77,7 @@
                     <label for="rejectionReason2">거절 사유:</label>
                     <textarea id="rejectionReason2" name="rejectionReason"></textarea>
                 </div>
-                <button type="submit" > 결재 완료 </button>
+                <button type="button" onclick="updateReportApprove(event)"> 결재 완료 </button>
             </form>
         </div>
         <!-- 결재 상태 변경 기능 끝 -->

@@ -1,5 +1,6 @@
 // 전역변수
 selectedEmployees = {};
+initialValues = {};
 //========================================결재 상태 변경 =================================================================
 
 // 결재 상태 변경 시 "거절"을 선택한 경우 거절 사유를 적는 칸이 생김
@@ -25,7 +26,7 @@ function toggleRejectionReason(status, rejectReason) {
     }
 }
 
-//
+// 결재상태 변경 버튼 클릭시 영역을 만들어줌
 function toggleApprovalSection(formId) {
     var approvalForm = document.getElementById(formId);
     approvalForm.style.display = approvalForm.style.display === 'none' ? 'block' : 'none';
@@ -48,11 +49,13 @@ function initEventListeners() {
     if (deselectAllButton) {
         deselectAllButton.addEventListener('click', deselectAllEmployees); // 전체 해제 이벤트 리스너
     }
+
 }
 
 // 선택된 부서에 맞는 임원들 리스트를 반환해줌
 function loadEmployeesByDepartment() {
     const departmentId = document.getElementById('departmentId').value;
+    const selectAllButton = document.getElementById('selectAllEmployeesButton');
 
     // 부서 선택 시 employeeSection을 보여줌
     const employeeSection = document.getElementById('employeeSection');
@@ -73,6 +76,14 @@ function loadEmployeesByDepartment() {
             const availableContainer = document.getElementById('idContainer');
             availableContainer.innerHTML = '';
 
+            if (employeeList.length === 0) {
+                // 부서에 맞는 임원이 없을 경우 메시지 출력
+                const noEmployeesMessage = document.createElement('div');
+                noEmployeesMessage.textContent = "선택한 부서에 임원이 없습니다.";
+                availableContainer.appendChild(noEmployeesMessage);
+                selectAllButton.style.display = 'none';
+            }
+
             employeeList.forEach(employee => {
                 if (!selectedEmployees[employee.employeeId]) {
                     const employeeItem = createEmployeeItem(employee.employeeId, employee.name, false);
@@ -80,7 +91,8 @@ function loadEmployeesByDepartment() {
                 }
             });
         })
-        .catch(error => console.error('데이터를 읽어 올 수 없음', error));
+        .catch(error => console.error('데이터를 읽어 올 수 없음', error))
+    checkEmployees();
 }
 
 // 임원 리스트 아이템 생성
@@ -107,6 +119,32 @@ function createEmployeeItem(employeeId, employeeName, isSelected) {
 
     div.appendChild(actionButton);
     return div;
+}
+
+// 선택된 임원들이 있는지 체크함
+function checkEmployees() {
+    const selectedEmployeesContainer = document.getElementById('selectedEmployees');
+    const availableContainer = document.getElementById('idContainer');
+    const deselectButton = document.getElementById('deselectAllEmployeesButton');
+
+    // 선택된 임원이 있는지 체크
+    if (Object.keys(selectedEmployees).length === 0) {
+        // 선택된 임원이 없으면 경고 메시지 출력
+        if (!document.getElementById('noEmployeesMessage')) { // 이미 메시지가 있으면 추가하지 않음
+            const noEmployeesMessage = document.createElement('div');
+            noEmployeesMessage.id = 'noEmployeesMessage'; // ID를 설정하여 중복 생성을 방지
+            noEmployeesMessage.textContent = "선택된 임원이 없습니다.";
+            selectedEmployeesContainer.appendChild(noEmployeesMessage);
+        }
+        deselectButton.style.display = 'none'; // 해제 버튼 숨기기
+    } else {
+        // 선택된 임원이 있을 때 메시지 삭제 및 해제 버튼 표시
+        const noEmployeesMessage = document.getElementById('noEmployeesMessage');
+        if (noEmployeesMessage) {
+            noEmployeesMessage.remove(); // 메시지가 있으면 삭제
+        }
+        deselectButton.style.display = 'inline'; // 해제 버튼 보이기
+    }
 }
 
 // 선택된 임원들을 나열함
@@ -154,22 +192,20 @@ function deselectAllEmployees() {
 //=================================================== 임원 선택 =========================================================
 //============================================= formData 유효성 검사 ====================================================
 function validateReportForm(event) {
-
     event.preventDefault();
 
-    let nameList;
+    let nameList = "";
     const title = document.getElementById("title").value.trim();
     const content = document.getElementById("content").value.trim();
+    const completeDate = document.getElementById("completeDate").value;
+    const errorAlert = document.getElementById("error-alert");
     // 선택된 결재자를 nameList로 정의
     if (Object.keys(selectedEmployees).length > 0) {
         nameList = Object.values(selectedEmployees);
-    } else {
+    } else if (document.getElementById('currentApproverName')) {
         // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
         nameList = document.getElementById('currentApproverName').value;
     }
-
-    const completeDate = document.getElementById("completeDate").value;
-    const errorAlert = document.getElementById("error-alert");
 
     if (errorAlert) {
         errorAlert.textContent = "";
@@ -185,7 +221,7 @@ function validateReportForm(event) {
         errorAlert.textContent = "내용을 입력해주세요.";
         return false;
     }
-    if (nameList.length === 0 && document.getElementById('currentApproverName') === null) {
+    if (nameList === "" && document.getElementById('currentApproverName') === null) {
         errorAlert.textContent = "결재자를 선택해주세요.";
         return false;
     }
@@ -200,12 +236,12 @@ function validateRequestForm(event) {
     event.preventDefault();
 
     const requestNote = document.getElementById("requestNote").value.trim();
-    // 선택된 결재자를 nameList로 정의
-    let nameList;
+    // 선택된 작성자를 nameList로 정의
+    let nameList="";
     if (Object.keys(selectedEmployees).length > 0) {
         nameList = Object.values(selectedEmployees);
-    } else {
-        // 이미 결재자가 있다면 nameList에 정의 (보고서 수정 시, 요청에 의한 보고서 작성 시)
+    } else if (document.getElementById('currentApproverName')) {
+        // 이미 작성자가 있다면 nameList에 정의
         nameList = document.getElementById('currentApproverName').value;
     }
     const dueDate = document.getElementById("dueDate").value;
@@ -218,7 +254,7 @@ function validateRequestForm(event) {
     }
 
     if (nameList.length === 0) {
-        errorAlert.textContent = "결재자를 선택해주세요.";
+        errorAlert.textContent = "작성자를 선택해주세요.";
         return false;
     }
     if (dueDate === "") {
@@ -306,6 +342,12 @@ function submitReportForm(event) {
 
 // 보고서 수정 시
 function updateReportForm(event) {
+    // 수정사항이 있는지 체크 (수정사항 추가)
+    if (!isFormChanged()) {
+        alert('수정사항이 없습니다.');
+        return;
+    }
+
     // 유효성 검사 실행
     if (!validateReportForm(event)) { return; }
 
@@ -355,7 +397,7 @@ function updateReportForm(event) {
 
     // 데이터를 서버로 전송
     fetch(actionUrl, {
-        method: 'POST',
+        method: 'PUT',
         body: formData
     })
         .then(response => response.text().then(data => ({
@@ -401,10 +443,70 @@ function deleteReportFile(num) {
     document.querySelector("#file" + num).remove();
 }
 
+// 보고서 결재 처리 시
+function updateReportApprove(event) {
+    event.preventDefault();
+
+    // 수정사항이 있는지 체크 (수정사항 추가)
+    if (!isFormChanged()) {
+        alert('수정사항이 없습니다.');
+        return;
+    }
+
+    const form = event.target.closest('form'); // 폼을 가져옴
+    const actionUrl = form.action; // 폼의 action URL 가져옴
+    const formData = new FormData(); // 기존 폼 데이터를 FormData 객체에 추가
+
+    const reportId = document.getElementsByName("reportId")[0].value;
+    const status = document.getElementsByName("status")[0].value;
+    let rejectionReason = '';
+    if (document.getElementsByName("rejectionReason")) {
+        rejectionReason = document.getElementsByName("rejectionReason")[0].value;
+        formData.append("rejectionReason", rejectionReason);
+    }
+
+    formData.append("reportId", reportId);
+    formData.append("status", status);
+
+    // 데이터를 서버로 전송
+    fetch(actionUrl, {
+        method: 'PUT',
+        body: formData
+    })
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            console.log('서버 응답 데이터 :', response.text);
+            if (response.status === 200) {
+                alert(response.text); // 성공 메시지 알림
+                window.location.href = '/admin/request/toApproveReportList';
+            } else if (response.status === 404) {
+                alert(response.text); // 404 오류 메세지 알림
+                window.location.reload();
+            } else if (response.status === 400) {
+                alert(response.text); // 400 오류 메시지 알림
+            } else if (response.status === 500) {
+                alert(response.text); // 500 오류 메시지 알림
+            } else {
+                alert('결재 처리 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        });
+}
+
 // 요청 작성 시
 function submitRequestForm(event) {
     // 유효성 검사 실행
+    // 내용들이 다 입력됐는지 확인
     if (!validateRequestForm(event)) { return; }
+    // 마감일이 잘 설정됐는지 확인
+    if (!validateRequestDueDate()) { return; }
 
     // form 제출 처리
     const { form, actionUrl } = handleReportForm(event);
@@ -454,8 +556,17 @@ function submitRequestForm(event) {
 
 // 요청 수정 시
 function updateRequestForm(event) {
+    // 수정사항이 있는지 체크 (수정사항 추가)
+    if (!isFormChanged()) {
+        alert('수정사항이 없습니다.');
+        return;
+    }
+
     // 유효성 검사 실행
+    // 내용들이 다 입력됐는지 확인
     if (!validateRequestForm(event)) { return; }
+    // 마감일이 잘 설정됐는지 확인
+    if (!validateRequestDueDate()) { return; }
 
     // form 제출 처리
     const { form, actionUrl } = handleReportForm(event);
@@ -481,7 +592,7 @@ function updateRequestForm(event) {
 
     // 데이터를 서버로 전송
     fetch(actionUrl, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -504,7 +615,7 @@ function updateRequestForm(event) {
             } else if (response.status === 500) {
                 alert(response.text); // 500 오류 메시지 알림
             } else {
-                alert('요청 작성 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                alert('요청 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                 window.location.reload();
             }
         })
@@ -527,6 +638,7 @@ function submitReportSearchForm(event) {
     const searchType = document.getElementById('searchType').value;
     const keyword = document.getElementById('keywordField').value;
     const size = document.getElementById('size').value;
+    const searchDate = document.getElementById('searchDate').value;
 
     let startDate = dateRange.startDate;
     let endDate = dateRange.endDate;
@@ -538,11 +650,12 @@ function submitReportSearchForm(event) {
 
     // URLSearchParams 객체 생성
     const params = new URLSearchParams({
-        searchDate: searchDateOption,
+        // searchDate: searchDateOption,
         approvalStatus: approvalStatus,
         searchType: searchType,
         keyword: keyword,
-        size: size
+        size: size,
+        searchDate : searchDate
     });
 
     if (startDate && endDate) {
@@ -566,6 +679,7 @@ function submitRequestSearchForm(event) {
     const searchType = document.getElementById('searchType').value;
     const keyword = document.getElementById('keywordField').value;
     const size = document.getElementById('size').value;
+    const searchDate = document.getElementById('searchDate').value;
 
     let startDate = dateRange.startDate;
     let endDate = dateRange.endDate;
@@ -577,7 +691,7 @@ function submitRequestSearchForm(event) {
 
     // URLSearchParams 객체 생성
     const params = new URLSearchParams({
-        searchDate: searchDateOption,
+        searchDate: searchDate,
         searchType: searchType,
         keyword: keyword,
         size: size
@@ -601,12 +715,15 @@ function submitReportStatisticForm(event) {
 
     const searchDateOption = document.getElementById('searchDate').value;
     const dateRange = getDateRangeByOption(searchDateOption);
+    const searchDate = document.getElementById('searchDate').value;
 
     let startDate = dateRange.startDate;
     let endDate = dateRange.endDate;
 
     const params = new URLSearchParams({
     });
+
+    params.append('searchDate', searchDate);
 
     if (searchDateOption === 'custom') {
         startDate = document.getElementById('startDate').value;
@@ -631,6 +748,7 @@ function submitReportStatisticFormByManager(event) {
 
     const searchDateOption = document.getElementById('searchDate').value;
     const dateRange = getDateRangeByOption(searchDateOption);
+    const searchDate = document.getElementById('searchDate').value;
 
     let startDate = dateRange.startDate;
     let endDate = dateRange.endDate;
@@ -638,6 +756,7 @@ function submitReportStatisticFormByManager(event) {
     const params = new URLSearchParams({
         idList: Object.keys(selectedEmployees),
         nameList: Object.values(selectedEmployees),
+        searchDate: searchDate
     });
 
     if (searchDateOption === 'custom') {
@@ -650,15 +769,9 @@ function submitReportStatisticFormByManager(event) {
         params.append('endDate', endDate);
     }
 
-    params.forEach((value, key) => {
-        console.log(key, value);
-    })
-
     // 데이터를 서버로 GET 요청 전송
     window.location.href = `${actionUrl}?${params.toString()}`;
 }
-
-
 
 //=============================================== formData 전송 =========================================================
 //============================================= 검색 관련 메소드 =========================================================
@@ -786,12 +899,37 @@ function updateChartWithSelectedWriters(ids) {
 function validateDateRange() {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-
     if (startDate && endDate && startDate > endDate) {
         alert('시작 월은 종료 월보다 늦을 수 없습니다.');
         return false; // 폼 제출을 막음
     }
+    return true; // 폼 제출 허용
+}
 
+function validateRequestDueDate() {
+    const dueDateValue = document.getElementById('dueDate').value; // 입력된 마감 기한
+    const today = new Date().toISOString().split('T')[0]; // 현재 날짜의 연, 월, 일만 가져오기 (YYYY-MM-DD 형식)
+
+    if (dueDateValue < today) {
+        alert('마감 기한은 오늘 날짜 또는 이후여야 합니다.');
+        return false; // 폼 제출을 막음
+    }
     return true; // 폼 제출 허용
 }
 //========================================== 날짜 설정 메소드 =================================================================
+//============================================ 수정 메소드 =================================================================
+// 수정사항이 있는지 체크하는 함수 (수정사항 추가)
+function isFormChanged() {
+    const formElements = document.querySelectorAll('#form input, #form textarea');
+    let isChanged = false;
+
+    formElements.forEach(function (element) {
+        if (element.type === "hidden") return; // hidden 필드를 건너뜀
+        if (initialValues[element.id] !== element.value) {
+            isChanged = true; // 변경된 값이 있으면 true 설정
+        }
+    });
+
+    return isChanged;
+}
+//============================================== 수정 메소드 =================================================================

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='작성한 보고서 조회')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='요청 조회')}">
 
 <th:block layout:fragment="css">
     <style>
@@ -29,13 +29,21 @@
                     submitRequestSearchForm(event);  // 유효성 검사가 성공하면 검색 수행
                 }
             });
+
+            // 특정 class가 view인 요소들만 클릭 이벤트 추가
+            document.querySelectorAll('.view').forEach(function (element) {
+                element.addEventListener('click', function () {
+                    const requestId = this.closest('tr').getAttribute('requestId');
+                    openModal('/admin/request/' + requestId);
+                });
+            });
         });
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h1>내가 쓴 요청 목록</h1>
+        <h1>내 요청 목록</h1>
         <div>
             <form id="form" th:action="@{/admin/request/requestList}" method="get">
                 <input type="hidden" name="page" th:value="1"/>
@@ -44,41 +52,41 @@
                 <fieldset>
                     <legend>보기 옵션</legend>
                     <label for="size">보기:</label>
-                    <select id="size" name="size" onchange="submitRequestSearchForm(event)">
+                    <select id="size" onchange="submitRequestSearchForm(event)">
                         <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
                         <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                         <option th:value="40" th:text="'40개씩 보기'" th:selected="${pageSize == 40}">40개씩 보기</option>
                     </select>
-                </fieldset>
-
-                <fieldset>
-                    <legend>검색 옵션</legend>
-                    <label for="searchDate">마감 기간:</label>
-                    <select id="searchDate">
-                        <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
+                    <label for="searchDate">요청 일자:</label>
+                    <select id="searchDate" onchange="submitRequestSearchForm(event)">
+                        <option th:value="${null}" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
                         <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
                         <option th:value="month" th:text="'1개월'" th:selected="${searchDate == 'month'}">1개월</option>
                         <option th:value="sixMonth" th:text="'6개월'" th:selected="${searchDate == 'sixMonth'}">6개월</option>
                         <option th:value="year" th:text="'1년'" th:selected="${searchDate == 'year'}">1년</option>
                         <option th:value="custom" th:text="'사용자 지정'" th:selected="${searchDate == 'custom'}">사용자 지정</option>
                     </select>
+                </fieldset>
 
+                <fieldset>
+                    <legend>검색 옵션</legend>
                     <div id="customDateRange" style="display: none;">
                         <label for="startDate">시작 날짜:</label>
-                        <input type="date" id="startDate" name="startDate" th:value="${startDate}"/>
+                        <input type="date" id="startDate" th:value="${startDate}"/>
 
                         <label for="endDate">종료 날짜:</label>
-                        <input type="date" id="endDate" name="endDate" th:value="${endDate}"/>
+                        <input type="date" id="endDate" th:value="${endDate}"/>
                     </div>
 
                     <label for="searchType">검색 유형:</label>
-                    <select name="searchType" id="searchType">
+                    <select id="searchType">
+                        <option th:value="${null}" th:text="'검색 유형 선택'" th:selected="${searchType == null}"></option>
                         <option th:value="1" th:text="'요청 내용'" th:selected="${searchType == 1}">요청 내용</option>
                         <option th:value="2" th:text="'보고서 작성자'" th:selected="${searchType == 2}">보고서 작성자</option>
                     </select>
 
                     <label for="keywordField">검색어:</label>
-                    <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input id="keywordField" type="text" placeholder="검색어 입력" th:value="${keyword}" th:selected="${keyword}"/>
                 </fieldset>
 
                 <button type="submit">검색</button>
@@ -95,17 +103,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
-                th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
+            <tr th:each="request : ${requests}" th:requestId="${request.requestId}">
                 <td>
                     <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
                        th:onclick="openModal('/report/' + this.getAttribute('reportId'))">조회</a>
                     <a th:if="${request.reportId == null}" >없음</a>
                 </td>
-                <td th:text="${request.writerName}"></td>
-                <td th:text="${request.requestNote}"></td>
-                <td th:text="${request.dueDate}"></td>
-                <td th:text="${request.requestDate}" class="dateTime"></td>
+                <td class="view" th:text="${request.writerName}"></td>
+                <td class="view" th:text="${request.requestNote}"></td>
+                <td class="view" th:text="${request.dueDate}"></td>
+                <td class="view dateTime" th:text="${request.requestDate}"></td>
             </tr>
             </tbody>
         </table>

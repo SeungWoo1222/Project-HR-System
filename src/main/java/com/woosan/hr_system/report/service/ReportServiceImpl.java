@@ -9,6 +9,7 @@ import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportFileLink;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.upload.model.File;
@@ -129,14 +130,10 @@ public class ReportServiceImpl implements ReportService {
         // 조인 테이블에 연결 할 file, report Id리스트 생성
         List<Integer> fileIdlist = new ArrayList<>();
 
-        // approverName 설정
-        Employee employee = employeeDAO.getEmployeeById(report.getApproverId());
-        String approverName = employee.getName();
-
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
-        params.put("approverId", report.getApproverId());
-        params.put("approverName", approverName);
+        params.put("approverId", report.getIdList().get(0));
+        params.put("approverName", report.getNameList().get(0));
         params.put("title", report.getTitle());
         params.put("content", report.getContent());
         params.put("createdDate", report.getCreatedDate());
@@ -170,7 +167,11 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 특정 보고서 조회
     public Report getReportById(int reportId) {
-        return reportDAO.getReportById(reportId);
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
+        Report report = checkReportAuthorization(reportId, currentEmployeeId);
+
+        return report;
     }
 
 
@@ -188,7 +189,7 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override // 보고서 검색
-    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
 
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -202,7 +203,7 @@ public class ReportServiceImpl implements ReportService {
 
     // 결재할 보고서 검색
     @Override
-    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, int searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -242,10 +243,18 @@ public class ReportServiceImpl implements ReportService {
             createdReportIdList.add(report.getReportId()); // 조인테이블 수정
             reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
         }
-
     }
+    @Override // 보고서 결재 처리
+    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
+        // report 객체 설정
+        Report report = new Report();
+        report.setReportId(reportId);
+        report.setStatus(status);
+        report.setRejectReason(rejectionReason);
 
-    //=====================================================수정 메소드======================================================
+        reportDAO.updateApprovalStatus(report);
+    }
+//=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================
     @Transactional
     @Override // 보고서 삭제
@@ -264,8 +273,25 @@ public class ReportServiceImpl implements ReportService {
         // 조인테이블 서비스로 reportId를 보내줌 -> 파일 삭제
         reportFileService.deleteReportFileByReportId(reportId);
     }
-}
 //=====================================================삭제 메소드======================================================
+//=====================================================기타 메소드======================================================
+    // 요청에 대한 접근 권한이 있는지 확인
+    public Report checkReportAuthorization(int reportId, String currentEmployeeId) {
+        Report report = reportDAO.getReportById(reportId); // 요청 세부 정보 가져오기
+        if (report == null) {
+            throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+        }
+        // 결재자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
+        if (!report.getApproverId().equals(currentEmployeeId)) {
+            if (!report.getWriterId().equals(currentEmployeeId)) {
+                throw new SecurityException("권한이 없습니다.");
+            }
+        }
+        return report; // 요청 정보 반환
+    }
+//=====================================================기타 메소드======================================================
+
+}
 
 
 

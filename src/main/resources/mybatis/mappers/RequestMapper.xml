@@ -96,10 +96,10 @@
                 AND (e.name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="startDate != null and endDate != null">
-                AND DATE_FORMAT(r.due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+                AND DATE_FORMAT(r.request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY r.due_date DESC
+        ORDER BY r.request_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
@@ -119,7 +119,7 @@
                 )
             </if>
             <if test="startDate != null and endDate != null">
-                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+                AND DATE_FORMAT(request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>
@@ -143,10 +143,10 @@
                 AND (writer_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="startDate != null and endDate != null">
-                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+                AND DATE_FORMAT(request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY due_date DESC
+        ORDER BY request_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
@@ -166,18 +166,10 @@
                 )
             </if>
             <if test="startDate != null and endDate != null">
-                AND DATE_FORMAT(due_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+                AND DATE_FORMAT(request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
     </select>
-
-    <!-- 보고서 결재처리 -->
-    <update id="updateApprovalStatus" parameterType="com.woosan.hr_system.report.model.Report">
-        UPDATE reports
-        SET status        = #{status},
-            reject_reason = #{rejectReason}
-        WHERE report_id = #{reportId}
-    </update>
 <!-- ==================================================조회 SQL문=======================================================-->
 
 <!-- ==================================================수정 SQL문=======================================================-->

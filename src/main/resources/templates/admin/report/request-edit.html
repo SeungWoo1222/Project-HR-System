@@ -14,7 +14,16 @@
     <script th:src="@{/js/employee.js}"></script>
 
     <script>
+        let initialValues = {}; // 초기값을 저장할 객체 선언
+
         $(document).ready(function () {
+            // 초기 값 저장 (수정사항 추가)
+            const formElements = document.querySelectorAll('#form input, #form textarea');
+            formElements.forEach(function (element) {
+                initialValues[element.id] = element.value; // 각 필드의 초기 값을 저장
+            });
+            console.log("초기 값 : ", initialValues);
+
             $('#editButton').on('click', function () {
                 $('#departmentIdContainer').show();
                 initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
@@ -93,7 +102,7 @@
                 <textarea id="requestNote" name="requestNote" rows="10" th:text="${request.requestNote}"></textarea>
             </div>
             <div id="error-alert"></div>
-            <button id="updateRequestButton" type="button" onclick="updateRequestForm(event)">생성하기</button>
+            <button id="updateRequestButton" type="button" onclick="updateRequestForm(event)">수정 하기</button>
         </form>
     </div>
 </div>

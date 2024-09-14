@@ -54,9 +54,8 @@ public class ReportController {
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(@RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                              @RequestParam(name = "searchDate", required = false) String searchDate,
                               Model model) throws JsonProcessingException {
-
-
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -69,6 +68,7 @@ public class ReportController {
         List<Request> requests = requestService.getMyPendingRequests(writerId);
         model.addAttribute("requests", requests);
 
+        // 보고서 통계 데이터 가져옴
         List<String> employeeIds = Collections.singletonList(writerId); // writerId를 List<String>으로 변환 후 전달
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate, employeeIds);
 
@@ -80,6 +80,11 @@ public class ReportController {
         }
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
+
+        // 사용자가 선택한 select를 다시 보여줌
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
         return "report/main"; // main.html 반환
     }
@@ -116,11 +121,8 @@ public class ReportController {
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
     public String showCreateFromRequestPage(@RequestParam("requestId") int requestId,
                                             Model model) {
-
-        log.info("컨트롤러 - requestId {}", requestId);
         Request request = requestService.getRequestById(requestId);
 
-        log.info("reuqeerName씨발 쳐 알아멀ㄱ어러ㅏ 좁ㅇ신씨발 컴퓨터 존나 좆같네 {}", request.getRequesterName());
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
         return "report/write-from-request";
@@ -153,7 +155,6 @@ public class ReportController {
 
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
-
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -166,7 +167,22 @@ public class ReportController {
             model.addAttribute("files", files);
         }
 
-        return "/report/report-view";
+        return "report/report-view";
+    }
+
+    @GetMapping("/requestedReport/{reportId}") // 요청에 의한 보고서 조회
+    public String viewReportFromRequest(@PathVariable("reportId") int reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
+        model.addAttribute("report", report);
+
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
+
+        return "report/view-from-request";
     }
 
     // 내가 작성한 보고서 리스트
@@ -174,10 +190,11 @@ public class ReportController {
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "searchType", required = false) Integer searchType,
                                  @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                 @RequestParam(name = "searchDate", required = false) String searchDate,
                                  Model model) {
         // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -192,6 +209,8 @@ public class ReportController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("searchStatus", approvalStatus);
 
         return "report/report-list";
     }
@@ -201,11 +220,11 @@ public class ReportController {
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                  @RequestParam(name = "searchType", required = false) Integer searchType,
                                   @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                   @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                  @RequestParam(name = "searchDate", required = false) String searchDate,
                                   Model model) {
-
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -220,8 +239,17 @@ public class ReportController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
 
         return "report/request-list";
+    }
+
+    // 내게 온 요청 세부 조회
+    @GetMapping("/request/{requestId}")
+    public String viewRequest(@PathVariable("requestId") int requestId, Model model) {
+        Request request = requestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "report/request-view";
     }
 
 
@@ -246,9 +274,26 @@ public class ReportController {
         return "report/edit";
     }
 
+    @GetMapping("/editFromRequest") // 요청에의한 보고서 수정 페이지 이동
+    public String updateReportFromRequest(@RequestParam("reportId") int reportId, Model model) {
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        Report report = reportService.getReportById(reportId);
+
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
+
+        model.addAttribute("employees", employees); // employees 목록 추가
+        model.addAttribute("report", report);
+        return "report/edit-from-request";
+    }
+
     // 보고서 수정
     @Transactional
-    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
+    @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
     public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {

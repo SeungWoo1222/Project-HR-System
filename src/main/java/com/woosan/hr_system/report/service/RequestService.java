@@ -22,16 +22,14 @@ public interface RequestService {
     Request getRequestById(int requestId);
     // 내가 쓴 요청 리스트 조회
     List<Request> getMyRequests(String requesterId);
-    // 보고서 결재 처리
-    void updateApprovalStatus(int reportId, String status, String rejectionReasont);
     // reportId로 요청 조회
     int getRequestByReportId(int reportId);
     // 페이지, 서칭 + 보고서 리스트 (MANAGER)
-    PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, int searchType, LocalDate startDate, LocalDate endDate);
+    PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate);
     // 나에게 온 최근 5개 요청 조회 (STAFF)
     List<Request> getMyPendingRequests(String writerId);
     // 페이지, 서칭 + 보고서 리스트 (STAFF)
-    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, int searchType, LocalDate startDate, LocalDate endDate);
+    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate);
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
     // 요청 수정
