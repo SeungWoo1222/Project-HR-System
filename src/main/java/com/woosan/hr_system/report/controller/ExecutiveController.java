@@ -57,7 +57,6 @@ public class ExecutiveController {
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               @RequestParam(name = "searchDate", required = false) String searchDate,
                               Model model) throws JsonProcessingException {
-        log.info("컨트롤러 - 시작날짜 {}, 마지막날짜 {}, IDList{}", startDate, endDate, writerIdList);
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String employeeId = userSessionInfo.getCurrentEmployeeId();
@@ -296,7 +295,6 @@ public class ExecutiveController {
     public ResponseEntity<String> approveReport(@RequestParam(name = "reportId") int reportId,
                                 @RequestParam(name = "status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
-        log.info("컨트롤러 도착 reportId : {}, status : {}", reportId, status);
         try {
             reportService.updateApprovalStatus(reportId, status, rejectionReason);
             return ResponseEntity.ok("결재 처리가 완료되었습니다.");
