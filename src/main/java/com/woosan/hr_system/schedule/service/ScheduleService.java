@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ScheduleService {
     List<Schedule> getAllSchedules();
+    List<Schedule> getSchedulesByEmployeeId(String employeeId);
     Schedule getScheduleById(int taskId);
     void insertSchedule(Schedule schedule);
     void updateSchedule(Schedule schedule);

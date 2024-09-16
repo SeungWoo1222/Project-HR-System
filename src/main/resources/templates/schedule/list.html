@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 일정 목록 조회')}">
+
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{example.css}"> -->
+    <style>
+        .list tbody tr:hover {
+            cursor: pointer;
+        }
+        .notStarted {
+            color: #FFD700;
+            font-weight: bold;
+        }
+        .inProcess {
+            color: #FF8C00;
+            font-weight: bold;
+        }
+        .done {
+            color: #32CD32;
+            font-weight: bold;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth'
+            });
+            calendar.render();
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div>
+            <h3>오늘의 일정 <span th:text="${#dates.format(#dates.createNow(), ' - MM월 dd일 (EEEE)')}" style="font-size: 16px"></span></h3>
+            <table border="1" class="list">
+                <thead>
+                <tr>
+                    <th>일정 이름</th>
+                    <th>일정 기한</th>
+                    <th>일정 상태</th>
+                    <th>일정 생성일</th>
+                    <th>프로젝트 번호</th>
+                    <th>출장 번호</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${todaySchedules.isEmpty()}">
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        오늘의 일정이 없습니다.
+                    </td>
+                </tr>
+                <tr th:each="schedule : ${todaySchedules}" th:taskId="${schedule.taskId}" th:onclick="openModal('/schedule/' + this.getAttribute('taskId'))">
+                    <td th:text="${schedule.taskName}">일정 이름</td>
+                    <td th:text="${#temporals.format(schedule.startTime, 'MM월 dd일 EEEE') + ' ~ '
+                    + #temporals.format(schedule.endTime, 'MM월 dd일 EEEE')}">일정 기한</td>
+                    <td th:text="${schedule.status}"
+                        th:classappend="${schedule.status == '시작 전'} ? 'notStarted' :
+                                       (${schedule.status == '진행중'} ? 'inProcess' :
+                                       (${schedule.status == '완료'} ? 'done' : ''))">일정 상태</td>
+                    <td th:text="${#dates.format(schedule.createdDate, 'MM월 dd일 EEEE')}">일정 생성일</td>
+                    <td th:text="${schedule.projectId}">프로젝트 번호</td>
+                    <td th:text="${schedule.mapId}">출장 번호</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3>캘린더</h3>
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+</html>

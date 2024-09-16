@@ -23,7 +23,7 @@
             <li>
                 <p onclick="toggleSubmenu('schedule-submenu')"><img src="/images/icons/calendar.png" alt="Schedule" width="20">일정</p>
                 <ul id="schedule-submenu" class="submenu">
-                    <li><a th:href="@{/schedule/list}">- 일정 목록</a></li>
+                    <li><a th:href="@{/schedule/{employeeId}/list(employeeId=${#authentication.principal.username})}">- 일정 목록</a></li>
                     <li><a th:href="@{/schedule/plan}">- 일정 등록</a></li>
                 </ul>
             </li>
@@ -31,7 +31,7 @@
                 <p onclick="toggleSubmenu('my-vacation-submenu')"><img src="/images/icons/vacation.png" alt="Leave" width="20">휴가</p>
                 <ul id="my-vacation-submenu" class="submenu">
                     <li><a th:href="@{/vacation/employee}">- 휴가 내역</a></li>
-                    <li><a th:href="@{/vacation/{employeeId}/reques4t(employeeId=${#authentication.principal.username})}">- 휴가 신청</a></li>
+                    <li><a th:href="@{/vacation/{employeeId}/request(employeeId=${#authentication.principal.username})}">- 휴가 신청</a></li>
                 </ul>
             </li>
         </ul>

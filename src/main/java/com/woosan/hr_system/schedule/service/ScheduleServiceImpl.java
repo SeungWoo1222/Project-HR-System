@@ -17,6 +17,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleDAO.getAllSchedules();
     }
 
+    @Override // 사원의 모든 일정 조회
+    public List<Schedule> getSchedulesByEmployeeId(String employeeId) {
+        return scheduleDAO.getSchedulesByEmployeeId(employeeId);
+    }
+
     @Override
     public Schedule getScheduleById(int taskId) {
         return scheduleDAO.getScheduleById(taskId);
