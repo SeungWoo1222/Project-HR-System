@@ -1,6 +1,5 @@
 package com.woosan.hr_system.schedule.model;
 
-import ch.qos.logback.core.status.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

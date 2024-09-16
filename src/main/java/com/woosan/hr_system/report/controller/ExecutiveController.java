@@ -55,8 +55,8 @@ public class ExecutiveController {
     public String getMainPage(@RequestParam(name = "idList", required = false) List<String> writerIdList,
                               @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                              @RequestParam(name = "searchDate", required = false) String searchDate,
                               Model model) throws JsonProcessingException {
+        log.info("컨트롤러 - 시작날짜 {}, 마지막날짜 {}, IDList{}", startDate, endDate, writerIdList);
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String employeeId = userSessionInfo.getCurrentEmployeeId();
@@ -91,14 +91,8 @@ public class ExecutiveController {
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        // 사용자가 선택한 보고서 날짜 범위를 반환해줌
-        model.addAttribute("searchDate", searchDate);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
-
         return "admin/report/main";
     }
-
 //=====================================================생성 메소드========================================================
     @RequireManagerPermission
     @GetMapping("/write") // 요청 생성 페이지 이동
@@ -124,16 +118,15 @@ public class ExecutiveController {
 
 //=====================================================조회 메소드========================================================
     // 내가 작성한 요청 리스트
-    @RequireManagerPermission
     @GetMapping("/requestList")
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                  @RequestParam(name = "searchType", required = false) Integer searchType,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                   @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                   @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                                  @RequestParam(name = "searchDate", required = false) String searchDate,
                                  Model model) {
+        log.info("컨트롤러로 오는 size : {}", size);
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String requesterId = userSessionInfo.getCurrentEmployeeId();
@@ -147,22 +140,19 @@ public class ExecutiveController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
-        model.addAttribute("searchDate", searchDate);
 
         return "/admin/report/request-list";
     }
 
     // 내가 결재할 보고서 목록
-    @RequireManagerPermission
     @GetMapping("toApproveReportList")
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", required = false) Integer searchType,
+                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
                                  @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                                 @RequestParam(name = "searchDate", required = false) String searchDate,
                                  Model model) {
         // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -177,43 +167,30 @@ public class ExecutiveController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
-        model.addAttribute("searchStatus", approvalStatus);
-        model.addAttribute("searchDate", searchDate);
 
         return "admin/report/report-list";
     }
 
-    @RequireManagerPermission
     @GetMapping("/{requestId}") // 요청 세부 조회
     public String viewRequest(@PathVariable("requestId") int requestId, Model model) {
-        try {
-            Request request = requestService.getRequestById(requestId);
-            model.addAttribute("request", request);
-            return "admin/report/request-view";
-        } catch (SecurityException e) {
-            model.addAttribute("errorMessage", "권한이 없습니다."); // 오류 메시지 추가
-            return "error/403"; // templates/error/403.html 페이지로 이동
-        }
+        Request request = requestService.getRequestById(requestId);
+        model.addAttribute("request", request);
+        return "admin/report/request-view";
     }
 
-    @RequireManagerPermission
-    @GetMapping("/report/{reportId}") // 결재 할 보고서 조회
+    @GetMapping("/report/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
-        try {
-            Report report = reportService.getReportById(reportId);
-            model.addAttribute("report", report);
+        Report report = reportService.getReportById(reportId);
+        model.addAttribute("report", report);
 
-            List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
-            // 보고서에 맞는 파일이 있다면 실행
-            if (!fileIds.isEmpty()) {
-                List<File> files = fileService.getFileListById(fileIds);
-                model.addAttribute("files", files);
-            }
-            return "admin/report/report-view";
-        } catch (SecurityException e) {
-            model.addAttribute("errorMessage", "권한이 없습니다."); // 오류 메시지 추가
-            return "error/403"; // templates/error/403.html 페이지로 이동
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
         }
+
+        return "admin/report/report-view";
     }
 
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
@@ -234,6 +211,7 @@ public class ExecutiveController {
             endDate = LocalDate.parse((String) payload.get("endDate"));
         }
 
+        log.info("업데이트 요청 수신 - 시작 날짜: {}, 종료 날짜: {}, 선택된 임원 목록: {}", startDate, endDate, writerIdList);
         // 통계 데이터 조회
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerIdList);
         return prepareStatsResponse(stats);
@@ -267,7 +245,7 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @PutMapping("/edit") // 요청 수정
+    @PostMapping("/edit") // 요청 수정
     public ResponseEntity<String> updateRequest(@RequestBody Request request) {
         // ↓ 요청 수정 권한이 있는지 확인 ↓
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
@@ -291,15 +269,15 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @PutMapping("/approve") // 보고서 결재 처리
-    public ResponseEntity<String> approveReport(@RequestParam(name = "reportId") int reportId,
-                                @RequestParam(name = "status") String status,
+    @PostMapping("/approve") // 보고서 결재 처리
+    public String approveReport(@RequestParam("reportId") int reportId,
+                                @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {
             reportService.updateApprovalStatus(reportId, status, rejectionReason);
-            return ResponseEntity.ok("결재 처리가 완료되었습니다.");
+            return "redirect:/admin/request/toApproveReportList";
         } catch (Exception e) {
-            throw new SecurityException("권한이 없습니다.");
+            return "error"; // 에러 메시지 표시
         }
     }
 //===================================================수정 메소드=========================================================

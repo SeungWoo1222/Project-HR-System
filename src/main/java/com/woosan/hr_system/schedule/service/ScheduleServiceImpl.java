@@ -2,7 +2,6 @@ package com.woosan.hr_system.schedule.service;
 
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
 import com.woosan.hr_system.schedule.model.Schedule;
-import com.woosan.hr_system.schedule.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
