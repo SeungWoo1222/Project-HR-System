@@ -6,8 +6,6 @@ import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.file.model.File;
-import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -16,6 +14,9 @@ import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.file.model.File;
+import com.woosan.hr_system.file.service.FileService;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -273,7 +274,7 @@ public class ExecutiveController {
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
         try {
-            requestService.updateApprovalStatus(reportId, status, rejectionReason);
+            reportService.updateApprovalStatus(reportId, status, rejectionReason);
             return "redirect:/admin/request/toApproveReportList";
         } catch (Exception e) {
             return "error"; // 에러 메시지 표시

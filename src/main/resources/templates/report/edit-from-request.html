@@ -9,25 +9,11 @@
 
 <th:block layout:fragment="script">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/js/report/report.js}"></script>
-    <script th:src="@{/js/report/report-file.js}"></script>
+    <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/report-file.js}"></script>
     <script>
         $(document).ready(function () {
             initializeRegisteredFiles(); // 기존에 있는 파일을 IdList에 추가
-
-            // 초기 값 저장 (수정사항 추가)
-            const formElements = document.querySelectorAll('#form input, #form textarea');
-            formElements.forEach(function (element) {
-                initialValues[element.id] = element.value; // 각 필드의 초기 값을 저장
-            });
-            console.log("초기 값 : ", initialValues);
-
-            $('#editButton').on('click', function () {
-                $('#departmentIdContainer').show();
-                $('#editButton').hide();
-
-                initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
-            });
 
             $('#editFileButton').on('click', function () {
                 $('#file-area').show();
@@ -92,43 +78,11 @@
                 <textarea id="content" th:text="${report.content}"></textarea>
             </div>
             <div>
-                <label id="currentLabel" for="idContainer">현재 보고서 결재자 : </label>
+                <label id="currentLabel" >현재 보고서 결재자 : </label>
                 <span id="current" th:text="${report.approverName}"></span>
                 <input type="hidden" id="currentApproverName" th:value="${report.approverName}"/>
                 <input type="hidden" id="currentApproverId" th:value="${report.approverId}"/>
-                <button type="button" id="editButton">결재자 수정</button>
             </div>
-
-            <div id="departmentIdContainer" style="display: none;">
-                <label for="departmentId">부서 선택:</label>
-                <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
-                    <option value="" disabled selected>부서를 선택하세요</option>
-                    <option value="PR">생산(PR)</option>
-                    <option value="QC">품질 관리(QC)</option>
-                    <option value="SA">영업(SA)</option>
-                    <option value="MK">마케팅(MK)</option>
-                    <option value="FI">재무(FI)</option>
-                    <option value="HR">인사(HR)</option>
-                    <option value="RD">연구개발(RD)</option>
-                </select>
-            </div>
-
-        <div id="employeeSection" style="display:none;">
-            <div id="selectAllContainer">
-                <label for="idContainer">임원 리스트</label>
-                <button id="selectAllEmployeesButton" type="button">전체 선택</button>
-            </div>
-
-            <div id="idContainer">
-                <!-- 직원 목록이 여기에 추가됩니다. -->
-            </div>
-
-            <div>
-                <label id="selectedEmployeesLabel">선택된 결재자</label>
-                <button id="deselectAllEmployeesButton" type="button">전체 해제</button>
-                <div id="selectedEmployees" class="selected-employees"></div>
-            </div>
-        </div>
 
             <div>
                 <label for="completeDate">업무 처리 날짜:</label>
@@ -137,7 +91,7 @@
             <!-- 첨부 파일 리스트 표시 -->
             <button type="button" id="editFileButton">파일 수정</button>
             <div th:if="${files != null}">
-            <span>첨부 파일</span>
+                <span>첨부 파일</span>
                 <ul id="fileList">
                     <li th:each="file : ${files}">
                         <form th:action="@{'/report/downloadFile'}" method="get">
@@ -157,13 +111,13 @@
             </div>
 
             <div id="file-area" style="display: none;">
-                    <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
-                    <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
-                    <input type="file" id="reportDocuments" class="hidden"
-                           onchange="addFile(this)"
-                           multiple/>
-                    <div class="file-list"></div>
-                </div>
+                <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
+                <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
+                <input type="file" id="reportDocuments" class="hidden"
+                       onchange="addFile(this)"
+                       multiple/>
+                <div class="file-list"></div>
+            </div>
             <div id="error-alert"></div>
             <button id="updateReportButton" type="button" onclick="updateReportForm(event)">수정하기</button>
         </form>

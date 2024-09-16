@@ -157,7 +157,6 @@ public class FileServiceImpl implements FileService {
 
         // DB에서 해당 파일 삭제
         fileDAO.deleteFile(fileId);
-        log.info("파일 ID '{}'번이 files 테이블에서 삭제되었습니다.", fileId);
 
         // S3에서 제거
         deleteFileFromS3(file);

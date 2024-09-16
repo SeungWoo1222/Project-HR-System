@@ -53,12 +53,11 @@ public class RequestDAO {
 
     // 내게 온 요청 조회
     public List<Request> getMyPendingRequests(String writerId) {
-        log.info("DAO writerId {}", writerId);
         return sqlSession.selectList(NAMESPACE + "getRecentRequests", writerId);
     }
 
     // 내게 온 요청 검색(STAFF)
-    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  int searchType, LocalDate startDate, LocalDate endDate) {
+    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  Integer searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -72,7 +71,7 @@ public class RequestDAO {
     }
 
     // 내게 온 요청 검색(STAFF)
-    public int count(String keyword, String writerId, int searchType, LocalDate startDate, LocalDate endDate) {
+    public int count(String keyword, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
@@ -83,7 +82,7 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 검색
-    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  int searchType, LocalDate startDate, LocalDate endDate) {
+    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  Integer searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -97,7 +96,7 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 검색
-    public int countMyRequests(String keyword, String requesterId, int searchType, LocalDate startDate, LocalDate endDate) {
+    public int countMyRequests(String keyword, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
@@ -106,12 +105,6 @@ public class RequestDAO {
         params.put("endDate", endDate);
         return sqlSession.selectOne(NAMESPACE + "countMyRequests", params);
     }
-
-    // 보고서 결재 처리
-    public void updateApprovalStatus(Report report) {
-        sqlSession.update(NAMESPACE + "updateApprovalStatus", report);
-    }
-
 // ==================================================조회 메소드=======================================================
 
 // ==================================================수정 메소드=======================================================

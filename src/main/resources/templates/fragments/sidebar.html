@@ -48,9 +48,10 @@
                 </ul>
             </li>
             <li>
-                <a sec:authorize="hasRole('ROLE_MANAGER')" th:href="@{/admin/request/main}">
-                <img src="/images/icons/report.png" alt="Report" width="20"> 보고서 요청</a>
-                <ul class="submenu">
+                <p onclick="toggleSubmenu('request-submenu')" sec:authorize="hasRole('ROLE_MANAGER')">
+                    <img src="/images/icons/report.png" alt="Report" width="20"> 보고서 요청</p>
+                <ul id="request-submenu" class="submenu">
+                    <li><a th:href="@{/admin/request/main}">- 메인</a></li>
                     <li><a th:href="@{/admin/request/write}">- 요청 작성</a></li>
                     <li><a th:href="@{/admin/request/requestList}">- 내 요청 목록</a></li>
                     <li><a th:href="@{/admin/request/toApproveReportList}">- 결재 할 보고서 목록</a></li>

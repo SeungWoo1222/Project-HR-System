@@ -48,6 +48,7 @@
 <!--==================================================파일 아카이브 생성===============================================-->
     <insert id="createReportFileArchive" parameterType="map">
         INSERT INTO report_file_archive (
+            archive_id,
             file_id,
             report_id,
             deleted_date,
@@ -58,6 +59,7 @@
             uploaded_by,
             file_id_usage
         ) VALUES (
+                     #{archiveId},
                      #{fileId},
                      #{reportId},
                      #{deletedDate},
@@ -72,6 +74,7 @@
 
     <insert id="createReportFileArchiveByFileList" parameterType="map">
         INSERT INTO report_file_archive (
+            archive_id,
             file_id,
             report_id,
             deleted_date,
@@ -82,6 +85,7 @@
             uploaded_by,
             file_id_usage
         ) VALUES (
+            #{archivId},
             #{fileId},
             #{reportId},
             #{deletedDate},

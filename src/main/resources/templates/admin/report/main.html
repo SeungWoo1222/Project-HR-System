@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='관리자 화면')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/layout.css}">
@@ -41,12 +41,15 @@
         function drawChart() {
             // hidden-stats 요소에서 데이터를 읽어와서 파싱
             var stats = JSON.parse(document.getElementById('hidden-stats').textContent);
-            var data = google.visualization.arrayToDataTable(stats);
-
-            var options = {};
-
-            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
-            chart.draw(data, google.charts.Bar.convertOptions(options));
+            if (stats.length >= 2) {
+                var data = google.visualization.arrayToDataTable(stats);
+                var options = {};
+                var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            } else {
+                console.log("작성된 보고서가 없습니다.");
+                document.getElementById('columnchart_material').innerHTML = "<h2>작성된 보고서가 없습니다.</h2>";
+            }
         }
     </script>
 </th:block>
@@ -107,7 +110,8 @@
         <div>
             <h1>보고서 통계</h1>
             <form id="form" th:action="@{/admin/request/main}" method="get" onsubmit="return false;">
-                <select id="searchDate">
+                <label for="searchDate">작성 기간 검색:</label>
+                <select id="searchDate" name="searchDate" th:value="${searchDate}">
                     <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
                     <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
                     <option th:value="month" th:text="'1개월'" th:selected="${searchDate == 'month'}">1개월</option>
@@ -153,19 +157,20 @@
             </form>
             <div>
                 <h2>선택된 임원 목록</h2>
-                    <ul id="selected-writers-list">
-                        <li th:each="writer : ${selectedWriters}" th:if="${selectedWriters != null and !selectedWriters.isEmpty()}">
-                            <span th:text="${writer.name}"></span>
-                            <button type="button" th:data-employee-id="${writer.employeeId}" onclick="removeWriter(this)">x</button>
-                        </li>
-                        <li th:if="${selectedWriters == null or selectedWriters.isEmpty()}">
-                            <span>모든 임원</span>
-                        </li>
-                    </ul>
+                <ul id="selected-writers-list">
+                    <li th:each="writer : ${selectedWriters}" th:if="${selectedWriters != null and !selectedWriters.isEmpty()}">
+                        <span th:text="${writer.name}"></span>
+                        <button type="button" th:data-employee-id="${writer.employeeId}" onclick="removeWriter(this)">x</button>
+                    </li>
+                    <li th:if="${selectedWriters == null or selectedWriters.isEmpty()}">
+                        <span>모든 임원</span>
+                    </li>
+                </ul>
             </div>
         </div>
 
         <!-- 구글 차트 통계 추가 -->
+
         <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
 
         <!-- 숨겨진 요소에 통계 데이터를 JSON 형식으로 저장 -->

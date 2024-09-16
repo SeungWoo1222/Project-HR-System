@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='작성한 보고서 조회')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서 조회')}">
 
 <th:block layout:fragment="css"></th:block>
 
@@ -40,48 +40,48 @@
           <fieldset>
               <legend>보기 옵션</legend>
               <label for="size">보기:</label>
-              <select id="size" name="size" onchange="submitReportSearchForm(event)">
+              <select id="size" onchange="submitReportSearchForm(event)">
                   <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
                   <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                   <option th:value="40" th:text="'40개씩 보기'" th:selected="${pageSize == 40}">40개씩 보기</option>
               </select>
-          </fieldset>
-
-          <fieldset>
-              <legend>검색 옵션</legend>
               <label for="searchDate">작성 기간:</label>
-              <select id="searchDate">
-                  <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
+              <select id="searchDate" onchange="submitReportSearchForm(event)">
+                  <option th:value="${null}" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
                   <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
                   <option th:value="month" th:text="'1개월'" th:selected="${searchDate == 'month'}">1개월</option>
                   <option th:value="sixMonth" th:text="'6개월'" th:selected="${searchDate == 'sixMonth'}">6개월</option>
                   <option th:value="year" th:text="'1년'" th:selected="${searchDate == 'year'}">1년</option>
                   <option th:value="custom" th:text="'사용자 지정'" th:selected="${searchDate == 'custom'}">사용자 지정</option>
               </select>
+          </fieldset>
 
+          <fieldset>
+              <legend>검색 옵션</legend>
               <div id="customDateRange" style="display: none;">
                   <label for="startDate">시작 날짜:</label>
-                  <input type="date" id="startDate" name="startDate" th:value="${startDate}"/>
+                  <input type="date" id="startDate" th:value="${startDate}"/>
                   <label for="endDate">종료 날짜:</label>
-                  <input type="date" id="endDate" name="endDate" th:value="${endDate}"/>
+                  <input type="date" id="endDate" th:value="${endDate}"/>
               </div>
 
               <label for="approvalStatus">결재 상태:</label>
-              <select name="approvalStatus" id="approvalStatus">
-                  <option th:value="null" th:text="'전체 결재상태'" th:selected="${searchStatus == null}">전체 결재상태</option>
+              <select id="approvalStatus">
+                  <option th:value="${null}" th:text="'전체 결재상태'" th:selected="${searchStatus == null}">전체 결재상태</option>
                   <option th:value="미처리" th:text="'미처리'" th:selected="${searchStatus == '미처리'}">미처리</option>
                   <option th:value="승인" th:text="'승인'" th:selected="${searchStatus == '승인'}">승인</option>
                   <option th:value="거절" th:text="'거절'" th:selected="${searchStatus == '거절'}">거절</option>
               </select>
 
               <label for="searchType">검색 유형:</label>
-              <select name="searchType" id="searchType">
+              <select id="searchType">
+                  <option th:value="${null}" th:text="'검색 유형 선택'" th:selected="${searchType == null}"></option>
                   <option th:value="1" th:text="'제목+내용'" th:selected="${searchType == 1}">제목+내용</option>
                   <option th:value="2" th:text="'보고서 작성자'" th:selected="${searchType == 2}">보고서 작성자</option>
               </select>
 
               <label for="keywordField">검색어:</label>
-              <input id="keywordField" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+              <input id="keywordField" type="text" placeholder="검색어 입력" th:value="${keyword}" th:selected="${keyword}"/>
           </fieldset>
 
           <button type="submit">검색</button>
