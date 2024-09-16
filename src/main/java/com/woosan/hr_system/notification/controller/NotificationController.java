@@ -20,7 +20,7 @@ public class NotificationController {
 
     @GetMapping("/all") // 내 알림 조회
     public String getAllNotification(Model model) {
-        model.addAttribute("noti ficationList", notificationService.getAllNotification());
+        model.addAttribute("notificationList", notificationService.getAllNotification());
         return "/fragments/notification-content";
     }
 
