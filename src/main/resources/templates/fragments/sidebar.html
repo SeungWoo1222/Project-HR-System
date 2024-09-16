@@ -18,17 +18,21 @@
                 <a th:href="@{/attendance}"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 출퇴근</a>
             </li>
             <li>
-                <a th:href="@{/schedule}"><img src="/images/icons/location.png" alt="Schedule" width="20"> 방문 일정</a>
+                <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
             </li>
             <li>
-                <p onclick="toggleSubmenu('my-vacation-submenu')"><img src="/images/icons/leave.png" alt="Leave" width="20">휴가</p>
-                <ul id="my-vacation-submenu" class="submenu">
-                    <li><a th:href="@{/vacation/employee}">- 휴가 내역</a></li>
-                    <li><a th:href="@{/vacation/{employeeId}/request(employeeId=${#authentication.principal.username})}">- 휴가 신청</a></li>
+                <p onclick="toggleSubmenu('schedule-submenu')"><img src="/images/icons/calendar.png" alt="Schedule" width="20">일정</p>
+                <ul id="schedule-submenu" class="submenu">
+                    <li><a th:href="@{/schedule/list}">- 일정 목록</a></li>
+                    <li><a th:href="@{/schedule/plan}">- 일정 등록</a></li>
                 </ul>
             </li>
             <li>
-                <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
+                <p onclick="toggleSubmenu('my-vacation-submenu')"><img src="/images/icons/vacation.png" alt="Leave" width="20">휴가</p>
+                <ul id="my-vacation-submenu" class="submenu">
+                    <li><a th:href="@{/vacation/employee}">- 휴가 내역</a></li>
+                    <li><a th:href="@{/vacation/{employeeId}/reques4t(employeeId=${#authentication.principal.username})}">- 휴가 신청</a></li>
+                </ul>
             </li>
         </ul>
     </div>
@@ -36,7 +40,7 @@
     <div class="section-sidebar">
         <p class="sidebar-category" onclick="toggleMenu('communication-section')">커뮤니케이션</p>
         <ul id="communication-section">
-            <li><a th:href="@{/announcement}"><img src="/images/icons/announcement.png" alt="Announcement" width="20">
+            <li><a th:href="@{/announcement}"><img src="/images/icons/megaphone.png" alt="Announcement" width="20">
                 공지 및 설문</a></li>
             <li>
                 <p onclick="toggleSubmenu('report-submenu')"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</p>
@@ -49,7 +53,7 @@
             </li>
             <li>
                 <p onclick="toggleSubmenu('request-submenu')" sec:authorize="hasRole('ROLE_MANAGER')">
-                    <img src="/images/icons/report.png" alt="Report" width="20"> 보고서 요청</p>
+                    <img src="/images/icons/contract.png" alt="Report" width="20"> 보고서 요청</p>
                 <ul id="request-submenu" class="submenu">
                     <li><a th:href="@{/admin/request/main}">- 메인</a></li>
                     <li><a th:href="@{/admin/request/write}">- 요청 작성</a></li>
