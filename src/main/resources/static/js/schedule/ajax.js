@@ -1,5 +1,18 @@
 // 진승우씨가 채워주시면 됩니다
 
+// 수정 페이지 모달 열기
+function goToUpdateForm(taskId) {
+    if (confirm("일정을 수정하시겠습니까?")) {
+        openModal('/schedule/' + taskId + '/edit');
+
+        // 모달이 열리고 DOM이 로드될 시간을 주기 위해 약간의 지연을 둠
+        setTimeout(function() {
+            toggleDateTimeFields();
+        }, 100); // 지연
+    }
+    return;
+}
+
 // 사원이 선택되면 서버로 API 요청해서 사원 정보를 받아와서 업데이트
 function fetchEmployeeInfo(employeeId) {
     fetch(`/api/employee/` + employeeId)
@@ -149,4 +162,27 @@ function createFormData(form) {
     formData.set("endTime", endTime);
 
     return formData;
+}
+
+// AJAX PUT 요청 - 일정 수정
+function submitUpdateForm(event) {
+    event.preventDefault();
+
+    // 유효성 검사
+    if (!validateForm()) {
+        return;
+    }
+
+    const form = event.target;
+    const actionUrl = form.action;
+
+    const formData = createFormData(form);
+
+    // 일정 수정
+    if (confirm('일정을 수정하시겠습니까?')) {
+        fetch(actionUrl, {
+            method: "PUT",
+            body: formData
+        })
+    }
 }

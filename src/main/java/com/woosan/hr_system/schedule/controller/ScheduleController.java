@@ -69,15 +69,22 @@ public class ScheduleController {
         return "schedule/new2";
     }
 
+    @GetMapping("/{taskId}/edit") // 일정 수정 페이지
+    public String newScheduleForm(@PathVariable("taskId") int taskId, Model model) {
+        Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
+        model.addAttribute("schedule", scheduleInfo);
+        model.addAttribute("employee", employeeService.getEmployeeById(scheduleInfo.getMemberId()));
+        return "schedule/edit";
+    }
+
     @PostMapping // 일정 등록
     public ResponseEntity<String> insertSchedule(@ModelAttribute Schedule schedule) {
         return ResponseEntity.ok(scheduleService.insertSchedule(schedule));
     }
 
-    @PutMapping("/{taskId}")
-    public void updateSchedule(@PathVariable("taskId") int taskId, @RequestBody Schedule schedule) {
-        schedule.setTaskId(taskId);
-        scheduleService.updateSchedule(schedule);
+    @PutMapping // 일정 수정
+    public ResponseEntity<String> updateSchedule(@ModelAttribute Schedule schedule) {
+        return ResponseEntity.ok(scheduleService.updateSchedule(schedule));
     }
 
     @DeleteMapping("/{taskId}")
