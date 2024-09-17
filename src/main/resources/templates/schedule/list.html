@@ -4,6 +4,8 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='내 일정 목록 조회')}">
 
 <th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}">
+    <link rel="stylesheet" th:href="@{/css/switch.css}">
     <link rel="stylesheet" th:href="@{/css/calander.css}">
     <style>
         .list tbody tr:hover {
@@ -63,9 +65,13 @@
                         start: schedule.startTime,        // 시작일
                         end: schedule.endTime,            // 종료일
                         allDay: schedule.allDay,          // 하루종일 옵션
-                        backgroundColor: schedule.color   // 색상 옵션
+                        backgroundColor: schedule.color,  // 색상 옵션
+                        id: schedule.taskId               // 일정 ID
                     };
-                })
+                }),
+                eventClick: function(info) {
+                    openModal('/schedule/' + info.event.id);
+                }
             });
             calendar.render();
         });

@@ -1,6 +1,7 @@
 package com.woosan.hr_system.schedule.controller;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import java.util.List;
 public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private EmployeeService employeeService;
 
     @GetMapping("/{employeeId}/list") // 사원의 모든 일정 조회
     public String viewScheduleList(@PathVariable("employeeId") String employeeId, Model model) {
@@ -43,9 +46,14 @@ public class ScheduleController {
         return "schedule/list";
     }
 
-    @GetMapping("/{taskId}")
-    public Schedule getScheduleById(@RequestParam("taskId") int taskId) {
-        return scheduleService.getScheduleById(taskId);
+    @GetMapping("/{taskId}") // 일정 세부 조회
+    public String viewScheduleDetail(@PathVariable("taskId") int taskId, Model model) {
+        Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
+        // 일정 세부 정보
+        model.addAttribute("schedule", scheduleInfo);
+        // 사원 정보
+        model.addAttribute("employee", employeeService.getEmployeeById(scheduleInfo.getMemberId()));
+        return "schedule/detail";
     }
 
     @PostMapping
