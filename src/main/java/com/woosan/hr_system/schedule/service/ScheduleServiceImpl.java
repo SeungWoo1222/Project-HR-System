@@ -54,8 +54,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         return message;
     }
 
-    @Override
+    @Override // 일정 삭제
     public void deleteSchedule(int taskId) {
         scheduleDAO.deleteSchedule(taskId);
     }
+
+    // 일정 상태 변경 메소드 필요함
 }

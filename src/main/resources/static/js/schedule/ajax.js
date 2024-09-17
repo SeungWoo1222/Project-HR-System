@@ -184,5 +184,14 @@ function submitUpdateForm(event) {
             method: "PUT",
             body: formData
         })
+        // 미완성 - 구현 필요
     }
 }
+
+// AJAX DELETE 요청 - 일정 삭제
+function deleteSchedule(taskId) {
+
+}
+
+// AJAX PATCH 요청 - 일정 상태 변경
+// 메소드 필요
