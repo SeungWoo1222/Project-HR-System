@@ -1,6 +1,6 @@
 package com.woosan.hr_system.schedule.controller;
 
-import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +22,8 @@ public class ScheduleController {
     private ScheduleService scheduleService;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/{employeeId}/list") // 사원의 모든 일정 조회
     public String viewScheduleList(@PathVariable("employeeId") String employeeId, Model model) {
@@ -56,17 +57,21 @@ public class ScheduleController {
         return "schedule/detail";
     }
 
-    @PostMapping
-    public ResponseEntity<String> insertSchedule(@RequestPart(value="schedule") Schedule schedule) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String memberId = userSessionInfo.getCurrentEmployeeId();
-        LocalDateTime currentTime = userSessionInfo.getNow();
-        schedule.setMemberId(memberId);
-        schedule.setCreatedDate(currentTime);
+    @GetMapping("/new") // 일정 등록 페이지
+    public String viewScheduleForm(Model model) {
+        model.addAttribute("employeeList", employeeService.getAllEmployee());
+        return "schedule/new";
+    }
 
-        scheduleService.insertSchedule(schedule);
+    @GetMapping("/new2") // 본인 일정 등록 페이지
+    public String newScheduleForm(Model model) {
+        model.addAttribute("employee", employeeService.getEmployeeById(authService.getAuthenticatedUser().getUsername()));
+        return "schedule/new2";
+    }
 
-        return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
+    @PostMapping // 일정 등록
+    public ResponseEntity<String> insertSchedule(@ModelAttribute Schedule schedule) {
+        return ResponseEntity.ok(scheduleService.insertSchedule(schedule));
     }
 
     @PutMapping("/{taskId}")

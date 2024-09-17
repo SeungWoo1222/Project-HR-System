@@ -21,8 +21,8 @@
 
     <!-- Create -->
     <insert id="createSchedule">
-        INSERT INTO schedules (member_id, task_name, content, start_time, end_time, status, project_id, map_id, allDay, color)
-        VALUES (#{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, '미완료', #{projectId}, #{mapId}, #{all_day},#{color})
+        INSERT INTO schedules (member_id, task_name, content, start_time, end_time, status, project_id, map_id, all_day, color)
+        VALUES (#{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, '시작 전', #{projectId}, #{mapId}, #{allDay},#{color})
     </insert>
 
     <!-- Read by ID -->

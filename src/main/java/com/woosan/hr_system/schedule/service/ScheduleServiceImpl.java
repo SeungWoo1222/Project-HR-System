@@ -5,6 +5,7 @@ import com.woosan.hr_system.schedule.model.Schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,9 +28,19 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleDAO.getScheduleById(taskId);
     }
 
-    @Override
-    public void insertSchedule(Schedule schedule) {
+    @Override // 일정 등록
+    public String insertSchedule(Schedule schedule) {
+        // created_date 설정
+        schedule.setCreatedDate(LocalDateTime.now());
+
+        // 일정 등록
         scheduleDAO.insertSchedule(schedule);
+
+        // 알림 전송 후 메세지 반환
+        String message = "새로운 일정이 등록되었습니다."
+                + "\n담당자 : " + schedule.getMemberId()
+                + "\n일정 이름 : " + schedule.getTaskName();
+        return message;
     }
 
     @Override

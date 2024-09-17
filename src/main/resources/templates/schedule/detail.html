@@ -9,6 +9,7 @@
 
 <div class="detail-container">
     <div class="btn-container">
+        <button type="button" class="btn">일정 상태 변경</button>
         <button class="btn" th:taskId="${schedule.taskId}" th:onclick="goToUpdateForm(this.getAttribute('taskId'))">수정하기</button>
         <button class="btn" th:taskId="${schedule.taskId}" th:onclick="deleteSchedule(this.getAttribute('taskId'))">삭제하기</button>
     </div>
@@ -23,17 +24,17 @@
             <td class="section-title">작업 생성일</td>
         </tr>
         <tr>
-            <td th:text="${schedule.taskId}">작업 ID</td>
+            <td th:text="${schedule.taskId}">일정 ID</td>
             <td th:text="${employee.name + '(' + schedule.memberId + ')'}">담당자</td>
             <td th:text="${employee.department + ' / ' + employee.position}">부서와 직급</td>
-            <td th:text="${#temporals.format(schedule.createdDate, 'yyyy년 MM월 dd일 HH시 mm분')}">작업 생성일</td>
+            <td th:text="${#temporals.format(schedule.createdDate, 'yyyy년 MM월 dd일 HH시 mm분')}">일정 생성일</td>
         </tr>
     </table>
     <table class="details">
         <tr>
             <td class="section-title">하루종일</td>
             <td class="section-title">일정 색상</td>
-            <td class="section-title">작업 상태</td>
+            <td class="section-title">일정 상태</td>
         </tr>
         <tr>
             <td>
@@ -55,8 +56,8 @@
     </table>
     <table class="details">
         <tr>
-            <td class="section-title">작업 내용</td>
-            <td th:text="${schedule.content}">작업 내용</td>
+            <td class="section-title">일정 내용</td>
+            <td th:text="${schedule.content}">일정 내용</td>
         </tr>
         <tr>
             <td class="section-title">시작일</td>

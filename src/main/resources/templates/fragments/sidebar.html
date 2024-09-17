@@ -24,7 +24,7 @@
                 <p onclick="toggleSubmenu('schedule-submenu')"><img src="/images/icons/calendar.png" alt="Schedule" width="20">일정</p>
                 <ul id="schedule-submenu" class="submenu">
                     <li><a th:href="@{/schedule/{employeeId}/list(employeeId=${#authentication.principal.username})}">- 일정 목록</a></li>
-                    <li><a th:href="@{/schedule/plan}">- 일정 등록</a></li>
+                    <li><a th:href="@{/schedule/new}">- 일정 등록</a></li>
                 </ul>
             </li>
             <li>
