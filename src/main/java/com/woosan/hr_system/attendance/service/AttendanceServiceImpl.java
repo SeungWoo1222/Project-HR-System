@@ -4,6 +4,8 @@ import com.woosan.hr_system.attendance.dao.AttendanceDAO;
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
+import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.vacation.model.Vacation;
@@ -34,6 +36,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     private VacationService vacationService;
     @Autowired
     private BusinessTripService businessTripService;
+    @Autowired
+    private EmployeeService employeeService;
 
     @Override // 근태 정보 조회
     public Attendance getAttendanceById(int attendanceId) {
@@ -186,7 +190,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 오늘이 공휴일이면 작업 중단
         if (holidayService.isHoliday(today)) {
-            log.info("금일은 공휴일입니다. 근태 자동등록 작업을 중단합니다.");
+            log.info("금일은 공휴일입니다. 근태 자동 등록 작업을 중단합니다.");
             return;
         }
 
@@ -195,6 +199,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 출장 사원 근태 등록 - 출장 관련 기능 미구현으로 주석 처리
 //        registerTripAttendance();
+
+        log.info("{}년 {}월 {}일 휴가 및 출장 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonth(), today.getDayOfMonth());
     }
 
     // 휴가 사원 근태 등록
@@ -239,6 +245,49 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        }
     }
 
+    // 결근 자동 처리
+    // 평일 오후 6시에 실행, 공휴일은 제외
+    @Transactional
+    @Scheduled(cron = "0 0 18 * * MON-FRI")
+    public void registerAbsence() {
+        LocalDate today = LocalDate.now();
 
-    // 자동 결근 처리
+        // 오늘이 공휴일이면 작업 중단
+        if (holidayService.isHoliday(today)) {
+            log.info("금일은 공휴일입니다. 결근 자동 처리 작업을 중단합니다.");
+            return;
+        }
+
+        // 모든 사원 조회 후 재직중인 사원 ID 필터
+        List<String> workingEmployeeIdList = employeeService.getAllEmployee().stream()
+                .filter(employee -> employee.getStatus().equals("재직") || employee.getStatus().equals("퇴사 예정"))
+                .map(Employee::getEmployeeId)
+                .toList();
+
+        // 금일 근태 현황 조회 후 기록이 있는 사원의 ID 리스트 필터
+        List<String> presentEmployeeIdList = attendanceDAO.getTodayAttendance().stream()
+                .map(Attendance::getEmployeeId)
+                .toList();
+
+        // 재직중인 사원 ID 리스트와 기록이 있는 사원 ID 리스트 비교하여 결근한 사원 ID 리스트 추출
+        List<String> absentEmployeeIdList = workingEmployeeIdList.stream()
+                .filter(employeeId -> !presentEmployeeIdList.contains(employeeId))  // 기록에 사원이 없는 경우 필터
+                .toList();
+
+        // 객체 생성하여 근태 등록
+        for (String employeeId : absentEmployeeIdList) {
+            // 근태 객체 생성
+            Attendance attendance = Attendance.builder()
+                    .employeeId(employeeId)
+                    .date(LocalDate.now())
+                    .checkIn(LocalTime.of(0, 0, 0))
+                    .checkOut(LocalTime.of(0, 0, 0))
+                    .status("결근")
+                    .build();
+            // 근태 등록
+            attendanceDAO.insertAttendance(attendance);
+        }
+
+        log.info("{}년 {}월 {}일 결근한 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonth(), today.getDayOfMonth());
+    }
 }
