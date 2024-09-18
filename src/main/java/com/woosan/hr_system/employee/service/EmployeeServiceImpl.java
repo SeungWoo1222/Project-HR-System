@@ -102,7 +102,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    @Override // 모든 사원 정보 조회
+    @Override // 사원 정보 검색
     public PageResult<Employee> searchEmployees(PageRequest pageRequest, String department, String status) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -112,6 +112,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         int total = employeeDAO.countEmployees(pageRequest.getKeyword(), department, status);
 
         return new PageResult<>(employees, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 모든 사원 정보 조회
+    public List<Employee> getAllEmployee() {
+        return employeeDAO.getAllEmployees();
     }
 
     @Override // 퇴사 예정인 사원 정보 조회

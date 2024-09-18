@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<div class="vacation-detail-container">
+<div class="detail-container">
     <div class="btn-container">
         <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
         <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
