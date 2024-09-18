@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="holiday">
+    <resultMap id="HolidayResultMap" type="com.woosan.hr_system.holiday.model.Holiday">
+        <id property="holidayId" column="holiday_id"/>
+        <result property="dateName" column="date_name"/>
+        <result property="locDate" column="loc_date"/>
+    </resultMap>
+
+    <!-- 해당 년도 공휴일 조회 -->
+    <select id="getHolidayByYear" parameterType="int" resultMap="HolidayResultMap">
+        SELECT * FROM holidays WHERE YEAR(loc_date) = #{year}
+    </select>
+
+    <!-- 해당 년월 공휴일 조회 -->
+    <select id="getHolidayByYearMonth" parameterType="java.time.YearMonth" resultMap="HolidayResultMap">
+        SELECT * FROM holidays WHERE YEAR(loc_date) = #{yearMonth.year} AND MONTH(loc_date) = #{yearMonth.monthValue}
+    </select>
+
+    <!-- 모든 공휴일 조회 -->
+    <select id="getAllHoliday" resultMap="HolidayResultMap">
+        SELECT * FROM holidays
+    </select>
+
+    <!-- 공휴일 ID를 이용한 공휴일 조회 -->
+    <select id="getHolidayById" resultMap="HolidayResultMap">
+        SELECT * FROM holidays WHERE holiday_id = #{holidayId}
+    </select>
+
+    <!-- 공휴일 리스트 일괄 등록 -->
+    <insert id="insertHolidayList">
+        INSERT INTO holidays (date_name, loc_date)
+        VALUES
+        <foreach collection="list" item="holiday" separator=",">
+            (#{holiday.dateName}, #{holiday.locDate})
+        </foreach>
+    </insert>
+
+    <!-- 공휴일 등록 -->
+    <insert id="insertHoliday" parameterType="com.woosan.hr_system.holiday.model.Holiday">
+        INSERT INTO holidays (date_name, loc_date)
+        VALUES (#{dateName}, #{locDate})
+    </insert>
+
+    <!-- 공휴일 수정 -->
+    <update id="updateHoliday" parameterType="com.woosan.hr_system.holiday.model.Holiday">
+        UPDATE holidays
+        SET date_name = #{dateName}, loc_date = #{locDate}
+        WHERE holiday_id = #{holidayId}
+    </update>
+
+    <!-- 공휴일 삭제 -->
+    <delete id="deleteHoliday" parameterType="int">
+        DELETE FROM holidays WHERE holiday_id = #{holidayId}
+    </delete>
+</mapper>
