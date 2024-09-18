@@ -13,6 +13,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     private ScheduleDAO scheduleDAO;
 
     @Override
+    public void insertSchedule(Schedule schedule) {
+        scheduleDAO.insertSchedule(schedule);
+    }
+
+    @Override
     public List<Schedule> getAllSchedules() {
         return scheduleDAO.getAllSchedules();
     }
@@ -20,11 +25,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Schedule getScheduleById(int taskId) {
         return scheduleDAO.getScheduleById(taskId);
-    }
-
-    @Override
-    public void insertSchedule(Schedule schedule) {
-        scheduleDAO.insertSchedule(schedule);
     }
 
     @Override

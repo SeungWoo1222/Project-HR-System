@@ -1,12 +1,15 @@
 package com.woosan.hr_system.schedule.controller;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -18,19 +21,15 @@ import java.util.List;
 public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
-
-    @GetMapping
-    public List<Schedule> getAllSchedules() {
-        return scheduleService.getAllSchedules();
+//=============================================생성 메소드================================================================
+    @GetMapping("/showCreatePage") // 보고서 생성 페이지 이동
+    public String showCreatePage(Model model) {
+        model.addAttribute("schedule", new Schedule());
+        return "schedule/create";
     }
 
-    @GetMapping("/{taskId}")
-    public Schedule getScheduleById(@RequestParam("taskId") int taskId) {
-        return scheduleService.getScheduleById(taskId);
-    }
-
-    @PostMapping
-    public ResponseEntity<String> insertSchedule(@RequestPart(value="schedule") Schedule schedule) {
+    @PostMapping// 보고서 생성
+    public ResponseEntity<String> createSchedule(@RequestBody Schedule schedule)  {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String memberId = userSessionInfo.getCurrentEmployeeId();
         LocalDateTime currentTime = userSessionInfo.getNow();
@@ -39,17 +38,34 @@ public class ScheduleController {
 
         scheduleService.insertSchedule(schedule);
 
-        return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
+        return ResponseEntity.ok("일정 등록이 완료되었습니다.");
+    }
+//=============================================생성 메소드================================================================
+//=============================================조회 메소드================================================================
+    @GetMapping
+    public String getAllSchedules(Model model) {
+        List<Schedule> Schedules = scheduleService.getAllSchedules();
+        model.addAttribute("Schedules", Schedules);
+        return "scheduleList";
     }
 
+    @GetMapping("/{taskId}")
+    public String getScheduleById(@PathVariable("taskId") int taskId, Model model) {
+        Schedule schedule = scheduleService.getScheduleById(taskId);
+        model.addAttribute("schedule", schedule);
+        return "scheduleDetail";
+    }
+//=============================================조회 메소드================================================================
+//=============================================수정 메소드================================================================
     @PutMapping("/{taskId}")
-    public void updateSchedule(@PathVariable("taskId") int taskId, @RequestBody Schedule schedule) {
-        schedule.setTaskId(taskId);
+    public void updateSchedule(@RequestBody Schedule schedule)  {
         scheduleService.updateSchedule(schedule);
     }
-
+//=============================================수정 메소드================================================================
+//=============================================삭제 메소드================================================================
     @DeleteMapping("/{taskId}")
     public void deleteSchedule(@PathVariable("taskId") int taskId) {
         scheduleService.deleteSchedule(taskId);
     }
+//=============================================삭제 메소드================================================================
 }

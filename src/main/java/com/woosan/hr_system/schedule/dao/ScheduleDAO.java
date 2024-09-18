@@ -13,6 +13,7 @@ public class ScheduleDAO {
     private SqlSession sqlSession;
     private static final String NAMESPACE = "com.woosan.hr_system.schedule.dao.ScheduleDAO.";
 
+    // 일정 생성
     public void insertSchedule(Schedule schedule) {
         sqlSession.insert(NAMESPACE + "createSchedule", schedule);
     }
