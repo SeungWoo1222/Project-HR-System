@@ -23,6 +23,11 @@ public class ScheduleDAO {
         return sqlSession.selectOne(NAMESPACE + "getScheduleById", taskId);
     }
 
+    // 사원의 모든 일정 조회
+    public List<Schedule> getSchedulesByEmployeeId(String employeeId) {
+        return sqlSession.selectList(NAMESPACE + "getSchedulesByEmployeeId", employeeId);
+    }
+
     // 모든 일정 조회
     public List<Schedule> getAllSchedules() {
         return sqlSession.selectList(NAMESPACE + "getAllSchedules");

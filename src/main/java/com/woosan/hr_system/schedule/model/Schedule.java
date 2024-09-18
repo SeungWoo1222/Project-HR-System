@@ -20,4 +20,6 @@ public class Schedule {
     private LocalDateTime createdDate;
     private Integer projectId;
     private Integer mapId;
+    private boolean allDay;
+    private String color;
 }

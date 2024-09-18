@@ -1,4 +1,4 @@
-.vacation-detail-container {
+.detail-container {
     line-height: 1.6;
     width: 210mm;
     margin: 0 auto;
@@ -8,12 +8,12 @@
     font-family: Arial, sans-serif;
 }
 
-.vacation-request-container {
+.insert-form-container {
     line-height: 1.6;
     width: 210mm;
 }
 
-.vacation-header {
+.insert-form-header {
     display: flex;
     justify-content: space-between;
     align-items: center;

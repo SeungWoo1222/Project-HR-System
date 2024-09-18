@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='일정 등록')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}">
+    <link rel="stylesheet" th:href="@{/css/switch.css}">
+    <link rel="stylesheet" th:href="@{/css/schedule/create.css}">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/schedule/create.js}"></script>
+    <script th:src="@{/js/schedule/ajax.js}"></script>
+    <script>
+        // 사원 선택 시 이벤트 핸들러 설정
+        document.addEventListener("DOMContentLoaded", function() {
+            const employeeSelect = document.getElementById("memberId");
+            if (employeeSelect) {
+                employeeSelect.addEventListener("change", function () {
+                    const selectedEmployeeId = this.value;
+                    if (selectedEmployeeId) {
+                        fetchEmployeeInfo(selectedEmployeeId); // 선택된 사원 ID로 API 요청
+                    }
+                });
+            } else {
+                console.error('memberId 요소를 찾을 수 없습니다.');
+            }
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <form action="/schedule" onsubmit="submitInsertForm(event)">
+            <div class="insert-form-container">
+                <div class="insert-form-header">
+                    <div id="error-message" class="error-message"></div>
+                    <div class="btn-container">
+                        <button type="reset" class="btn">초기화</button>
+                        <button type="submit" class="btn">일정 등록</button>
+                    </div>
+                </div>
+                <div class="task-name">
+                    <label> 일정 :
+                        <input type="text" id="taskName" name="taskName">
+                    </label>
+                </div>
+                <table class="employee-details">
+                    <tr>
+                        <td class="section-title">사원 ID</td>
+                        <td class="section-title">이름</td>
+                        <td class="section-title">부서</td>
+                        <td class="section-title">직급</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="memberId" name="memberId">
+                                <option value="" disabled selected>선택해주세요.</option>
+                                <option th:each="employee : ${employeeList}"
+                                        th:value="${employee.employeeId}"
+                                        th:text="${employee.name} + '(' +  ${employee.employeeId} + ')'"></option>
+                            </select>
+                        </td>
+                        <td id="name"></td>
+                        <td id="department"></td>
+                        <td id="position"></td>
+                    </tr>
+                </table>
+                <table class="details">
+                    <tr>
+                        <td class="section-title">하루종일</td>
+                        <td class="section-title">일정 색상</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="padding-top: 5px">
+                                <label class="switch">
+                                    <input type="checkbox" id="allDay" name="allDay" onchange="toggleDateTimeFields()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <div class="color-area">
+                                <div id="colorPreview" class="color-preview"></div>
+                                <select id="color" name="color" onchange="changeColor()">
+                                    <option value="#FF0000">빨강색</option>
+                                    <option value="#FF8000">주황색</option>
+                                    <option value="#FFD700">노랑색</option>
+                                    <option value="#32CD32">초록색</option>
+                                    <option value="#18A8F1" selected>하늘색</option>
+                                    <option value="#000080">남색</option>
+                                    <option value="#8A2BE2">보라색</option>
+                                    <option value="#FF1493">핑크색</option>
+                                    <option value="#8B4513">갈색</option>
+                                    <option value="#808080">회색</option>
+                                    <option value="#000000">검은색</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <table class="details">
+                    <tr>
+                        <td class="section-title">일정 내용</td>
+                        <td>
+                            <textarea id="content" name="content" placeholder="일정 내용을 입력해주세요."></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">시작일</td>
+                        <td>
+                            <div class="date-td">
+                                <input type="datetime-local" id="startDateTime">
+                                <input type="date" id="startDate" style="display: none">
+                                <input type="hidden" id="startTime" name="startTime">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">종료일</td>
+                        <td>
+                            <div class="date-td">
+                                <input type="datetime-local" id="endDateTime">
+                                <input type="date" id="endDate" style="display: none">
+                                <input type="hidden" id="endTime" name="endTime">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">연관된 프로젝트</td>
+                        <td>
+                            <select id="projectId" name="projectId">
+                                <!-- 프로젝트 구현 완료 되면 ajax로 불러올 예정 -->
+                                <option value="" disabled selected>선택해주세요.</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">연관된 출장</td>
+                        <td>
+                            <select id="mapId" name="mapId">
+                                <!-- 출장 구현 완료 되면 ajax로 불러올 예정 -->
+                                <option value="" disabled selected>선택해주세요.</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+</html>
