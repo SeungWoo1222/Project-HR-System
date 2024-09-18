@@ -135,14 +135,14 @@ public class VacationServiceImpl implements VacationService {
         vacationDAO.updateVacation(vacation);
         return "휴가 정보('" + vacationId  + "')가 수정되었습니다.";
     }
-
     // Vacation의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
     private void checkForVacationChanges(Vacation original, Vacation updated) {
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
-            "startAt", "endAt", "vacationType", "reason", "usedDays"
+                "startAt", "endAt", "vacationType", "reason", "usedDays"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
     }
+
 
     @Transactional
     @LogBeforeExecution
