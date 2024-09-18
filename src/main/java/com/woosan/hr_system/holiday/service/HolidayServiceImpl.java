@@ -111,6 +111,11 @@ public class HolidayServiceImpl implements HolidayService {
         return holiday.getDateName() + "(" + holiday.getLocDate() + ")이(가) 삭제되었습니다." ;
     }
 
+    @Override // 해당 날짜가 공휴일인지 확인
+    public boolean isHoliday(LocalDate date) {
+        return holidayDAO.isHoliday(date) != 0;
+    }
+
     @Transactional
     @LogBeforeExecution
     @LogAfterExecution

@@ -14,15 +14,15 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Attendance {
-    private int attendanceId; // 근태 ID
-    private String employeeId; // 사원 ID
-    private LocalDate date; // 날짜
-    private LocalTime checkIn; // 출근 시간
-    private LocalTime checkOut; // 퇴근 시간
-    private String status; // 근태 상태
-    private Integer vacationId; // 휴가 ID
-    private Integer tripId; // 출장 ID
-    private String notes; // 메모
+    private int attendanceId;           // 근태 ID
+    private String employeeId;          // 사원 ID
+    private LocalDate date;             // 날짜
+    private LocalTime checkIn;          // 출근 시간
+    private LocalTime checkOut;         // 퇴근 시간
+    private String status;              // 근태 상태
+    private Integer vacationId;         // 휴가 ID
+    private Integer tripId;             // 출장 ID
+    private String notes;               // 메모
     private LocalDateTime lastModified; // 마지막 수정 일시
-    private String modifiedBy; // 마지막 수정 사원 ID
+    private String modifiedBy;          // 마지막 수정 사원 ID
 }

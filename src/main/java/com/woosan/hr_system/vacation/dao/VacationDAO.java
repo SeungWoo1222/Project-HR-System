@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,5 +58,10 @@ public class VacationDAO {
     // 휴가 삭제
     public void deleteVacation(int vacationId) {
         sqlSession.delete(NAMESPACE + "deleteVacation", vacationId);
+    }
+
+    // 오늘 휴가인 사원 조회
+    public List<Vacation> getEmployeesOnVacationToday(LocalDate today) {
+        return sqlSession.selectList(NAMESPACE + "getEmployeesOnVacationToday", today);
     }
 }

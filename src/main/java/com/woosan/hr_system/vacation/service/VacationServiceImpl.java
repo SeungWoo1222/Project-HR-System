@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -184,5 +185,11 @@ public class VacationServiceImpl implements VacationService {
         String message = "휴가 정보('" + vacationId + "')가 삭제되었습니다.";
         return message;
     }
+
+    @Override // 오늘 휴가인 사원 조회
+    public List<Vacation> findEmployeesOnVacationToday() {
+        return vacationDAO.getEmployeesOnVacationToday(LocalDate.now());
+    }
+
 
 }

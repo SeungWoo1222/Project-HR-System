@@ -2,6 +2,7 @@ package com.woosan.hr_system.holiday.service;
 
 import com.woosan.hr_system.holiday.model.Holiday;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface HolidayService {
     String addHoliday(Holiday holiday);
     String editHoliday(Holiday holiday);
     String deleteHoliday(int holidayId);
+    boolean isHoliday(LocalDate date);
 }

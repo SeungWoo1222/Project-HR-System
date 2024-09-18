@@ -55,4 +55,11 @@
     <delete id="deleteHoliday" parameterType="int">
         DELETE FROM holidays WHERE holiday_id = #{holidayId}
     </delete>
+
+    <!-- 해당 날짜가 공휴일인지 확인 -->
+    <select id="isHoliday" parameterType="java.time.LocalDate">
+        SELECT COUNT(*)
+        FROM holidays
+        WHERE loc_date = #{date}
+    </select>
 </mapper>

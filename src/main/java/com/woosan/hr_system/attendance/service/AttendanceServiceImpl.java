@@ -4,9 +4,15 @@ import com.woosan.hr_system.attendance.dao.AttendanceDAO;
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
+import com.woosan.hr_system.holiday.service.HolidayService;
+import com.woosan.hr_system.schedule.service.BusinessTripService;
+import com.woosan.hr_system.vacation.model.Vacation;
+import com.woosan.hr_system.vacation.service.VacationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +28,12 @@ public class AttendanceServiceImpl implements AttendanceService {
     private CommonService commonService;
     @Autowired
     private AttendanceDAO attendanceDAO;
+    @Autowired
+    private HolidayService holidayService;
+    @Autowired
+    private VacationService vacationService;
+    @Autowired
+    private BusinessTripService businessTripService;
 
     @Override // 근태 정보 조회
     public Attendance getAttendanceById(int attendanceId) {
@@ -166,6 +178,67 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     // 휴가, 출장 사원 근태 자동 등록
+    // 평일 오전 9시에 실행, 공휴일은 제외
+    @Transactional
+    @Scheduled(cron = "0 0 9 * * MON-FRI")
+    public void registerAttendance() {
+        LocalDate today = LocalDate.now();
+
+        // 오늘이 공휴일이면 작업 중단
+        if (holidayService.isHoliday(today)) {
+            log.info("금일은 공휴일입니다. 근태 자동등록 작업을 중단합니다.");
+            return;
+        }
+
+        // 휴가 사원 근태 등록
+        registerVacationAttendance();
+
+        // 출장 사원 근태 등록 - 출장 관련 기능 미구현으로 주석 처리
+//        registerTripAttendance();
+    }
+
+    // 휴가 사원 근태 등록
+    private void registerVacationAttendance() {
+        // 휴가 사원 목록 조회
+        List<Vacation> employeeListOnVacation = vacationService.findEmployeesOnVacationToday();
+
+        // 객체 생성하여 근태 등록
+        for (Vacation vacation : employeeListOnVacation) {
+            // 근태 객체 생성
+            Attendance attendance = Attendance.builder()
+                    .employeeId(vacation.getEmployeeId())
+                    .date(LocalDate.now())
+                    .checkIn(LocalTime.of(0, 0, 0))
+                    .checkOut(LocalTime.of(0, 0, 0))
+                    .status("휴가")
+                    .vacationId(vacation.getVacationId())
+                    .build();
+            // 근태 등록
+            attendanceDAO.insertAttendance(attendance);
+        }
+    }
+
+    // 출장 사원 근태 등록 - 출장 관련 기능 미구현으로 주석 처리
+    private void registerTripAttendance() {
+//        // 출장 사원 목록 조회
+//        List<BusinessTrip> employeeListOnTrip = businessTripService.findEmployeesOnTripToday();
+//
+//        // 객체 생성하여 근태 등록
+//        for (BusinessTrip trip : employeeListOnTrip) {
+//            // 근태 객체 생성
+//            Attendance attendance = Attendance.builder()
+//                    .employeeId(trip.getEmployeeId())
+//                    .date(LocalDate.now())
+//                    .checkIn(LocalTime.of(9, 0, 0))
+//                    .checkOut(LocalTime.of(18, 0, 0))
+//                    .status("출장")
+//                    .vacationId(trip.getTripId())
+//                    .build();
+//            // 근태 등록
+//            attendanceDAO.insertAttendance(attendance);
+//        }
+    }
+
 
     // 자동 결근 처리
 }

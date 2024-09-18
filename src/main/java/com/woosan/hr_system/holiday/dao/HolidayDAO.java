@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -51,5 +52,10 @@ public class HolidayDAO {
     // 공휴일 삭제
     public void deleteHoliday(int holidayId) {
         sqlSession.delete("holiday.deleteHoliday", holidayId);
+    }
+
+    // 해당 날짜가 공휴일인지 확인
+    public int isHoliday(LocalDate date) {
+        return sqlSession.selectOne("holiday.isHoliday", date);
     }
 }

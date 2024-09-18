@@ -112,4 +112,12 @@
     <delete id="deleteVacation" parameterType="int">
         DELETE FROM vacation WHERE vacation_id = #{vacationId}
     </delete>
+
+    <!-- 오늘 휴가인 사원 조회 -->
+    <select id="getEmployeesOnVacationToday" parameterType="java.time.LocalDate" resultMap="VacationResultMap">
+        SELECT vacation_id, employee_id
+        FROM vacation
+        WHERE #{date} BETWEEN start_at AND end_at
+        AND approval_status = '승인'
+    </select>
 </mapper>
