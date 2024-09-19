@@ -89,7 +89,7 @@ img {
     display: block;
 }
 
-.sidebar ul li a, .sidebar ul #notification-li div p,.section-sidebar ul li p {
+.sidebar ul li a, .sidebar ul #notification-li div p, .section-sidebar ul li p {
     text-decoration: none;
     color: #333;
     display: flex;
@@ -141,13 +141,13 @@ img {
     margin: 3px 0 !important;
 }
 
-.submenu li a {
+.submenu li a, .submenu li p {
     padding: 4px 0 4px 10px;
     font-size: 15px;
     display: block;
 }
 
-.submenu li:hover a {
+.submenu li:hover a, .submenu li:hover p {
     background-color: #C3E8FB;
     border-radius: 4px;
     transition: background-color 0.3s ease;

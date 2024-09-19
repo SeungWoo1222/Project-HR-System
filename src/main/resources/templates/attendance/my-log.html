@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='근태 현황')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/calander.css}">
+    <style>
+        .this-month-summary {
+            width: 1000px;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .this-month-summary, th, td {
+            border: 1px solid #ddd;
+        }
+
+        .this-month-summary th, .this-month-summary td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            // 모델에 담긴 scheduleList를 자바스크립트 변수로 변환
+            var events = /*[[${attendanceList}]]*/ [];
+
+            // FullCalendar 초기화
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: "ko",
+                eventLimit: 4,
+                height: 800,
+                buttonText: {
+                    today: '오늘',
+                    month: '월',
+                    list: '목록'
+                },
+                customButtons: {
+                    listButton: {
+                        text: '목록',
+                        click: function() {
+                            openModal('/attendance/');
+                        }
+                    }
+                },
+                headerToolbar: {
+                    left: 'prev,next today',         // 왼쪽에 이전, 다음, 오늘 버튼 배치
+                    center: 'title',                 // 가운데에 현재 년/월 표시
+                    right: 'dayGridMonth,listMonth'  // 오른쪽에 보기 전환 버튼
+                },
+                events: events.map(function(attendance) {
+                    let color;
+                    switch (attendance.status) {
+                        case "결근" :
+                            color = "#FF0000";
+                            break;
+                        case "지각" :
+                            color = "#FF8000";
+                            break;
+                        case "조퇴" :
+                            color = "#FFD700";
+                            break;
+                        case "출장" :
+                            color = "#8A2BE2";
+                            break;
+                        case "휴가" :
+                            color = "#18A8F1";
+                            break;
+                        default :
+                            color = "#32CD32";
+                            break;
+
+                    }
+                    let workingTime = attendance.checkIn.substring(0, 5)
+                    if (attendance.checkOut !== null ) {
+                        workingTime += '~' + attendance.checkOut.substring(0, 5);
+                    }
+                    return {
+                        // 근태 상태와 시간
+                        title: attendance.status + ' (' + workingTime + ')',
+                        start: attendance.date,     // 근무 날짜
+                        allDay: true,               // 하루종일 옵션
+                        backgroundColor: color,     // 색상 옵션
+                        borderColor: color,         // 테두리 색상 옵션
+                        id: attendance.attendanceId // 근태 ID
+                    };
+                }),
+                eventClick: function(info) {
+                    openModal('/attendance/' + info.event.id);
+                }
+            });
+            calendar.render();
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div>
+            <table border="1" class="this-month-summary">
+                <thead>
+                <th>ID</th>
+                <th>이름</th>
+                <th>잔여 연차</th>
+                <th>근무 일수</th>
+                <th>근무 시간</th>
+                <th>초과근무 시간</th>
+                </thead>
+                <tbody>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tbody>
+            </table>
+        </div>
+        <div id="calendar-container" class="calendar-container">
+            <div class="calendar-title" id="calendar-title"></div>
+            <div id="calendar" style="width: 1000px"></div>
+        </div>
+    </div>
+</div>
+</html>

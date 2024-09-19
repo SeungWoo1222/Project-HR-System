@@ -78,6 +78,26 @@ public class AttendanceServiceImpl implements AttendanceService {
         return List.of();
     }
 
+    @Override // 로그인한 사원의 금일 근태기록 있는지 확인
+    public Attendance hasTodayAttendanceRecord () {
+        // 로그인 사원 ID 조회
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+
+        // 오늘의 근태 현황 조회
+        List<Attendance> todayAttendanceList = getTodayAttendance();
+
+        // Optional 클래스 이용하여 로그인 사원의 금일 근태 기록이 있는지 확인
+        Optional<Attendance> optionalAttendance = todayAttendanceList.stream()
+                .filter(attendance -> attendance.getEmployeeId().equals(employeeId))
+                .findFirst();
+
+        if (optionalAttendance.isPresent()) { // 값이 있다면 사용
+            return optionalAttendance.get();
+        } else { // 값이 없다면 null 처리
+            return null;
+        }
+    }
+
     @Override // 출근
     public String checkIn() {
         // 현재 로그인된 사원 조회
@@ -105,7 +125,10 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 출근 처리
         attendanceDAO.insertAttendance(attendance);
 
-        return "";
+        LocalDate today = LocalDate.now();
+        return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 출근 체크가 완료되었습니다."
+                + "\n출근 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
+                + "\n오늘도 좋은 하루 되세요!";
     }
 
     @Override // 퇴근
@@ -113,14 +136,19 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 금일 근태 ID 조회
         int todayAttendanceId = getMyTodayAttendance();
 
+        LocalTime now = LocalTime.now();
+
         Map<String, Object> params = new HashMap<>();
         params.put("todayAttendanceId", todayAttendanceId);
-        params.put("checkOut", LocalTime.now());
+        params.put("checkOut", now);
 
         // 퇴근 처리
         attendanceDAO.updateCheckout(params);
 
-        return "";
+        LocalDate today = LocalDate.now();
+        return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 퇴근 체크가 완료되었습니다."
+                + "\n퇴근 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
+                + "\n오늘도 고생 많으셨습니다!";
     }
 
     @Override // 조퇴
@@ -128,16 +156,21 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 금일 근태 ID 조회
         int todayAttendanceId = getMyTodayAttendance();
 
+        LocalTime now = LocalTime.now();
+
         Map<String, Object> params = new HashMap<>();
         params.put("todayAttendanceId", todayAttendanceId);
-        params.put("checkOut", LocalTime.now());
+        params.put("checkOut", now);
         params.put("status", "조퇴");
         params.put("notes", notes);
 
         // 조퇴 처리
         attendanceDAO.updateEarlyLeave(params);
 
-        return "";
+        LocalDate today = LocalDate.now();
+        return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 조퇴 체크가 완료되었습니다."
+                + "\n조퇴 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
+                + "\n오늘도 고생 많으셨습니다!";
     }
 
     // 로그인된 사원의 금일 근태 ID 조회

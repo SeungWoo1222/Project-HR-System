@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -25,8 +26,8 @@ public class AttendanceApiController {
     }
 
     @PatchMapping("/earlyLeave") // 조퇴
-    public ResponseEntity<String> earlyLeave(@RequestParam("notes") String notes) {
-        return ResponseEntity.ok(attendanceService.earlyLeave(notes));
+    public ResponseEntity<String> earlyLeave(@RequestBody Map<String, String> requestData) {
+        return ResponseEntity.ok(attendanceService.earlyLeave(requestData.get("notes")));
     }
 
     @PutMapping // 근태 수정

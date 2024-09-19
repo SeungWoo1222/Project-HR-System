@@ -11,6 +11,7 @@ public interface AttendanceService {
     List<Attendance> getTodayAttendance();
     List<Attendance> searchAttendance();
     List<Attendance> searchDeptAttendance(String department);
+    Attendance hasTodayAttendanceRecord ();
     String checkIn();
     String checkOut();
     String earlyLeave(String notes);

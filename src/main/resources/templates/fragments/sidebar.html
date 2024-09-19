@@ -15,7 +15,12 @@
         <p class="sidebar-category" onclick="toggleMenu('attendance-section')">출퇴근 및 방문</p>
         <ul id="attendance-section">
             <li>
-                <a th:href="@{/attendance}"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 출퇴근</a>
+                <p onclick="toggleSubmenu('attendance-submenu')"><img src="/images/icons/attendance.png" alt="Attendance" width="20"> 근태</p>
+                <ul id="attendance-submenu" class="submenu">
+                    <li><p onclick="openAttendanceModal('/attendance/commute')">- 출퇴근 등록</p></li>
+                    <li><p onclick="openAttendanceModal('/attendance/early-leave')">- 조퇴 등록</p></li>
+                    <li><a th:href="@{/attendance}">- 근태 현황</a></li>
+                </ul>
             </li>
             <li>
                 <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
