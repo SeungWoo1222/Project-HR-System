@@ -203,7 +203,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 근태 정보 수정
         attendanceDAO.updateAttendance(updatedAttendance);
 
-        return "";
+        return "근태 정보('" + attendance.getAttendanceId()  + "')가 수정되었습니다.";
     }
 
     // Attendance의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드

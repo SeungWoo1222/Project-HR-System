@@ -63,7 +63,7 @@ public class VacationServiceImpl implements VacationService {
         return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-    @Override // 해당 사원의 모든 휴가 정보 조회
+    @Override // 해당 사원의 모든 휴가 정보 조회 (페이징)
     public PageResult<Vacation> getVacationByEmployeeId(PageRequest pageRequest, String employeeId) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
@@ -76,6 +76,11 @@ public class VacationServiceImpl implements VacationService {
         int total = vacationList.size(); // 검색 결과 개수
 
         return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 해당 사원의 모든 휴가 정보 조회
+    public List<Vacation> getVacationByEmployeeId(String employeeId) {
+        return vacationDAO.getVacationByEmployeeId(employeeId);
     }
 
     @Override // 해당 부서의 모든 휴가 정보 조회

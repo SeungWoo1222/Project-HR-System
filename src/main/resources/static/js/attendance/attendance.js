@@ -77,7 +77,7 @@ function checkInAndOut(method, message) {
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else {
-                    alert(message + ' 체크 중 오류가 발생하였습니다.\n재신청 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    alert(message + ' 체크 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                     window.location.reload();
                 }
             })
@@ -120,7 +120,76 @@ function earlyLeave(event) {
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else {
-                    alert('조퇴 처리 중 오류가 발생하였습니다.\n재신청 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    alert('조퇴 처리 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
+}
+
+// 수정 페이지 모달 열기
+function goToUpdateForm(attendanceId) {
+    if (confirm("근태 정보를 수정하시겠습니까?")) openModal('/attendance/' + attendanceId + '/edit');
+}
+
+// AJAX PUT 요청 - 근태 수정
+function submitUpdateForm(event) {
+    event.preventDefault();
+
+    // 유효성 검사
+    const checkIn = document.getElementById('checkIn').value;
+    const checkOut = document.getElementById('checkOut').value;
+    const status = document.getElementById('status').value;
+
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/;
+
+    // 오류 메시지 초기화
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = '';
+
+    if (!checkIn.match(timeRegex)) {
+        errorMessage.textContent = "출근 시간은 'HH:mm:ss' 형식이어야 합니다.";
+        return;
+    }
+
+    if (!checkOut.match(timeRegex)) {
+        errorMessage.textContent = "퇴근 시간은 'HH:mm:ss' 형식이어야 합니다.";
+        return;
+    }
+
+    if (!status) {
+        errorMessage.textContent = "근태 상태를 선택해주세요.";
+        return;
+    }
+
+    errorMessage.textContent = '';
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const actionUrl = form.action;
+
+    if (confirm('근태 정보를 수정하시겠습니까?')) {
+        fetch(actionUrl, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('근태 정보 수정 중 오류가 발생하였습니다.\n재수정 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                     window.location.reload();
                 }
             })

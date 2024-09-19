@@ -10,6 +10,7 @@ public interface VacationService {
     Vacation getVacationById(int vacationId);
     PageResult<Vacation> searchVacation(PageRequest pageRequest, String department, String status);
     PageResult<Vacation> getVacationByEmployeeId(PageRequest pageRequest, String employeeId);
+    List<Vacation> getVacationByEmployeeId(String employeeId);
     PageResult<Vacation> getVacationByDepartmentId(PageRequest pageRequest, String departmentId, String status);
     String requestVacation(Vacation vacation);
     String editVacation(Vacation vacation);

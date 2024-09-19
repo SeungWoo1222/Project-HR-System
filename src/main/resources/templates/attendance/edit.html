@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<style>
+  .attendance-detail-container {
+    width: 550px;
+  }
+  .attendance-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .attendance-detail-header h2 {
+    margin: 0;
+  }
+  .attendance-detail-container table {
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  .attendance-detail-container table th, .attendance-detail-container table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  .attendance-detail-container table th {
+    width: 150px;
+    background-color: #f7f7f7;
+  }
+  .attendance-detail-container table td {
+    width: 400px;
+  }
+</style>
+
+<div class="attendance-detail-container">
+  <form action="/api/attendance" onsubmit="submitUpdateForm(event)">
+    <div class="attendance-detail-header">
+      <h3><span th:text="${employee.name} + ' 님의 근태 정보 (' + ${#temporals.format(attendance.date, 'yyyy년 MM월 dd일 (EE)')} + ')'"></span></h3>
+      <div class="btn-container" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">수정 완료</button>
+      </div>
+    </div>
+    <div id="error-message" class="error-message"></div>
+    <table>
+      <tr>
+        <th>사원 ID</th>
+        <td th:text="${attendance.employeeId}"></td>
+      </tr>
+      <tr>
+        <th>출근 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></th>
+        <td>
+          <input type="text" id="checkIn" name="checkIn" th:value="${attendance.checkIn}"/>
+        </td>
+      </tr>
+      <tr>
+        <th>퇴근 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></th>
+        <td>
+          <input type="text" id="checkOut" name="checkOut" th:value="${attendance.checkOut}"/>
+        </td>
+      </tr>
+      <tr>
+        <th>근태 상태</th>
+        <td>
+          <select id="status" name="status">
+            <option value="출근" th:selected="${attendance.status == '출근'}">출근</option>
+            <option value="결근" th:selected="${attendance.status == '결근'}">결근</option>
+            <option value="지각" th:selected="${attendance.status == '지각'}">지각</option>
+            <option value="조퇴" th:selected="${attendance.status == '조퇴'}">조퇴</option>
+            <option value="출장" th:selected="${attendance.status == '출장'}">출장</option>
+            <option value="휴가" th:selected="${attendance.status == '휴가'}">휴가</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>휴가 ID</th>
+        <td>
+          <select id="vacationId" name="vacationId">
+            <option value="" th:selected="${attendance.vacationId == ''}">해당 없음</option>
+            <option th:each="vacation : ${vacationList}"
+                    th:value="${vacation.vacationId}"
+                    th:text="${vacation.vacationType} + '(' + ${vacation.reason} + ')'"></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>출장 ID</th>
+        <td>
+          <select id="tripId" name="tripId">
+            <option value="" th:selected="${attendance.tripId == ''}">해당 없음</option>
+            <!-- 출장 미구현으로 구현되면 주석 해제 후 수정 예정-->
+  <!--          <option th:each="trip : ${tripList}"-->
+  <!--                  th:value="${trip.tripId}"-->
+  <!--                  th:text="${trip.contact?.clientName} + '(' + ${trip.visitDate} + ')'"></option>-->
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>메모</th>
+        <td>
+          <textarea id="notes" name="notes" th:text="${attendance.notes}" rows="2" style="resize: none; width: 270px;"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <th>마지막 수정 일시</th>
+        <td th:text="${#temporals.format(attendance.lastModified, 'yyyy년 MM월 dd일 hh:mm')}"></td>
+      </tr>
+      <tr>
+        <th>마지막 수정 사원 ID</th>
+        <td th:text="${attendance.modifiedBy}"></td>
+      </tr>
+    </table>
+    <input type="hidden" id="attendanceId" name="attendanceId" th:value="${attendance.attendanceId}"/>
+  </form>
+</div>
+
+</html>

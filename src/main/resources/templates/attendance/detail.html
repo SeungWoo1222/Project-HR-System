@@ -36,7 +36,8 @@
     <div class="attendance-detail-header">
         <h2><span th:text="${employee.name} + ' 님의 근태 정보 (' + ${#temporals.format(attendance.date, 'yyyy년 MM월 dd일 (EE)')} + ')'"></span></h2>
         <div class="btn-container" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
-            <button class="btn">수정</button>
+            <button type="button" class="btn" th:attendanceId="${attendance.attendanceId}"
+                    th:onclick="goToUpdateForm(this.getAttribute('attendanceId'))">수정</button>
         </div>
     </div>
     <table>
@@ -70,7 +71,7 @@
         </tr>
         <tr>
             <th>마지막 수정 일시</th>
-            <td th:text="${attendance.lastModified}"></td>
+            <td th:text="${#temporals.format(attendance.lastModified, 'yyyy년 MM월 dd일 hh:mm')}"></td>
         </tr>
         <tr>
             <th>마지막 수정 사원 ID</th>
