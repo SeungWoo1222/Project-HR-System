@@ -1,7 +1,9 @@
 package com.woosan.hr_system.attendance.controller;
 
+import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.service.AttendanceService;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,8 @@ public class AttendanceViewController {
     private AttendanceService attendanceService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private EmployeeService employeeService;
 
     @GetMapping// 나의 근태 페이지
     public String viewMyAttendance(Model model) {
@@ -28,7 +32,11 @@ public class AttendanceViewController {
     @GetMapping("/{attendanceId}") // 근태 상세 페이지
     public String viewAttendanceDetail(@PathVariable("attendanceId") int attendanceId, Model model) {
         // 근태 정보 상세 조회
-        model.addAttribute(attendanceService.getAttendanceById(attendanceId));
+        Attendance attendance = attendanceService.getAttendanceById(attendanceId);
+        model.addAttribute(attendance);
+
+        // 사원 정보 상세 조회 후 모델에 추가
+        model.addAttribute("employee", employeeService.getEmployeeById(attendance.getEmployeeId()));
         return "attendance/detail";
     }
 
@@ -45,4 +53,5 @@ public class AttendanceViewController {
         model.addAttribute("attendance", attendanceService.hasTodayAttendanceRecord());
         return "attendance/early-leave";
     }
+
 }
