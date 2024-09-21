@@ -8,6 +8,7 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
 import com.woosan.hr_system.vacation.service.VacationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequestMapping("/attendance")
 public class AttendanceViewController {
@@ -150,4 +156,151 @@ public class AttendanceViewController {
         return "attendance/list-department";
     }
 
+    @GetMapping("/today") // 오늘의 근태 현황 조회
+    public String viewTodayAttendance(@RequestParam(name="normalPage", defaultValue = "1") int normalPage,
+                                      @RequestParam(name="badPage", defaultValue = "1") int badPage,
+                                      @RequestParam(name="tripPage", defaultValue = "1") int tripPage,
+                                      Model model) {
+        // 페이지 크기
+        final int size = 5;
+
+        // 오늘의 근태 현황 조회
+        List<Attendance> attendanceList = attendanceService.getTodayAttendance();
+
+        // 정상 출근 사원 리스트
+        List<Attendance> normalAttendanceList = attendanceList.stream()
+                .filter(attendance -> "출근".equals(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 근태 불량 사원 리스트
+        List<Attendance> badAttendanceList = attendanceList.stream()
+                .filter(attendance -> List.of("지각", "결근", "조퇴").contains(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 휴가 및 출장 사원 리스트
+        List<Attendance> vacationOrBusinessList = attendanceList.stream()
+                .filter(attendance -> List.of("휴가", "출장").contains(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 근태 상태별 갯수 세기
+        Map<String, Long> statusCount = attendanceList.stream()
+                .collect(Collectors.groupingBy(Attendance::getStatus, Collectors.counting()));
+
+        // 출석률 계산
+        int total = employeeService.getAllEmployee().size();
+        Long rate = (long) ((((attendanceList.size())
+                        - Objects.requireNonNullElse(statusCount.get("결근"), 0L)
+                        - Objects.requireNonNullElse(statusCount.get("출장"), 0L)
+                        - Objects.requireNonNullElse(statusCount.get("휴가"), 0L))
+                        / (double) total) * 100);
+
+        // 페이징 처리
+        List<Attendance> pagedNormalAttendanceList = getPage(normalAttendanceList, normalPage, size);
+        List<Attendance> pagedBadAttendanceList = getPage(badAttendanceList, badPage, size);
+        List<Attendance> pagedVacationOrBusinessList = getPage(vacationOrBusinessList, tripPage, size);
+
+        // 모델에 리스트 및 카운트 전달
+        model.addAttribute("normalAttendanceList", pagedNormalAttendanceList);
+        model.addAttribute("badAttendanceList", pagedBadAttendanceList);
+        model.addAttribute("vacationOrBusinessList", pagedVacationOrBusinessList);
+        model.addAttribute("statusCount", statusCount);
+        model.addAttribute("total", total);
+        model.addAttribute("rate", rate);
+
+        // 현재 페이지와 총 페이지 수 전달
+        model.addAttribute("normalCurrentPage", normalPage);
+        model.addAttribute("normalTotalPages", (int) Math.ceil((double) normalAttendanceList.size() / size));
+
+        model.addAttribute("badCurrentPage", badPage);
+        model.addAttribute("badTotalPages", (int) Math.ceil((double) badAttendanceList.size() / size));
+
+        model.addAttribute("tripCurrentPage", tripPage);
+        model.addAttribute("tripTotalPages", (int) Math.ceil((double) vacationOrBusinessList.size() / size));
+
+        return "attendance/today";
+    }
+
+    @GetMapping("/today-department") // 오늘의 부서원 근태 현황 조회
+    public String viewTodayDepartmentAttendance(@RequestParam(name="normalPage", defaultValue = "1") int normalPage,
+                                      @RequestParam(name="badPage", defaultValue = "1") int badPage,
+                                      @RequestParam(name="tripPage", defaultValue = "1") int tripPage,
+                                      Model model) {
+        // 페이지 크기
+        final int size = 5;
+
+        // 로그인한 관리자의 부서
+        String department = authService.getAuthenticatedUser().getDepartment();
+
+        // 오늘의 근태 현황 조회
+        List<Attendance> attendanceList = attendanceService.getTodayAttendance().stream()
+                .filter(attendance -> {
+                    String employeeDepartmentCode = attendance.getEmployeeId().substring(0, 2);
+                    return employeeDepartmentCode.equals(department);
+                })
+                .toList();
+
+        // 정상 출근 사원 리스트
+        List<Attendance> normalAttendanceList = attendanceList.stream()
+                .filter(attendance -> "출근".equals(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 근태 불량 사원 리스트
+        List<Attendance> badAttendanceList = attendanceList.stream()
+                .filter(attendance -> List.of("지각", "결근", "조퇴").contains(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 휴가 및 출장 사원 리스트
+        List<Attendance> vacationOrBusinessList = attendanceList.stream()
+                .filter(attendance -> List.of("휴가", "출장").contains(attendance.getStatus()))
+                .collect(Collectors.toList());
+
+        // 근태 상태별 갯수 세기
+        Map<String, Long> statusCount = attendanceList.stream()
+                .collect(Collectors.groupingBy(Attendance::getStatus, Collectors.counting()));
+
+        // 출석률 계산
+        int total = employeeService.getAllEmployee().size();
+        Long rate = (long) ((((attendanceList.size())
+                - Objects.requireNonNullElse(statusCount.get("결근"), 0L)
+                - Objects.requireNonNullElse(statusCount.get("출장"), 0L)
+                - Objects.requireNonNullElse(statusCount.get("휴가"), 0L))
+                / (double) total) * 100);
+
+        // 페이징 처리
+        List<Attendance> pagedNormalAttendanceList = getPage(normalAttendanceList, normalPage, size);
+        List<Attendance> pagedBadAttendanceList = getPage(badAttendanceList, badPage, size);
+        List<Attendance> pagedVacationOrBusinessList = getPage(vacationOrBusinessList, tripPage, size);
+
+        // 모델에 리스트 및 카운트 전달
+        model.addAttribute("normalAttendanceList", pagedNormalAttendanceList);
+        model.addAttribute("badAttendanceList", pagedBadAttendanceList);
+        model.addAttribute("vacationOrBusinessList", pagedVacationOrBusinessList);
+        model.addAttribute("statusCount", statusCount);
+        model.addAttribute("total", total);
+        model.addAttribute("rate", rate);
+
+        // 현재 페이지와 총 페이지 수 전달
+        model.addAttribute("normalCurrentPage", normalPage);
+        model.addAttribute("normalTotalPages", (int) Math.ceil((double) normalAttendanceList.size() / size));
+
+        model.addAttribute("badCurrentPage", badPage);
+        model.addAttribute("badTotalPages", (int) Math.ceil((double) badAttendanceList.size() / size));
+
+        model.addAttribute("tripCurrentPage", tripPage);
+        model.addAttribute("tripTotalPages", (int) Math.ceil((double) vacationOrBusinessList.size() / size));
+
+        return "attendance/today";
+    }
+
+    // 페이지 처리
+    private List<Attendance> getPage(List<Attendance> list, int page, int size) {
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, list.size());
+
+        if (fromIndex > list.size()) {
+            return Collections.emptyList(); // 페이지가 리스트 크기를 초과하면 빈 리스트 반환
+        }
+
+        return list.subList(fromIndex, toIndex);
+    }
 }

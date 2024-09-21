@@ -74,8 +74,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override // 근태 목록 검색 조회
     public PageResult<Attendance> searchAttendance(PageRequest pageRequest, String department, String status, YearMonth yearMonth) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
-        log.info("offset : " + offset);
-        log.info("size : " + pageRequest.getSize());
 
         // 검색 조건들 map에 넣어 전달
         Map<String, Object> params = new HashMap<>();

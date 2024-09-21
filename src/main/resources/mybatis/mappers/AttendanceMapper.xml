@@ -52,8 +52,11 @@
     </select>
 
     <!-- 금일 근태 현황 조회 -->
-    <select id="getTodayAttendance" resultMap="attendanceResultMap">
-        SELECT * FROM attendance WHERE date = #{date}
+    <select id="getTodayAttendance" resultMap="attendanceWithEmployeeResultMap">
+        SELECT a.*, e.name, e.department_id, e.position_id
+        FROM attendance a
+        JOIN employees e ON a.employee_id = e.employee_id
+        WHERE a.`date` = #{date}
     </select>
 
     <!-- 근태 등록 -->
