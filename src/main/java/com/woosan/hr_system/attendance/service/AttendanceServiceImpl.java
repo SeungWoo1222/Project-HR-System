@@ -8,6 +8,8 @@ import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.schedule.service.BusinessTripService;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
 import com.woosan.hr_system.vacation.service.VacationService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.*;
 
 @Slf4j
@@ -69,13 +72,24 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override // 근태 목록 검색 조회
-    public List<Attendance> searchAttendance() {
-        return List.of();
-    }
+    public PageResult<Attendance> searchAttendance(PageRequest pageRequest, String department, String status, YearMonth yearMonth) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        log.info("offset : " + offset);
+        log.info("size : " + pageRequest.getSize());
 
-    @Override // 부서원의 근태 목록 검색 조회
-    public List<Attendance> searchDeptAttendance(String department) {
-        return List.of();
+        // 검색 조건들 map에 넣어 전달
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", pageRequest.getKeyword());
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("status", status);
+        params.put("yearMonth", yearMonth);
+
+        List<Attendance> attendanceList = attendanceDAO.searchAttendance(params);
+        int total = attendanceList.size();
+
+        return new PageResult<>(attendanceList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
     @Override // 로그인한 사원의 금일 근태기록 있는지 확인

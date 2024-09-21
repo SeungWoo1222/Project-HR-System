@@ -60,6 +60,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
     public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
+
         List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
         int total = salaryPaymentDAO.countPayslips(pageRequest.getKeyword());
 

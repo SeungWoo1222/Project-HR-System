@@ -1,7 +1,10 @@
 package com.woosan.hr_system.attendance.service;
 
 import com.woosan.hr_system.attendance.model.Attendance;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 
+import java.time.YearMonth;
 import java.util.List;
 
 public interface AttendanceService {
@@ -9,8 +12,7 @@ public interface AttendanceService {
     List<Attendance> getAttendanceByEmployeeId(String employeeId);
     List<Attendance> getAllAttendance();
     List<Attendance> getTodayAttendance();
-    List<Attendance> searchAttendance();
-    List<Attendance> searchDeptAttendance(String department);
+    PageResult<Attendance> searchAttendance(PageRequest pageRequest, String department, String status, YearMonth yearMonth);
     Attendance hasTodayAttendanceRecord ();
     String checkIn();
     String checkOut();

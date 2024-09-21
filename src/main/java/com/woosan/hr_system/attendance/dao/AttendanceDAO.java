@@ -64,4 +64,9 @@ public class AttendanceDAO {
     public int getMyTodayAttendance(Map<String, Object> params) {
         return sqlSession.selectOne(NAMESPACE + "getMyTodayAttendance", params);
     }
+
+    // 근태 목록 검색 조회
+    public List<Attendance> searchAttendance(Map<String, Object> params) {
+        return sqlSession.selectList(NAMESPACE + "searchAttendance", params);
+    }
 }
