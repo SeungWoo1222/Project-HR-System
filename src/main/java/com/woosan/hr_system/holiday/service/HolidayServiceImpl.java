@@ -2,11 +2,9 @@ package com.woosan.hr_system.holiday.service;
 
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
-import com.woosan.hr_system.aspect.RequireHRPermission;
-import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.holiday.model.Holiday;
 import com.woosan.hr_system.holiday.dao.HolidayDAO;
+import com.woosan.hr_system.holiday.model.Holiday;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -66,8 +64,6 @@ public class HolidayServiceImpl implements HolidayService {
         return holidayDAO.getAllHoliday();
     }
 
-    @RequireHRPermission
-    @RequireManagerPermission
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 공휴일 등록
@@ -76,8 +72,6 @@ public class HolidayServiceImpl implements HolidayService {
         return "새로운 공휴일이 등록되었습니다.\n" + holiday.getDateName() + "(" + holiday.getLocDate() + ")";
     }
 
-    @RequireHRPermission
-    @RequireManagerPermission
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 공휴일 수정
@@ -103,8 +97,6 @@ public class HolidayServiceImpl implements HolidayService {
         commonService.processFieldChanges(original, updated, fieldsToCompare);
     }
 
-    @RequireHRPermission
-    @RequireManagerPermission
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 공휴일 삭제
@@ -133,8 +125,6 @@ public class HolidayServiceImpl implements HolidayService {
         createHolidays(Year.now());
     }
 
-    @RequireHRPermission
-    @RequireManagerPermission
     @Transactional
     @LogBeforeExecution
     @LogAfterExecution

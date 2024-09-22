@@ -1,5 +1,7 @@
 package com.woosan.hr_system.holiday.controller;
 
+import com.woosan.hr_system.aspect.RequireHRPermission;
+import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.holiday.service.HolidayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,16 +35,22 @@ public class HolidayViewController {
         return "holiday/list";
     }
 
+    @RequireHRPermission
+    @RequireManagerPermission
     @GetMapping("/year") // 연 단위 공휴일 생성 페이지
     public String viewCreateYearHolidayForm(Model model) {
         return "holiday/year";
     }
 
+    @RequireHRPermission
+    @RequireManagerPermission
     @GetMapping("/add") // 공휴일 등록 페이지
     public String addHolidayForm(Model model) {
         return "holiday/add";
     }
 
+    @RequireHRPermission
+    @RequireManagerPermission
     @GetMapping("/edit/{holidayId}") // 공휴일 수정 페이지
     public String addHolidayForm(@PathVariable("holidayId") int holidayId, Model model) {
         model.addAttribute("holiday", holidayService.getHolidayById(holidayId));
