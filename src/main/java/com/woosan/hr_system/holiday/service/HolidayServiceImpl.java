@@ -42,8 +42,17 @@ public class HolidayServiceImpl implements HolidayService {
 
     private static final String SERVICE_KEY = "RAkHJ6RjhKqi3n0QzIOSv691iUpS%2B7e5vbMU4Epf5iGdCpHQI34ji%2FPQstUq8wWtEwxYwB48qYoBOH7DcCbqNg%3D%3D";
 
+    @Override // ID를 이용한 공휴일 조회
+    public Holiday getHolidayById(int holidayId) {
+        Holiday holiday = holidayDAO.getHolidayById(holidayId);
+        if (holiday == null) {
+            throw new IllegalArgumentException("해당 공휴일 정보가 존재하지 않습니다.\n공휴일 ID :" + holidayId);
+        }
+        return holiday;
+    }
+
     @Override // 해당 년도 공휴일 조회
-    public List<Holiday> getHolidayByYear(int year) {
+    public List<Holiday> getHolidayByYear(Year year) {
         return holidayDAO.getHolidayByYear(year);
     }
 
@@ -103,7 +112,7 @@ public class HolidayServiceImpl implements HolidayService {
         // 공휴일 정보 조회 후 검사
         Holiday holiday = holidayDAO.getHolidayById(holidayId);
         if (holiday == null) {
-            throw new IllegalArgumentException("해당 공휴일이 존재하지 않습니다.\n 공휴일 번호 : " + holidayId);
+            throw new IllegalArgumentException("해당 공휴일이 존재하지 않습니다.\n 공휴일 ID : " + holidayId);
         }
 
         // 공휴일 삭제
@@ -122,6 +131,45 @@ public class HolidayServiceImpl implements HolidayService {
     @Scheduled(cron = "0 0 0 1 1 *") // 새해 공휴일 자동 생성
     public void createNewYearHoliday() {
         createHolidays(Year.now());
+    }
+
+    @RequireHRPermission
+    @RequireManagerPermission
+    @Transactional
+    @LogBeforeExecution
+    @LogAfterExecution
+    @Override // 해당 년도 공휴일 생성
+    public String createThisYearHolidays(Year year) {
+        // 해당 년도 공휴일 조회
+        List<Holiday> holidayList = getHolidayByYear(year);
+
+        // 공휴일 생성 전 해당 년도 공휴일 검사
+        if (!holidayList.isEmpty()) {
+            // 비교할 중요한 공휴일 리스트 정의
+            List<String> importantHolidaysList = Arrays.asList("1월1일", "설날", "삼일절", "추석", "어린이날",
+                    "부처님오신날", "현충일", "광복절", "개천절", "한글날", "기독탄신일");
+
+            // 해당 년도의 공휴일 이름 리스트를 추출
+            List<String> existingHolidayNames = holidayList.stream()
+                    .map(Holiday::getDateName)
+                    .toList();
+
+            // 중요한 공휴일 리스트 중에서 없는 공휴일을 필터링
+            List<String> missingHolidays = importantHolidaysList.stream()
+                    .filter(holiday -> !existingHolidayNames.contains(holiday))
+                    .toList();
+
+            if (!missingHolidays.isEmpty()) {
+                return year + "년도에 없는 중요한 공휴일은 " + String.join(", ", missingHolidays)
+                        + "입니다.\n해당 공휴일만 따로 추가해주세요";
+            } else {
+                return year + "년도 모든 중요한 공휴일이 이미 존재합니다.";
+            }
+        }
+        // 공휴일 생성
+        createHolidays(year);
+
+        return year + "년도 공휴일이 생성되었습니다.";
     }
 
     // 해당 년도 공휴일 생성
@@ -156,6 +204,10 @@ public class HolidayServiceImpl implements HolidayService {
 
             // XML 응답 파싱 및 공휴일 리스트 생성
             List<Holiday> holidayList = parseXmlResponse(sb.toString());
+
+            if (holidayList.isEmpty()) {
+                throw new IllegalArgumentException("해당 년도의 공휴일 데이터가 존재하지 않습니다.\n유효한 년도를 입력했는지 확인해주세요.");
+            }
 
             // 파싱한 공휴일 리스트 DB에 저장
             holidayDAO.insertHolidayList(holidayList);

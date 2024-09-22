@@ -1,22 +1,30 @@
 package com.woosan.hr_system.holiday.dao;
 
 import com.woosan.hr_system.holiday.model.Holiday;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class HolidayDAO {
     @Autowired
     private SqlSession sqlSession;
 
+    // 공휴일 ID를 이용한 공휴일 조회
+    public Holiday getHolidayById(int holidayId) {
+        return sqlSession.selectOne("holiday.getHolidayById", holidayId);
+    }
+
     // 해당 년도 공휴일 조회
-    public List<Holiday> getHolidayByYear(int year) {
-        return sqlSession.selectList("holiday.getHolidayByYear", year);
+    public List<Holiday> getHolidayByYear(Year year) {
+        return sqlSession.selectList("holiday.getHolidayByYear", year.getValue());
     }
 
     // 해당 년월 공휴일 조회
@@ -27,11 +35,6 @@ public class HolidayDAO {
     // 모든 공휴일 조회
     public List<Holiday> getAllHoliday() {
         return sqlSession.selectList("holiday.getAllHoliday");
-    }
-
-    // 공휴일 ID를 이용한 공휴일 조회
-    public Holiday getHolidayById(int holidayId) {
-        return sqlSession.selectOne("holiday.getHolidayById", holidayId);
     }
 
     // 공휴일 리스트 일괄 등록
