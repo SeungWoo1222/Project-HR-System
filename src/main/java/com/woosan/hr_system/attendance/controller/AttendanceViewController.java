@@ -4,6 +4,7 @@ import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.service.AttendanceService;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
@@ -36,12 +37,17 @@ public class AttendanceViewController {
     private EmployeeService employeeService;
     @Autowired
     private VacationService vacationService;
+    @Autowired
+    private HolidayService holidayService;
 
     @GetMapping// 나의 근태 페이지
     public String viewMyAttendance(Model model) {
-        // 로그인 사원 ID 조회
+        // 로그인 사원 ID 조회 후 근태 기록 모델에 추가
         String employeeId = authService.getAuthenticatedUser().getUsername();
         model.addAttribute("attendanceList", attendanceService.getAttendanceByEmployeeId(employeeId));
+
+        // 모든 공휴일 모델에 추가
+        model.addAttribute("holidays", holidayService.getAllHoliday());
         return "attendance/my-log";
     }
 

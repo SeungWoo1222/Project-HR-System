@@ -21,7 +21,7 @@
             text-align: center;
         }
 
-        thead th {
+        .this-month-summary thead th {
             background-color: #f2f2f2;
             color: #333;
         }
@@ -31,18 +31,71 @@
 <th:block layout:fragment="script">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script th:inline="javascript">
+        // 모델에 담긴 모든 공휴일 자바스크립트 변수로 변환
+        let holidays = /*[[${holidays}]]*/ [];
+
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
             // 모델에 담긴 scheduleList를 자바스크립트 변수로 변환
             var events = /*[[${attendanceList}]]*/ [];
 
+            // 근태 이벤트 (attendanceList)
+            var attendanceEvents = events.map(function(attendance) {
+                let color;
+                switch (attendance.status) {
+                    case "결근" :
+                        color = "#FF0000";
+                        break;
+                    case "지각" :
+                        color = "#FF8000";
+                        break;
+                    case "조퇴" :
+                        color = "#FFD700";
+                        break;
+                    case "출장" :
+                        color = "#8A2BE2";
+                        break;
+                    case "휴가" :
+                        color = "#18A8F1";
+                        break;
+                    default :
+                        color = "#32CD32";
+                        break;
+                }
+                let workingTime = attendance.checkIn ? attendance.checkIn.substring(0, 5) : "";
+                if (attendance.checkOut !== null) {
+                    workingTime += ' ~ ' + attendance.checkOut.substring(0, 5);
+                }
+                return {
+                    title: attendance.status + ' (' + workingTime + ')',
+                    start: attendance.date,     // 근무 날짜
+                    allDay: true,               // 하루종일 옵션
+                    backgroundColor: color,     // 색상 옵션
+                    borderColor: color,         // 테두리 색상 옵션
+                    id: attendance.attendanceId // 근태 ID
+                };
+            });
+
+            // 공휴일 이벤트 (holidays)
+            var holidayEvents = holidays.map(function(holiday) {
+                return {
+                    title: holiday.dateName,        // 공휴일 이름
+                    start: holiday.locDate,         // 공휴일 날짜
+                    allDay: true,                   // 하루종일 설정
+                    backgroundColor: '#FF0000',     // 공휴일 배경색
+                    borderColor: '#FF0000',         // 공휴일 테두리 색상
+                    id: 'holiday',                  // 공휴일 ID 'holiday'로 설정
+                    editable: false,                // 공휴일은 수정 불가로 설정
+                    interactive: false              // 공휴일은 클릭 불가로 설정
+                };
+            });
+
             // FullCalendar 초기화
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: "ko",
-                eventLimit: 4,
-                height: 800,
+                dayMaxEventRows: 4,
                 buttonText: {
                     today: '오늘',
                     month: '월',
@@ -61,45 +114,23 @@
                     center: 'title',                 // 가운데에 현재 년/월 표시
                     right: 'dayGridMonth,listMonth'  // 오른쪽에 보기 전환 버튼
                 },
-                events: events.map(function(attendance) {
-                    let color;
-                    switch (attendance.status) {
-                        case "결근" :
-                            color = "#FF0000";
-                            break;
-                        case "지각" :
-                            color = "#FF8000";
-                            break;
-                        case "조퇴" :
-                            color = "#FFD700";
-                            break;
-                        case "출장" :
-                            color = "#8A2BE2";
-                            break;
-                        case "휴가" :
-                            color = "#18A8F1";
-                            break;
-                        default :
-                            color = "#32CD32";
-                            break;
+                dayCellDidMount: function(info) { // 공휴일 날짜와 매칭하여 날짜 빨강 스타일 적용
+                    let date = info.date.toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    }).replace(/\./g, '').trim().replace(/\s+/g, '-');  // yyyy-mm-dd 형식으로 변환
 
+                    if (holidays.some(holiday => holiday.locDate === date)) {
+                        // 공휴일이면 날짜 텍스트를 빨간색으로 설정
+                        info.el.style.color = '#FF0000';
                     }
-                    let workingTime = attendance.checkIn.substring(0, 5)
-                    if (attendance.checkOut !== null ) {
-                        workingTime += '~' + attendance.checkOut.substring(0, 5);
-                    }
-                    return {
-                        // 근태 상태와 시간
-                        title: attendance.status + ' (' + workingTime + ')',
-                        start: attendance.date,     // 근무 날짜
-                        allDay: true,               // 하루종일 옵션
-                        backgroundColor: color,     // 색상 옵션
-                        borderColor: color,         // 테두리 색상 옵션
-                        id: attendance.attendanceId // 근태 ID
-                    };
-                }),
+                },
+                events: attendanceEvents.concat(holidayEvents), // 근태 일정과 공휴일을 결합
                 eventClick: function(info) {
-                    openModal('/attendance/' + info.event.id);
+                    if (info.event.id !== 'holiday') {
+                        openModal('/attendance/' + info.event.id); // 공휴일이 아닌 근태 일정 클릭 시에만 모달 열기
+                    }
                 }
             });
             calendar.render();
