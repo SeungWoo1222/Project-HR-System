@@ -57,7 +57,7 @@
     </delete>
 
     <!-- 해당 날짜가 공휴일인지 확인 -->
-    <select id="isHoliday" parameterType="java.time.LocalDate">
+    <select id="isHoliday" parameterType="java.time.LocalDate" resultType="int">
         SELECT COUNT(*)
         FROM holidays
         WHERE loc_date = #{date}

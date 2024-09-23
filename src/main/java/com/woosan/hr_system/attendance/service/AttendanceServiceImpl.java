@@ -227,13 +227,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     // 휴가, 출장 사원 근태 자동 등록
-    // 평일 오전 9시에 실행, 공휴일은 제외
+    // 평일 오전 9시에 실행, 주말 공휴일은 제외
     @Transactional
     @Scheduled(cron = "0 0 9 * * MON-FRI")
     public void registerAttendance() {
         LocalDate today = LocalDate.now();
 
-        // 오늘이 공휴일이면 작업 중단
+        // 오늘이 휴일이면 작업 중단
         if (holidayService.isHoliday(today)) {
             log.info("금일은 공휴일입니다. 근태 자동 등록 작업을 중단합니다.");
             return;
@@ -245,7 +245,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 출장 사원 근태 등록 - 출장 관련 기능 미구현으로 주석 처리
 //        registerTripAttendance();
 
-        log.info("{}년 {}월 {}일 휴가 및 출장 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonth(), today.getDayOfMonth());
+        log.info("{}년 {}월 {}일 휴가 및 출장 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonthValue(), today.getDayOfMonth());
     }
 
     // 휴가 사원 근태 등록
@@ -293,11 +293,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     // 결근 자동 처리
     // 평일 오후 6시에 실행, 공휴일은 제외
     @Transactional
-    @Scheduled(cron = "0 0 18 * * MON-FRI")
+    @Scheduled(cron = "0 00 18 * * MON-FRI")
     public void registerAbsence() {
         LocalDate today = LocalDate.now();
 
-        // 오늘이 공휴일이면 작업 중단
+        // 오늘이 휴일이면 작업 중단
         if (holidayService.isHoliday(today)) {
             log.info("금일은 공휴일입니다. 결근 자동 처리 작업을 중단합니다.");
             return;
@@ -321,6 +321,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 객체 생성하여 근태 등록
         for (String employeeId : absentEmployeeIdList) {
+            log.info("employeeId: {}", employeeId);
             // 근태 객체 생성
             Attendance attendance = Attendance.builder()
                     .employeeId(employeeId)
@@ -329,10 +330,11 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .checkOut(LocalTime.of(0, 0, 0))
                     .status("결근")
                     .build();
+            log.info("attendance: {}", attendance);
             // 근태 등록
             attendanceDAO.insertAttendance(attendance);
         }
 
-        log.info("{}년 {}월 {}일 결근한 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonth(), today.getDayOfMonth());
+        log.info("{}년 {}월 {}일 결근한 사원의 근태가 등록되었습니다.", today.getYear(), today.getMonthValue(), today.getDayOfMonth());
     }
 }

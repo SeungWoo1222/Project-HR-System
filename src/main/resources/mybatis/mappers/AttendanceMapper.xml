@@ -61,8 +61,8 @@
 
     <!-- 근태 등록 -->
     <insert id="insertAttendance">
-        INSERT INTO attendance (employee_id, date, check_in, status, vacation_id, trip_id)
-        VALUES (#{employeeId}, #{date}, #{checkIn}, #{status}, #{vacationId}, #{tripId})
+        INSERT INTO attendance (employee_id, date, check_in, check_out, status, vacation_id, trip_id)
+        VALUES (#{employeeId}, #{date}, #{checkIn}, #{checkOut}, #{status}, #{vacationId}, #{tripId})
     </insert>
 
     <!-- 퇴근 시간 업데이트 -->
