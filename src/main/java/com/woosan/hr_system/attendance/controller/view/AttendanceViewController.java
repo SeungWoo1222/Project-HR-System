@@ -1,4 +1,4 @@
-package com.woosan.hr_system.attendance.controller;
+package com.woosan.hr_system.attendance.controller.view;
 
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.service.AttendanceService;
