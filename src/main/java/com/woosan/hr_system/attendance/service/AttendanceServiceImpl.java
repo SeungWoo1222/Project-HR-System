@@ -122,7 +122,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         LocalTime checkInTime = setCheckInTime(employeeId);
 
         String status;
-        if (now.isAfter(checkInTime)) {
+        if (now.isAfter(checkInTime))  {
             status = "지각";
         } else {
             status = "출근";
