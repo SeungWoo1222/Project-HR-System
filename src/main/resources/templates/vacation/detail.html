@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
+<style>
+    .title {
+        margin: 0;
+    }
+</style>
+
 <div class="detail-container">
-    <div class="btn-container">
-        <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
-        <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
+    <div class="content-header">
+        <div class="content-header-left"></div>
+        <div class="title content-header-center">휴가 신청서</div>
+        <div class="content-header-right">
+            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
+            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
+        </div>
     </div>
-    <div class="title">휴가 신청서</div>
     <table class="employee-details">
         <tr>
             <td class="section-title">사원 ID</td>

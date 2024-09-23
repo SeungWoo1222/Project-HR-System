@@ -6,6 +6,13 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/pagination.css}" rel="stylesheet">
     <link th:href="@{/css/department-nav.css}" rel="stylesheet">
+    <style>
+        .content-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -14,40 +21,47 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h3>모든 급여정보 목록</h3>
-        <div class="search-container">
-            <form th:action="@{/salary/list}" method="get" id="pageSizeForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="status" th:value="${status}">
-            </form>
-            <div class="search-option">
-                <form th:action="@{/salary/list}" method="get" id="statusForm">
-                    <input type="hidden" name="page" th:value="1"/>
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="hidden" name="keyword" th:value="${keyword}"/>
-                    <input type="hidden" name="department" th:value="${department}">
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
-                        <option value="" th:selected="${status == ''}" disabled>사용 여부</option>
-                        <option th:value="1" th:text="사용중" th:selected="${status == '1'}">사용 중</option>
-                        <option th:value="0" th:text="사용중지" th:selected="${status == '0'}">사용 중지</option>
-                    </select>
-                </form>
-                <form th:action="@{/salary/list}" method="get">
-                    <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
-                    <input type="hidden" name="department" th:value="${department}">
-                    <input type="hidden" name="status" th:value="${status}">
-                    <button type="submit">검색</button>
-                </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/list'"/>
+        <div class="content-header">
+            <div class="content-header-left">
+                <h3>모든 급여정보 목록</h3>
+                <div>
+                    <form th:action="@{/salary/list}" method="get" id="pageSizeForm">
+                        <input type="hidden" name="page" th:value="1"/>
+                        <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                            <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                            <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                            <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                        </select>
+                        <input type="hidden" name="keyword" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${department}">
+                        <input type="hidden" name="status" th:value="${status}">
+                    </form>
+                </div>
+            </div>
+            <div class="content-header-center"></div>
+            <div class="content-header-right">
+                <div class="search-option">
+                    <form th:action="@{/salary/list}" method="get" id="statusForm">
+                        <input type="hidden" name="page" th:value="1"/>
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="hidden" name="keyword" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${department}">
+                        <select name="status" onchange="document.getElementById('statusForm').submit()">
+                            <option value="" th:selected="${status == ''}" disabled>사용 여부</option>
+                            <option th:value="1" th:text="사용중" th:selected="${status == '1'}">사용 중</option>
+                            <option th:value="0" th:text="사용중지" th:selected="${status == '0'}">사용 중지</option>
+                        </select>
+                    </form>
+                    <form th:action="@{/salary/list}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${department}">
+                        <input type="hidden" name="status" th:value="${status}">
+                        <button type="submit">검색</button>
+                    </form>
+                    <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/list'"/>
+                </div>
             </div>
         </div>
         <form th:action="@{/salary/list}" method="get" id="department-nav">

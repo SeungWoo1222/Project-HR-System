@@ -15,60 +15,66 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form id="pageSizeForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${#authentication.principal.department}">
-                <input type="hidden" name="status" th:value="${status}">
-                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <form id="yearMonthForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
-                <div class="month-nav">
-                    <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
-                    <span class="current-month" th:text="${yearmonth}"></span>
-                    <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
-                </div>
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${#authentication.principal.department}">
-                <input type="hidden" name="status" th:value="${status}">
-                <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <div class="search-option">
-                <form id="statusForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form id="pageSizeForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="content-header-center">
+                <form id="yearMonthForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                    <div class="month-nav">
+                        <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+                        <span class="current-month" th:text="${yearmonth}"></span>
+                        <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+                    </div>
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>
                     <input type="hidden" name="keyword" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${#authentication.principal.department}">
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
-                        <option value="" th:selected="${status == ''}">근태 상태</option>
-                        <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
-                        <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
-                        <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
-                        <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
-                        <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
-                        <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
-                    </select>
-                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                </form>
-                <form th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
-                    <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
-                    <input type="hidden" name="department" th:value="${#authentication.principal.department}">
                     <input type="hidden" name="status" th:value="${status}">
-                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                    <button type="submit">검색</button>
+                    <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
                 </form>
-                <img src="/images/icons/reset.png" class="image-btn"
-                     th:onclick="window.location.href='/attendance/list/' + /*[[${#authentication.principal.department}]]*/">
+            </div>
+            <div class="content-header-right">
+                <div class="search-option">
+                    <form id="statusForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="hidden" name="keyword" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                        <select name="status" onchange="document.getElementById('statusForm').submit()">
+                            <option value="" th:selected="${status == ''}">근태 상태</option>
+                            <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
+                            <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
+                            <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
+                            <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
+                            <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
+                            <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
+                        </select>
+                        <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                    </form>
+                    <form th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                        <input type="hidden" name="status" th:value="${status}">
+                        <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                        <button type="submit">검색</button>
+                    </form>
+                    <img src="/images/icons/reset.png" class="image-btn"
+                         th:onclick="window.location.href='/attendance/list/' + /*[[${#authentication.principal.department}]]*/">
+                </div>
             </div>
         </div>
         <table border="1" class="list">

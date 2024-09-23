@@ -16,33 +16,37 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form id="pageSizeForm" th:action="@{/attendance/list}" method="get">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="status" th:value="${status}">
-                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <form id="yearMonthForm" th:action="@{/attendance/list}" method="get">
-                <div class="month-nav">
-                    <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
-                    <span class="current-month" th:text="${yearmonth}"></span>
-                    <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
-                </div>
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="status" th:value="${status}">
-                <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <div class="search-option">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form id="pageSizeForm" th:action="@{/attendance/list}" method="get">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="content-header-center">
+                <form id="yearMonthForm" th:action="@{/attendance/list}" method="get">
+                    <div class="month-nav">
+                        <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+                        <span class="current-month" th:text="${yearmonth}"></span>
+                        <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+                    </div>
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="search-option content-header-right">
                 <form id="statusForm" th:action="@{/attendance/list}" method="get">
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>

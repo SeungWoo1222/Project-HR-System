@@ -119,7 +119,7 @@ public class VacationServiceImpl implements VacationService {
         // 알림 전송 후 메세지 반환
         String message = "'" + employeeDAO.getEmployeeName(vacation.getEmployeeId()) + "' 사원이 "
                 + vacation.getVacationType()  + "를 신청하였습니다.";
-        return message;
+        return vacation.getVacationType() + " 신청이 완료되었습니다.";
     }
 
     @Transactional
