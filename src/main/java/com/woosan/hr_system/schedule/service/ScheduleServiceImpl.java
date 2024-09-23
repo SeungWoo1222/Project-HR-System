@@ -1,13 +1,16 @@
 package com.woosan.hr_system.schedule.service;
 
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
 import com.woosan.hr_system.schedule.model.Schedule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
@@ -29,18 +32,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override // 일정 등록
-    public String insertSchedule(Schedule schedule) {
-        // created_date 설정
+    public int insertSchedule(Schedule schedule) {
+        log.info("Schedule ServiceImpl 도착");
+        // created_date, memberId 설정
         schedule.setCreatedDate(LocalDateTime.now());
-
-        // 일정 등록
-        scheduleDAO.insertSchedule(schedule);
-
-        // 알림 전송 후 메세지 반환
-        String message = "새로운 일정이 등록되었습니다."
-                + "\n담당자 : " + schedule.getMemberId()
-                + "\n일정 이름 : " + schedule.getTaskName();
-        return message;
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        schedule.setMemberId(userSessionInfo.getCurrentEmployeeId());
+        return scheduleDAO.insertSchedule(schedule);
     }
 
     @Override // 일정 수정

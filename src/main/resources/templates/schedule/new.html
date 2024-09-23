@@ -10,8 +10,14 @@
 </th:block>
 
 <th:block layout:fragment="script">
+    <!--네이버 지도 API-->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uu5esh416f&submodules=geocoder"></script>
+    <!--카카오 우편번호 API-->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
     <script th:src="@{/js/schedule/create.js}"></script>
     <script th:src="@{/js/schedule/ajax.js}"></script>
+    <script th:src="@{/js/schedule/trip.js}"></script>
     <script>
         // 사원 선택 시 이벤트 핸들러 설정
         document.addEventListener("DOMContentLoaded", function() {
@@ -69,7 +75,7 @@
                 </table>
                 <table class="details">
                     <tr>
-                        <td class="section-title">하루종일</td>
+                        <td id="all" class="section-title">하루종일</td>
                         <td class="section-title">일정 색상</td>
                     </tr>
                     <tr>
@@ -118,7 +124,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="endDateSection">
                         <td class="section-title">종료일</td>
                         <td>
                             <div class="date-td">
@@ -138,12 +144,13 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="section-title">연관된 출장</td>
+                        <td class="section-title">출장지</td>
                         <td>
-                            <select id="mapId" name="mapId">
-                                <!-- 출장 구현 완료 되면 ajax로 불러올 예정 -->
-                                <option value="" disabled selected>선택해주세요.</option>
-                            </select>
+                            <!-- 추가된 출장지 정보를 표시하는 div -->
+                            <div id="tripListContainer">
+                                <ul id="tripList"></ul>
+                            </div>
+                            <button type="button" class="btn" th:onclick="openModal('/schedule/trip')">출장지 추가</button>
                         </td>
                     </tr>
                 </table>

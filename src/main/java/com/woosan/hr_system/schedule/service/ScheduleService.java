@@ -8,7 +8,7 @@ public interface ScheduleService {
     List<Schedule> getAllSchedules();
     List<Schedule> getSchedulesByEmployeeId(String employeeId);
     Schedule getScheduleById(int taskId);
-    String insertSchedule(Schedule schedule);
+    int insertSchedule(Schedule schedule);
     String updateSchedule(Schedule schedule);
     void deleteSchedule(int taskId);
 }

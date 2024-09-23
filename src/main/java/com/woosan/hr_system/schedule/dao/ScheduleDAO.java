@@ -1,12 +1,14 @@
 package com.woosan.hr_system.schedule.dao;
 
 import com.woosan.hr_system.schedule.model.Schedule;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Slf4j
 @Repository
 public class ScheduleDAO {
     @Autowired
@@ -14,8 +16,11 @@ public class ScheduleDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.schedule.dao.ScheduleDAO.";
 
     // 일정 생성
-    public void insertSchedule(Schedule schedule) {
+    public int insertSchedule(Schedule schedule) {
+        log.info("Schedule ServiceDAO 도착");
         sqlSession.insert(NAMESPACE + "createSchedule", schedule);
+        log.info("반환된 taskId: {}", schedule.getTaskId());
+        return schedule.getTaskId();
     }
 
     // 일정 조회 (ID로)

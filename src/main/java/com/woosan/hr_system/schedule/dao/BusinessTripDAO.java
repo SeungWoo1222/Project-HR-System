@@ -1,7 +1,6 @@
 package com.woosan.hr_system.schedule.dao;
 
 import com.woosan.hr_system.schedule.model.BusinessTrip;
-import com.woosan.hr_system.schedule.model.Contact;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +16,19 @@ public class BusinessTripDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.schedule.dao.BusinessTripDAO.";
 
     // 전체 출장 목록 조회
-    public List<BusinessTrip> getAllBusinessTrips() {
+    public List<BusinessTrip> getAllBusinessTrips(int taskId) {
         return sqlSession.selectList(NAMESPACE + "getAllBusinessTrips");
     }
 
     // 출장 ID로 단일 출장 조회
-    public BusinessTrip getBusinessTripById(int mapId) {
-        return sqlSession.selectOne(NAMESPACE + "getBusinessTripById", mapId);
+    public BusinessTrip getBusinessTripById(int tripId) {
+        return sqlSession.selectOne(NAMESPACE + "getBusinessTripById", tripId);
     }
 
     // 새로운 출장 정보 생성
-    public void createBusinessTrip(BusinessTrip businessTrip) {
-        sqlSession.insert(NAMESPACE + "createBusinessTrip", businessTrip);
+    public void insertBusinessTrip(BusinessTrip businessTrip) {
+        log.info("insetBusinessTrip DAO 도착");
+        sqlSession.insert(NAMESPACE + "insertBusinessTrip", businessTrip);
     }
 
     // 출장 정보 업데이트
@@ -39,10 +39,5 @@ public class BusinessTripDAO {
     // 출장 정보 삭제
     public void deleteBusinessTrip(int mapId) {
         sqlSession.delete(NAMESPACE + "deleteBusinessTrip", mapId);
-    }
-
-    // 모든 연락처 목록 조회 (contacts)
-    public List<Contact> getAllContacts() {
-        return sqlSession.selectList(NAMESPACE + "getAllContacts");
     }
 }

@@ -76,7 +76,7 @@
 
                     <label for="searchType">검색 유형:</label>
                     <select id="searchType">
-                        <option th:value="${null}" th:text="'검색 유형 선택'" th:selected="${searchType == null}"></option>
+                        <option th:value="${null}" th:text="'전체'" th:selected="${searchType == null}"></option>
                         <option th:value="1" th:text="'요청 내용'" th:selected="${searchType == 1}">요청 내용</option>
                         <option th:value="2" th:text="'보고서 작성자'" th:selected="${searchType == 2}">보고서 작성자</option>
                     </select>

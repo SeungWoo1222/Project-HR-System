@@ -11,15 +11,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusinessTrip {
-    private int mapId;
-    private String employeeId;
-    private int contactId;
-    private Date visitDate;
+    private int tripId;
+    private int taskId;
     private String address;
     private String detailedAddress;
     private LocalDateTime createdDate;
-    public enum Status {
-        미방문,
-        방문_완료
-    }
+    public String status;
+    private String clientName;
+    private String contactTel;
+    private String contactEmail;
+    private String note;
 }

@@ -14,18 +14,19 @@
         <result property="status" column="status" jdbcType="VARCHAR"/>
         <result property="createdDate" column="created_date" />
         <result property="projectId" column="project_id" />
-        <result property="mapId" column="map_id" />
         <result property="allDay" column="all_day" />
         <result property="color" column="color" />
     </resultMap>
 
-    <!-- Create -->
-    <insert id="createSchedule">
-        INSERT INTO schedules (member_id, task_name, content, start_time, end_time, status, project_id, map_id, all_day, color)
-        VALUES (#{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, '시작 전', #{projectId}, #{mapId}, #{allDay},#{color})
+    <!-- 일정 생성 -->
+    <insert id="createSchedule" parameterType="com.woosan.hr_system.schedule.model.Schedule" useGeneratedKeys="true" keyProperty="taskId">
+        INSERT INTO schedules (member_id, task_name, content, start_time, end_time, status, project_id, all_day, color)
+        VALUES (#{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, '미완료', #{projectId}, #{allDay}, #{color})
     </insert>
 
-    <!-- Read by ID -->
+
+
+    <!-- taskID로 모든 일정 조회 -->
     <select id="getScheduleById" resultMap="scheduleResultMap">
         SELECT * FROM schedules WHERE task_id = #{taskId}
     </select>
@@ -35,12 +36,12 @@
         SELECT * FROM schedules WHERE member_id = #{employeeId}
     </select>
 
-    <!-- Read all -->
+    <!-- 모든 일정 조회 -->
     <select id="getAllSchedules" resultMap="scheduleResultMap">
         SELECT * FROM schedules
     </select>
 
-    <!-- Update -->
+    <!-- 일정 수정 -->
     <update id="updateSchedule">
         UPDATE schedules
         SET member_id = #{memberId},
@@ -50,13 +51,12 @@
             end_time = #{endTime},
             status = #{status},
             project_id = #{projectId},
-            map_id = #{mapId},
             all_day = #{allDay},
             color = #{color}
         WHERE task_id = #{taskId}
     </update>
 
-    <!-- Delete -->
+    <!-- 일정 삭제 -->
     <delete id="deleteSchedule">
         DELETE FROM schedules WHERE task_id = #{taskId}
     </delete>

@@ -5,21 +5,14 @@
 
 <mapper namespace="com.woosan.hr_system.schedule.dao.BusinessTripDAO">
     <resultMap id="BusinessTripResultMap" type="com.woosan.hr_system.schedule.model.BusinessTrip">
-        <id property="mapId" column="map_id" />
-        <result property="employeeId" column="employee_id" />
-        <result property="contactId" column="contact_id" />
-        <result property="visitDate" column="visit_date" />
+        <id property="tripId" column="trip_id" />
+        <result property="taskId" column="task_id" />
         <result property="address" column="address" />
         <result property="detailedAddress" column="detailed_address" />
         <result property="createdDate" column="created_date" />
         <result property="status" column="status" />
-    </resultMap>
-
-    <!-- Contact에 대한 ResultMap 정의 -->
-    <resultMap id="ContactResultMap" type="com.woosan.hr_system.schedule.model.Contact">
-        <id property="contactId" column="contact_id" />
         <result property="clientName" column="client_name" />
-        <result property="contactNumber" column="contact_number" />
+        <result property="contactTel" column="contact_tel" />
         <result property="contactEmail" column="contact_email" />
         <result property="note" column="note" />
     </resultMap>
@@ -27,51 +20,47 @@
     <!-- 전체 출장 목록 조회 -->
     <select id="getAllBusinessTrips" resultMap="BusinessTripResultMap">
         SELECT
-            map_id, employee_id, contact_id, visit_date,
-            address, detailed_address, created_date, status
+            trip_id, task_id, address, detailed_address, created_date, status,
+            client_name, contact_tel, contact_email, note
         FROM business_trips
+        WHERE task_id = #{taskId}
     </select>
 
     <!-- 출장 ID로 단일 출장 조회 -->
     <select id="getBusinessTripById" parameterType="int" resultMap="BusinessTripResultMap">
         SELECT
-            map_id, employee_id, contact_id, visit_date,
-            address, detailed_address, created_date, status
+            trip_id, task_id, address, detailed_address, created_date, status,
+            client_name, contact_tel, contact_email, note
         FROM business_trips
-        WHERE map_id = #{mapId}
+        WHERE trip_id = #{tripId}
     </select>
 
     <!-- 새로운 출장 정보 삽입 -->
-    <insert id="createBusinessTrip" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
+    <insert id="insertBusinessTrip" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
         INSERT INTO business_trips
-        (employee_id, contact_id, visit_date, address, detailed_address, status)
+        (task_id, address, detailed_address, created_date, status, client_name, contact_tel, contact_email, note)
         VALUES
-            (#{employeeId}, #{contactId}, #{visitDate}, #{address}, #{detailedAddress}, #{status})
+            (#{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{clientName}, #{contactTel}, #{contactEmail}, #{note})
     </insert>
 
     <!-- 출장 정보 업데이트 -->
     <update id="updateBusinessTrip" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
         UPDATE business_trips
         SET
-            employee_id = #{employeeId},
-            contact_id = #{contactId},
-            visit_date = #{visitDate},
+            task_id = #{taskId},
             address = #{address},
             detailed_address = #{detailedAddress},
-            status = #{status}
-        WHERE map_id = #{mapId}
+            status = #{status},
+            client_name = #{clientName},
+            contact_tel = #{contactTel},
+            contact_email = #{contactEmail},
+            note = #{note}
+        WHERE trip_id = #{tripId}
     </update>
 
     <!-- 출장 정보 삭제 -->
     <delete id="deleteBusinessTrip" parameterType="int">
-        DELETE FROM business_trips WHERE map_id = #{mapId}
+        DELETE FROM business_trips WHERE trip_id = #{tripId}
     </delete>
-
-    <!-- 모든 연락처 목록 조회 -->
-    <select id="getAllContacts" resultMap="ContactResultMap">
-        SELECT
-            contact_id, client_name, contact_number, contact_email, note
-        FROM contacts
-    </select>
 
 </mapper>

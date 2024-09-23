@@ -18,8 +18,8 @@ public class BusinessTripController {
     // 전체 조회
     @GetMapping("/list")
     public String getAllBusinessTrips(Model model) {
-        List<BusinessTrip> trips = businessTripService.getAllBusinessTrips();
-        model.addAttribute("trips", trips);
+//        List<BusinessTrip> trips = businessTripService.getAllBusinessTrips();
+//        model.addAttribute("trips", trips);
         return "businessTrip/list"; // 모든 비즈니스 트립을 보여주는 페이지
     }
 
@@ -36,24 +36,16 @@ public class BusinessTripController {
         }
     }
 
-    @GetMapping("/create")
-    public String createForm(Model model) {
-        model.addAttribute("businessTrip", new BusinessTrip());
-        model.addAttribute("contacts", businessTripService.getAllContacts());
-        return "businessTrip/form";
-    }
-
-    @PostMapping("/create")
-    public String createBusinessTrip(@RequestPart BusinessTrip businessTrip) {
-        businessTripService.createBusinessTrip(businessTrip);
-        return "redirect:/businessTrip/list";
-    }
+//    @PostMapping("/insert")
+//    public String createBusinessTrip(@RequestPart BusinessTrip businessTrip) {
+//        businessTripService.insertBusinessTrip(businessTrip);
+//        return "redirect:/businessTrip/list";
+//    }
 
     @GetMapping("/edit/{mapId}")
     public String editForm(@PathVariable("mapId") int mapId, Model model) {
         BusinessTrip trip = businessTripService.getBusinessTripById(mapId);
         model.addAttribute("businessTrip", trip);
-        model.addAttribute("contacts", businessTripService.getAllContacts());
         return "businessTrip/form";
     }
 

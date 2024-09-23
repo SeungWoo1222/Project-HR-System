@@ -1,5 +1,3 @@
-// 진승우씨가 채워주시면 됩니다
-
 // 수정 페이지 모달 열기
 function goToUpdateForm(taskId) {
     if (confirm("일정을 수정하시겠습니까?")) {
@@ -93,6 +91,7 @@ function validateForm() {
     return true;
 }
 
+
 // AJAX POST 요청 - 일정 등록
 function submitInsertForm(event) {
     event.preventDefault();
@@ -106,6 +105,8 @@ function submitInsertForm(event) {
     const actionUrl = form.action;
 
     const formData = createFormData(form);
+
+    formData.append('tripInfo', JSON.stringify(tripInfo));
 
     // 일정 등록
     if (confirm('새로운 일정을 등록하시겠습니까?')) {
@@ -122,6 +123,7 @@ function submitInsertForm(event) {
                 if (response.status === 200) {
                     alert(response.text);
                     window.location.reload();
+                    // window.location.href = '/schedule/list';
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else {
@@ -195,3 +197,4 @@ function deleteSchedule(taskId) {
 
 // AJAX PATCH 요청 - 일정 상태 변경
 // 메소드 필요
+

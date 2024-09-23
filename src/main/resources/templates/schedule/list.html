@@ -28,6 +28,7 @@
 </th:block>
 
 <th:block layout:fragment="script">
+    <!--네이버 지도 API-->
     <script th:src="@{/js/schedule/create.js}"></script>
     <script th:src="@{/js/schedule/ajax.js}"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
@@ -107,12 +108,12 @@
                     <td th:text="${#temporals.format(schedule.startTime, 'MM월 dd일(EE)') + ' ~ '
                     + #temporals.format(schedule.endTime, 'MM월 dd일(EE)')}">일정 기한</td>
                     <td th:text="${schedule.status}"
-                        th:classappend="${schedule.status == '시작 전'} ? 'notStarted' :
-                                       (${schedule.status == '진행 중'} ? 'inProcess' :
+                        th:classappend="${schedule.status == '미완료'} ? 'notStarted' :
+                                       (${schedule.status == '진행중'} ? 'inProcess' :
                                        (${schedule.status == '완료'} ? 'done' : ''))">일정 상태</td>
                     <td th:text="${#temporals.format(schedule.createdDate, 'MM월 dd일(EE)')}">일정 생성일</td>
                     <td th:text="${schedule.projectId}">프로젝트 번호</td>
-                    <td th:text="${schedule.mapId}">출장 번호</td>
+                    <td th:text="${schedule.tripId}">출장 번호</td>
                 </tr>
                 </tbody>
             </table>

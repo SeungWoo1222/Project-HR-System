@@ -2,7 +2,9 @@ package com.woosan.hr_system.schedule.controller;
 
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
+import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import java.util.List;
 public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private BusinessTripService businessTripService;
     @Autowired
     private EmployeeService employeeService;
     @Autowired
@@ -54,6 +58,11 @@ public class ScheduleController {
         model.addAttribute("schedule", scheduleInfo);
         // 사원 정보
         model.addAttribute("employee", employeeService.getEmployeeById(scheduleInfo.getMemberId()));
+
+        // 해당 일정과 연관된 출장 정보만 가져오기
+        List<BusinessTrip> trips = businessTripService.getAllBusinessTrips(taskId);
+        log.info("trips 갯수 : {}", trips.size());
+        model.addAttribute("trips", trips);
         return "schedule/detail";
     }
 
@@ -78,8 +87,19 @@ public class ScheduleController {
     }
 
     @PostMapping // 일정 등록
-    public ResponseEntity<String> insertSchedule(@ModelAttribute Schedule schedule) {
-        return ResponseEntity.ok(scheduleService.insertSchedule(schedule));
+    public ResponseEntity<String> insertSchedule(@ModelAttribute Schedule schedule,
+                                                 @RequestParam("tripInfo") String tripInfoJson) {
+        log.info("insert schedule: {}", schedule);
+        log.info("insert tripInfoJson: {}", tripInfoJson);
+
+        int taskId = scheduleService.insertSchedule(schedule);
+        log.info("taskId 반환 완료 : {}", taskId);
+        if (tripInfoJson != null) {
+            log.info("tripInfoJson 기반 출장정보 삽입 시작");
+            businessTripService.insertBusinessTrip(tripInfoJson, taskId);
+        }
+
+        return ResponseEntity.ok("일정 생성이 완료되었습니다.");
     }
 
     @PutMapping // 일정 수정
@@ -90,5 +110,11 @@ public class ScheduleController {
     @DeleteMapping("/{taskId}")
     public void deleteSchedule(@PathVariable("taskId") int taskId) {
         scheduleService.deleteSchedule(taskId);
+    }
+
+    // 출장지, 거래처 정보 입력하는 모달 창 생성
+    @GetMapping("/trip")
+    public String viewTrip() {
+        return "schedule/trip";
     }
 }
