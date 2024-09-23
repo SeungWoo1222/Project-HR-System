@@ -115,32 +115,55 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 현재 로그인된 사원 조회
         String employeeId = authService.getAuthenticatedUser().getUsername();
 
-        // 시간에 따른 근태 상태 설정
         LocalTime now = LocalTime.now();
-        LocalTime nineAM = LocalTime.of(9, 0);  // 오전 9시
-        String status;
+        LocalDate today = LocalDate.now();
 
-        if (now.isBefore(nineAM)) {
-            status = "출근";  // 오전 9시 이전이면 출근 상태
+        // 근무시간 설정
+        LocalTime checkInTime = setCheckInTime(employeeId);
+
+        String status;
+        if (now.isAfter(checkInTime)) {
+            status = "지각";
         } else {
-            status = "지각";  // 오전 9시 이후면 지각 상태
+            status = "출근";
         }
 
         // 근태 객체 생성
         Attendance attendance = Attendance.builder()
                 .employeeId(employeeId)
-                .date(LocalDate.now())
-                .checkIn(LocalTime.now())
+                .date(today)
+                .checkIn(now)
                 .status(status)
                 .build();
 
         // 출근 처리
         attendanceDAO.insertAttendance(attendance);
 
-        LocalDate today = LocalDate.now();
         return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 출근 체크가 완료되었습니다."
                 + "\n출근 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
                 + "\n오늘도 좋은 하루 되세요!";
+    }
+
+    // 출근 시간 설정
+    private LocalTime setCheckInTime(String employeeId) {
+        // 사원이 휴가인지 확인
+        Vacation vacationInfo = checkEmployeeVacationStatusToday(employeeId);
+
+        // 출근 시간 설정
+        LocalTime checkInTime = LocalTime.of(9, 0); // 기본 출근 시간
+        if (vacationInfo != null && vacationInfo.getUsedDays() == 0.5 && vacationInfo.getStartAt().getHour() == 9) {
+            // 오전 반차면 출근 시간 조정
+            checkInTime = LocalTime.of(14, 0);
+        }
+
+        return checkInTime;
+    }
+
+    // 해당 사원의 금일 휴가 여부 확인
+    private Vacation checkEmployeeVacationStatusToday(String employeeId) {
+        return vacationService.findEmployeesOnVacationToday().stream()
+                .filter(vacation -> vacation.getEmployeeId().equals(employeeId))
+                .findFirst().orElse(null);
     }
 
     @Override // 퇴근
@@ -150,8 +173,19 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         LocalTime now = LocalTime.now();
 
+        // 근무시간 설정
+        LocalTime checkOutTime = setCheckOutTime(authService.getAuthenticatedUser().getUsername());
+
+        String status;
+        if (now.isBefore(checkOutTime)) {
+            status = "조퇴";
+        } else {
+            status = "출근";
+        }
+
         Map<String, Object> params = new HashMap<>();
         params.put("todayAttendanceId", todayAttendanceId);
+        params.put("status", status);
         params.put("checkOut", now);
 
         // 퇴근 처리
@@ -161,6 +195,21 @@ public class AttendanceServiceImpl implements AttendanceService {
         return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 퇴근 체크가 완료되었습니다."
                 + "\n퇴근 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
                 + "\n오늘도 고생 많으셨습니다!";
+    }
+
+    // 퇴근 시간 설정
+    private LocalTime setCheckOutTime(String employeeId) {
+        // 사원이 휴가인지 확인
+        Vacation vacationInfo = checkEmployeeVacationStatusToday(employeeId);
+
+        // 퇴근 시간 설정
+        LocalTime checkOutTime = LocalTime.of(18, 0); // 기본 퇴근 시간
+        if (vacationInfo != null && vacationInfo.getUsedDays() == 0.5 && vacationInfo.getStartAt().getHour() == 13) {
+            // 오후 반차면 퇴근 시간 조정
+            checkOutTime = LocalTime.of(13, 0);
+        }
+
+        return checkOutTime;
     }
 
     @Override // 조퇴
@@ -321,7 +370,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 객체 생성하여 근태 등록
         for (String employeeId : absentEmployeeIdList) {
-            log.info("employeeId: {}", employeeId);
             // 근태 객체 생성
             Attendance attendance = Attendance.builder()
                     .employeeId(employeeId)
@@ -330,7 +378,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .checkOut(LocalTime.of(0, 0, 0))
                     .status("결근")
                     .build();
-            log.info("attendance: {}", attendance);
             // 근태 등록
             attendanceDAO.insertAttendance(attendance);
         }

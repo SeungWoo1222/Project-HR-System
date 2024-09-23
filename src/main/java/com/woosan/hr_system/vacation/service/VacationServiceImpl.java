@@ -196,5 +196,4 @@ public class VacationServiceImpl implements VacationService {
         return vacationDAO.getEmployeesOnVacationToday(LocalDate.now());
     }
 
-
 }

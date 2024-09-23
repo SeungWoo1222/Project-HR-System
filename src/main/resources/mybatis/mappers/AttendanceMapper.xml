@@ -68,7 +68,7 @@
     <!-- 퇴근 시간 업데이트 -->
     <update id="updateCheckout">
         UPDATE attendance
-        SET check_out = #{checkOut}
+        SET check_out = #{checkOut}, status = #{status}
         WHERE attendance_id = #{todayAttendanceId}
     </update>
 
