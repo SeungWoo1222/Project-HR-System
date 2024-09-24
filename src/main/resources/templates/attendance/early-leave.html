@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<div class="attendance-modal">
+    <h3 style="margin: 0;">조퇴 ></h3>
+    <p th:text="${#dates.format(#dates.createToday(), 'yyyy.MM.dd EE')}" style="margin: 10px 0 10px; color: #C8C8C8"></p>
+    <div class="time-container">
+        <div th:if="${attendance != null and attendance.checkOut == null}" class="attendance-status"><img src="/images/icons/switch-on.png"/></div>
+        <div th:if="${attendance == null or (attendance.checkIn != null and attendance.checkOut != null)}" class="attendance-status"><img src="/images/icons/switch-off.png"/></div>
+        <div id="currentTime" class="current-time"> </div>
+    </div>
+    <form id="early-leave-form" onsubmit="earlyLeave(event)">
+        <p>* 조퇴를 진행하기 전에 반드시 관리자에게 보고해 주세요. *</p>
+        <div class="form-group">
+            <label for="notes"><strong>조퇴 사유 : </strong></label>
+            <textarea id="notes" name="notes" placeholder="사유를 입력해주세요." rows="1"></textarea>
+        </div>
+        <div class="commute-btn-container">
+            <button type="submit" class="attendance-btn"
+                    th:classappend="${attendance != null and attendance.checkOut == null} ? 'check-out ' : ''"
+                    th:disabled="${attendance == null or attendance.checkOut != null}">조퇴</button>
+        </div>
+    </form>
+</div>
+
+</html>

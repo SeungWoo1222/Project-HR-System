@@ -19,7 +19,7 @@ public class Schedule {
     private String status;
     private LocalDateTime createdDate;
     private Integer projectId;
-    private Integer mapId;
+    private Integer tripId;
     private boolean allDay;
     private String color;
 }

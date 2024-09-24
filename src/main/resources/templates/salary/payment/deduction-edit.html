@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<style>
-    #deduction-edit-form table input {
-        width: 90%;
-        text-align: center;
-    }
-</style>
-
-<form id="deduction-edit-form" th:action="@{/api/salary/payment/deduction}" onsubmit="submitUpdateForm(event)">
-    <h3>공제 비율 수정</h3>
+<form id="deduction-edit-form" class="ratio-edit-form" th:action="@{/api/salary/payment/deduction}" onsubmit="submitUpdateForm(event)">
+    <div class="ratio-edit-header">
+        <h3>공제 비율 수정</h3>
+        <div class="btn-container">
+            <button type="reset" class="btn">초기화</button>
+            <button type="submit" id="edit-deduction-ratio" class="btn">수정 완료</button>
+        </div>
+    </div>
     <table border="1">
-        <thead>
         <tr>
-            <th>근로소득세</th>
-            <th>지방소득세</th>
-            <th>국민연금</th>
-            <th>건강보험</th>
-            <th>장기요양보험</th>
-            <th>고용보험</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
+            <td>근로소득세</td>
             <td style="text-align: center"> - </td>
+        </tr>
+        <tr>
+            <td>지방소득세</td>
             <td><input type="text" name="localIncomeTaxRate" th:value="${deductionRatios.localIncomeTaxRate}"/></td>
+        </tr>
+        <tr>
+            <td>국민연금</td>
             <td><input type="text" name="nationalPensionRate" th:value="${deductionRatios.nationalPensionRate}"/></td>
+        </tr>
+        <tr>
+            <td>건강보험</td>
             <td><input type="text" name="healthInsuranceRate" th:value="${deductionRatios.healthInsuranceRate}"/></td>
+        </tr>
+        <tr>
+            <td>장기요양보험</td>
             <td><input type="text" name="longTermCareRate" th:value="${deductionRatios.longTermCareRate}"/></td>
+        </tr>
+        <tr>
+            <td>고용보험</td>
             <td><input type="text" name="employmentInsuranceRate" th:value="${deductionRatios.employmentInsuranceRate}"/></td>
         </tr>
-        </tbody>
     </table>
-    <div class="btn-section">
-        <button type="reset" class="btn">초기화</button>
-        <button type="submit" id="edit-deduction-ratio" class="btn">수정 완료</button>
-    </div>
 </form>
+
 </html>

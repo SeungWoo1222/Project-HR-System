@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woosan.hr_system.attendance.dao.AttendanceDAO">
+    <resultMap id="attendanceResultMap" type="com.woosan.hr_system.attendance.model.Attendance">
+        <id property="attendanceId" column="attendance_id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="date" column="date" />
+        <result property="checkIn" column="check_in" />
+        <result property="checkOut" column="check_out" />
+        <result property="status" column="status" />
+        <result property="vacationId" column="vacation_id" />
+        <result property="tripId" column="trip_id" />
+        <result property="notes" column="notes" />
+        <result property="lastModified" column="last_modified" />
+        <result property="modifiedBy" column="modified_by" />
+    </resultMap>
+
+    <resultMap id="attendanceWithEmployeeResultMap" type="com.woosan.hr_system.attendance.model.Attendance">
+        <id property="attendanceId" column="attendance_id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="date" column="date" />
+        <result property="checkIn" column="check_in" />
+        <result property="checkOut" column="check_out" />
+        <result property="status" column="status" />
+        <result property="vacationId" column="vacation_id" />
+        <result property="tripId" column="trip_id" />
+        <result property="notes" column="notes" />
+        <result property="lastModified" column="last_modified" />
+        <result property="modifiedBy" column="modified_by" />
+        <!-- 사원 관련 정보 -->
+        <result property="employee.employeeId" column="employee_id" />
+        <result property="employee.name" column="name" />
+        <result property="employee.department" column="department_id" />
+        <result property="employee.position" column="position_id" />
+    </resultMap>
+
+    <!-- 근태 ID로 근태 정보 조회 -->
+    <select id="getAttendanceById" resultMap="attendanceResultMap">
+        SELECT * FROM attendance WHERE attendance_id = #{attendanceId}
+    </select>
+
+    <!-- 사원 ID로 근태 목록 조회 -->
+    <select id="getAttendanceByEmployeeId" resultMap="attendanceResultMap">
+        SELECT * FROM attendance WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 모든 근태 목록 조회 -->
+    <select id="getAllAttendance" resultMap="attendanceResultMap">
+        SELECT * FROM attendance
+    </select>
+
+    <!-- 금일 근태 현황 조회 -->
+    <select id="getTodayAttendance" resultMap="attendanceWithEmployeeResultMap">
+        SELECT a.*, e.name, e.department_id, e.position_id
+        FROM attendance a
+        JOIN employees e ON a.employee_id = e.employee_id
+        WHERE a.`date` = #{date}
+    </select>
+
+    <!-- 근태 등록 -->
+    <insert id="insertAttendance">
+        INSERT INTO attendance (employee_id, date, check_in, check_out, status, vacation_id, trip_id)
+        VALUES (#{employeeId}, #{date}, #{checkIn}, #{checkOut}, #{status}, #{vacationId}, #{tripId})
+    </insert>
+
+    <!-- 퇴근 시간 업데이트 -->
+    <update id="updateCheckout">
+        UPDATE attendance
+        SET check_out = #{checkOut}, status = #{status}
+        WHERE attendance_id = #{todayAttendanceId}
+    </update>
+
+    <!-- 조퇴 처리 -->
+    <update id="updateEarlyLeave">
+        UPDATE attendance
+        SET check_out = #{checkOut}, status = #{status}, notes = #{notes}
+        WHERE attendance_id = #{todayAttendanceId}
+    </update>
+
+    <!-- 근태 수정 -->
+    <update id="updateAttendance">
+        UPDATE attendance
+        SET check_in = #{checkIn},
+            check_out = #{checkOut},
+            status = #{status},
+            vacation_id = #{vacationId},
+            trip_id = #{tripId},
+            notes = #{notes},
+            last_modified = #{lastModified},
+            modified_by = #{modifiedBy}
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <!-- 금일 근태 ID 조회 -->
+    <select id="getMyTodayAttendance" resultType="int">
+        SELECT attendance_id FROM attendance
+        WHERE employee_id = #{employeeId} AND date = #{date}
+    </select>
+
+    <!-- 근태 목록 검색 조회 -->
+    <select id="searchAttendance" parameterType="map" resultMap="attendanceWithEmployeeResultMap">
+        SELECT a.*, e.name, e.department_id, e.position_id
+        FROM attendance a
+        JOIN employees e ON a.employee_id = e.employee_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                a.attendance_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.check_in LIKE CONCAT('%', #{keyword}, '%') OR
+                a.check_out LIKE CONCAT('%', #{keyword}, '%') OR
+                a.notes LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%') OR
+                e.position_id LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND e.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(a.date, '%Y-%m') = #{yearMonth}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.date DESC, a.check_in ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+</mapper>

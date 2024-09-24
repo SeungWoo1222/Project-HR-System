@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,7 +14,7 @@ public class BusinessTrip {
     private int mapId;
     private String employeeId;
     private int contactId;
-    private Date visitDate;
+    private LocalDate visitDate;
     private String address;
     private String detailedAddress;
     private LocalDateTime createdDate;

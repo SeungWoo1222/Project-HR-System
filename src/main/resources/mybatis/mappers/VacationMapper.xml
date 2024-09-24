@@ -51,11 +51,16 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 해당 사원의 모든 휴가 정보 조회 -->
+    <!-- 해당 사원의 모든 휴가 정보 조회 (페이징) -->
     <select id="selectVacationByEmployeeId" parameterType="map" resultMap="VacationResultMap">
         SELECT * FROM vacation WHERE employee_id = #{employeeId}
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 정보 조회 -->
+    <select id="getVacationByEmployeeId" parameterType="String" resultMap="VacationResultMap">
+        SELECT * FROM vacation WHERE employee_id = #{employeeId}
     </select>
 
     <!-- 해당 부서의 모든 휴가 정보 조회 -->
@@ -112,4 +117,12 @@
     <delete id="deleteVacation" parameterType="int">
         DELETE FROM vacation WHERE vacation_id = #{vacationId}
     </delete>
+
+    <!-- 오늘 휴가인 사원 조회 -->
+    <select id="getEmployeesOnVacationToday" parameterType="java.time.LocalDate" resultMap="VacationResultMap">
+        SELECT vacation_id, employee_id
+        FROM vacation
+        WHERE #{date} BETWEEN start_at AND end_at
+        AND approval_status = '승인'
+    </select>
 </mapper>

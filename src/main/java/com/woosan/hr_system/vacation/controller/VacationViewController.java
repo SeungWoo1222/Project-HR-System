@@ -3,6 +3,7 @@ package com.woosan.hr_system.vacation.controller;
 import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
@@ -24,6 +25,8 @@ public class VacationViewController {
     private VacationService vacationService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private HolidayService holidayService;
     @Autowired
     private EmployeeDAO employeeDAO;
 
@@ -103,13 +106,21 @@ public class VacationViewController {
     @GetMapping("/{employeeId}/request") // 내 휴가 신청 페이지 이동
     public String viewMyRequestForm(@PathVariable("employeeId") String employeeId,
                                   Model model) {
+        // 로그인한 사원 정보 모델에 추가
         model.addAttribute("employee", employeeDAO.getEmployeeById(employeeId));
+
+        // 모든 공휴일 모델에 추가
+        model.addAttribute("holidays", holidayService.getAllHoliday());
         return "/vacation/request";
     }
 
     @GetMapping("/request") // 휴가 신청 페이지 이동
     public String viewRequestForm(Model model) {
+        // 모든 사원 정보 모델에 추가
         model.addAttribute("employeeList", employeeDAO.getAllEmployees());
+
+        // 모든 공휴일 모델에 추가
+        model.addAttribute("holidays", holidayService.getAllHoliday());
         return "/vacation/request2";
     }
 

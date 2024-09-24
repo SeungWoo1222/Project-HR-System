@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='부서 근태 목록 조회')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/yearmonth-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/attendance/status.css}" rel="stylesheet">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/yearmonth-nav.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form id="pageSizeForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="content-header-center">
+                <form id="yearMonthForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                    <div class="month-nav">
+                        <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+                        <span class="current-month" th:text="${yearmonth}"></span>
+                        <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+                    </div>
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="content-header-right">
+                <div class="search-option">
+                    <form id="statusForm" th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="hidden" name="keyword" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                        <select name="status" onchange="document.getElementById('statusForm').submit()">
+                            <option value="" th:selected="${status == ''}">근태 상태</option>
+                            <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
+                            <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
+                            <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
+                            <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
+                            <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
+                            <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
+                        </select>
+                        <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                    </form>
+                    <form th:action="@{/attendance/list/{department}(department=${#authentication.principal.department})}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${#authentication.principal.department}">
+                        <input type="hidden" name="status" th:value="${status}">
+                        <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                        <button type="submit">검색</button>
+                    </form>
+                    <img src="/images/icons/reset.png" class="image-btn"
+                         th:onclick="window.location.href='/attendance/list/' + /*[[${#authentication.principal.department}]]*/">
+                </div>
+            </div>
+        </div>
+        <table border="1" class="list">
+            <thead>
+            <tr>
+                <th>근태 ID</th>
+                <th>사원 ID</th>
+                <th>이름</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>근태 상태</th>
+                <th>날짜</th>
+                <th>출근 시간</th>
+                <th>퇴근 시간</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${attendanceList.isEmpty()}">
+                <td colspan="9" style="text-align: center; padding: 20px;">
+                    조회된 근태 내역이 없습니다. 다른 검색 조건을 시도해보세요.
+                </td>
+            </tr>
+            <tr th:each="attendance : ${attendanceList}" th:attendanceId="${attendance.attendanceId}" th:onclick="openModal('/attendance/' + this.getAttribute('attendanceId'))">
+                <td th:text="${attendance.attendanceId}">근태 ID</td>
+                <td th:text="${attendance.employeeId}">사원 ID</td>
+                <td th:text="${attendance.employee?.name}">이름</td>
+                <td th:text="${attendance.employee?.department.name}">부서</td>
+                <td th:text="${attendance.employee?.position.name}">직급</td>
+                <td th:text="${attendance.status}"
+                    th:classappend="${attendance.status == '출근'} ? 'present' :
+                                    (${attendance.status == '결근'} ? 'absent' :
+                                    (${attendance.status == '지각'} ? 'late' :
+                                    (${attendance.status == '조퇴'} ? 'early-leave' :
+                                    (${attendance.status == '출장'} ? 'business-trip' :
+                                    (${attendance.status == '휴가'} ? 'vacation' : '')))))">근태 상태</td>
+                <td th:text="${#temporals.format(attendance.date, 'yy년 MM월 dd일')}">날짜</td>
+                <td th:text="${#temporals.format(attendance.checkIn, 'hh시 mm분')}">출근 시간</td>
+                <td th:text="${#temporals.format(attendance.checkOut, 'hh시 mm분')}">퇴근 시간</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination-container" th:if="${totalPages > 0}">
+            <div class="pagination">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/attendance/list/' + ${#authentication.principal.department} + '?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status} + '&yearmonth=' + ${yearmonth}}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
+                </span>
+                <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/attendance/list/' + ${#authentication.principal.department} + '?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status} + '&yearmonth=' + ${yearmonth}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                    <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/attendance/list/' + ${#authentication.principal.department} + '?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status} + '&yearmonth=' + ${yearmonth}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                        </span>
+                </div>
+                <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/attendance/list/' + ${#authentication.principal.department} + '?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status} + '&yearmonth=' + ${yearmonth}}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
