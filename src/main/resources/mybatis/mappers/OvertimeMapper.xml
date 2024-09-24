@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="overtime">
+    <resultMap id="OvertimeResultMap" type="com.woosan.hr_system.attendance.model.Overtime">
+        <id property="overtimeId" column="overtime_id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="date" column="date" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="nightHours" column="night_hours" />
+        <result property="totalHours" column="total_hours" />
+    </resultMap>
+
+    <!-- ID를 이용한 초과근무 조회 -->
+    <select id="getOvertimeById" resultMap="OvertimeResultMap">
+        SELECT * FROM Overtime WHERE overtime_id = #{overtimeId}
+    </select>
+
+    <!-- 모든 초과근무 조회 -->
+    <select id="getAllOvertimes" resultMap="OvertimeResultMap">
+        SELECT * FROM Overtime
+    </select>
+
+    <!-- 사원의 이번 달 초과근무 조회 -->
+    <select id="getThisMonthOvertimes" resultMap="OvertimeResultMap">
+        SELECT * FROM Overtime
+        WHERE employee_id = #{employeeId}
+          AND DATE_FORMAT(date, '%Y-%m') = #{yearMonth}
+    </select>
+
+    <!-- 사원의 이번 주 초과근무 총 시간 조회 -->
+    <select id="getTotalWeeklyOvertime" resultType="float">
+        SELECT COALESCE(SUM(total_hours), 0)
+        FROM Overtime
+        WHERE employee_id = #{employeeId}
+          AND WEEK(date, 1) = WEEK(#{date}, 1)
+    </select>
+
+    <!-- 초과근무 등록 -->
+    <insert id="insertOvertime">
+        INSERT INTO Overtime (employee_id, date, start_time, end_time, night_hours, total_hours)
+        VALUES (#{employeeId}, #{date}, #{startTime}, #{endTime}, #{nightHours}, #{totalHours})
+    </insert>
+
+    <!-- 초과근무 수정 -->
+    <update id="updateOvertime">
+        UPDATE Overtime
+        SET employee_id = #{employeeId},
+            date = #{date},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            night_hours = #{nightHours},
+            total_hours = #{totalHours}
+        WHERE overtime_id = #{overtimeId}
+    </update>
+
+    <!-- 초과근무 삭제 -->
+    <delete id="deleteOvertime">
+        DELETE FROM Overtime WHERE overtime_id = #{overtimeId}
+    </delete>
+
+</mapper>

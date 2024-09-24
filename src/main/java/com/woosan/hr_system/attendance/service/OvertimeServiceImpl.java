@@ -141,8 +141,22 @@ public class OvertimeServiceImpl implements OvertimeService{
         // 변경사항 확인
         checkForOvertimeChanges(originalOvertime, overtime);
 
+        // 총 초과 근무 시간 설정
+        Map<String, Object> map = setTotalHours(overtime.getEmployeeId(), overtime.getStartTime(), overtime.getEndTime());
+        float overtimeHours = (float) map.get("overtimeHours");
+        LocalTime endTime = (LocalTime) map.get("endTime");
 
-        overtimeDAO.updateOvertime(overtime);
+        // 야간 근무 시간 설정
+        float nightHours = setNightHours(endTime);
+
+        // 초과근무 객체 생성 후 등록
+        Overtime updatedOvertime = overtime.toBuilder()
+                .endTime(endTime)
+                .nightHours(nightHours)
+                .totalHours(overtimeHours)
+                .build();
+
+        overtimeDAO.updateOvertime(updatedOvertime);
 
         return "초과근무('" + overtime.getOvertimeId() + "')가 수정되었습니다.";
     }
