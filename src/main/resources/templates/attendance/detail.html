@@ -47,15 +47,26 @@
         </tr>
         <tr>
             <th>출근 시간</th>
-            <td th:text="${#temporals.format(attendance.checkIn, 'hh시 mm분')}"></td>
+            <td th:text="${#temporals.format(attendance.checkIn, 'HH:mm')}"></td>
         </tr>
         <tr>
             <th>퇴근 시간</th>
-            <td th:text="${#temporals.format(attendance.checkOut, 'hh시 mm분')}"></td>
+            <td th:text="${#temporals.format(attendance.checkOut, 'HH:mm')}"></td>
+        </tr>
+        <tr>
+            <th>근무한 정규 근무시간</th>
+            <td th:text="${attendance.workingHours} + '시간'"></td>
         </tr>
         <tr>
             <th>근태 상태</th>
             <td th:text="${attendance.status}"></td>
+        </tr>
+        <tr>
+            <th>초과 근무시간</th>
+            <td th:if="${attendance.overtimeId} == null"></td>
+            <td th:if="${attendance.overtimeId} != null" th:text="${attendance.overtime?.totalHours} + '시간 '
+                + '(' + ${#temporals.format(attendance.overtime?.startTime, 'HH:mm')}
+                + '~' + ${#temporals.format(attendance.overtime?.endTime, 'HH:mm')} + ')'"></td>
         </tr>
         <tr>
             <th>휴가 정보</th>

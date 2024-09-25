@@ -18,10 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.*;
 
 @Slf4j
@@ -41,10 +38,21 @@ public class AttendanceServiceImpl implements AttendanceService {
     private BusinessTripService businessTripService;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private OvertimeService overtimeService;
 
     @Override // 근태 정보 조회
     public Attendance getAttendanceById(int attendanceId) {
-        return findAttendanceById(attendanceId);
+        // 근태 정보 상세 조회
+        Attendance attendance = findAttendanceById(attendanceId);
+        // 초과근무 정보가 있을 경우, 초과근무 정보를 함께 조회하여 반환
+        Integer overtimeId = attendance.getOvertimeId();
+        if (overtimeId != null) {
+            return attendance.toBuilder()
+                    .overtime(overtimeService.getOvertimeById(overtimeId))
+                    .build();
+        }
+        return attendance;
     }
 
     // 근태 ID를 통한 근태 상세 조회
@@ -166,14 +174,30 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .findFirst().orElse(null);
     }
 
+    @Transactional
     @Override // 퇴근
     public String checkOut() {
-        // 금일 근태 ID 조회
+        // 금일 근태 ID와 근태정보 조회
         int todayAttendanceId = getMyTodayAttendance();
+        Attendance todayAttendance = getAttendanceById(todayAttendanceId);
 
         LocalTime now = LocalTime.now();
 
-        // 근무시간 설정
+        // 초과근무 여부 확인 후 초과근무 등록
+        LocalTime checkInTime = todayAttendance.getCheckIn(); // 출근 시간
+        Duration duration = Duration.between(checkInTime, now);
+        float workingHours = duration.toMinutes() / 60.00f; // 근무 시간
+        // 근무 시간이 9시간(휴게시간 포함)을 초과한다면
+        if (workingHours > 9.0f) {
+            workingHours = 8.0f; // 휴게시간을 제외한 정규 근무 시간 : 8시간
+            // 이번 주 초과근무 총 시간 조회 후 12시간이 넘지 않는다면 초과근무 등록
+            if (overtimeService.getTotalWeeklyOvertime(todayAttendance.getEmployeeId(), LocalDate.now()) < 12.0f) {
+                LocalTime startTime = checkInTime.plusHours(9);
+                overtimeService.addOvertime(todayAttendanceId, startTime, now);
+            }
+        }
+
+        // 퇴근 시간 설정
         LocalTime checkOutTime = setCheckOutTime(authService.getAuthenticatedUser().getUsername());
 
         String status;
@@ -187,6 +211,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         params.put("todayAttendanceId", todayAttendanceId);
         params.put("status", status);
         params.put("checkOut", now);
+        params.put("workingHours", workingHours);
 
         // 퇴근 처리
         attendanceDAO.updateCheckout(params);

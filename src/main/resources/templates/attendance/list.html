@@ -118,11 +118,13 @@
                 <th>날짜</th>
                 <th>출근 시간</th>
                 <th>퇴근 시간</th>
+                <th>초과 근무</th>
+                <th>근무 시간</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${attendanceList.isEmpty()}">
-                <td colspan="9" style="text-align: center; padding: 20px;">
+                <td colspan="11" style="text-align: center; padding: 20px;">
                     조회된 근태 내역이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
@@ -140,8 +142,10 @@
                                     (${attendance.status == '출장'} ? 'business-trip' :
                                     (${attendance.status == '휴가'} ? 'vacation' : '')))))">근태 상태</td>
                 <td th:text="${#temporals.format(attendance.date, 'yy년 MM월 dd일')}">날짜</td>
-                <td th:text="${#temporals.format(attendance.checkIn, 'hh시 mm분')}">출근 시간</td>
-                <td th:text="${#temporals.format(attendance.checkOut, 'hh시 mm분')}">퇴근 시간</td>
+                <td th:text="${#temporals.format(attendance.checkIn, 'HH:mm')}">출근 시간</td>
+                <td th:text="${#temporals.format(attendance.checkOut, 'HH:mm')}">퇴근 시간</td>
+                <td th:text="${attendance.overtimeId} == null ? 'N' : 'Y'"></td>
+                <td th:text="${attendance.workingHours} + '시간'"></td>
             </tr>
             </tbody>
         </table>

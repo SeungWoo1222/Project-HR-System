@@ -21,6 +21,7 @@ public class Attendance {
     private LocalTime checkIn;          // 출근 시간
     private LocalTime checkOut;         // 퇴근 시간
     private String status;              // 근태 상태
+    private float workingHours;         // 근무한 정규 근무시간
     private Integer overtimeId;         // 초과근무 ID
     private Integer vacationId;         // 휴가 ID
     private Integer tripId;             // 출장 ID
