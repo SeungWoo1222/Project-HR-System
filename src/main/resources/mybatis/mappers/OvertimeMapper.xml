@@ -39,7 +39,7 @@
     </select>
 
     <!-- 초과근무 등록 -->
-    <insert id="insertOvertime">
+    <insert id="insertOvertime" useGeneratedKeys="true" keyProperty="overtimeId">
         INSERT INTO Overtime (employee_id, date, start_time, end_time, night_hours, total_hours)
         VALUES (#{employeeId}, #{date}, #{startTime}, #{endTime}, #{nightHours}, #{totalHours})
     </insert>
@@ -60,5 +60,12 @@
     <delete id="deleteOvertime">
         DELETE FROM Overtime WHERE overtime_id = #{overtimeId}
     </delete>
+
+    <!-- 근태 정보에 초과근무 ID 연결 -->
+    <update id="linkOvertimeToAttendance" parameterType="map">
+        UPDATE Attendance
+        SET overtime_id = #{overtimeId}
+        WHERE attendance_id = #{attendanceId}
+    </update>
 
 </mapper>

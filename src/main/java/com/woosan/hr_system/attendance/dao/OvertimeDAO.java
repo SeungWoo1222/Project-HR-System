@@ -43,8 +43,14 @@ public class OvertimeDAO {
     }
 
     // 초과근무 등록
-    public void insertOvertime(Overtime overtime) {
-        sqlSession.insert("overtime.insertOvertime", overtime);
+    public void insertOvertime(Overtime overtime, int attendanceId) {
+        int overtimeId = sqlSession.insert("overtime.insertOvertime", overtime);
+
+        // 근태 정보에 초과근무 ID 연결
+        Map<String, Object> param = new HashMap<>();
+        param.put("overtimeId", overtimeId);
+        param.put("attendanceId", attendanceId);
+        sqlSession.update("overtime.linkOvertimeToAttendance", param);
     }
 
     // 초과근무 수정

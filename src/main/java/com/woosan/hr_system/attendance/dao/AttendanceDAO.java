@@ -14,59 +14,53 @@ public class AttendanceDAO {
     @Autowired
     private SqlSession sqlSession;
 
-    private static final String NAMESPACE = "com.woosan.hr_system.attendance.dao.AttendanceDAO.";
-
     // 근태 ID를 통한 근태 상세 조회
     public Attendance getAttendanceById(int attendanceId) {
-        return sqlSession.selectOne(NAMESPACE + "getAttendanceById", attendanceId);
+        return sqlSession.selectOne("attendance.getAttendanceById", attendanceId);
     }
 
     // 사원 ID를 통한 해당 사원의 근태 목록 조회
     public List<Attendance> getAttendanceByEmployeeId(String employeeId) {
-        return sqlSession.selectList(NAMESPACE + "getAttendanceByEmployeeId", employeeId);
+        return sqlSession.selectList("attendance.getAttendanceByEmployeeId", employeeId);
     }
 
     // 모든 근태 목록 조회
     public List<Attendance> getAllAttendance() {
-        return sqlSession.selectList(NAMESPACE + "getAllAttendance");
+        return sqlSession.selectList("attendance.getAllAttendance");
     }
 
     // 금일 근태 현황 조회
     public List<Attendance> getTodayAttendance() {
-        return sqlSession.selectList(NAMESPACE + "getTodayAttendance", LocalDate.now());
+        return sqlSession.selectList("attendance.getTodayAttendance", LocalDate.now());
     }
-
-    // 근태 목록 검색 조회
-
-    // 부서원의 근태 목록 검색 조회
 
     // 근태 등록
     public void insertAttendance(Attendance attendance) {
-        sqlSession.insert(NAMESPACE + "insertAttendance", attendance);
+        sqlSession.insert("attendance.insertAttendance", attendance);
     }
 
     // 퇴근 시간 등록
     public void updateCheckout(Map<String, Object> params) {
-        sqlSession.update(NAMESPACE + "updateCheckout", params);
+        sqlSession.update("attendance.updateCheckout", params);
     }
 
     // 조퇴 처리
     public void updateEarlyLeave(Map<String, Object> params) {
-        sqlSession.update(NAMESPACE + "updateEarlyLeave", params);
+        sqlSession.update("attendance.updateEarlyLeave", params);
     }
 
     // 근태 수정
     public void updateAttendance(Attendance updatedAttendance) {
-        sqlSession.update(NAMESPACE + "updateAttendance", updatedAttendance);
+        sqlSession.update("attendance.updateAttendance", updatedAttendance);
     }
 
     // 금일 근태 ID 조회
     public int getMyTodayAttendance(Map<String, Object> params) {
-        return sqlSession.selectOne(NAMESPACE + "getMyTodayAttendance", params);
+        return sqlSession.selectOne("attendance.getMyTodayAttendance", params);
     }
 
     // 근태 목록 검색 조회
     public List<Attendance> searchAttendance(Map<String, Object> params) {
-        return sqlSession.selectList(NAMESPACE + "searchAttendance", params);
+        return sqlSession.selectList("attendance.searchAttendance", params);
     }
 }

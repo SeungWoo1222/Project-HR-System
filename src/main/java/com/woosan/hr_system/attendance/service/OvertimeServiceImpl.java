@@ -9,6 +9,7 @@ import com.woosan.hr_system.common.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -66,6 +67,7 @@ public class OvertimeServiceImpl implements OvertimeService{
         return overtimeDAO.getTotalWeeklyOvertime(employeeId, date);
     }
 
+    @Transactional
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 초과근무 등록
@@ -90,9 +92,9 @@ public class OvertimeServiceImpl implements OvertimeService{
                 .totalHours(overtimeHours)
                 .build();
 
-        overtimeDAO.insertOvertime(overtime);
+        overtimeDAO.insertOvertime(overtime, attendanceId);
 
-        return authService.getAuthenticatedUser().getNameWithId() + "사원의 새로운 초과근무(" + overtimeHours + "시간)가 등록되었습니다.";
+        return authService.getAuthenticatedUser().getNameWithId() + "님의 새로운 초과근무(" + overtimeHours + "시간)가 등록되었습니다.";
     }
 
     // 총 초과근무 시간 설정
