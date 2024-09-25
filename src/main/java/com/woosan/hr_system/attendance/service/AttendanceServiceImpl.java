@@ -103,6 +103,20 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceDAO.getTotalWeeklyWorkingTime(employeeId, date);
     }
 
+    @Override // 사원의 이번 달 근태 조회
+    public Map<String, Object> getThisMonthAttendance(String employeeId, YearMonth yearMonth) {
+        // 사원의 이번 달 근태 조회
+        List<Attendance> attendanceList = attendanceDAO.getThisMonthAttendance(employeeId, yearMonth);
+
+        // 총 근무시간 계산
+        double totalWorkingTime = attendanceList.stream()
+                .mapToDouble(Attendance::getWorkingHours)
+                .sum();
+
+        return Map.of("totalTime", totalWorkingTime,
+                    "days", attendanceList.size());
+    }
+
     @Override // 로그인한 사원의 금일 근태기록 있는지 확인
     public Attendance hasTodayAttendanceRecord () {
         // 로그인 사원 ID 조회

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,5 +72,13 @@ public class AttendanceDAO {
         param.put("employeeId", employeeId);
         param.put("date", date);
         return sqlSession.selectOne("attendance.getTotalWeeklyWorkingTime", param);
+    }
+
+    // 사원의 이번 달 근태 조회
+    public List<Attendance> getThisMonthAttendance(String employeeId, YearMonth yearMonth) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("employeeId", employeeId);
+        param.put("yearMonth", yearMonth);
+        return sqlSession.selectList("attendance.getThisMonthAttendance", param);
     }
 }
