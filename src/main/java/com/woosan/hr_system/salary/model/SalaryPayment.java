@@ -44,6 +44,12 @@ public class SalaryPayment { // 급여 명세서
     private int deductions;              // 총 공제 금액 (위 공제 항목들의 합)
     private int grossSalary;             // 총 급여
     private int netSalary;               // 실 지급액 (총 급여 - 공제 금액)
+
+    // 근태 정보
+    private int days;                    // 근로일수
+    private double totalTime;             // 총 근로시간
+    private double totalOvertime;         // 총 초과근로시간
+    private double totalNightTime;        // 총 야간근로시간
     private String remarks;              // 비고
 
     private Salary salary;               // 급여 정보

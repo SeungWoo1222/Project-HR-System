@@ -76,7 +76,7 @@ public class OvertimeServiceImpl implements OvertimeService{
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 초과근무 등록
-    public String addOvertime(int attendanceId, LocalTime startTime, LocalTime endTime) {
+    public String addOvertime(int attendanceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
 
         // 총 초과 근무 시간 설정
@@ -90,7 +90,7 @@ public class OvertimeServiceImpl implements OvertimeService{
         // 초과근무 객체 생성 후 등록
         Overtime overtime = Overtime.builder()
                 .employeeId(employeeId)
-                .date(LocalDate.now())
+                .date(date)
                 .startTime(startTime)
                 .endTime(endTime)
                 .nightHours(nightHours)

@@ -108,7 +108,45 @@
                 </otherwise>
             </choose>
         FROM income_tax
-        WHERE #{taxableSalary} &gt;= salary_min AND #{taxableSalary} &lt; salary_max;
+        WHERE #{taxableSalary} &gt;= salary_min AND #{taxableSalary} &lt; salary_max
     </select>
 
+    <!-- 소득세 조회 (1억 이상) -->
+    <select id="selectIncomeTaxFor100Million" parameterType="map" resultType="int">
+        SELECT
+        <choose>
+            <when test="numChildren == 2">
+                tax_amount_for_2_dependent
+            </when>
+            <when test="numChildren == 3">
+                tax_amount_for_3_dependent
+            </when>
+            <when test="numChildren == 4">
+                tax_amount_for_4_dependent
+            </when>
+            <when test="numChildren == 5">
+                tax_amount_for_5_dependent_dependent
+            </when>
+            <when test="numChildren == 6">
+                tax_amount_for_6_dependent
+            </when>
+            <when test="numChildren == 7">
+                tax_amount_for_8_dependent
+            </when>
+            <when test="numChildren == 9">
+                tax_amount_for_9_dependent
+            </when>
+            <when test="numChildren == 10">
+                tax_amount_for_10_dependent
+            </when>
+            <when test="numChildren == 11">
+                tax_amount_for_11_dependent
+            </when>
+            <otherwise>
+                tax_amount_for_1_dependent
+            </otherwise>
+        </choose>
+        FROM income_tax
+        WHERE #{taxableSalary} = salary_min AND #{taxableSalary} = salary_max
+    </select>
 </mapper>

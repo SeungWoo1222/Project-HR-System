@@ -108,7 +108,7 @@ public class AttendanceViewController {
         Attendance attendance = attendanceService.hasTodayAttendanceRecord();
         model.addAttribute("attendance", attendance);
 
-        String employeeId = attendance.getEmployeeId();
+        String employeeId = authService.getAuthenticatedUser().getUsername();
         LocalDate today = LocalDate.now();
 
         // 이번 주 근무시간, 초과근무, 야간근무 시간 조회

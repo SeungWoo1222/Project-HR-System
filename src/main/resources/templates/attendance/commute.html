@@ -77,12 +77,12 @@
             th:classappend="${attendance == null} ? 'check-in ' : ''"
             th:disabled="${attendance != null}"
             onclick="checkInAndOut('POST', '출근')">출근
-            <span th:text="${#temporals.format(attendance.checkIn, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
+            <span th:if="${attendance != null and attendance.checkIn != null}" th:text="${#temporals.format(attendance.checkIn, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
     <button type="button" class="attendance-btn"
             th:classappend="${attendance != null and attendance.checkOut == null} ? 'check-out ' : ''"
             th:disabled="${attendance == null or attendance.checkOut != null}"
             onclick="checkInAndOut('PATCH', '퇴근')">퇴근
-            <span th:text="${#temporals.format(attendance.checkOut, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
+            <span th:if="${attendance != null and attendance.checkOut != null}" th:text="${#temporals.format(attendance.checkOut, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
   </div>
   <h4>이번 주 근무시간 ></h4>
   <div class="weekly-summary">

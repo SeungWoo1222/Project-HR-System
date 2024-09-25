@@ -212,7 +212,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             // 이번 주 초과근무 총 시간 조회 후 12시간이 넘지 않는다면 초과근무 등록
             if (overtimeService.getTotalWeeklyOvertime(todayAttendance.getEmployeeId(), LocalDate.now()) < 12.0f) {
                 LocalTime startTime = checkInTime.plusHours(9);
-                overtimeService.addOvertime(todayAttendanceId, startTime, now);
+                overtimeService.addOvertime(todayAttendanceId, todayAttendance.getDate(), startTime, now);
             }
         }
 
