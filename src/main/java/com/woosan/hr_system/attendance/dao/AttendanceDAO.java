@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,5 +63,13 @@ public class AttendanceDAO {
     // 근태 목록 검색 조회
     public List<Attendance> searchAttendance(Map<String, Object> params) {
         return sqlSession.selectList("attendance.searchAttendance", params);
+    }
+
+    // 사원의 이번 주 근무시간 조회
+    public float getTotalWeeklyWorkingTime(String employeeId, LocalDate date) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("employeeId", employeeId);
+        param.put("date", date);
+        return sqlSession.selectOne("attendance.getTotalWeeklyWorkingTime", param);
     }
 }

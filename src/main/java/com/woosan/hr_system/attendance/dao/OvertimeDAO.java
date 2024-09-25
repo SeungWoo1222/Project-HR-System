@@ -42,6 +42,14 @@ public class OvertimeDAO {
         return sqlSession.selectOne("overtime.getTotalWeeklyOvertime", param);
     }
 
+    // 사원의 이번 주 야간근무 총 시간 조회
+    public float getTotalWeeklyNightOvertime(String employeeId, LocalDate date) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("employeeId", employeeId);
+        param.put("date", date);
+        return sqlSession.selectOne("overtime.getTotalWeeklyNightOvertime", param);
+    }
+
     // 초과근무 등록
     public void insertOvertime(Overtime overtime, int attendanceId) {
         int overtimeId = sqlSession.insert("overtime.insertOvertime", overtime);

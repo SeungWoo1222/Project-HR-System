@@ -15,38 +15,46 @@
 
     <!-- ID를 이용한 초과근무 조회 -->
     <select id="getOvertimeById" resultMap="OvertimeResultMap">
-        SELECT * FROM Overtime WHERE overtime_id = #{overtimeId}
+        SELECT * FROM overtime WHERE overtime_id = #{overtimeId}
     </select>
 
     <!-- 모든 초과근무 조회 -->
     <select id="getAllOvertimes" resultMap="OvertimeResultMap">
-        SELECT * FROM Overtime
+        SELECT * FROM overtime
     </select>
 
     <!-- 사원의 이번 달 초과근무 조회 -->
     <select id="getThisMonthOvertimes" resultMap="OvertimeResultMap">
-        SELECT * FROM Overtime
+        SELECT * FROM overtime
         WHERE employee_id = #{employeeId}
           AND DATE_FORMAT(date, '%Y-%m') = #{yearMonth}
     </select>
 
-    <!-- 사원의 이번 주 초과근무 총 시간 조회 -->
+    <!-- 사원의 이번 주 초과근무 시간 조회 -->
     <select id="getTotalWeeklyOvertime" resultType="float">
         SELECT COALESCE(SUM(total_hours), 0)
-        FROM Overtime
+        FROM overtime
+        WHERE employee_id = #{employeeId}
+          AND WEEK(date, 1) = WEEK(#{date}, 1)
+    </select>
+
+    <!-- 사원의 이번 주 야간근무 시간 조회 -->
+    <select id="getTotalWeeklyNightOvertime" resultType="float">
+        SELECT COALESCE(SUM(night_hours), 0)
+        FROM overtime
         WHERE employee_id = #{employeeId}
           AND WEEK(date, 1) = WEEK(#{date}, 1)
     </select>
 
     <!-- 초과근무 등록 -->
     <insert id="insertOvertime" useGeneratedKeys="true" keyProperty="overtimeId">
-        INSERT INTO Overtime (employee_id, date, start_time, end_time, night_hours, total_hours)
+        INSERT INTO overtime (employee_id, date, start_time, end_time, night_hours, total_hours)
         VALUES (#{employeeId}, #{date}, #{startTime}, #{endTime}, #{nightHours}, #{totalHours})
     </insert>
 
     <!-- 초과근무 수정 -->
     <update id="updateOvertime">
-        UPDATE Overtime
+        UPDATE overtime
         SET employee_id = #{employeeId},
             date = #{date},
             start_time = #{startTime},
@@ -58,7 +66,7 @@
 
     <!-- 초과근무 삭제 -->
     <delete id="deleteOvertime">
-        DELETE FROM Overtime WHERE overtime_id = #{overtimeId}
+        DELETE FROM overtime WHERE overtime_id = #{overtimeId}
     </delete>
 
     <!-- 근태 정보에 초과근무 ID 연결 -->

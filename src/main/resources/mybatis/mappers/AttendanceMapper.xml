@@ -133,4 +133,12 @@
         ORDER BY a.date DESC, a.check_in ASC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
+
+    <!-- 사원의 이번 주 근무시간 조회 -->
+    <select id="getTotalWeeklyWorkingTime" resultType="float">
+        SELECT COALESCE(SUM(working_hours), 0)
+        FROM attendance
+        WHERE employee_id = #{employeeId}
+          AND WEEK(date, 1) = WEEK(#{date}, 1)
+    </select>
 </mapper>

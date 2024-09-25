@@ -13,6 +13,7 @@ public interface OvertimeService {
     List<Overtime> getAllOvertimes();
     Map<String, Object> getThisMonthOvertimes(String employeeId, YearMonth yearMonth);
     float getTotalWeeklyOvertime(String employeeId, LocalDate date);
+    float getTotalWeeklyNightOvertime(String employeeId, LocalDate date);
     String addOvertime(int attendanceId, LocalTime startTime, LocalTime endTime);
     String editOvertime(Overtime overtime);
     String deleteOvertime(int overtimeId);

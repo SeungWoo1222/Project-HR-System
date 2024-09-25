@@ -98,6 +98,11 @@ public class AttendanceServiceImpl implements AttendanceService {
         return new PageResult<>(attendanceList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
+    @Override // 사원의 이번 주 근무 시간 조회
+    public float getTotalWeeklyWorkingTime(String employeeId, LocalDate date) {
+        return attendanceDAO.getTotalWeeklyWorkingTime(employeeId, date);
+    }
+
     @Override // 로그인한 사원의 금일 근태기록 있는지 확인
     public Attendance hasTodayAttendanceRecord () {
         // 로그인 사원 ID 조회

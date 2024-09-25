@@ -2,6 +2,7 @@ package com.woosan.hr_system.attendance.controller.view;
 
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.service.AttendanceService;
+import com.woosan.hr_system.attendance.service.OvertimeService;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +42,8 @@ public class AttendanceViewController {
     private VacationService vacationService;
     @Autowired
     private HolidayService holidayService;
+    @Autowired
+    private OvertimeService overtimeService;
 
     @GetMapping// 나의 근태 페이지
     public String viewMyAttendance(Model model) {
@@ -48,6 +53,7 @@ public class AttendanceViewController {
 
         // 모든 공휴일 모델에 추가
         model.addAttribute("holidays", holidayService.getAllHoliday());
+
         return "attendance/my-log";
     }
 
@@ -65,8 +71,39 @@ public class AttendanceViewController {
     @GetMapping("/commute") // 출퇴근 페이지
     public String viewCommuteModal(Model model) {
         // 로그인한 사원의 금일 근태기록 있는지 확인 후 모델에 추가
-        model.addAttribute("attendance", attendanceService.hasTodayAttendanceRecord());
+        Attendance attendance = attendanceService.hasTodayAttendanceRecord();
+        model.addAttribute("attendance", attendance);
+
+        String employeeId = attendance.getEmployeeId();
+        LocalDate today = LocalDate.now();
+
+        // 이번 주 근무시간, 초과근무, 야간근무 시간 조회
+        float totalWorkingTime = attendanceService.getTotalWeeklyWorkingTime(employeeId, today);
+        float totalOverTime = overtimeService.getTotalWeeklyOvertime(employeeId, today);
+        float totalNightTime = overtimeService.getTotalWeeklyNightOvertime(employeeId, today);
+
+        // 조회한 시간 LocalTime으로 변환
+        LocalTime workingTime = convertToLocalTime(totalWorkingTime);
+        LocalTime overtime = convertToLocalTime(totalOverTime);
+        LocalTime overtimeWithoutNight = convertToLocalTime(totalOverTime - totalNightTime);
+        LocalTime nightTime = convertToLocalTime(totalNightTime);
+        LocalTime totalTime = convertToLocalTime(totalWorkingTime + totalOverTime);
+
+        // 모델에 추가
+        model.addAttribute("workingTime", workingTime);
+        model.addAttribute("totalOverTime", overtime);
+        model.addAttribute("overtime", overtimeWithoutNight);
+        model.addAttribute("nightTime", nightTime);
+        model.addAttribute("totalTime", totalTime);
+
         return "attendance/commute";
+    }
+
+    // 근무 시간을 분으로 변환한 후, 시간과 분으로 분리
+    private LocalTime convertToLocalTime(float f) {
+        int hours = (int) f;
+        int minutes = (int) ((f - hours) * 60);
+        return LocalTime.of(hours, minutes);
     }
 
     @GetMapping("/early-leave") // 조퇴 페이지

@@ -1,8 +1,71 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
+<style>
+  .attendance-modal h3 {
+    margin: 0;
+  }
+  .attendance-modal h4 {
+    margin: 15px 0 10px;
+  }
+  .weekly-summary {
+    line-height: 3;
+    border: solid 1px #888888;
+    border-radius: 10px;
+  }
+
+  .weekly-summary p {
+    margin: 0;
+  }
+
+  .weekly-section {
+    padding: 0 15px 0 10px;
+  }
+
+  .weekly-section:nth-child(2), .weekly-section:nth-child(3) {
+    border-top: solid 1px #888888;
+  }
+
+  .basic-work, .over-work, .total-work {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px
+  }
+
+  .work-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .basic-work > .work-header, .over-work > .work-header, .work-time {
+    color: #6C6C6C;
+    font-weight: bold;
+  }
+
+  .total-work > .work-header, .total-time {
+    font-weight: bold;
+  }
+
+  .over-work > p {
+    margin-left: 40px;
+    color: #878787;
+  }
+
+  .over-work-time {
+    color: #878787;
+  }
+
+  .commute-icon {
+    width: 30px;
+  }
+</style>
+
 <div class="attendance-modal">
-  <h3 style="margin: 0;">출퇴근 ></h3>
+  <h3>출퇴근 ></h3>
   <p th:text="${#dates.format(#dates.createToday(), 'yyyy.MM.dd EE')}" style="margin: 10px 0 10px; color: #C8C8C8"></p>
   <div class="time-container">
     <div th:if="${attendance != null and attendance.checkOut == null}" class="attendance-status"><img src="/images/icons/switch-on.png"/></div>
@@ -13,11 +76,56 @@
     <button type="button" class="attendance-btn"
             th:classappend="${attendance == null} ? 'check-in ' : ''"
             th:disabled="${attendance != null}"
-            onclick="checkInAndOut('POST', '출근')">출근</button>
+            onclick="checkInAndOut('POST', '출근')">출근
+            <span th:text="${#temporals.format(attendance.checkIn, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
     <button type="button" class="attendance-btn"
             th:classappend="${attendance != null and attendance.checkOut == null} ? 'check-out ' : ''"
             th:disabled="${attendance == null or attendance.checkOut != null}"
-            onclick="checkInAndOut('PATCH', '퇴근')">퇴근</button>
+            onclick="checkInAndOut('PATCH', '퇴근')">퇴근
+            <span th:text="${#temporals.format(attendance.checkOut, '(HH시 mm분)')}" style="font-size: 14px; color: #565656;"></span></button>
+  </div>
+  <h4>이번 주 근무시간 ></h4>
+  <div class="weekly-summary">
+    <div class="weekly-section">
+      <div class="basic-work">
+        <div class="work-header">
+          <img class="commute-icon" src="/images/icons/egg.png" alt="기본 근무"/>
+          <p>기본 근무</p>
+        </div>
+        <span class="work-time" th:text="${#temporals.format(workingTime, 'H시간')} + ' '
+        + (${#temporals.format(workingTime, 'm')} != '0' ? ${#temporals.format(workingTime, 'm분')} : '') + ' / 40시간'"></span>
+      </div>
+    </div>
+    <div class="weekly-section">
+      <div class="over-work">
+        <div class="work-header">
+          <img class="commute-icon" src="/images/icons/fire.png" alt="초과 근무"/>
+          <p>초과 근무</p>
+        </div>
+        <span class="work-time" th:text="${#temporals.format(totalOverTime, 'H시간')} + ' '
+        + (${#temporals.format(totalOverTime, 'm')} != '0' ? ${#temporals.format(totalOverTime, 'm분')} : '') + ' / 12시간'"></span>
+      </div>
+      <div class="over-work">
+        <p>연장</p>
+        <span class="over-work-time" th:text="${#temporals.format(overtime, 'H시간')} + ' '
+        + (${#temporals.format(overtime, 'm')} != 0 ? ${#temporals.format(overtime, 'm분')} : '')"></span>
+      </div>
+      <div class="over-work">
+        <p>연장 • 야간</p>
+        <span class="over-work-time" th:text="${#temporals.format(nightTime, 'H시간')} + ' '
+        + (${#temporals.format(nightTime, 'm')} != 0 ? ${#temporals.format(nightTime, 'm분')} : '')"></span>
+      </div>
+    </div>
+    <div class="weekly-section">
+      <div class="total-work">
+        <div class="work-header">
+          <img class="commute-icon" src="/images/icons/time.png" alt="전체 시간"/>
+          <p>전체 시간</p>
+        </div>
+        <span class="total-time" th:text="${#temporals.format(totalTime, 'H시간')} + ' '
+        + (${#temporals.format(totalTime, 'm')} != 0 ? ${#temporals.format(totalTime, 'm분')} : '') + ' / 52시간'"></span>
+      </div>
+    </div>
   </div>
 </div>
 

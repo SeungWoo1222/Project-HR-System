@@ -62,9 +62,14 @@ public class OvertimeServiceImpl implements OvertimeService{
                 "days", overtimeList.size());
     }
 
-    @Override // 사원의 이번 주 초과근무 총 시간 조회
+    @Override // 사원의 이번 주 초과근무 시간 조회
     public float getTotalWeeklyOvertime(String employeeId, LocalDate date) {
         return overtimeDAO.getTotalWeeklyOvertime(employeeId, date);
+    }
+
+    @Override // 사원의 이번 주 야간근무 시간 조회
+    public float getTotalWeeklyNightOvertime(String employeeId, LocalDate date) {
+        return overtimeDAO.getTotalWeeklyNightOvertime(employeeId, date);
     }
 
     @Transactional
