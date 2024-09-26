@@ -18,7 +18,7 @@
     </resultMap>
 
     <!-- 전체 출장 목록 조회 -->
-    <select id="getAllBusinessTrips" resultMap="BusinessTripResultMap">
+    <select id="getAllBusinessTrips" parameterType="int" resultMap="BusinessTripResultMap">
         SELECT
             trip_id, task_id, address, detailed_address, created_date, status,
             client_name, contact_tel, contact_email, note
@@ -32,7 +32,7 @@
             trip_id, task_id, address, detailed_address, created_date, status,
             client_name, contact_tel, contact_email, note
         FROM business_trips
-        WHERE trip_id = #{tripId}
+        WHERE taskId = #{taskId}
     </select>
 
     <!-- 새로운 출장 정보 삽입 -->
@@ -47,7 +47,6 @@
     <update id="updateBusinessTrip" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
         UPDATE business_trips
         SET
-            task_id = #{taskId},
             address = #{address},
             detailed_address = #{detailedAddress},
             status = #{status},
@@ -55,7 +54,7 @@
             contact_tel = #{contactTel},
             contact_email = #{contactEmail},
             note = #{note}
-        WHERE trip_id = #{tripId}
+        WHERE task_id = #{taskId}
     </update>
 
     <!-- 출장 정보 삭제 -->

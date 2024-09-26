@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <style>
-        .slider::after {
-            left: 0;
-        }
-    </style>
+<!--<head>-->
+<!--    &lt;!&ndash; 네이버 지도 API &ndash;&gt;-->
+<!--    <script type="text/javascript"-->
+<!--            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=YOUR_CLIENT_ID&submodules=geocoder"></script>-->
+<!--    <script th:src="@{/js/schedule/trip.js}"></script>-->
+<!--</head>-->
 
-    <!-- 네이버 지도 API -->
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=YOUR_CLIENT_ID&submodules=geocoder"></script>
-    <script th:src="@{/js/schedule/trip.js}"></script>
-</head>
 <body>
 <div class="detail-container">
     <div class="btn-container">
         <button type="button" class="btn">일정 상태 변경</button>
-        <button class="btn" th:taskId="${schedule.taskId}" th:onclick="goToUpdateForm(this.getAttribute('taskId'))">수정하기</button>
-        <button class="btn" th:taskId="${schedule.taskId}" th:onclick="deleteSchedule(this.getAttribute('taskId'))">삭제하기</button>
+        <button class="btn" th:taskId="${schedule.taskId}" th:onclick="goToUpdateForm(this.getAttribute('taskId'))">
+            수정하기
+        </button>
+        <button class="btn" th:taskId="${schedule.taskId}" th:onclick="deleteSchedule(this.getAttribute('taskId'))">
+            삭제하기
+        </button>
     </div>
     <div class="task-name" style="text-align: center; margin-bottom: 20px;">
         <h2 th:text="'작업명 : ' + ${schedule.taskName}"></h2>
@@ -57,7 +57,8 @@
             <td th:text="${schedule.status}"
                 th:classappend="${schedule.status == '시작 전'} ? 'notStarted' :
                                    (${schedule.status == '진행 중'} ? 'inProcess' :
-                                   (${schedule.status == '완료'} ? 'done' : ''))">상태</td>
+                                   (${schedule.status == '완료'} ? 'done' : ''))">상태
+            </td>
         </tr>
     </table>
     <table class="details">
@@ -77,25 +78,47 @@
             <td class="section-title">프로젝트 정보</td>
             <td th:text="${schedule.projectId}">프로젝트 번호</td>
         </tr>
-        <tr>
-            <td class="section-title">출장 정보</td>
-            <td>
-                <div>
-                    주소: <span id="sample6_address" th:text="${trip.address}"></span>
-                    상세 주소: <span id="sample6_detailAddress" th:text="${trip.detailedAddress}"></span>
-                    고객명: <span th:text="${trip.clientName}"></span>
-                    전화번호: <span th:text="${trip.contactTel}"></span>
-                    이메일: <span th:text="${trip.contactEmail}"></span>
-                    비고: <span th:text="${trip.note}"></span>
-                    <button type="button" onclick="viewMap()">지도 보기</button>
-                </div>
-                <div id="map-section" style="display: none;">
-                    <!-- 지도와 수정 버튼 -->
-                    <div id="map" style="width:500px; height:400px;"></div>
-                </div>
-            </td>
-        </tr>
     </table>
+    <!-- 출장 정보 표시 -->
+    <div>
+        <h3>출장 정보</h3>
+        <table class="details" th:each="trip, stat : ${trips}">
+            <tr>
+                <input type="hidden" id="sample6_address_[[${stat.index}]]" th:value="${trip.address}" />
+                <td class="section-title">주소</td>
+                <td th:value="${trip.address}" th:text="${trip.address}">주소</td>
+            </tr>
+            <tr>
+                <input type="hidden" id="sample6_detailAddress_[[${stat.index}]]" th:value="${trip.detailedAddress}" />
+                <td class="section-title">상세주소</td>
+                <td th:value="${trip.detailedAddress}" th:text="${trip.detailedAddress}">상세 주소</td>
+            </tr>
+            <tr>
+                <td class="section-title">고객명</td>
+                <td th:text="${trip.clientName}">고객명</td>
+            </tr>
+            <tr>
+                <td class="section-title">전화번호</td>
+                <td th:text="${trip.contactTel}">전화번호</td>
+            </tr>
+            <tr>
+                <td class="section-title">이메일</td>
+                <td th:text="${trip.contactEmail}">이메일</td>
+            </tr>
+            <tr>
+                <td class="section-title">비고</td>
+                <td th:text="${trip.note}">비고</td>
+            </tr>
+            <!-- 지도 보기 버튼 -->
+            <button type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}" onclick="viewMapWithData(this)">
+                지도 보기</button>
+            <!-- 지도 표시 -->
+            <div id="map-section" style="display: none;">
+                <div id="map" style="width:500px; height:400px;"></div>
+            </div>
+        </table>
+    </div>
+
 </div>
 </body>
 </html>

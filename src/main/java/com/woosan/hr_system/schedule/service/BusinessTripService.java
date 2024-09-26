@@ -7,7 +7,7 @@ import java.util.List;
 public interface BusinessTripService {
     List<BusinessTrip> getAllBusinessTrips(int taskId);
 
-    BusinessTrip getBusinessTripById(int tripId);
+    BusinessTrip getBusinessTripById(int taskId);
 
     void insertBusinessTrip(String tripInfoJson, int taskId);
 

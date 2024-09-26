@@ -28,9 +28,12 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <!--네이버 지도 API-->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uu5esh416f&submodules=geocoder"></script>
+    <script th:src="@{/js/schedule/trip.js}"></script>
     <script th:src="@{/js/schedule/create.js}"></script>
     <script th:src="@{/js/schedule/ajax.js}"></script>
+    <script th:src="@{/js/schedule/edit.js}"></script>
+
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
@@ -113,7 +116,6 @@
                                        (${schedule.status == '완료'} ? 'done' : ''))">일정 상태</td>
                     <td th:text="${#temporals.format(schedule.createdDate, 'MM월 dd일(EE)')}">일정 생성일</td>
                     <td th:text="${schedule.projectId}">프로젝트 번호</td>
-                    <td th:text="${schedule.tripId}">출장 번호</td>
                 </tr>
                 </tbody>
             </table>

@@ -33,7 +33,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 등록
     public int insertSchedule(Schedule schedule) {
-        log.info("Schedule ServiceImpl 도착");
         // created_date, memberId 설정
         schedule.setCreatedDate(LocalDateTime.now());
         UserSessionInfo userSessionInfo = new UserSessionInfo();

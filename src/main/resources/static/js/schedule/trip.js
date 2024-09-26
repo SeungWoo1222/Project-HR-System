@@ -11,7 +11,9 @@ function viewMap() {
     }
 
     // 주소 입력창 숨기기, 지도 보여주기
-    document.getElementById('address-input-section').style.display = 'none';
+    if (document.getElementById('address-input-section')) {
+        document.getElementById('address-input-section').style.display = 'none';
+    }
     document.getElementById('map-section').style.display = 'block';
 
     var fullAddress = address + ' ' + detailAddress;
@@ -57,16 +59,20 @@ function viewMap() {
     });
 }
 
-// 주소 수정 버튼 클릭 시 주소 입력창 다시 표시
-function editAddress() {
-    document.getElementById('map-section').style.display = 'none';
-    document.getElementById('address-input-section').style.display = 'block';
-}
+function viewMapWithData(button) {
+    const address = button.getAttribute('data-address');
+    const detailAddress = button.getAttribute('data-detail');
 
-// 일정 세부조회 중 지도 표시
-function showMapForSchedule(mapId, address, detailedAddress) {
-    const fullAddress = address + ' ' + detailedAddress;
+    if (!address) {
+        alert('주소를 입력하세요.');
+        return;
+    }
 
+    document.getElementById('map-section').style.display = 'block';
+
+    const fullAddress = address + ' ' + detailAddress;
+
+    // 지도 표시 로직
     naver.maps.Service.geocode({ query: fullAddress }, function (status, response) {
         if (status === naver.maps.Service.Status.ERROR) {
             alert('Geocode Error');
@@ -91,8 +97,7 @@ function showMapForSchedule(mapId, address, detailedAddress) {
                 },
             };
 
-            // 각 divId에 맞는 지도를 생성하고 마커를 추가
-            var map = new naver.maps.Map(mapId, mapOptions);
+            var map = new naver.maps.Map('map', mapOptions);
 
             new naver.maps.Marker({
                 position: newCenter,
@@ -105,6 +110,12 @@ function showMapForSchedule(mapId, address, detailedAddress) {
             alert('No result');
         }
     });
+}
+
+// 주소 수정 버튼 클릭 시 주소 입력창 다시 표시
+function editAddress() {
+    document.getElementById('map-section').style.display = 'none';
+    document.getElementById('address-input-section').style.display = 'block';
 }
 
 // 우편번호 입력 창 생성
@@ -158,7 +169,6 @@ function sample6_execDaumPostcode() {
 
 // 출장 정보 저장
 function saveTripInfo() {
-    console.log("trip.js 내 saveTripInfo 실행");
 
     // 유효성 검사 통과 후에만 등록 확인
     if (validateTripInfo()) {
@@ -185,8 +195,6 @@ function saveTripInfo() {
             // trip.name을 넘겨서 출장지 이름만 업데이트
             updateTripList(trip.clientName);
 
-            console.log("tripInfo 정보", tripInfo);
-
             alert("등록이 완료되었습니다!");
             closeModal();
         }
@@ -194,7 +202,6 @@ function saveTripInfo() {
 }
 
 function validateTripInfo() {
-    console.log("trip.js 내 validateTripInfo 실행");
 
     const address = document.getElementById('sample6_address').value;
     const detailedAddress = document.getElementById('sample6_detailAddress').value;

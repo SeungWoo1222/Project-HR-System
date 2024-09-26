@@ -17,9 +17,7 @@ public class ScheduleDAO {
 
     // 일정 생성
     public int insertSchedule(Schedule schedule) {
-        log.info("Schedule ServiceDAO 도착");
         sqlSession.insert(NAMESPACE + "createSchedule", schedule);
-        log.info("반환된 taskId: {}", schedule.getTaskId());
         return schedule.getTaskId();
     }
 

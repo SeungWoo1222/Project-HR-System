@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-
+<body>
 <form action="/schedule" onsubmit="submitUpdateForm(event)">
   <div class="detail-container">
     <div class="insert-form-header">
@@ -100,16 +100,65 @@
           </select>
         </td>
       </tr>
-      <tr>
-        <td class="section-title">연관된 출장</td>
-        <td>
-          <select id="mapId" name="mapId">
-            <!-- 출장 구현 완료 되면 ajax로 불러올 예정 -->
-            <option value="" disabled selected>선택해주세요.</option>
-          </select>
-        </td>
-      </tr>
     </table>
+    <!-- 출장 정보 표시 -->
+    <div>
+      <h3>출장 정보</h3>
+      <table class="details" th:each="trip, stat : ${trips}">
+        <tr>
+          <input type="hidden" id="sample6_address_[[${stat.index}]]" th:value="${trip.address}" />
+          <td class="section-title">주소</td>
+          <td th:value="${trip.address}" th:text="${trip.address}">주소</td>
+        </tr>
+        <tr>
+          <input type="hidden" id="sample6_detailAddress_[[${stat.index}]]" th:value="${trip.detailedAddress}" />
+          <td class="section-title">상세주소</td>
+          <td th:value="${trip.detailedAddress}" th:text="${trip.detailedAddress}">상세 주소</td>
+        </tr>
+        <tr>
+          <td class="section-title">고객명</td>
+          <td th:text="${trip.clientName}">고객명</td>
+        </tr>
+        <tr>
+          <td class="section-title">전화번호</td>
+          <td th:text="${trip.contactTel}">전화번호</td>
+        </tr>
+        <tr>
+          <td class="section-title">이메일</td>
+          <td th:text="${trip.contactEmail}">이메일</td>
+        </tr>
+        <tr>
+          <td class="section-title">비고</td>
+          <td th:text="${trip.note}">비고</td>
+        </tr>
+        <!-- 지도 보기 버튼 -->
+        <button type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}"
+                onclick="viewMapByEdit(this)">지도 보기</button>
+
+        <!-- 주소 수정 버튼 -->
+        <button type="button" onclick="editAddressByEdit(this)">주소 수정</button>
+
+        <!-- 지도 및 주소 수정 섹션 -->
+        <div class="map-section" style="display: none;">
+          <div class="map" style="width:500px; height:400px;"></div>
+        </div>
+
+        <!-- 주소 입력 폼 -->
+        <div class="address-input-section" style="display: none;">
+          <form>
+            <input type="text" class="sample6_postcode" placeholder="우편번호">
+            <input type="button" value="우편번호 찾기" onclick="sample6_execDaumPostcode(this)"><br>
+            <input type="text" class="sample6_address" placeholder="주소"><br>
+            <input type="text" class="sample6_detailAddress" placeholder="상세주소"><br>
+            <input type="text" class="sample6_extraAddress" placeholder="참고항목">
+            <button type="button" onclick="saveUpdatedAddress(this)">저장</button>
+          </form>
+        </div>
+      </table>
+    </div>
   </div>
 </form>
+<script th:src="@{/js/schedule/edit.js}"></script>
+
+</body>
 </html>

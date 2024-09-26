@@ -28,8 +28,8 @@ public class BusinessTripServiceImpl implements BusinessTripService {
     }
 
     @Override
-    public BusinessTrip getBusinessTripById(int tripId) {
-        return businessTripDAO.getBusinessTripById(tripId);
+    public BusinessTrip getBusinessTripById(int taskId) {
+        return businessTripDAO.getBusinessTripById(taskId);
     }
 
     @Override

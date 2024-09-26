@@ -47,7 +47,6 @@ public class ScheduleController {
                                         && schedule.getEndTime().toLocalDate().isAfter(today)))
                 .toList();
         model.addAttribute("todaySchedules", todaySchedules);
-
         return "schedule/list";
     }
 
@@ -61,7 +60,6 @@ public class ScheduleController {
 
         // 해당 일정과 연관된 출장 정보만 가져오기
         List<BusinessTrip> trips = businessTripService.getAllBusinessTrips(taskId);
-        log.info("trips 갯수 : {}", trips.size());
         model.addAttribute("trips", trips);
         return "schedule/detail";
     }
@@ -80,8 +78,11 @@ public class ScheduleController {
 
     @GetMapping("/{taskId}/edit") // 일정 수정 페이지
     public String newScheduleForm(@PathVariable("taskId") int taskId, Model model) {
+        log.info("일정 수정 컨트롤러 호출");
         Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", scheduleInfo);
+        List<BusinessTrip> businessTrip = businessTripService.getAllBusinessTrips(taskId);
+        model.addAttribute("trips", businessTrip);
         model.addAttribute("employee", employeeService.getEmployeeById(scheduleInfo.getMemberId()));
         return "schedule/edit";
     }

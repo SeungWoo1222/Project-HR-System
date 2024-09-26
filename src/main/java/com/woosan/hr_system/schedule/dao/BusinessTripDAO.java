@@ -17,12 +17,12 @@ public class BusinessTripDAO {
 
     // 전체 출장 목록 조회
     public List<BusinessTrip> getAllBusinessTrips(int taskId) {
-        return sqlSession.selectList(NAMESPACE + "getAllBusinessTrips");
+        return sqlSession.selectList(NAMESPACE + "getAllBusinessTrips", taskId);
     }
 
-    // 출장 ID로 단일 출장 조회
-    public BusinessTrip getBusinessTripById(int tripId) {
-        return sqlSession.selectOne(NAMESPACE + "getBusinessTripById", tripId);
+    // 일정Id로 단일 출장 조회
+    public BusinessTrip getBusinessTripById(int taskId) {
+        return sqlSession.selectOne(NAMESPACE + "getBusinessTripById", taskId);
     }
 
     // 새로운 출장 정보 생성
