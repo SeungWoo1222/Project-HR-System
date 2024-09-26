@@ -151,7 +151,7 @@ public class OvertimeServiceImpl implements OvertimeService{
         // 변경사항 확인
         checkForOvertimeChanges(originalOvertime, overtime);
 
-        LocalTime startTime = originalOvertime.getStartTime();
+        LocalTime startTime = overtime.getStartTime();
 
         // 총 초과 근무 시간 설정
         Map<String, Object> map = setTotalHours(overtime.getEmployeeId(), startTime, overtime.getEndTime());
