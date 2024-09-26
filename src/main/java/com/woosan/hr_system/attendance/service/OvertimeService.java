@@ -1,6 +1,9 @@
 package com.woosan.hr_system.attendance.service;
 
+import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.model.Overtime;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -17,4 +20,5 @@ public interface OvertimeService {
     String addOvertime(int attendanceId, LocalDate date, LocalTime startTime, LocalTime endTime);
     String editOvertime(Overtime overtime);
     String deleteOvertime(int overtimeId);
+    PageResult<Attendance> searchOvertime(PageRequest pageRequest, String department, YearMonth yearMonth);
 }

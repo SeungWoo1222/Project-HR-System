@@ -13,6 +13,21 @@
         <result property="totalHours" column="total_hours" />
     </resultMap>
 
+    <resultMap id="OvertimeWithEmployeeResultMap" type="com.woosan.hr_system.attendance.model.Overtime">
+        <id property="overtimeId" column="overtime_id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="date" column="date" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="nightHours" column="night_hours" />
+        <result property="totalHours" column="total_hours" />
+        <!-- 사원 관련 정보 -->
+        <result property="employee.employeeId" column="employee_id" />
+        <result property="employee.name" column="name" />
+        <result property="employee.department" column="department_id" />
+        <result property="employee.position" column="position_id" />
+    </resultMap>
+
     <!-- ID를 이용한 초과근무 조회 -->
     <select id="getOvertimeById" resultMap="OvertimeResultMap">
         SELECT * FROM overtime WHERE overtime_id = #{overtimeId}
@@ -55,9 +70,7 @@
     <!-- 초과근무 수정 -->
     <update id="updateOvertime">
         UPDATE overtime
-        SET employee_id = #{employeeId},
-            date = #{date},
-            start_time = #{startTime},
+        SET start_time = #{startTime},
             end_time = #{endTime},
             night_hours = #{nightHours},
             total_hours = #{totalHours}
@@ -76,4 +89,32 @@
         WHERE attendance_id = #{attendanceId}
     </update>
 
+    <!-- 초과근무 목록 검색 조회 -->
+    <select id="searchOvertime" parameterType="map" resultMap="OvertimeWithEmployeeResultMap">
+        SELECT o.*, e.name, e.department_id, e.position_id
+        FROM overtime o
+        JOIN employees e ON o.employee_id = e.employee_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                o.overtime_id LIKE CONCAT('%', #{keyword}, '%') OR
+                o.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                o.start_time LIKE CONCAT('%', #{keyword}, '%') OR
+                o.end_time LIKE CONCAT('%', #{keyword}, '%') OR
+                o.night_hours LIKE CONCAT('%', #{keyword}, '%') OR
+                o.total_hours LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%') OR
+                e.position_id LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND e.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(o.date, '%Y-%m') = #{yearMonth}
+            </if>
+        </where>
+        ORDER BY o.date DESC, o.start_time ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
 </mapper>

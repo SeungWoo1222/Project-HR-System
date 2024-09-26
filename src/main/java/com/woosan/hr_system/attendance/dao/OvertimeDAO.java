@@ -1,5 +1,6 @@
 package com.woosan.hr_system.attendance.dao;
 
+import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.model.Overtime;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,10 @@ public class OvertimeDAO {
     // 초과근무 삭제
     public void deleteOvertime(int overtimeId) {
         sqlSession.delete("overtime.deleteOvertime", overtimeId);
+    }
+
+    // 초과근무 목록 검색 조회
+    public List<Attendance> searchOvertime(Map<String, Object> params) {
+        return sqlSession.selectList("overtime.searchOvertime", params);
     }
 }

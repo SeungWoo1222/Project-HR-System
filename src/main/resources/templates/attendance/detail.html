@@ -15,6 +15,7 @@
         margin: 0;
     }
     .attendance-detail-container table {
+        border: solid 1px #ddd;
         border-collapse: collapse;
         margin-top: 20px;
     }
@@ -29,6 +30,14 @@
     }
     .attendance-detail-container table td {
         width: 400px;
+    }
+    .overtime-td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .overtime-td button {
+        padding: 8px;
     }
 </style>
 
@@ -64,9 +73,15 @@
         <tr>
             <th>초과 근무시간</th>
             <td th:if="${attendance.overtimeId} == null"></td>
-            <td th:if="${attendance.overtimeId} != null" th:text="${attendance.overtime?.totalHours} + '시간 '
-                + '(' + ${#temporals.format(attendance.overtime?.startTime, 'HH:mm')}
-                + '~' + ${#temporals.format(attendance.overtime?.endTime, 'HH:mm')} + ')'"></td>
+            <td th:if="${attendance.overtimeId} != null">
+                <div class="overtime-td">
+                    <span th:text="${attendance.overtime?.totalHours} + '시간 '
+                    + '(' + ${#temporals.format(attendance.overtime?.startTime, 'HH:mm')}
+                    + '~' + ${#temporals.format(attendance.overtime?.endTime, 'HH:mm')} + ')'"></span>
+                    <button type="button" class="btn" th:overtimeId="${attendance.overtimeId}"
+                            th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">초과근무 수정</button>
+                </div>
+            </td>
         </tr>
         <tr>
             <th>휴가 정보</th>

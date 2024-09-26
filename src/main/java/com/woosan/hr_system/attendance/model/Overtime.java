@@ -1,5 +1,6 @@
 package com.woosan.hr_system.attendance.model;
 
+import com.woosan.hr_system.employee.model.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,6 @@ public class Overtime {
     private LocalTime endTime;          // 종료 시간
     private Float nightHours;           // 야간 근무 시간
     private Float totalHours;           // 총 초과근무 시간
+
+    private Employee employee;          // 사원 정보
 }

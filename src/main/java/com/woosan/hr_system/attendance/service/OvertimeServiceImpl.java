@@ -3,9 +3,12 @@ package com.woosan.hr_system.attendance.service;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.attendance.dao.OvertimeDAO;
+import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.model.Overtime;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,8 +151,10 @@ public class OvertimeServiceImpl implements OvertimeService{
         // 변경사항 확인
         checkForOvertimeChanges(originalOvertime, overtime);
 
+        LocalTime startTime = originalOvertime.getStartTime();
+
         // 총 초과 근무 시간 설정
-        Map<String, Object> map = setTotalHours(overtime.getEmployeeId(), overtime.getStartTime(), overtime.getEndTime());
+        Map<String, Object> map = setTotalHours(overtime.getEmployeeId(), startTime, overtime.getEndTime());
         float overtimeHours = (float) map.get("overtimeHours");
         LocalTime endTime = (LocalTime) map.get("endTime");
 
@@ -158,6 +163,7 @@ public class OvertimeServiceImpl implements OvertimeService{
 
         // 초과근무 객체 생성 후 등록
         Overtime updatedOvertime = overtime.toBuilder()
+                .startTime(startTime)
                 .endTime(endTime)
                 .nightHours(nightHours)
                 .totalHours(overtimeHours)
@@ -186,5 +192,23 @@ public class OvertimeServiceImpl implements OvertimeService{
         overtimeDAO.deleteOvertime(overtimeId);
 
         return "초과근무('" + overtimeId + "')가 삭제되었습니다.";
+    }
+
+    @Override // 초과근무 목록 검색 조회
+    public PageResult<Attendance> searchOvertime(PageRequest pageRequest, String department, YearMonth yearMonth) {
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+
+        // 검색 조건들 map에 넣어 전달
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", pageRequest.getKeyword());
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("yearMonth", yearMonth);
+
+        List<Attendance> overtimeList = overtimeDAO.searchOvertime(params);
+        int total = overtimeList.size();
+
+        return new PageResult<>(overtimeList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 }
