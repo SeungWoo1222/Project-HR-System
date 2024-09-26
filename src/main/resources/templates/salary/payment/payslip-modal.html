@@ -24,7 +24,7 @@
                 <td style="width: 12.5%;">생년월일</td>
                 <td style="width: 14%;" th:text="${employee.birth}"></td>
                 <td style="width: 12.5%;">지급일</td>
-                <td style="width: 15%;" th:text="${payslip.paymentDate}"></td>
+                <td style="width: 15%;" th:text="${#temporals.format(payslip.paymentDate, 'yy년 MM월 dd일')}"></td>
             </tr>
             <tr>
                 <td style="width: 12.5%;">부서</td>

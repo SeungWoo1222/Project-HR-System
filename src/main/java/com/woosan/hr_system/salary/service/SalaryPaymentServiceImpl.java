@@ -243,7 +243,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
 
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "baseSalary", "positionAllowance", "mealAllowance", "transportAllowance",
-                "personalBonus", "teamBonus", "holidayBonus", "yearEndBonus", "overtimePay", "remarks"
+                "personalBonus", "teamBonus", "holidayBonus", "yearEndBonus", "remarks"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
     }
