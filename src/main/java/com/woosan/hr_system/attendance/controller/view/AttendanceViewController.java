@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -116,29 +115,40 @@ public class AttendanceViewController {
         float totalOverTime = overtimeService.getTotalWeeklyOvertime(employeeId, today);
         float totalNightTime = overtimeService.getTotalWeeklyNightOvertime(employeeId, today);
 
-        // 조회한 시간 LocalTime으로 변환
-        LocalTime workingTime = convertToLocalTime(totalWorkingTime);
-        LocalTime overtime = convertToLocalTime(totalOverTime);
-        LocalTime overtimeWithoutNight = convertToLocalTime(totalOverTime - totalNightTime);
-        LocalTime nightTime = convertToLocalTime(totalNightTime);
-        LocalTime totalTime = convertToLocalTime(totalWorkingTime + totalOverTime);
+        // 조회한 총 시간들을 시간으로 변환
+        int workingHours = convertToHours(totalWorkingTime);
+        int overHours = convertToHours(totalOverTime);
+        int overHoursWithoutNight = convertToHours(totalOverTime - totalNightTime);
+        int nightHours = convertToHours(totalNightTime);
+        int totalHours = convertToHours(totalWorkingTime + totalOverTime);
 
         // 모델에 추가
-        model.addAttribute("workingTime", workingTime);
-        model.addAttribute("totalOverTime", overtime);
-        model.addAttribute("overtime", overtimeWithoutNight);
-        model.addAttribute("nightTime", nightTime);
-        model.addAttribute("totalTime", totalTime);
+        model.addAttribute("workingHours", workingHours);
+        model.addAttribute("workingMinutes", convertToMinutes(totalWorkingTime, workingHours));
+
+        model.addAttribute("totalOverHours", overHours);
+        model.addAttribute("totalOverMinutes", convertToMinutes(totalOverTime, overHours));
+
+        model.addAttribute("overHours", overHoursWithoutNight);
+        model.addAttribute("overMinutes", convertToMinutes((totalOverTime - totalNightTime), overHoursWithoutNight));
+
+        model.addAttribute("nightHours", nightHours);
+        model.addAttribute("nightMinutes", convertToMinutes(totalNightTime, nightHours));
+
+        model.addAttribute("totalHours", totalHours);
+        model.addAttribute("totalMinutes", convertToMinutes((totalWorkingTime + totalOverTime), totalHours));
 
         return "attendance/commute";
     }
 
-    // 근무 시간을 분으로 변환한 후, 시간과 분으로 분리
-    private LocalTime convertToLocalTime(float f) {
-        int hours = (int) f;
-        int minutes = (int) ((f - hours) * 60);
-        return LocalTime.of(hours, minutes);
+    // 근무 시간을 시간과 분으로 분리
+    private int convertToHours(float f) {
+        return (int) f;
     }
+    private int convertToMinutes(float f, int hours) {
+        return (int) ((f - hours) * 60);
+    }
+
 
     @GetMapping("/early-leave") // 조퇴 페이지
     public String viewEarlyLeaveModal(Model model) {

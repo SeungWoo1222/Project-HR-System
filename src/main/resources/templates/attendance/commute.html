@@ -92,8 +92,8 @@
           <img class="commute-icon" src="/images/icons/egg.png" alt="기본 근무"/>
           <p>기본 근무</p>
         </div>
-        <span class="work-time" th:text="${#temporals.format(workingTime, 'H시간')} + ' '
-        + (${#temporals.format(workingTime, 'm')} != '0' ? ${#temporals.format(workingTime, 'm분')} : '') + ' / 40시간'"></span>
+        <span class="work-time" th:text="${workingHours + '시간'} + ' '
+        + (${workingMinutes} != '0' ? ${workingMinutes + '분'} : '') + ' / 40시간'"></span>
       </div>
     </div>
     <div class="weekly-section">
@@ -102,18 +102,18 @@
           <img class="commute-icon" src="/images/icons/fire.png" alt="초과 근무"/>
           <p>초과 근무</p>
         </div>
-        <span class="work-time" th:text="${#temporals.format(totalOverTime, 'H시간')} + ' '
-        + (${#temporals.format(totalOverTime, 'm')} != '0' ? ${#temporals.format(totalOverTime, 'm분')} : '') + ' / 12시간'"></span>
+        <span class="work-time" th:text="${totalOverHours + '시간'} + ' '
+        + (${totalOverMinutes} != '0' ? ${totalOverMinutes + '분'} : '') + ' / 12시간'"></span>
       </div>
       <div class="over-work">
         <p>연장</p>
-        <span class="over-work-time" th:text="${#temporals.format(overtime, 'H시간')} + ' '
-        + (${#temporals.format(overtime, 'm')} != 0 ? ${#temporals.format(overtime, 'm분')} : '')"></span>
+        <span class="over-work-time" th:text="${overHours + '시간'} + ' '
+        + (${overMinutes} != 0 ? ${overMinutes + '분'} : '')"></span>
       </div>
       <div class="over-work">
         <p>연장 • 야간</p>
-        <span class="over-work-time" th:text="${#temporals.format(nightTime, 'H시간')} + ' '
-        + (${#temporals.format(nightTime, 'm')} != 0 ? ${#temporals.format(nightTime, 'm분')} : '')"></span>
+        <span class="over-work-time" th:text="${nightHours + '시간'} + ' '
+        + (${nightMinutes} != 0 ? ${nightMinutes + '분'} : '')"></span>
       </div>
     </div>
     <div class="weekly-section">
@@ -122,8 +122,8 @@
           <img class="commute-icon" src="/images/icons/time.png" alt="전체 시간"/>
           <p>전체 시간</p>
         </div>
-        <span class="total-time" th:text="${#temporals.format(totalTime, 'H시간')} + ' '
-        + (${#temporals.format(totalTime, 'm')} != 0 ? ${#temporals.format(totalTime, 'm분')} : '') + ' / 52시간'"></span>
+        <span class="total-time" th:text="${totalHours + '시간'} + ' '
+        + (${totalMinutes} != 0 ? ${totalMinutes + '분'} : '') + ' / 52시간'"></span>
       </div>
     </div>
   </div>
