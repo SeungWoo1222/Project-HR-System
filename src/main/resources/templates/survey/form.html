@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='새 설문지 작성')}">
+
+<th:block layout:fragment="css">
+    <style>
+        .content-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+        .survey-container, .survey-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .question-row {
+            width: 800px;
+        }
+
+        .add-btn {
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            height: min-content;
+            position: relative;
+            top: 0;
+        }
+
+        .add-btn img {
+            padding: 5px;
+            width: 25px;
+            height: 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .add-btn img:hover {
+            background-color: #EDEDED;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            alignAddButtonWithLastQuestion();
+        });
+
+        // add-btn을 마지막 질문과 수평으로 배치
+        function alignAddButtonWithLastQuestion() {
+            const lastQuestion = document.querySelector('.survey-container .question-row:last-child');
+            const addButton = document.querySelector('.add-btn');
+
+            if (lastQuestion) {
+                const questionRect = lastQuestion.getBoundingClientRect();
+                const containerRect = document.querySelector('.survey-container').getBoundingClientRect();
+
+                addButton.style.top = (questionRect.top - containerRect.top) + 'px'; // 마지막 질문의 위치에 맞춤
+            }
+        }
+    </script>
+
+</th:block>
+
+<div layout:fragment="~{content}">
+    <form>
+        <div class="survey-container">
+            <div class="content survey-header">
+                <input type="text" id="title" name="title" value="제목 없는 설문지"/>
+                <input type="text" id="description" name="description" placeholder="설문지 설명"/>
+            </div>
+            <div class="question-row">
+                <div class="content question">질문 1</div>
+            </div>
+        </div>
+    </form>
+    <div class="content add-btn">
+        <img src="/images/icons/plus.png" alt="새 항목" style=""/>
+    </div>
+</div>
+
+</html>
