@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.attendance.dao.AttendanceDAO">
+<mapper namespace="attendance">
     <resultMap id="attendanceResultMap" type="com.woosan.hr_system.attendance.model.Attendance">
         <id property="attendanceId" column="attendance_id" />
         <result property="employeeId" column="employee_id" />
@@ -10,6 +10,8 @@
         <result property="checkIn" column="check_in" />
         <result property="checkOut" column="check_out" />
         <result property="status" column="status" />
+        <result property="workingHours" column="working_hours" />
+        <result property="overtimeId" column="overtime_id" />
         <result property="vacationId" column="vacation_id" />
         <result property="tripId" column="trip_id" />
         <result property="notes" column="notes" />
@@ -24,6 +26,8 @@
         <result property="checkIn" column="check_in" />
         <result property="checkOut" column="check_out" />
         <result property="status" column="status" />
+        <result property="workingHours" column="working_hours" />
+        <result property="overtimeId" column="overtime_id" />
         <result property="vacationId" column="vacation_id" />
         <result property="tripId" column="trip_id" />
         <result property="notes" column="notes" />
@@ -68,7 +72,7 @@
     <!-- 퇴근 시간 업데이트 -->
     <update id="updateCheckout">
         UPDATE attendance
-        SET check_out = #{checkOut}, status = #{status}
+        SET check_out = #{checkOut}, status = #{status}, working_hours = #{workingHours}
         WHERE attendance_id = #{todayAttendanceId}
     </update>
 
@@ -128,5 +132,20 @@
         </where>
         ORDER BY a.date DESC, a.check_in ASC
         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 사원의 이번 주 근무시간 조회 -->
+    <select id="getTotalWeeklyWorkingTime" resultType="float">
+        SELECT COALESCE(SUM(working_hours), 0)
+        FROM attendance
+        WHERE employee_id = #{employeeId}
+          AND WEEK(date, 1) = WEEK(#{date}, 1)
+    </select>
+
+    <!-- 사원의 이번 달 근태 조회 -->
+    <select id="getThisMonthAttendance" resultMap="attendanceResultMap">
+        SELECT * FROM attendance
+        WHERE employee_id = #{employeeId}
+          AND DATE_FORMAT(date, '%Y-%m') = #{yearMonth}
     </select>
 </mapper>

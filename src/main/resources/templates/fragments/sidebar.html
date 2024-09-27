@@ -23,9 +23,6 @@
                 </ul>
             </li>
             <li>
-                <a th:href="@{/overtime}"><img src="/images/icons/overtime.png" alt="Overtime" width="20"> 초과근무</a>
-            </li>
-            <li>
                 <p onclick="toggleSubmenu('schedule-submenu')"><img src="/images/icons/calendar.png" alt="Schedule" width="20">일정</p>
                 <ul id="schedule-submenu" class="submenu">
                     <li><a th:href="@{/schedule/{employeeId}/list(employeeId=${#authentication.principal.username})}">- 일정 목록</a></li>
@@ -87,6 +84,7 @@
                 <ul id="attendance-submenu" class="submenu">
                     <li><a th:href="@{/attendance/today}">- 오늘의 근태 현황</a></li>
                     <li><a th:href="@{/attendance/list}">- 근태 목록</a></li>
+                    <li><a th:href="@{/overtime/list}">- 초과근무 목록</a></li>
                     <li><a th:href="@{/holiday/list}">- 공휴일 관리</a></li>
                 </ul>
             </li>

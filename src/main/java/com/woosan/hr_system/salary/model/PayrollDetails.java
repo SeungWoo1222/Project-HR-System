@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,25 +60,5 @@ public class PayrollDetails {
 
     public int calculateYearEndBonus() {
         return calculate(yearEndBonusRatio);
-    }
-    // 비과세 포함한 월급 계산
-    public int calculateTotalPayrolls() {
-        return calculateBaseSalary()
-                + calculatePositionAllowance()
-                + calculateMealAllowance()
-                + calculateTransportAllowance()
-                + calculatePersonalBonus()
-                + calculateTeamBonus()
-                + calculateHolidayBonus()
-                + calculateYearEndBonus();
-    }
-    // 비과세 제외한 월급 계산
-    public int calculateTaxableSalary() {
-        return calculateBaseSalary()
-                + calculatePositionAllowance()
-                + calculatePersonalBonus()
-                + calculateTeamBonus()
-                + calculateHolidayBonus()
-                + calculateYearEndBonus();
     }
 }

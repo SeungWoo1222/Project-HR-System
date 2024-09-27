@@ -2,7 +2,9 @@ package com.woosan.hr_system.attendance.controller.view;
 
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.service.AttendanceService;
+import com.woosan.hr_system.attendance.service.OvertimeService;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.search.PageRequest;
@@ -11,6 +13,7 @@ import com.woosan.hr_system.vacation.model.Vacation;
 import com.woosan.hr_system.vacation.service.VacationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +21,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +40,8 @@ public class AttendanceViewController {
     private VacationService vacationService;
     @Autowired
     private HolidayService holidayService;
+    @Autowired
+    private OvertimeService overtimeService;
 
     @GetMapping// 나의 근태 페이지
     public String viewMyAttendance(Model model) {
@@ -48,7 +51,43 @@ public class AttendanceViewController {
 
         // 모든 공휴일 모델에 추가
         model.addAttribute("holidays", holidayService.getAllHoliday());
-        return "attendance/my-log";
+
+        return "attendance/my-attendance";
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Object>> getAttendanceSummary(@RequestParam("yearMonth") String yearMonthStr) {
+        // 로그인 사원 아이디 조회
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+
+        Map<String, Object> summary = new HashMap<>();
+
+        // 사원 정보 조회 후 ID, 이름, 잔여 연차 맵에 담기
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        summary.put("employeeId", employeeId);
+        summary.put("name", employee.getName());
+        summary.put("remainingLeave", employee.getRemainingLeave());
+
+        YearMonth yearMonth = YearMonth.parse(yearMonthStr);
+
+        // 근무 시간 맵에 담기
+        Map<String, Object> thisMonthAttendance = attendanceService.getThisMonthAttendance(employeeId, yearMonth);
+        double workingTime = (double) thisMonthAttendance.get("totalTime");
+        int days = (int) thisMonthAttendance.get("days");
+        summary.put("workingTime", workingTime);
+        summary.put("days", days);
+
+        // 초과근무, 야간근무 시간 맵에 담기
+        Map<String, Object> thisMonthOvertimes = overtimeService.getThisMonthOvertimes(employeeId, yearMonth);
+        double nightTime = (double) thisMonthOvertimes.get("nightTime");
+        double totalOverTime = (double) thisMonthOvertimes.get("totalTime");
+        summary.put("overtime", totalOverTime - nightTime);
+        summary.put("nightTime", nightTime);
+
+        summary.put("year", yearMonth.getYear());
+        summary.put("month", yearMonth.getMonthValue());
+
+        return ResponseEntity.ok(summary);
     }
 
     @GetMapping("/{attendanceId}") // 근태 상세 페이지
@@ -65,9 +104,51 @@ public class AttendanceViewController {
     @GetMapping("/commute") // 출퇴근 페이지
     public String viewCommuteModal(Model model) {
         // 로그인한 사원의 금일 근태기록 있는지 확인 후 모델에 추가
-        model.addAttribute("attendance", attendanceService.hasTodayAttendanceRecord());
+        Attendance attendance = attendanceService.hasTodayAttendanceRecord();
+        model.addAttribute("attendance", attendance);
+
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+        LocalDate today = LocalDate.now();
+
+        // 이번 주 근무시간, 초과근무, 야간근무 시간 조회
+        float totalWorkingTime = attendanceService.getTotalWeeklyWorkingTime(employeeId, today);
+        float totalOverTime = overtimeService.getTotalWeeklyOvertime(employeeId, today);
+        float totalNightTime = overtimeService.getTotalWeeklyNightOvertime(employeeId, today);
+
+        // 조회한 총 시간들을 시간으로 변환
+        int workingHours = convertToHours(totalWorkingTime);
+        int overHours = convertToHours(totalOverTime);
+        int overHoursWithoutNight = convertToHours(totalOverTime - totalNightTime);
+        int nightHours = convertToHours(totalNightTime);
+        int totalHours = convertToHours(totalWorkingTime + totalOverTime);
+
+        // 모델에 추가
+        model.addAttribute("workingHours", workingHours);
+        model.addAttribute("workingMinutes", convertToMinutes(totalWorkingTime, workingHours));
+
+        model.addAttribute("totalOverHours", overHours);
+        model.addAttribute("totalOverMinutes", convertToMinutes(totalOverTime, overHours));
+
+        model.addAttribute("overHours", overHoursWithoutNight);
+        model.addAttribute("overMinutes", convertToMinutes((totalOverTime - totalNightTime), overHoursWithoutNight));
+
+        model.addAttribute("nightHours", nightHours);
+        model.addAttribute("nightMinutes", convertToMinutes(totalNightTime, nightHours));
+
+        model.addAttribute("totalHours", totalHours);
+        model.addAttribute("totalMinutes", convertToMinutes((totalWorkingTime + totalOverTime), totalHours));
+
         return "attendance/commute";
     }
+
+    // 근무 시간을 시간과 분으로 분리
+    private int convertToHours(float f) {
+        return (int) f;
+    }
+    private int convertToMinutes(float f, int hours) {
+        return (int) ((f - hours) * 60);
+    }
+
 
     @GetMapping("/early-leave") // 조퇴 페이지
     public String viewEarlyLeaveModal(Model model) {

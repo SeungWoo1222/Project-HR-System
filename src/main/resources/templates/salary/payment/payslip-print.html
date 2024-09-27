@@ -112,7 +112,7 @@
                 <td style="width: 12.5%;">생년월일</td>
                 <td style="width: 14%;" th:text="${employee.birth}"></td>
                 <td style="width: 12.5%;">지급일</td>
-                <td style="width: 15%;" th:text="${payslip.paymentDate}"></td>
+                <td style="width: 15%;" th:text="${#temporals.format(payslip.paymentDate, 'yy년 MM월 dd일')}"></td>
             </tr>
             <tr>
                 <td style="width: 12.5%;">부서</td>
@@ -196,28 +196,31 @@
             <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
             <td colspan="2" class="right" th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}"></td>
         </tr>
-        <tr>
-            <td colspan="4" class="section-title">실수령액</td>
-        </tr>
-        <tr>
-            <td colspan="4" class="right" th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}"></td>
-        </tr>
     </table>
 
     <table class="summary">
         <tr>
             <td class="section-title">근로일수</td>
-            <td class="section-title">총 근로시간수</td>
-            <td class="section-title">연장근로시간수</td>
-            <td class="section-title">휴일근로시간수</td>
+            <td class="section-title">총 근로시간</td>
+            <td class="section-title">초과근로시간</td>
+            <td class="section-title">야간근로시간</td>
             <td class="section-title">총 액</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="right" th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
+            <td class="center" th:text="${payslip.days}"></td>
+            <td class="center" th:text="${payslip.totalTime}"></td>
+            <td class="center" th:text="${payslip.totalOvertime}"></td>
+            <td class="center" th:text="${payslip.totalNightTime}"></td>
+            <td class="right" th:text="${payslip.overtimePay} != 0 ? ${#numbers.formatInteger(payslip.overtimePay, 3, 'COMMA')} : '0'"></td>
+        </tr>
+    </table>
+
+    <table class="details">
+        <tr>
+            <td colspan="4" class="section-title">실수령액</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="right" th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}"></td>
         </tr>
     </table>
 
@@ -269,7 +272,7 @@
             <td class="left">보너스</td>
             <td>명절 : (연봉x1.25%)<br>연말 : (연봉x2.5%)</td>
             <td class="left">추가 근로수당</td>
-            <td></td>
+            <td>초과근무 : (통상시급x1.5%) x 근무시간<br>야간근무 : (통상시급x2.0%) x 근무시간</td>
         </tr>
     </table>
     <div class="last-word">

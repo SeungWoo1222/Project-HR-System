@@ -22,6 +22,10 @@
     </style>
 </th:block>
 
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendance/overtime.js}"></script>
+</th:block>
+
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="today-container">
@@ -115,8 +119,8 @@
                         <td th:text="${attendance.employee?.name}">이름</td>
                         <td th:text="${attendance.employee?.department}">부서</td>
                         <td th:text="${attendance.employee?.position}">직급</td>
-                        <td th:text="${#temporals.format(attendance.checkIn,'hh시 mm분')}">출근 시간</td>
-                        <td th:text="${#temporals.format(attendance.checkOut,'hh시 mm분')}">퇴근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
                     </tr>
                     </tbody>
                 </table>
@@ -188,8 +192,8 @@
                             th:classappend="${attendance.status == '결근'} ? 'absent' :
                                             (${attendance.status == '지각'} ? 'late' :
                                             (${attendance.status == '조퇴'} ? 'early-leave' : ''))">근태 상태</td>
-                        <td th:text="${#temporals.format(attendance.checkIn,'hh시 mm분')}">출근 시간</td>
-                        <td th:text="${#temporals.format(attendance.checkOut,'hh시 mm분')}">퇴근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
                     </tr>
                     </tbody>
                 </table>
@@ -261,8 +265,8 @@
                         <td th:text="${attendance.status}"
                             th:classappend="${attendance.status == '출장'} ? 'business-trip' :
                                             (${attendance.status == '휴가'} ? 'vacation' : '')">근태 상태</td>
-                        <td th:text="${#temporals.format(attendance.checkIn,'hh시 mm분')}">출근 시간</td>
-                        <td th:text="${#temporals.format(attendance.checkOut,'hh시 mm분')}">퇴근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
                     </tr>
                     </tbody>
                 </table>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<style>
+  .attendance-detail-container {
+    width: 550px;
+  }
+  .attendance-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .attendance-detail-header h2 {
+    margin: 0;
+  }
+  .attendance-detail-container table {
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  .attendance-detail-container table th, .attendance-detail-container table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  .attendance-detail-container table th {
+    width: 150px;
+    background-color: #f7f7f7;
+  }
+  .attendance-detail-container table td {
+    width: 400px;
+  }
+</style>
+
+<div class="attendance-detail-container">
+  <form action="/api/overtime" onsubmit="submitUpdateOvertimeForm(event)">
+    <div class="attendance-detail-header">
+      <h3><span th:text="${employee.name} + ' 님의 초과근무 정보 (' + ${#temporals.format(overtime.date, 'yyyy년 MM월 dd일 (EE)')} + ')'"></span></h3>
+      <div class="btn-container" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">수정 완료</button>
+      </div>
+    </div>
+    <div id="error-message" class="error-message"><b>* 야간 및 초과근무 시간은 수정 완료 후 적용됩니다 *</b></div>
+    <table>
+      <tr>
+        <th>사원 ID</th>
+        <td th:text="${overtime.employeeId}"></td>
+      </tr>
+      <tr>
+        <th>시작 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></th>
+        <td>
+          <input type="text" id="startTime" name="startTime" th:value="${overtime.startTime}"/>
+        </td>
+      </tr>
+      <tr>
+        <th>종료 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></th>
+        <td>
+          <input type="text" id="endTime" name="endTime" th:value="${overtime.endTime}"/>
+        </td>
+      </tr>
+      <tr>
+        <th>야간근무 시간</th>
+        <td th:text="${overtime.nightHours}"></td>
+      </tr>
+      <tr>
+        <th>총 초과근무 시간</th>
+        <td th:text="${overtime.totalHours}"></td>
+      </tr>
+    </table>
+    <input type="hidden" id="overtimeId" name="overtimeId" th:value="${overtime.overtimeId}"/>
+  </form>
+</div>
+
+</html>

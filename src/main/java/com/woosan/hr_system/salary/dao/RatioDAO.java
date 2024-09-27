@@ -39,4 +39,9 @@ public class RatioDAO {
     public int selectIncomeTax(Map<String, Object> map) {
         return sqlSession.selectOne(NAMESPACE + "selectIncomeTax", map);
     }
+
+    // 근로소득세 조회 (1억 이상일 때)
+    public int selectIncomeTaxFor100Million(Map<String, Object> map) {
+        return sqlSession.selectOne(NAMESPACE + "selectIncomeTaxFor100Million", map);
+    }
 }
