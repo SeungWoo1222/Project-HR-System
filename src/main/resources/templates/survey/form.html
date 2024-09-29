@@ -4,67 +4,38 @@
       layout:decorate="~{fragments/layout-with-modal :: layout(title='새 설문지 작성')}">
 
 <th:block layout:fragment="css">
-    <style>
-        .content-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-        }
-        .survey-container, .survey-header {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .question-row {
-            width: 800px;
-        }
-
-        .add-btn {
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            height: min-content;
-            position: relative;
-            top: 0;
-        }
-
-        .add-btn img {
-            padding: 5px;
-            width: 25px;
-            height: 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .add-btn img:hover {
-            background-color: #EDEDED;
-        }
-    </style>
+    <link th:href="@{/css/survey/form.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
+    <script th:src="@{/js/survey/form.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             alignAddButtonWithLastQuestion();
+
+            document.querySelector('.add-btn').addEventListener('click', function () {
+                addNewQuestion();
+            });
+
+            const questionTypeSelects = document.querySelectorAll('select[name^="questionType"]');
+
+            // 각 질문 유형에 대해 옵션 필드 표시 여부 결정
+            questionTypeSelects.forEach(select => {
+                select.addEventListener('change', function () {
+                    toggleOptionsVisibility(this);
+                });
+            });
+            // 초기 상태에서 옵션 필드 표시 여부 설정
+            questionTypeSelects.forEach(select => toggleOptionsVisibility(select));
+
+            // 옵션 추가 버튼 클릭 시 새로운 옵션 필드를 추가
+            document.querySelectorAll('.option-add-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    addNewOptionField(this);
+                });
+            });
         });
-
-        // add-btn을 마지막 질문과 수평으로 배치
-        function alignAddButtonWithLastQuestion() {
-            const lastQuestion = document.querySelector('.survey-container .question-row:last-child');
-            const addButton = document.querySelector('.add-btn');
-
-            if (lastQuestion) {
-                const questionRect = lastQuestion.getBoundingClientRect();
-                const containerRect = document.querySelector('.survey-container').getBoundingClientRect();
-
-                addButton.style.top = (questionRect.top - containerRect.top) + 'px'; // 마지막 질문의 위치에 맞춤
-            }
-        }
     </script>
-
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -75,12 +46,31 @@
                 <input type="text" id="description" name="description" placeholder="설문지 설명"/>
             </div>
             <div class="question-row">
-                <div class="content question">질문 1</div>
+                <div class="content question">
+                    <div class="question-header">
+                        <input type="text" id="questionText0" name="questionText0" placeholder="질문"/>
+                        <select id="questionType0" name="questionType0">
+                            <option value="text">단답형</option>
+                            <option value="textarea">장문형</option>
+                            <option value="radio">단일 선택</option>
+                            <option value="checkbox">다중 선택</option>
+                            <option value="date">날짜</option>
+                            <option value="time">시간</option>
+                        </select>
+                        <div></div>
+                    </div>
+                    <div class="options-container" style="display:none;">
+                        <div class="option-wrapper">
+                            <input type="text" name="option0" placeholder="옵션 1"/>
+                        </div>
+                        <div class="option-add-btn">옵션 추가</div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
     <div class="content add-btn">
-        <img src="/images/icons/plus.png" alt="새 항목" style=""/>
+        <img src="/images/icons/plus.png" alt="새 항목"/>
     </div>
 </div>
 
