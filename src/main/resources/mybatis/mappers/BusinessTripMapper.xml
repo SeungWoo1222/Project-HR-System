@@ -32,7 +32,16 @@
             trip_id, task_id, address, detailed_address, created_date, status,
             client_name, contact_tel, contact_email, note
         FROM business_trips
-        WHERE taskId = #{taskId}
+        WHERE task_id = #{taskId}
+    </select>
+
+    <!-- trip ID로 단일 출장 조회 -->
+    <select id="getBusinessTripByTripId" parameterType="int" resultMap="BusinessTripResultMap">
+        SELECT
+            trip_id, task_id, address, detailed_address, created_date, status,
+            client_name, contact_tel, contact_email, note
+        FROM business_trips
+        WHERE trip_id = #{tripId}
     </select>
 
     <!-- 새로운 출장 정보 삽입 -->
@@ -49,7 +58,6 @@
         SET
             address = #{address},
             detailed_address = #{detailedAddress},
-            status = #{status},
             client_name = #{clientName},
             contact_tel = #{contactTel},
             contact_email = #{contactEmail},
@@ -57,9 +65,24 @@
         WHERE task_id = #{taskId}
     </update>
 
+    <!-- 출장 상태 변경  -->
+    <update id="updateTripStatus" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
+        UPDATE business_trips
+        SET
+            status = #{status}
+        WHERE trip_id = #{tripId}
+    </update>
+
     <!-- 출장 정보 삭제 -->
     <delete id="deleteBusinessTrip" parameterType="int">
         DELETE FROM business_trips WHERE trip_id = #{tripId}
     </delete>
+
+    <insert id="insertTripInfoInArchive" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
+        INSERT INTO business_trip_archive
+        (trip_id, task_id, address, detailed_address, created_date, status, client_name, contact_tel, contact_email, note)
+        VALUES
+            (#{tripId}, #{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{clientName}, #{contactTel}, #{contactEmail}, #{note})
+    </insert>
 
 </mapper>

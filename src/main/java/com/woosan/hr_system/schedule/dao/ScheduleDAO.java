@@ -6,7 +6,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -41,8 +43,22 @@ public class ScheduleDAO {
         sqlSession.update(NAMESPACE + "updateSchedule", schedule);
     }
 
+    // 일정 상태 변경
+    public void updateScheduleStatus(int taskId, String status) {
+        log.info("status : {}", status);
+        Map<String, Object> params = new HashMap<>();
+        params.put("taskId", taskId);
+        params.put("status", status);
+        sqlSession.update(NAMESPACE + "updateScheduleStatus", params);
+    }
+
     // 일정 삭제
     public void deleteSchedule(int taskId) {
         sqlSession.delete(NAMESPACE + "deleteSchedule", taskId);
+    }
+
+    // 일정 아카이브 추가
+    public void insertScheduleArchive(Schedule schedule) {
+        sqlSession.insert(NAMESPACE + "insertScheduleArchive", schedule);
     }
 }

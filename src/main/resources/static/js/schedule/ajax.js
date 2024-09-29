@@ -4,7 +4,7 @@ function goToUpdateForm(taskId) {
         openModal('/schedule/' + taskId + '/edit');
 
         // 모달이 열리고 DOM이 로드될 시간을 주기 위해 약간의 지연을 둠
-        setTimeout(function() {
+        setTimeout(function () {
             toggleDateTimeFields();
         }, 100); // 지연
     }
@@ -106,7 +106,35 @@ function submitInsertForm(event) {
 
     const formData = createFormData(form);
 
-    formData.append('tripInfo', JSON.stringify(tripInfo));
+    // 출장 정보가 입력된 경우에만 추가
+    const addressElement = document.getElementById('sample6_address');
+    const address = addressElement ? addressElement.value : null;
+
+    const detailedAddressElement = document.getElementById('sample6_detailAddress');
+    const detailedAddress = detailedAddressElement ? detailedAddressElement.value : null;
+
+    const clientNameElement = document.getElementById('tripName');
+    const clientName = clientNameElement ? clientNameElement.value : null;
+
+    const contactTelElement = document.getElementById('tripTel');
+    const contactTel = contactTelElement ? contactTelElement.value : null;
+
+    const contactEmailElement = document.getElementById('email');
+    const contactEmail = contactEmailElement ? contactEmailElement.value : null;
+
+    if (address || detailedAddress || clientName || contactTel) {
+        if (!validateTripInfo()) {
+            return;  // 유효성 검사 실패 시 종료
+        }
+
+        // 유효성 통과 시 출장 정보를 formData에 추가
+        formData.append('address', address);
+        formData.append('detailedAddress', detailedAddress);
+        formData.append('clientName', clientName);
+        formData.append('contactTel', contactTel);
+        formData.append('contactEmail', contactEmail);
+        formData.append('note', document.getElementById('note') ? document.getElementById('note').value : '');
+    }
 
     // 일정 등록
     if (confirm('새로운 일정을 등록하시겠습니까?')) {
@@ -123,7 +151,6 @@ function submitInsertForm(event) {
                 if (response.status === 200) {
                     alert(response.text);
                     window.location.reload();
-                    // window.location.href = '/schedule/list';
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else {
@@ -177,24 +204,157 @@ function submitUpdateForm(event) {
 
     const form = event.target;
     const actionUrl = form.action;
-
     const formData = createFormData(form);
+
+    // 출장 정보가 입력된 경우에만 추가
+    const addressElement = document.getElementById('sample6_address');
+    const address = addressElement ? addressElement.value : null;
+
+    const detailedAddressElement = document.getElementById('sample6_detailAddress');
+    const detailedAddress = detailedAddressElement ? detailedAddressElement.value : null;
+
+    const clientNameElement = document.getElementById('tripName');
+    const clientName = clientNameElement ? clientNameElement.value : null;
+
+    const contactTelElement = document.getElementById('tripTel');
+    const contactTel = contactTelElement ? contactTelElement.value : null;
+
+    const contactEmailElement = document.getElementById('email');
+    const contactEmail = contactEmailElement ? contactEmailElement.value : null;
+
+    if (address || detailedAddress || clientName || contactTel) {
+        if (!validateTripInfo()) {
+            return;  // 유효성 검사 실패 시 종료
+        }
+        const tripId = document.getElementById('tripId').value;
+
+        // 유효성 통과 시 출장 정보를 formData에 추가
+        formData.append('tripId', tripId);
+        formData.append('address', address);
+        formData.append('detailedAddress', detailedAddress);
+        formData.append('clientName', clientName);
+        formData.append('contactTel', contactTel);
+        formData.append('contactEmail', contactEmail);
+        formData.append('note', document.getElementById('note') ? document.getElementById('note').value : '');
+    }
 
     // 일정 수정
     if (confirm('일정을 수정하시겠습니까?')) {
         fetch(actionUrl, {
             method: "PUT",
             body: formData
-        })
-        // 미완성 - 구현 필요
+        }).then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('일정 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
     }
 }
 
 // AJAX DELETE 요청 - 일정 삭제
 function deleteSchedule(taskId) {
-
+    if (confirm("일정을 삭제하시겠습니까?")) {
+        fetch(`/schedule/delete/${taskId}`, {
+            method: "DELETE"
+        }).then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('일정 삭제 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // AJAX PATCH 요청 - 일정 상태 변경
-// 메소드 필요
+function updateScheduleStatus(taskId) {
+    const selectedStatus = document.querySelector('input[name="scheduleStatus"]:checked').value;
 
+    fetch(`/schedule/status/${taskId}`, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: selectedStatus }) // 상태값을 JSON으로 전송
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
+        .then(response => {
+            const errorStatuses = [400, 403, 404, 500];
+            if (response.status === 200) {
+                alert(response.text);
+                window.location.reload();
+            } else if (errorStatuses.includes(response.status)) {
+                alert(response.text);
+            } else {
+                alert('일정 상태 변경 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        });
+}
+
+// 출장 상태 변경
+function updateTripStatus(tripId) {
+    // 선택된 출장 상태값 가져오기
+    const selectedTripStatus = document.querySelector('input[name="tripStatus"]:checked').value;
+
+    fetch(`/schedule/tripStatus/${tripId}`, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: selectedTripStatus }) // 상태값을 JSON으로 전송
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
+        .then(response => {
+            const errorStatuses = [400, 403, 404, 500];
+            if (response.status === 200) {
+                alert(response.text);
+                window.location.reload();
+            } else if (errorStatuses.includes(response.status)) {
+                alert(response.text);
+            } else {
+                alert('출장 상태 변경 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        });
+}

@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<!--<head>-->
-<!--    &lt;!&ndash; 네이버 지도 API &ndash;&gt;-->
-<!--    <script type="text/javascript"-->
-<!--            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=YOUR_CLIENT_ID&submodules=geocoder"></script>-->
-<!--    <script th:src="@{/js/schedule/trip.js}"></script>-->
-<!--</head>-->
-
 <body>
 <div class="detail-container">
     <div class="btn-container">
-        <button type="button" class="btn">일정 상태 변경</button>
         <button class="btn" th:taskId="${schedule.taskId}" th:onclick="goToUpdateForm(this.getAttribute('taskId'))">
             수정하기
         </button>
-        <button class="btn" th:taskId="${schedule.taskId}" th:onclick="deleteSchedule(this.getAttribute('taskId'))">
+        <button class="btn" th:taskId="${schedule.taskId}"
+                th:onclick="deleteSchedule(this.getAttribute('taskId'))">
             삭제하기
         </button>
     </div>
@@ -54,10 +47,11 @@
             <td style="text-align: center; vertical-align: middle;">
                 <div th:style="'width: 10px; height: 10px; border-radius: 50px; display: inline-block; background-color: ' + ${schedule.color}"></div>
             </td>
-            <td th:text="${schedule.status}"
-                th:classappend="${schedule.status == '시작 전'} ? 'notStarted' :
-                                   (${schedule.status == '진행 중'} ? 'inProcess' :
-                                   (${schedule.status == '완료'} ? 'done' : ''))">상태
+            <td>
+                <input type="radio" name="scheduleStatus" value="미완료" th:checked="${schedule.status == '미완료'}">미완료
+                <input type="radio" name="scheduleStatus" value="진행중" th:checked="${schedule.status == '진행중'}">진행중
+                <input type="radio" name="scheduleStatus" value="완료" th:checked="${schedule.status == '완료'}">완료
+                <button type="button" th:attr="onclick='updateScheduleStatus(' + ${schedule.taskId} + ')'">상태 변경</button>
             </td>
         </tr>
     </table>
@@ -80,18 +74,26 @@
         </tr>
     </table>
     <!-- 출장 정보 표시 -->
-    <div>
+    <div th:if="${trip} != null">
         <h3>출장 정보</h3>
-        <table class="details" th:each="trip, stat : ${trips}">
+        <table class="details">
             <tr>
-                <input type="hidden" id="sample6_address_[[${stat.index}]]" th:value="${trip.address}" />
+                <input type="hidden" id="sample6_address" th:value="${trip.address}"/>
                 <td class="section-title">주소</td>
                 <td th:value="${trip.address}" th:text="${trip.address}">주소</td>
             </tr>
             <tr>
-                <input type="hidden" id="sample6_detailAddress_[[${stat.index}]]" th:value="${trip.detailedAddress}" />
-                <td class="section-title">상세주소</td>
+                <input type="hidden" id="sample6_detailAddress" th:value="${trip.detailedAddress}"/>
+                <td class="section-title">상세 주소</td>
                 <td th:value="${trip.detailedAddress}" th:text="${trip.detailedAddress}">상세 주소</td>
+            </tr>
+            <tr>
+                <td class="section-title">방문 상태</td>
+                <td>
+                <input type="radio" name="tripStatus" value="미방문" th:checked="${trip.status == '미방문'}">미방문
+                <input type="radio" name="tripStatus" value="방문" th:checked="${trip.status == '방문'}">방문
+                <button type="button" th:attr="onclick='updateTripStatus(' + ${trip.tripId} + ')'">출장 상태 변경</button>
+                </td>
             </tr>
             <tr>
                 <td class="section-title">고객명</td>
@@ -110,8 +112,10 @@
                 <td th:text="${trip.note}">비고</td>
             </tr>
             <!-- 지도 보기 버튼 -->
-            <button type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}" onclick="viewMapWithData(this)">
-                지도 보기</button>
+            <button type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}"
+                    onclick="viewMap()">
+                지도 보기
+            </button>
             <!-- 지도 표시 -->
             <div id="map-section" style="display: none;">
                 <div id="map" style="width:500px; height:400px;"></div>

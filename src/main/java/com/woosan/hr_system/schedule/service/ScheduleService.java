@@ -9,6 +9,8 @@ public interface ScheduleService {
     List<Schedule> getSchedulesByEmployeeId(String employeeId);
     Schedule getScheduleById(int taskId);
     int insertSchedule(Schedule schedule);
-    String updateSchedule(Schedule schedule);
+    void updateSchedule(Schedule schedule);
+    void updateScheduleStatus(int taskId, String status);
     void deleteSchedule(int taskId);
+
 }

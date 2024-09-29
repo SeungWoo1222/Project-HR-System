@@ -6,7 +6,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -25,9 +27,13 @@ public class BusinessTripDAO {
         return sqlSession.selectOne(NAMESPACE + "getBusinessTripById", taskId);
     }
 
+    // tripId로 단일 출장 조회
+    public BusinessTrip getBusinessTripByTripId(int tripId) {
+        return sqlSession.selectOne(NAMESPACE + "getBusinessTripByTripId", tripId);
+    }
+
     // 새로운 출장 정보 생성
     public void insertBusinessTrip(BusinessTrip businessTrip) {
-        log.info("insetBusinessTrip DAO 도착");
         sqlSession.insert(NAMESPACE + "insertBusinessTrip", businessTrip);
     }
 
@@ -36,8 +42,21 @@ public class BusinessTripDAO {
         sqlSession.update(NAMESPACE + "updateBusinessTrip", businessTrip);
     }
 
+    // 출장 상태 변경
+    public void updateTripStatus(int tripId, String status) {
+        Map<String , Object> params = new HashMap<>();
+        params.put("tripId", tripId);
+        params.put("status", status);
+        sqlSession.update(NAMESPACE + "updateTripStatus", params);
+    }
+
     // 출장 정보 삭제
     public void deleteBusinessTrip(int mapId) {
         sqlSession.delete(NAMESPACE + "deleteBusinessTrip", mapId);
+    }
+
+    // 출장 정보 아카이브 테이블 삽입
+    public void insertTripInfoInArchive(BusinessTrip businessTrip) {
+        sqlSession.insert(NAMESPACE + "insertTripInfoInArchive", businessTrip);
     }
 }

@@ -47,9 +47,14 @@
             content = #{content},
             start_time = #{startTime},
             end_time = #{endTime},
-            status = #{status},
             all_day = #{allDay},
             color = #{color}
+        WHERE task_id = #{taskId}
+    </update>
+
+    <update id="updateScheduleStatus">
+        UPDATE schedules
+        SET status = #{status}
         WHERE task_id = #{taskId}
     </update>
 
@@ -57,4 +62,11 @@
     <delete id="deleteSchedule">
         DELETE FROM schedules WHERE task_id = #{taskId}
     </delete>
+
+    <!-- 일정 아카이브 삽입 -->
+    <!-- 일정 생성 -->
+    <insert id="insertScheduleArchive" parameterType="com.woosan.hr_system.schedule.model.Schedule">
+        INSERT INTO schedule_archive (task_id, member_id, task_name, content, start_time, end_time, created_date, status, project_id, all_day, color)
+        VALUES (#{taskId}, #{memberId}, #{taskName}, #{content}, #{startTime}, #{endTime}, #{createdDate}, '미완료', #{projectId}, #{allDay}, #{color})
+    </insert>
 </mapper>

@@ -29,10 +29,10 @@
 
 <th:block layout:fragment="script">
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uu5esh416f&submodules=geocoder"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/schedule/trip.js}"></script>
     <script th:src="@{/js/schedule/create.js}"></script>
     <script th:src="@{/js/schedule/ajax.js}"></script>
-    <script th:src="@{/js/schedule/edit.js}"></script>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script th:inline="javascript">

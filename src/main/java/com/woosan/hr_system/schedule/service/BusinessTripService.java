@@ -9,9 +9,13 @@ public interface BusinessTripService {
 
     BusinessTrip getBusinessTripById(int taskId);
 
-    void insertBusinessTrip(String tripInfoJson, int taskId);
+    void insertBusinessTrip(BusinessTrip businessTrip, int taskId);
 
     void updateBusinessTrip(BusinessTrip businessTrip);
 
+    void updateTripStatus(int tripId, String status);
+
     void deleteBusinessTrip(int mapId);
+
+    void insertTripInfoInArchive(BusinessTrip businessTrip);
 }
