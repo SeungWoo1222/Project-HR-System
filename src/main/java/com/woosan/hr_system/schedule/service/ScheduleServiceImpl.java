@@ -1,17 +1,25 @@
 package com.woosan.hr_system.schedule.service;
 
+import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
+import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private ScheduleDAO scheduleDAO;
+    @Autowired
+    private BusinessTripService businessTripService;
 
     @Override
     public List<Schedule> getAllSchedules() {
@@ -29,34 +37,63 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override // 일정 등록
-    public String insertSchedule(Schedule schedule) {
-        // created_date 설정
+    public int insertSchedule(Schedule schedule) {
+        // created_date, memberId 설정
         schedule.setCreatedDate(LocalDateTime.now());
-
-        // 일정 등록
-        scheduleDAO.insertSchedule(schedule);
-
-        // 알림 전송 후 메세지 반환
-        String message = "새로운 일정이 등록되었습니다."
-                + "\n담당자 : " + schedule.getMemberId()
-                + "\n일정 이름 : " + schedule.getTaskName();
-        return message;
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        schedule.setMemberId(userSessionInfo.getCurrentEmployeeId());
+        return scheduleDAO.insertSchedule(schedule);
     }
 
     @Override // 일정 수정
-    public String updateSchedule(Schedule schedule) {
-        // schedule 모델에서 id 뽑아서 쓰면 됨
-        // 변경사항 있는지 확인하셈
-        // 내가 짠 html에선 schedule 객체가 완전하지 않음 그대로 sql 실행하면 null 부분들 존재할꺼임
-        // 빌더 패턴 toBuild 메소드 이용하면 원본 객체에서 수정된 부분들만 고쳐서 새로 객체 생성할 수 있음
-        scheduleDAO.updateSchedule(schedule);
-        String message = "";
-        return message;
+    public void updateSchedule(Schedule schedule) {
+        // 기존 스케줄 정보 가져오기
+        Schedule existingSchedule = scheduleDAO.getScheduleById(schedule.getTaskId());
+
+        log.info("기존 일정: {}", existingSchedule);
+        log.info("수정 요청 받은 일정: {}", schedule);
+
+        // 빌더 패턴을 사용하여 기존 스케줄에서 수정된 부분만 반영하여 새 객체 생성
+        Schedule newSchedule = existingSchedule.toBuilder()
+                .taskName(Optional.ofNullable(schedule.getTaskName()).orElse(existingSchedule.getTaskName()))
+                .content(Optional.ofNullable(schedule.getContent()).orElse(existingSchedule.getContent()))
+                .startTime(Optional.ofNullable(schedule.getStartTime()).orElse(existingSchedule.getStartTime()))
+                .endTime(Optional.ofNullable(schedule.getEndTime()).orElse(existingSchedule.getEndTime()))
+                .allDay(schedule.isAllDay())
+                .color(Optional.ofNullable(schedule.getColor()).orElse(existingSchedule.getColor()))
+                .build();
+
+        newSchedule.setTaskId(existingSchedule.getTaskId());
+
+        log.info("최종 업데이트할 일정: {}", newSchedule);
+
+        // 새로운 객체로 데이터베이스 업데이트
+        scheduleDAO.updateSchedule(newSchedule);
+    }
+
+    @Override // 일정 상태 변경
+    public void updateScheduleStatus(int taskId, String status) {
+        scheduleDAO.updateScheduleStatus(taskId, status);
     }
 
     @Override // 일정 삭제
     public void deleteSchedule(int taskId) {
+        log.info("deleteSchedule 도착 : {}", taskId);
+
+        Schedule schedule = scheduleDAO.getScheduleById(taskId);
+        scheduleDAO.insertScheduleArchive(schedule);
+
+        log.info("insertScheduleArchive 완료");
+        BusinessTrip businessTrip = businessTripService.getBusinessTripById(taskId);
+        if (businessTrip != null) {
+            businessTripService.insertTripInfoInArchive(businessTrip);
+            log.info("insertTripArchive 완료");
+            businessTripService.deleteBusinessTrip(taskId);
+            log.info("deleteBusinessTrip 완료");
+        }
+
         scheduleDAO.deleteSchedule(taskId);
+        log.info("deleteSchedule 완료");
     }
 
     // 일정 상태 변경 메소드 필요함

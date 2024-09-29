@@ -1,3 +1,4 @@
+
 // 색상 선택 시 색상 미리보기 업데이트
 function changeColor() {
     var selectedColor = document.getElementById('color').value;
@@ -24,3 +25,5 @@ function toggleDateTimeFields() {
         endDate.style.display = "none";
     }
 }
+
+
