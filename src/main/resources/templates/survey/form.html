@@ -11,10 +11,17 @@
     <script th:src="@{/js/survey/form.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            alignAddButtonWithLastQuestion();
+            alignButtonsWithLastQuestion();
 
+            // 질문 추가 이벤트 등록
             document.querySelector('.add-btn').addEventListener('click', function () {
                 addNewQuestion();
+            });
+
+            // 설문 등록 이벤트 등록
+            document.querySelector('.send-btn').addEventListener('click', function (e) {
+                e.preventDefault();
+                if (confirm('설문을 등록하시겠습니까?')) submitSurvey();
             });
 
             const questionTypeSelects = document.querySelectorAll('select[name^="questionType"]');
@@ -44,6 +51,8 @@
             <div class="content survey-header">
                 <input type="text" id="title" name="title" value="제목 없는 설문지"/>
                 <input type="text" id="description" name="description" placeholder="설문지 설명"/>
+                <label for="expiresAt">설문조사 종료일 : </label>
+                <input type="date" id="expiresAt" name="expiresAt"/>
             </div>
             <div class="question-row">
                 <div class="content question">
@@ -61,7 +70,7 @@
                     </div>
                     <div class="options-container" style="display:none;">
                         <div class="option-wrapper">
-                            <input type="text" name="option0" placeholder="옵션 1"/>
+                            <input type="text" name="option0" value="옵션 1"/>
                         </div>
                         <div class="option-add-btn">옵션 추가</div>
                     </div>
@@ -69,8 +78,13 @@
             </div>
         </div>
     </form>
-    <div class="content add-btn">
-        <img src="/images/icons/plus.png" alt="새 항목"/>
+    <div class="content btn-container">
+        <div class="add-btn">
+            <img src="/images/icons/plus.png" alt="새 질문" title="새 질문 추가"/>
+        </div>
+        <div class="send-btn">
+            <img src="/images/icons/send.png" alt="설문 등록" title="설문 등록"/>
+        </div>
     </div>
 </div>
 

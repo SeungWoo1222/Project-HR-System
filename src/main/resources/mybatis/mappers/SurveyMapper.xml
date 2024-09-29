@@ -7,8 +7,10 @@
         <id property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="description" column="description"/>
-        <result property="created_by" column="created_by"/>
-        <result property="created_at" column="created_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+        <result property="expiresAt" column="created_at"/>
         <collection property="questions" ofType="com.woosan.hr_system.survey.model.Question" column="id"
                     select="selectQuestionsBySurveyId"/>
     </resultMap>
@@ -27,4 +29,10 @@
         <result property="employeeId" column="employee_id"/>
         <result property="answer" column="answer"/>
     </resultMap>
+
+    <!-- 설문 등록 -->
+    <insert id="insertSurvey" parameterType="com.woosan.hr_system.survey.model.Survey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO surveys (title, description, created_by, created_at, expires_at)
+        VALUES (#{title}, #{description}, #{createdBy}, #{createdAt}, #{expiresAt})
+    </insert>
 </mapper>

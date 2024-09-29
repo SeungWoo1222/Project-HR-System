@@ -19,16 +19,22 @@
     justify-content: space-between;
 }
 
-.add-btn {
+.btn-container {
     padding: 5px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     height: min-content;
     position: relative;
     top: 0;
 }
 
-.add-btn img, .option-remove-btn img, .question-remove-btn img {
+.btn-container .add-btn, .btn-container .send-btn {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.add-btn img, .send-btn img, .option-remove-btn img, .question-remove-btn img {
     padding: 5px;
     width: 25px;
     height: 25px;
@@ -38,7 +44,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.add-btn img:hover, .option-remove-btn img:hover, .question-remove-btn img:hover {
+.add-btn img:hover, .send-btn img:hover, .option-remove-btn img:hover, .question-remove-btn img:hover {
     background-color: #EDEDED;
 }
 

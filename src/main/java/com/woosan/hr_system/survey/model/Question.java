@@ -13,5 +13,5 @@ public class Question {
     private int id;
     private String questionText;
     private String questionType;
-    private List<Integer> options;
+    private List<String> options;
 }
