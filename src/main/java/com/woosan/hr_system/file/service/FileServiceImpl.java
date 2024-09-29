@@ -2,7 +2,6 @@ package com.woosan.hr_system.file.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.exception.file.FileBadRequestException;
-import com.woosan.hr_system.exception.file.FileInfoNotFoundException;
 import com.woosan.hr_system.exception.file.FileProcessingException;
 import com.woosan.hr_system.file.dao.FileDAO;
 import com.woosan.hr_system.file.model.File;
@@ -46,7 +45,7 @@ public class FileServiceImpl implements FileService {
     // 파일 정보 조회 후 null 확인
     private File findFileById(int fileId) {
         File fileInfo = fileDAO.getFileById(fileId);
-        if (fileInfo == null) throw new FileInfoNotFoundException(fileId);
+//        if (fileInfo == null) throw new FileInfoNotFoundException(fileId);
         return fileInfo;
     }
 

@@ -92,16 +92,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public Object handleAllRuntimeExceptions(RuntimeException ex, HttpServletRequest request) {
         log.error("알 수 없는 오류가 발생했습니다: {}", ex.getMessage(), ex);
-
-        // 요청의 Accept 헤더를 확인하여 API 요청인지 페이지 요청인지 확인
-        String acceptHeader = request.getHeader("Accept");
-        if (acceptHeader != null && acceptHeader.contains("application/json")) {
-            // API 요청인 경우 JSON 응답을 반환
-            return new ResponseEntity<>("시스템 오류가 발생했습니다. 관리자에게 문의하세요.", HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            // 페이지 요청인 경우 리디렉션
-            return new ModelAndView("redirect:/error/500");
-        }
+        return new ResponseEntity<>("시스템 오류가 발생했습니다. 관리자에게 문의하세요.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 

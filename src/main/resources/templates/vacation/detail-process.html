@@ -2,10 +2,12 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <style>
-    .btn-container {
-        justify-content: space-between;
+    .content-header {
+        margin-top: 30px;
     }
-
+    .title {
+        margin: 0;
+    }
     .reject {
         background-color: #FF7D7D;
     }
@@ -24,17 +26,19 @@
 </style>
 
 <div class="vacation-detail-container">
-    <div class="btn-container">
-        <div>
+    <div class="content-header">
+        <div class="content-header-left">
             <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
             <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
         </div>
-        <div th:if="${vacationInfo.approvalStatus.equals('미처리')}">
-            <button class="btn approval" th:vacationId="${vacationInfo.vacationId}" th:onclick="processVacation(this.getAttribute('vacationId'), '승인')">휴가 승인</button>
-            <button class="btn reject" th:vacationId="${vacationInfo.vacationId}" th:onclick="processVacation(this.getAttribute('vacationId'), '거절')">휴가 거절</button>
+        <div class="title content-header-center">휴가 신청서</div>
+        <div class="content-header-right">
+            <div th:if="${vacationInfo.approvalStatus.equals('미처리')}">
+                <button class="btn approval" th:vacationId="${vacationInfo.vacationId}" th:onclick="processVacation(this.getAttribute('vacationId'), '승인')">휴가 승인</button>
+                <button class="btn reject" th:vacationId="${vacationInfo.vacationId}" th:onclick="processVacation(this.getAttribute('vacationId'), '거절')">휴가 거절</button>
+            </div>
         </div>
     </div>
-    <div class="title">휴가 신청서</div>
     <table class="employee-details">
         <tr>
             <td class="section-title">사원 ID</td>

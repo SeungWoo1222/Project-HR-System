@@ -3,7 +3,22 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout-with-modal :: layout(title='급여 및 공제 비율 조회')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <style>
+        .ratio-section-header, .ratio-edit-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .ratio-section-header h3, .ratio-edit-header h3 {
+            margin: 0;
+        }
+        .deduction-section {
+            margin-top: 20px;
+        }
+    </style>
+</th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/salary/ratio.js}"></script>
@@ -12,7 +27,10 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="payroll-section">
-            <h3>급여 비율</h3>
+            <div class="ratio-section-header">
+                <h3>급여 비율</h3>
+                <button type="button" id="edit-payroll-ratio" class="btn" onclick="openModal('/salary/payment/payroll/edit')">급여 비율 수정</button>
+            </div>
             <table border="1">
                 <thead>
                 <tr>
@@ -39,11 +57,13 @@
                 </tr>
                 </tbody>
             </table>
-            <button type="button" id="edit-payroll-ratio" class="btn" onclick="openModal('/salary/payment/payroll/edit')">급여 비율 수정</button>
         </div>
 
         <div class="deduction-section">
-            <h3>공제 비율</h3>
+            <div class="ratio-section-header">
+                <h3>공제 비율</h3>
+                <button type="button" id="edit-deduction-ratio" class="btn" onclick="openModal('/salary/payment/deduction/edit')">공제 비율 수정</button>
+            </div>
             <table border="1">
                 <thead>
                 <tr>
@@ -66,7 +86,6 @@
                 </tr>
                 </tbody>
             </table>
-            <button type="button" id="edit-deduction-ratio" class="btn" onclick="openModal('/salary/payment/deduction/edit')">공제 비율 수정</button>
         </div>
     </div>
 </div>

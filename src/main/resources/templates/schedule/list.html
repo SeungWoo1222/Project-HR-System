@@ -36,18 +36,47 @@
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script th:inline="javascript">
+        // 모델에 담긴 모든 공휴일 자바스크립트 변수로 변환
+        let holidays = /*[[${holidays}]]*/ [];
+
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
             // 모델에 담긴 scheduleList를 자바스크립트 변수로 변환
             var events = /*[[${scheduleList}]]*/ [];
 
+            // 기존 일정 변환
+            var eventList = events.map(function(schedule) {
+                return {
+                    title: schedule.taskName,         // 일정 제목
+                    start: schedule.startTime,        // 시작일
+                    end: schedule.endTime,            // 종료일
+                    allDay: schedule.allDay,          // 하루종일 설정
+                    backgroundColor: schedule.color,  // 색상 옵션
+                    id: schedule.taskId               // 일정 ID
+                };
+            });
+
+            // 공휴일 데이터를 캘린더 이벤트로 변환하여 추가
+            var holidayEvents = holidays.map(function(holiday) {
+                return {
+                    title: holiday.dateName,        // 공휴일 이름
+                    start: holiday.locDate,         // 공휴일 날짜 (시작일)
+                    end: holiday.locDate,           // 공휴일 날짜 (종료일도 동일)
+                    allDay: true,                   // 하루종일 설정
+                    backgroundColor: '#FF0000',     // 공휴일 배경색
+                    borderColor: '#FF0000',         // 공휴일 테두리 색상
+                    id: 'holiday',                  // 공휴일 ID 'holiday'로 설정
+                    editable: false,                // 공휴일은 수정 불가로 설정
+                    interactive: false              // 공휴일은 클릭 불가로 설정
+                };
+            });
+
             // FullCalendar 초기화
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: "ko",
-                eventLimit: 4,
-                height: 800,
+                dayMaxEventRows: 4,
                 buttonText: {
                     today: '오늘',
                     month: '월',
@@ -62,22 +91,27 @@
                     }
                 },
                 headerToolbar: {
-                    left: 'prev,next today',        // 왼쪽에 이전, 다음, 오늘 버튼 배치
-                    center: 'title',                // 가운데에 현재 년/월 표시
+                    left: 'prev,next today',                   // 왼쪽에 이전, 다음, 오늘 버튼 배치
+                    center: 'title',                           // 가운데에 현재 년/월 표시
                     right: 'planButton dayGridMonth,listMonth' // 오른쪽에 보기 전환 버튼
                 },
-                events: events.map(function(schedule) {
-                    return {
-                        title: schedule.taskName,         // 일정 제목
-                        start: schedule.startTime,        // 시작일
-                        end: schedule.endTime,            // 종료일
-                        allDay: schedule.allDay,          // 하루종일 옵션
-                        backgroundColor: schedule.color,  // 색상 옵션
-                        id: schedule.taskId               // 일정 ID
-                    };
-                }),
+                dayCellDidMount: function(info) { // 공휴일 날짜와 매칭하여 날짜 빨강 스타일 적용
+                    let date = info.date.toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    }).replace(/\./g, '').trim().replace(/\s+/g, '-');  // yyyy-mm-dd 형식으로 변환
+
+                    if (holidays.some(holiday => holiday.locDate === date)) {
+                        // 공휴일이면 날짜 텍스트를 빨간색으로 설정
+                        info.el.style.color = '#FF0000';
+                    }
+                },
+                events: eventList.concat(holidayEvents), // 기존 일정과 공휴일을 결합
                 eventClick: function(info) {
-                    openModal('/schedule/' + info.event.id);
+                    if (info.event.id !== 'holiday') {
+                        openModal('/schedule/' + info.event.id); // 공휴일이 아닌 일정 클릭 시에만 모달 열기
+                    }
                 }
             });
             calendar.render();

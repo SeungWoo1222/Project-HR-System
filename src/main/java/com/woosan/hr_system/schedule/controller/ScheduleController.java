@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.schedule.model.BusinessTrip;
+import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.schedule.service.ScheduleService;
@@ -32,6 +33,8 @@ public class ScheduleController {
     private EmployeeService employeeService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private HolidayService holidayService;
 
     @GetMapping("/{employeeId}/list") // 사원의 모든 일정 조회
     public String viewScheduleList(@PathVariable("employeeId") String employeeId, Model model) {
@@ -51,6 +54,8 @@ public class ScheduleController {
                                         && schedule.getEndTime().toLocalDate().isAfter(today)))
                 .toList();
         model.addAttribute("todaySchedules", todaySchedules);
+        // 모든 공휴일 모델에 추가
+        model.addAttribute("holidays", holidayService.getAllHoliday());
         return "schedule/list";
     }
 

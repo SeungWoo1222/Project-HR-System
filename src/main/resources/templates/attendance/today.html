@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='오늘의 근태 현황')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/attendance/status.css}" rel="stylesheet">
+    <link th:href="@{/css/attendance/today-container.css}" rel="stylesheet">
+    <style>
+        .content-header {
+            border-top: #DCDCDC 1px solid;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+        .content-header-left h3 {
+            margin: 0;
+        }
+        .pagination, .pagination-container {
+            margin-top: 0;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendance/overtime.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="today-container">
+            <h3>근태 통계 <span th:text="${#temporals.format(#temporals.createToday(), '(yy년 MM월 dd일 EEEE)')}" style="color: #A9A9A9; font-size: 15px"></span></h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>전체 사원 수</th>
+                    <th>출근율</th>
+                    <th>정상 출근</th>
+                    <th>지각</th>
+                    <th>조퇴</th>
+                    <th>결근</th>
+                    <th>출장</th>
+                    <th>휴가</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${total}">0</td>
+                    <td th:text="${rate} + '%'">0</td>
+                    <td th:text="${statusCount['출근']}">0</td>
+                    <td th:text="${statusCount['지각']}">0</td>
+                    <td th:text="${statusCount['조퇴']}">0</td>
+                    <td th:text="${statusCount['결근']}">0</td>
+                    <td th:text="${statusCount['출장']}">0</td>
+                    <td th:text="${statusCount['휴가']}">0</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="today-section">
+                <div class="content-header">
+                    <div class="content-header-left">
+                        <h3>정상 출근 사원</h3>
+                    </div>
+                    <div class="content-header-center">
+                        <div class="pagination-container" th:if="${normalTotalPages > 0}">
+                            <div class="pagination">
+                        <span th:if="${normalCurrentPage > 1}">
+                            <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage - 1}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage}}">
+                                <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                            </a>
+                        </span>
+                                <div class="page-area">
+                            <span th:if="${normalTotalPages <= 5}">
+                                <span th:each="i : ${#numbers.sequence(1, normalTotalPages)}">
+                                    <a th:href="@{'/attendance/today?normalPage=' + (${i}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage}}"
+                                       th:text="${i}" th:classappend="${i == normalCurrentPage} ? 'active' : ''">1</a>
+                                </span>
+                            </span>
+                                    <span th:if="${normalTotalPages > 5}">
+                                <span th:each="i : ${#numbers.sequence(
+                                                normalCurrentPage > 3 ? (normalCurrentPage < normalTotalPages - 2 ? normalCurrentPage - 2 : normalTotalPages - 4) : 1,
+                                                normalCurrentPage > 3 ? (normalCurrentPage < normalTotalPages - 2 ? normalCurrentPage + 2 : normalTotalPages) : 5)}">
+                                    <a th:href="@{'/attendance/today?normalPage=' + (${i}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage}}"
+                                       th:text="${i}" th:classappend="${i == normalCurrentPage} ? 'active' : ''">1</a>
+                                </span>
+                                </span>
+                                </div>
+                                <span th:if="${normalCurrentPage < normalTotalPages}">
+                            <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage + 1}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage}}">
+                                <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                            </a>
+                        </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-header-right"></div>
+                </div>
+
+                <table class="list">
+                    <thead>
+                    <tr>
+                        <th>사원 ID</th>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>출근 시간</th>
+                        <th>퇴근 시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${normalAttendanceList.isEmpty()}">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
+                            정상 출근 사원이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="attendance : ${normalAttendanceList}" th:attendanceId="${attendance.attendanceId}" th:onclick="openModal('/attendance/' + this.getAttribute('attendanceId'))">
+                        <td th:text="${attendance.employeeId}">사원 ID</td>
+                        <td th:text="${attendance.employee?.name}">이름</td>
+                        <td th:text="${attendance.employee?.department}">부서</td>
+                        <td th:text="${attendance.employee?.position}">직급</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="today-section">
+                <div class="content-header">
+                    <div class="content-header-left">
+                        <h3>근태 불량 사원</h3>
+                    </div>
+                    <div class="content-header-center">
+                        <div class="pagination-container" th:if="${badTotalPages > 0}">
+                            <div class="pagination">
+                        <span th:if="${badCurrentPage > 1}">
+                            <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage - 1} + '&tripPage=' + ${tripCurrentPage}}">
+                                <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                            </a>
+                        </span>
+                                <div class="page-area">
+                            <span th:if="${badTotalPages <= 5}">
+                                <span th:each="i : ${#numbers.sequence(1, badTotalPages)}">
+                                    <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${i} + '&tripPage=' + ${tripCurrentPage}}"
+                                       th:text="${i}" th:classappend="${i == badCurrentPage} ? 'active' : ''">1</a>
+                                </span>
+                            </span>
+                                    <span th:if="${badTotalPages > 5}">
+                                <span th:each="i : ${#numbers.sequence(
+                                                badCurrentPage > 3 ? (badCurrentPage < badTotalPages - 2 ? badCurrentPage - 2 : badTotalPages - 4) : 1,
+                                                badCurrentPage > 3 ? (badCurrentPage < badTotalPages - 2 ? badCurrentPage + 2 : badTotalPages) : 5)}">
+                                    <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${i} + '&tripPage=' + ${tripCurrentPage}}"
+                                       th:text="${i}" th:classappend="${i == badCurrentPage} ? 'active' : ''">1</a>
+                                </span>
+                                </span>
+                                </div>
+                                <span th:if="${badCurrentPage < badTotalPages}">
+                            <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage + 1} + '&tripPage=' + ${tripCurrentPage}}">
+                                <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                            </a>
+                        </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-header-right"></div>
+                </div>
+                <table class="list">
+                    <thead>
+                    <tr>
+                        <th>사원 ID</th>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>근태 상태</th>
+                        <th>출근 시간</th>
+                        <th>퇴근 시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${badAttendanceList.isEmpty()}">
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            근태 불량 사원이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="attendance : ${badAttendanceList}" th:attendanceId="${attendance.attendanceId}" th:onclick="openModal('/attendance/' + this.getAttribute('attendanceId'))">
+                        <td th:text="${attendance.employeeId}">사원 ID</td>
+                        <td th:text="${attendance.employee?.name}">이름</td>
+                        <td th:text="${attendance.employee?.department}">부서</td>
+                        <td th:text="${attendance.employee?.position}">직급</td>
+                        <td th:text="${attendance.status}"
+                            th:classappend="${attendance.status == '결근'} ? 'absent' :
+                                            (${attendance.status == '지각'} ? 'late' :
+                                            (${attendance.status == '조퇴'} ? 'early-leave' : ''))">근태 상태</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="today-section">
+                <div class="content-header">
+                    <div class="content-header-left">
+                        <h3>출장 및 휴가 사원</h3>
+                    </div>
+                    <div class="content-header-center">
+                        <div class="pagination-container" th:if="${tripTotalPages > 0}">
+                            <div class="pagination">
+                            <span th:if="${tripCurrentPage > 1}">
+                                <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage - 1}}">
+                                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                                </a>
+                            </span>
+                                <div class="page-area">
+                                <span th:if="${tripTotalPages <= 5}">
+                                    <span th:each="i : ${#numbers.sequence(1, tripTotalPages)}">
+                                        <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${i}}"
+                                           th:text="${i}" th:classappend="${i == tripCurrentPage} ? 'active' : ''">1</a>
+                                    </span>
+                                </span>
+                                    <span th:if="${tripTotalPages > 5}">
+                                    <span th:each="i : ${#numbers.sequence(
+                                                    badCurrentPage > 3 ? (badCurrentPage < badTotalPages - 2 ? badCurrentPage - 2 : badTotalPages - 4) : 1,
+                                                    badCurrentPage > 3 ? (badCurrentPage < badTotalPages - 2 ? badCurrentPage + 2 : badTotalPages) : 5)}">
+                                        <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${i}}"
+                                           th:text="${i}" th:classappend="${i == tripCurrentPage} ? 'active' : ''">1</a>
+                                    </span>
+                                    </span>
+                                </div>
+                                <span th:if="${tripCurrentPage < tripTotalPages}">
+                                <a th:href="@{'/attendance/today?normalPage=' + (${normalCurrentPage}) + '&badPage=' + ${badCurrentPage} + '&tripPage=' + ${tripCurrentPage + 1}}">
+                                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                                </a>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-header-right"></div>
+                </div>
+
+                <table class="list">
+                    <thead>
+                    <tr>
+                        <th>사원 ID</th>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>근태 상태</th>
+                        <th>출근 시간</th>
+                        <th>퇴근 시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${vacationOrBusinessList.isEmpty()}">
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            출장 및 휴가인 사원이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="attendance : ${vacationOrBusinessList}" th:attendanceId="${attendance.attendanceId}" th:onclick="openModal('/attendance/' + this.getAttribute('attendanceId'))">
+                        <td th:text="${attendance.employeeId}">사원 ID</td>
+                        <td th:text="${attendance.employee?.name}">이름</td>
+                        <td th:text="${attendance.employee?.department}">부서</td>
+                        <td th:text="${attendance.employee?.position}">직급</td>
+                        <td th:text="${attendance.status}"
+                            th:classappend="${attendance.status == '출장'} ? 'business-trip' :
+                                            (${attendance.status == '휴가'} ? 'vacation' : '')">근태 상태</td>
+                        <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
+                        <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

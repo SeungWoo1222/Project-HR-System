@@ -5,52 +5,66 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/department-nav.css}" rel="stylesheet">
-    <link th:href="@{/css/salary/pay.css}" rel="stylesheet">
+    <link th:href="@{/css/yearmonth-nav.css}" rel="stylesheet">
     <link th:href="@{/css/pagination.css}" rel="stylesheet">
+    <style>
+        .content-header {
+            margin-top: 10px;
+        }
+        .pagination, .pagination-container {
+            margin-top: 0;
+        }
+    </style>
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/salary/list.js}"></script>
     <script th:src="@{/js/salary/pay.js}"></script>
+    <script th:src="@{/js/common/yearmonth-nav.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form id="pageSizeForm" th:action="@{/salary/payment}" method="get">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <form id="yearMonthForm" th:action="@{/salary/payment}" method="get">
-                <div class="month-nav">
-                    <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
-                    <span class="current-month" th:text="${yearmonth}"></span>
-                    <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
-                </div>
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
-            </form>
-            <div class="search-option">
-                <form th:action="@{/salary/payment}" method="get">
-                    <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+        <div class="content-header">
+            <div class="content-header-left">
+                <form id="pageSizeForm" th:action="@{/salary/payment}" method="get">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                    <button type="submit">검색</button>
                 </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/payment'"/>
+            </div>
+            <div class="content-header-center">
+                <form id="yearMonthForm" th:action="@{/salary/payment}" method="get">
+                    <div class="month-nav">
+                        <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+                        <span class="current-month" th:text="${yearmonth}"></span>
+                        <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+                    </div>
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
+                </form>
+            </div>
+            <div class="content-header-right">
+                <div class="search-option">
+                    <form th:action="@{/salary/payment}" method="get">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${pageSize}"/>
+                        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                        <input type="hidden" name="department" th:value="${department}">
+                        <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                        <button type="submit">검색</button>
+                    </form>
+                    <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/payment'"/>
+                </div>
             </div>
         </div>
         <form th:action="@{/salary/payment}" method="get" id="department-nav">
@@ -129,36 +143,41 @@
             </tr>
             </tbody>
         </table>
-        <div class="pagination-container" th:if="${totalPages > 0}">
-            <div class="pagination">
+        <div class="content-header">
+            <div class="content-header-left"></div>
+            <div class="content-header-center">
+                <div class="pagination-container" th:if="${totalPages > 0}">
+                    <div class="pagination">
                 <span th:if="${currentPage > 1}">
-                    <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}">
                         <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                     </a>
                 </span>
-                <div class="page-area">
+                        <div class="page-area">
                     <span th:if="${totalPages <= 5}">
                         <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}"
                                th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                         </span>
                     </span>
-                    <span th:if="${totalPages > 5}">
+                            <span th:if="${totalPages > 5}">
                         <span th:each="i : ${#numbers.sequence(
                                         currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
                                         currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}"
+                            <a th:href="@{'/salary/payment?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}"
                                th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                         </span>
                         </span>
-                </div>
-                <span th:if="${currentPage < totalPages}">
-                    <a th:href="@{'/salary/payment?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword}}">
+                        </div>
+                        <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/salary/payment?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}">
                         <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                     </a>
                 </span>
+                    </div>
+                </div>
             </div>
-            <div class="btn-container">
+            <div class="content-header-right">
                 <button type="button" class="btn" th:onclick="submitSelectedSalaries()">급여 지급</button>
             </div>
         </div>

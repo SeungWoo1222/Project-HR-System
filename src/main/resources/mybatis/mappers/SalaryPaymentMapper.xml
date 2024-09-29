@@ -26,6 +26,10 @@
         <result property="deductions" column="deductions" />
         <result property="grossSalary" column="gross_salary" />
         <result property="netSalary" column="net_salary" />
+        <result property="days" column="days" />
+        <result property="totalTime" column="total_time" />
+        <result property="totalOvertime" column="total_overtime" />
+        <result property="totalNightTime" column="total_night_time" />
         <result property="remarks" column="remarks" />
     </resultMap>
 
@@ -52,6 +56,10 @@
         <result property="deductions" column="deductions" />
         <result property="grossSalary" column="gross_salary" />
         <result property="netSalary" column="net_salary" />
+        <result property="days" column="days" />
+        <result property="totalTime" column="total_time" />
+        <result property="totalOvertime" column="total_overtime" />
+        <result property="totalNightTime" column="total_night_time" />
         <result property="remarks" column="remarks" />
         <!-- 급여 관련 정보 -->
         <result property="salary.salaryId" column="salary_id" />
@@ -212,13 +220,14 @@
             overtime_pay, position_allowance, meal_allowance, transport_allowance,
             personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
             local_income_tax, national_pension, health_insurance, long_term_care_insurance,
-            employment_insurance, deductions, net_salary, remarks
+            employment_insurance, deductions, net_salary, days, total_time, total_overtime, total_night_time, remarks
         ) VALUES (
                      #{salaryId}, #{compensationMonth}, #{paymentDate}, #{grossSalary}, #{baseSalary},
                      #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance},
                      #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{incomeTax},
                      #{localIncomeTax}, #{nationalPension}, #{healthInsurance}, #{longTermCareInsurance},
-                     #{employmentInsurance}, #{deductions}, #{netSalary}, #{remarks}
+                     #{employmentInsurance}, #{deductions}, #{netSalary}, #{days}, #{totalTime}, #{totalOvertime},
+                     #{totalNightTime}, #{remarks}
                  )
     </insert>
 
@@ -229,14 +238,15 @@
         overtime_pay, position_allowance, meal_allowance, transport_allowance,
         personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
         local_income_tax, national_pension, health_insurance, long_term_care_insurance,
-        employment_insurance, deductions, net_salary, remarks
+        employment_insurance, deductions, net_salary, days, total_time, total_overtime, total_night_time, remarks
         ) VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.salaryId}, #{item.compensationMonth}, #{item.paymentDate}, #{item.grossSalary}, #{item.baseSalary},
             #{item.overtimePay}, #{item.positionAllowance}, #{item.mealAllowance}, #{item.transportAllowance},
             #{item.personalBonus}, #{item.teamBonus}, #{item.holidayBonus}, #{item.yearEndBonus}, #{item.incomeTax},
             #{item.localIncomeTax}, #{item.nationalPension}, #{item.healthInsurance}, #{item.longTermCareInsurance},
-            #{item.employmentInsurance}, #{item.deductions}, #{item.netSalary}, #{item.remarks})
+            #{item.employmentInsurance}, #{item.deductions}, #{item.netSalary}, #{item.days}, #{item.totalTime},
+            #{item.totalOvertime}, #{item.totalNightTime}, #{item.remarks})
         </foreach>
     </insert>
 

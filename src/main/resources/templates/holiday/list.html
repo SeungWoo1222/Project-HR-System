@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='공휴일 관리')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/yearmonth-nav.css}" rel="stylesheet">
+    <style>
+
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendance/holiday.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="content-header">
+            <div class="content-header-left"></div>
+            <div class="content-header-center">
+                <form id="yearForm" th:action="@{/holiday/list}" method="get">
+                    <div class="month-nav">
+                        <div class="nav-btn prev" onclick="changeYear(-1)"></div>
+                        <span class="current-month" th:text="${year + '년'}"></span>
+                        <div id="nextBtn" class="nav-btn next" onclick="changeYear(1)"></div>
+                    </div>
+                    <input type="hidden" id="year" name="year" th:value="${year}">
+                </form>
+            </div>
+            <div class="content-header-right">
+                <button type="button" class="btn" onclick="openModal('/holiday/year')">해당 연도 공휴일 생성</button>
+                <button type="button" class="btn" onclick="openModal('/holiday/add')">공휴일 추가</button>
+            </div>
+        </div>
+        <div>
+            <table border="1">
+                <thead>
+                <th>공휴일 ID</th>
+                <th>이름</th>
+                <th>날짜</th>
+                <th>수정하기</th>
+                <th>삭제하기</th>
+                </thead>
+                <tbody>
+                <tr th:if="${holidays.isEmpty()}">
+                    <td colspan="5" style="text-align: center; padding: 20px;">
+                        해당 년도 공휴일 데이터가 없습니다.
+                    </td>
+                </tr>
+                <tr th:each="holiday : ${holidays}">
+                    <td th:text="${holiday.holidayId}"></td>
+                    <td th:text="${holiday.dateName}"></td>
+                    <td th:text="${#temporals.format(holiday.locDate, 'yyyy년 MM월 dd일')}"></td>
+                    <td><button type="button" th:holidayId="${holiday.holidayId}" th:onclick="openModal('/holiday/edit/' + this.getAttribute('holidayId'))">수정</button></td>
+                    <td><button type="button" th:holidayId="${holiday.holidayId}" th:onclick="deleteHoliday(this.getAttribute('holidayId'))">삭제</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

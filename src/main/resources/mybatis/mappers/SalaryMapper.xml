@@ -25,7 +25,7 @@
 
     <!-- 급여 ID를 이용한 특정 사원의 급여 정보 조회 -->
     <select id="selectSalaryById" parameterType="int" resultMap="SalaryResultMap">
-        SELECT * FROM salaries WHERE salary_id = #{salaryId} AND status = 1
+        SELECT * FROM salaries WHERE salary_id = #{salaryId}
     </select>
 
     <!-- 사원 ID를 이용한 특정 사원의 급여 정보 조회 -->

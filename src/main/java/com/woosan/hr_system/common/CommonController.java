@@ -31,7 +31,7 @@ public class CommonController {
             case "ChangeRequired" -> model.addAttribute("message", "ChangeRequired");
             default -> model.addAttribute("message", "NoChangeRequired");
         }
-        return "/common/home";
+        return "common/home";
     }
 
     @GetMapping("/myInfo") // 내 정보 조회
@@ -41,7 +41,7 @@ public class CommonController {
         model.addAttribute("employee", employee);
 
         model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
-        return "/common/myInfo";
+        return "common/myInfo";
     }
 
     @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
@@ -54,6 +54,6 @@ public class CommonController {
         model.addAttribute("pictureUrl", fileService.getUrl(fileId));
         model.addAttribute("originalFileName", fileService.getFileInfo(fileId).getOriginalFileName());
 
-        return "/common/edit/myInfo";
+        return "common/edit/myInfo";
     }
 }

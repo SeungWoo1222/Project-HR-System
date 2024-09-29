@@ -7,7 +7,8 @@
 
 .search-option {
     display: flex;
-    align-items:center;
+    align-items: center;
+    justify-content: right;
     gap: 5px;
 }
 

@@ -2,6 +2,8 @@ package com.woosan.hr_system.salary.service;
 
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
+import com.woosan.hr_system.attendance.service.AttendanceService;
+import com.woosan.hr_system.attendance.service.OvertimeService;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.salary.dao.RatioDAO;
@@ -33,6 +35,10 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Autowired
     private SalaryCalculation salaryCalculation;
     @Autowired
+    private AttendanceService attendanceService;
+    @Autowired
+    private OvertimeService overtimeService;
+    @Autowired
     private SalaryDAO salaryDAO;
     @Autowired
     private SalaryPaymentDAO salaryPaymentDAO;
@@ -60,6 +66,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
     public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
+
         List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
         int total = salaryPaymentDAO.countPayslips(pageRequest.getKeyword());
 
@@ -150,8 +157,23 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     private SalaryPayment createPayslip(Salary salaryInfo, YearMonth yearMonth) {
         // 급여 항목 계산
         Map<String, Integer> payslipComponents = new HashMap<>();
-        salaryCalculation.calculateSalaryPayment(salaryInfo.getEmployeeId(), salaryInfo.getAnnualSalary(), payslipComponents, yearMonth);
-        log.info("'{}' 사원의 {}년 {}월 급여명세서가 생성되었습니다.", employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()), yearMonth.getYear(), yearMonth.getMonthValue());
+        String employeeId = salaryInfo.getEmployeeId();
+        salaryCalculation.calculateSalaryPayment(employeeId, salaryInfo.getAnnualSalary(), payslipComponents, yearMonth);
+
+        // 근태 정보 조회
+        Map<String, Object> thisMonthAttendance = attendanceService.getThisMonthAttendance(employeeId, yearMonth);
+        int days = (int) thisMonthAttendance.get("days");
+        double totalWorkingTime = (double) thisMonthAttendance.get("totalTime");
+
+        // 초과근무 조회
+        Map<String, Object> thisMonthOvertime = overtimeService.getThisMonthOvertimes(employeeId, yearMonth);
+        double totalOvertime = (double) thisMonthOvertime.get("totalTime");
+        double totalNightTime = (double) thisMonthOvertime.get("nightTime");
+        double overtime = totalOvertime - totalNightTime;
+
+        double totalTime = totalWorkingTime + totalOvertime;
+
+        log.info("'{}' 사원의 {}년 {}월 급여명세서가 생성되었습니다.", employeeDAO.getEmployeeName(employeeId), yearMonth.getYear(), yearMonth.getMonthValue());
 
         // 급여명세서 작성
         return SalaryPayment.builder()
@@ -181,6 +203,12 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
                 .healthInsurance(payslipComponents.get("healthInsurance"))
                 .longTermCareInsurance(payslipComponents.get("longTermCareInsurance"))
                 .employmentInsurance(payslipComponents.get("employmentInsurance"))
+
+                // 근태 정보 설정
+                .days(days)
+                .totalTime(totalTime)
+                .totalOvertime(overtime)
+                .totalNightTime(totalNightTime)
 
                 // 총 급여, 총 공제 금액, 실 지급액 계산 설정
                 .grossSalary(payslipComponents.get("grossSalary"))
@@ -215,7 +243,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
 
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "baseSalary", "positionAllowance", "mealAllowance", "transportAllowance",
-                "personalBonus", "teamBonus", "holidayBonus", "yearEndBonus", "overtimePay", "remarks"
+                "personalBonus", "teamBonus", "holidayBonus", "yearEndBonus", "remarks"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
     }

@@ -4,6 +4,15 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woosan.hr_system.file.dao.FileDAO">
+    <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
+        <id property="fileId" column="file_id"/>
+        <result property="originalFileName" column="original_file_name"/>
+        <result property="storedFileName" column="stored_file_name"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="uploadDate" column="upload_date"/>
+        <result property="uploadedBy" column="uploaded_by"/>
+        <result property="fileIdUsage" column="file_id_usage"/>
+    </resultMap>
 
     <!-- 파일 정보 삽입 -->
     <insert id="insertFile" parameterType="com.woosan.hr_system.file.model.File" useGeneratedKeys="true" keyProperty="fileId">
@@ -12,12 +21,12 @@
     </insert>
 
     <!-- 파일 ID로 파일 정보 조회 -->
-    <select id="selectFileById" parameterType="int" resultType="com.woosan.hr_system.file.model.File">
+    <select id="selectFileById" parameterType="int" resultMap="FileResultMap">
         SELECT * FROM files WHERE file_id = #{fileId}
     </select>
 
     <!-- 파일 ID 리스트로 파일들 정보 조회 -->
-    <select id="selectFileListById" parameterType="list" resultType="com.woosan.hr_system.file.model.File">
+    <select id="selectFileListById" parameterType="list" resultMap="FileResultMap">
         SELECT * FROM files WHERE file_id IN
         <foreach item="fileId" collection="list" open="(" separator="," close=")">
             #{fileId}
@@ -32,7 +41,7 @@
     </select>
 
     <!-- 모든 파일 정보 조회 -->
-    <select id="selectAllFiles" resultType="com.woosan.hr_system.file.model.File">
+    <select id="selectAllFiles" resultMap="FileResultMap">
         SELECT * FROM files
     </select>
 

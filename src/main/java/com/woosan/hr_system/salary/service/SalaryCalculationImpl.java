@@ -3,6 +3,7 @@ package com.woosan.hr_system.salary.service;
 import com.github.usingsky.calendar.KoreanLunarCalendar;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
+import com.woosan.hr_system.attendance.service.OvertimeService;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.model.DeductionDetails;
@@ -25,6 +26,8 @@ public class SalaryCalculationImpl implements SalaryCalculation {
     private RatioDAO ratioDAO;
     @Autowired
     private EmployeeDAO employeeDAO;
+    @Autowired
+    private OvertimeService overtimeService;
 
     @LogBeforeExecution
     @LogAfterExecution
@@ -45,15 +48,17 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         // 보너스 항목 계산 후 components에 입력
         calculateBonusComponents(payrollDetails, components, yearMonth);
 
+        // 초과 및 야간 근무 수당 계산 후 components에 입력
+        calculateOvertimePayComponents(employeeId, components, yearMonth);
+
         // 비과세 제외된 월급
-        int taxableSalary = payrollDetails.calculateTaxableSalary();
+        int taxableSalary = calculateTaxableSalary(components);
 
         // 공제 항목 계산 후 components에 입력
         calculateDeductions(taxableSalary, employeeId, components);
 
         return "'" + employeeDAO.getEmployeeName(employeeId) + "'사원의 월 급여가 계산 완료되었습니다.";
     }
-
     // ============================================ 기타 계산 로직 start-point ============================================
     // 비과세 제외된 월급 계산
     private int calculateTaxableSalary(Map<String, Integer> components) {
@@ -215,7 +220,6 @@ public class SalaryCalculationImpl implements SalaryCalculation {
 
     // 근로소득세 계산 전 검사
     private int calculateIncomeTax(int taxableSalary, String employeeId) {
-        log.debug("taxableSalary : {}", taxableSalary);
         // 월급여 1,060,000원 미만은 원천징수 세금 0
         if (taxableSalary < 1060000) return 0;
         // 월급여 1,060,000원 이상 10,000,000원 이하
@@ -235,7 +239,12 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         map.put("taxableSalary", taxableSalary / 1000);
 
         // 간이세액표에서 해당하는 근로소득세 조회
-        int income = ratioDAO.selectIncomeTax(map);
+        int income;
+        if (taxableSalary >= 10000000) {
+            income = ratioDAO.selectIncomeTaxFor100Million(map);
+        } else {
+            income = ratioDAO.selectIncomeTax(map);
+        }
 
         // 근로소득세에서 가족 중 8세 이상 20세 이하 자녀 수만큼 공제
         income -= calculateChildTaxDeduction(familyInfo.get("num_children"));
@@ -243,6 +252,7 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         // 공제한 금액이 음수인 경우의 세액은 0원
         return Math.max(income, 0);
     }
+
     // 1천만원 초과 근로소득세 계산
     private int calculateIncomeTaxOverOneMillion(int taxableSalary, String employeeId) {
         int basicIncomeTax = calculateBasicIncomeTax(10000000, employeeId);
@@ -279,4 +289,28 @@ public class SalaryCalculationImpl implements SalaryCalculation {
         }
     }
     // =========================================== 공제 항목 계산 로직 end-point ===========================================
+
+    // ======================================== 초과 근무 항목 계산 로직 start-point ========================================
+    // 초과근무 항목 계산
+    private void calculateOvertimePayComponents(String employeeId, Map<String, Integer> components, YearMonth yearMonth) {
+        // 통상 시급 계산 - 월 기본급 / 209(월 소정로시간)
+        final double monthlyStandardHours = 209;
+        int baseSalary = components.get("baseSalary");
+        double hourlyWage = baseSalary / monthlyStandardHours;
+
+        // 해당 달의 초과근무 조회
+        Map<String, Object> thisMonthOvertime = overtimeService.getThisMonthOvertimes(employeeId, yearMonth);
+        double totalTime = (double) thisMonthOvertime.get("totalTime");
+        double nightTime = (double) thisMonthOvertime.get("nightTime");
+        double overtime = totalTime - nightTime;
+
+        // 초과근무 수당 계산 - 통상 시급 * 1.5 * 초과근무 시간
+        double overtimePay =  hourlyWage * 1.5 * overtime;
+
+        // 야간근무 수당 계산 - 통상 시급 * 2.0(야간 50% + 초과 50%) * 야간근무 시간
+        double nightPay = hourlyWage * 2.0 * nightTime;
+
+        components.put("overtimePay", computeRoundIncome(overtimePay + nightPay));
+    }
+    // ========================================= 초과 근무 항목 계산 로직 end-point =========================================
 }

@@ -12,6 +12,10 @@
     color: blue;
 }
 
+.fc-daygrid-day-frame {
+    height: 115px;
+}
+
 :root {
     --fc-button-bg-color: #18A8F1;
     --fc-button-border-color: #18A8F1;
