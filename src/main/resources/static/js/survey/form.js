@@ -122,7 +122,11 @@ function removeQuestion(button) {
 // AJAX POST 요청 - 새로운 설문지 등록
 function submitSurvey() {
     const surveyData = collectSurveyData();
-    console.log(JSON.stringify(surveyData));
+
+    // 유효성 검사
+    if (!validateSurvey(surveyData)) {
+        return;
+    }
 
     fetch('/api/survey', {
         method: 'POST',
@@ -131,13 +135,25 @@ function submitSurvey() {
         },
         body: JSON.stringify(surveyData)
     })
-        .then(response => response.json())
-        .then(data => {
-            // 서버에서 받은 응답 처리
-            alert('설문조사가 성공적으로 제출되었습니다.');
+        .then(response => response.text().then(data => ({
+            status: response.status,
+            text: data
+        })))
+        .then(response => {
+            const errorStatuses = [400, 403, 404, 500];
+            if (response.status === 200) {
+                alert(response.text);
+                window.location.href = '/survey/list';
+            } else if (errorStatuses.includes(response.status)) {
+                alert(response.text);
+            } else {
+                alert('설문 등록 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                window.location.reload();
+            }
         })
         .catch(error => {
-            console.error('오류 발생:', error);
+            console.error('Error :', error.message);
+            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
         });
 }
 
@@ -175,4 +191,44 @@ function collectSurveyData() {
         questions: questions,
         expiresAt: expiresAt,
     };
+}
+
+// 유효성 검사
+function validateSurvey(surveyData) {
+    const { title, expiresAt, questions } = surveyData;
+
+    if (!title || title.trim() === "") {
+        alert('설문 제목을 입력해주세요.');
+        document.querySelector('#title').focus();
+        return false;
+    }
+
+    if (!expiresAt || expiresAt.trim() === "") {
+        alert('설문 종료일을 입력해주세요.');
+        document.querySelector('#expiresAt').focus();
+        return false;
+    }
+
+    if (questions.length === 0) {
+        alert('최소한 하나의 질문을 추가해주세요.');
+        return false;
+    }
+
+    // 각 질문의 내용 유효성 검사
+    for (let i = 0; i < questions.length; i++) {
+        if (!questions[i].questionText || questions[i].questionText.trim() === "") {
+            alert(`질문 ${i + 1}의 내용을 입력해주세요.`);
+            document.querySelector(`input[name="questionText${i}"]`).focus();
+            return false;
+        }
+
+        // 옵션 필드가 있는 경우 (radio, checkbox) 옵션이 누락되지 않았는지 확인
+        if ((questions[i].questionType === 'radio' || questions[i].questionType === 'checkbox') && questions[i].options.length === 0) {
+            alert(`질문 ${i + 1}에 최소한 하나의 옵션을 추가해주세요.`);
+            document.querySelector(`input[name="option${i}_0"]`).focus();
+            return false;
+        }
+    }
+
+    return true;
 }

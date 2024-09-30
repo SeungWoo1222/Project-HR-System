@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='새 설문지 작성')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='새 설문조사 작성')}">
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/survey/form.css}" rel="stylesheet">
@@ -22,6 +22,11 @@
             document.querySelector('.send-btn').addEventListener('click', function (e) {
                 e.preventDefault();
                 if (confirm('설문을 등록하시겠습니까?')) submitSurvey();
+            });
+
+            // 설문 목록으로 이동 이벤트 등록
+            document.querySelector('.exit-btn').addEventListener('click', function () {
+                if (confirm('설문 목록으로 이동하시겠습니까?')) window.location.href='/survey/list';
             });
 
             const questionTypeSelects = document.querySelectorAll('select[name^="questionType"]');
@@ -49,8 +54,8 @@
     <form>
         <div class="survey-container">
             <div class="content survey-header">
-                <input type="text" id="title" name="title" value="제목 없는 설문지"/>
-                <input type="text" id="description" name="description" placeholder="설문지 설명"/>
+                <input type="text" id="title" name="title" placeholder="설문조사 제목"/>
+                <input type="text" id="description" name="description" placeholder="설문조사 설명"/>
                 <label for="expiresAt">설문조사 종료일 : </label>
                 <input type="date" id="expiresAt" name="expiresAt"/>
             </div>
@@ -80,10 +85,13 @@
     </form>
     <div class="content btn-container">
         <div class="add-btn">
-            <img src="/images/icons/plus.png" alt="새 질문" title="새 질문 추가"/>
+            <img class="survey-form-btn" src="/images/icons/plus.png" alt="새 질문" title="새 질문 추가"/>
         </div>
         <div class="send-btn">
-            <img src="/images/icons/send.png" alt="설문 등록" title="설문 등록"/>
+            <img class="survey-form-btn" src="/images/icons/send.png" alt="설문 등록" title="설문 등록"/>
+        </div>
+        <div class="exit-btn">
+            <img class="survey-form-btn" src="/images/icons/exit.png" alt="설문 목록" title="설문 목록으로"/>
         </div>
     </div>
 </div>

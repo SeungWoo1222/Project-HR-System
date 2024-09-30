@@ -10,7 +10,7 @@
         <result property="createdBy" column="created_by"/>
         <result property="createdAt" column="created_at"/>
         <result property="status" column="status"/>
-        <result property="expiresAt" column="created_at"/>
+        <result property="expiresAt" column="expires_at"/>
         <collection property="questions" ofType="com.woosan.hr_system.survey.model.Question" column="id"
                     select="selectQuestionsBySurveyId"/>
     </resultMap>
@@ -35,4 +35,58 @@
         INSERT INTO surveys (title, description, created_by, created_at, expires_at)
         VALUES (#{title}, #{description}, #{createdBy}, #{createdAt}, #{expiresAt})
     </insert>
+
+    <!-- 질문 등록 -->
+    <insert id="insertQuestion" parameterType="com.woosan.hr_system.survey.model.Survey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO questions (survey_id, question_text, question_type)
+        VALUES (#{surveyId}, #{questionText}, #{questionType})
+    </insert>
+
+    <!-- 옵션 등록 -->
+    <insert id="insertOption" parameterType="map">
+        INSERT INTO question_options (question_id, option_text)
+        VALUES (#{questionId}, #{optionText})
+    </insert>
+
+    <!-- 설문 검색 조회 -->
+    <select id="searchSurvey" parameterType="map" resultMap="SurveyResultMap">
+        SELECT * FROM surveys
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                id LIKE CONCAT('%', #{keyword}, '%') OR
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                description LIKE CONCAT('%', #{keyword}, '%') OR
+                resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                created_by LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                status LIKE CONCAT('%', #{keyword}, '%') OR
+                expires_at LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectSurveyById" parameterType="int" resultMap="SurveyResultMap">
+        SELECT * FROM surveys
+        WHERE id = #{id}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectQuestionsBySurveyId" parameterType="int" resultMap="QuestionResultMap">
+        SELECT * FROM questions
+        WHERE survey_id = #{id}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectOptionsByQuestionId" parameterType="int" resultType="String">
+        SELECT option_text FROM question_options
+        WHERE question_id = #{id}
+    </select>
 </mapper>

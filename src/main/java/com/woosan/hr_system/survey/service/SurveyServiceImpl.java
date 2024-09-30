@@ -1,6 +1,10 @@
 package com.woosan.hr_system.survey.service;
 
+import com.woosan.hr_system.aspect.LogAfterExecution;
+import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.search.PageRequest;
+import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
 import com.woosan.hr_system.survey.model.Question;
 import com.woosan.hr_system.survey.model.Survey;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -20,12 +26,34 @@ public class SurveyServiceImpl implements SurveyService {
     @Autowired
     private AuthService authService;
 
+    @Override // ID를 이용한 설문 조회
+    public Survey getSurveyById(int id) {
+        Survey survey = surveyDAO.selectSurveyById(id);
+        if (survey == null) {
+            throw new IllegalArgumentException("해당 설문조사가 존재하지 않습니다.\n설문 ID : " + id);
+        }
+        return survey;
+    }
+
+    @Override // 설문 검색 조회
+    public PageResult<Survey> searchSurvey(PageRequest pageRequest, String status) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        // 검색 결과 데이터
+        List<Survey> surveys = surveyDAO.searchSurvey(pageRequest.getKeyword(), pageRequest.getSize(), offset, status);
+        // 검색 결과 총 개수
+        int total = surveys.size();
+
+        return new PageResult<>(surveys, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @LogBeforeExecution
+    @LogAfterExecution
     @Transactional
     @Override // 새로운 설문 등록
     public String submitSurvey(Survey survey) {
         // 설문 정보 부분 등록
         int surveyId = addSurvey(survey);
-        log.debug("survey id : {}", surveyId);
 
         // 질문 부분 등록
         addQuestion(survey.getQuestions(), surveyId);
@@ -33,9 +61,14 @@ public class SurveyServiceImpl implements SurveyService {
         return "새로운 설문조사가 등록되었습니다.";
     }
 
+    @Override
+    public String updateSurvey(Survey survey) {
+        return "";
+    }
+
     // 설문 정보 등록
     private int addSurvey(Survey survey) {
-        Survey newSurvey = survey.toBuilder()
+        Survey newSurvey = Survey.builder()
                 .title(survey.getTitle())
                 .description(survey.getDescription())
                 .createdBy(authService.getAuthenticatedUser().getNameWithId())
@@ -45,9 +78,29 @@ public class SurveyServiceImpl implements SurveyService {
         return surveyDAO.insertSurvey(newSurvey);
     }
 
-    // 질문 부분 등록
+    // 질문 등록
     private void addQuestion(List<Question> questions, int surveyId) {
+        for (Question question : questions) {
+            Question newQuestion = Question.builder()
+                    .surveyId(surveyId)
+                    .questionText(question.getQuestionText())
+                    .questionType(question.getQuestionType())
+                    .build();
+            int questionId = surveyDAO.insertQuestion(newQuestion);
+            if (!question.getOptions().isEmpty()) {
+                addOption(question.getOptions(), questionId);
+            }
+        }
+    }
 
+    // 질문 타입이 radio 또는 checkbox 경우 옵션 등록
+    private void addOption(List<String> options, int questionId) {
+        for (String option : options) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("questionId", questionId);
+            map.put("optionText", option);
+            surveyDAO.insertOption(map);
+        }
     }
 
 }

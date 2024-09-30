@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='설문조사')}" >
+
+<th:block layout:fragment="css">
+    <style>
+        .content-header {
+            padding-bottom: 10px;
+            border-bottom: solid #f1f1f1 2px ;
+        }
+        .content-header-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .content-header-center a {
+            color: black;
+            text-decoration: none;
+            &:visited, &:hover, &:active {
+                color: inherit;
+            }
+            outline: none;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        .content-header-center .active {
+            position: relative;
+            bottom: -1px;
+            border-bottom: solid #18a8f1 3px;
+            color: #18a8f1 !important;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/survey/response.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <form onsubmit="submitSurveyResponses(event)">
+            <div class="survey-container">
+                <div class="content-header" th:if="${#authentication.principal.getUsername} == ${createdBy}">
+                    <div class="content-header-left"></div>
+                    <div class="content-header-center">
+                        <a class="active" th:href="@{'/survey/'}">질문</a>
+                        <a class="" th:href="@{'/survey/'}">응답</a>
+                        <a class="" th:href="@{'/survey/list'}">목록</a>
+                    </div>
+                    <div class="content-header-right">
+                        <button type="button" class="btn">수정</button>
+                        <button type="button" class="btn">삭제</button>
+                    </div>
+                </div>
+                <h2 th:text="${survey.title}">설문 제목</h2>
+                <p th:text="${survey.description}">설문 설명</p>
+
+                <div th:each="question : ${survey.questions}">
+                    <div class="question">
+                        <p th:text="${question.questionText}">질문 텍스트</p>
+
+                        <div class="options" th:switch="${question.questionType}">
+                            <div th:case="'text'"> <!-- 단답형 -->
+                                <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                            </div>
+
+                            <div th:case="'textarea'"> <!-- 장문형 -->
+                                <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                            </div>
+
+                            <div th:case="'radio'"> <!-- 단일 선택 -->
+                                <label th:each="option : ${question.options}">
+                                    <input type="radio" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
+                                </label>
+                            </div>
+
+                            <div th:case="'checkbox'"> <!-- 다중 선택 -->
+                                <label th:each="option : ${question.options}">
+                                    <input type="checkbox" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
+                                </label>
+                            </div>
+
+                            <div th:case="'date'"> <!-- 날짜 -->
+                                <input type="date" th:attr="name=${'question_' + question.id}" />
+                            </div>
+
+                            <div th:case="'time'"> <!-- 시간 -->
+                                <input type="time" th:attr="name=${'question_' + question.id}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="surveyId" name="surveyId" th:value="${survey.id}"/>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <div class="btn-container">
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">제출</button>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

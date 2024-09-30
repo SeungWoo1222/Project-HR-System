@@ -26,15 +26,16 @@
     height: min-content;
     position: relative;
     top: 0;
+    gap: 5px;
 }
 
-.btn-container .add-btn, .btn-container .send-btn {
+.survey-form-btn {
     padding: 5px;
     display: flex;
     align-items: center;
 }
 
-.add-btn img, .send-btn img, .option-remove-btn img, .question-remove-btn img {
+.survey-form-btn, .option-remove-btn img, .question-remove-btn img {
     padding: 5px;
     width: 25px;
     height: 25px;
@@ -44,7 +45,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.add-btn img:hover, .send-btn img:hover, .option-remove-btn img:hover, .question-remove-btn img:hover {
+.survey-form-btn:hover, .option-remove-btn img:hover, .question-remove-btn img:hover {
     background-color: #EDEDED;
 }
 
