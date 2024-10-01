@@ -4,41 +4,45 @@ function submitSurveyResponses(event) {
 
     // 유효성 검사
     const isValid = validateSurveyResponses();
+    let errorMessage = document.getElementById('error-message');
     if (!isValid) {
-        document.getElementById('error-message').textContent = "비어있는 항목이 있습니다. 모든 항목을 입력해주세요.";
+        errorMessage.textContent = "비어있는 항목이 있습니다. 모든 항목을 입력해주세요.";
         return;
     }
+    errorMessage.textContent = '';
 
     // 입력 필드 정보 수집
     const responses = collectSurveyResponses();
 
-    fetch('/api/survey/response', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(responses)
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            const errorStatuses = [400, 403, 404, 500];
-            if (response.status === 200) {
-                alert(response.text);
-                window.location.href = '/survey/list';
-            } else if (errorStatuses.includes(response.status)) {
-                alert(response.text);
-            } else {
-                alert('응답 등록 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm('설문을 제출하시겠습니까?')) {
+        fetch('/api/survey/response', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(responses)
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.href = '/survey/list';
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('응답 등록 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 유효성 검사
@@ -111,7 +115,7 @@ function collectSurveyResponses() {
         // 다중 선택형 (checkbox) 처리
         else if (question.querySelector('input[type="checkbox"]')) {
             const selectedOptions = question.querySelectorAll('input[type="checkbox"]:checked');
-            answer = Array.from(selectedOptions).map(opt => opt.value).join(', ');
+            answer = Array.from(selectedOptions).map(opt => opt.value).join(',');
         }
 
         // 텍스트형, 장문형, 날짜, 시간 등 처리

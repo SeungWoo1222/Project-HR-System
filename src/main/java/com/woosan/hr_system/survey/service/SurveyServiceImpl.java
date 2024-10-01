@@ -7,6 +7,7 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
 import com.woosan.hr_system.survey.model.Question;
+import com.woosan.hr_system.survey.model.Response;
 import com.woosan.hr_system.survey.model.Survey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,4 +104,39 @@ public class SurveyServiceImpl implements SurveyService {
         }
     }
 
+    @Transactional
+    @Override // 설문 응답 제출
+    public String submitResponse(List<Response> responses) {
+        // 로그인한 사원 ID 조회
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+
+        // 사원이 설문에 참여했는지 조회
+        int surveyId = responses.get(0).getSurveyId();
+        List<String> participantIds = selectParticipantIds(surveyId);
+        boolean isAlreadyParticipated = participantIds.stream()
+                .anyMatch(participantId -> participantId.equals(employeeId));
+        if (isAlreadyParticipated) {
+            throw new IllegalArgumentException("이미 설문에 참여하셨습니다.");
+        }
+
+        // 응답 등록
+        for (Response response : responses) {
+            // 사원 ID 추가하여 객체 생성 후 등록
+            Response newResponse = response.toBuilder()
+                    .employeeId(employeeId)
+                    .build();
+            surveyDAO.insertResponse(newResponse);
+        }
+
+        // 설문 참여자 등록
+        surveyDAO.insertParticipant(employeeId, surveyId);
+
+        return "응답이 성공적으로 제출되었습니다.\n감사합니다!";
+    }
+
+    @Override // 설문 참여자 조회
+    public List<String> selectParticipantIds(int surveyId) {
+        return surveyDAO.selectParticipantIds(surveyId);
+    }
 }
+

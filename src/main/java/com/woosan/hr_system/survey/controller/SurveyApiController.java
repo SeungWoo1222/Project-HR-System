@@ -28,6 +28,6 @@ public class SurveyApiController {
     @PostMapping("/response") // 설문 응답 제출
     public ResponseEntity<String> submitResponse(@RequestBody List<Response> responses) {
         log.debug("{}", responses);
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(surveyService.submitResponse(responses));
     }
 }

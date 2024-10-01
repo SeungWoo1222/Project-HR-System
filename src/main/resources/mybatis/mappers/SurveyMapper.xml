@@ -89,4 +89,23 @@
         SELECT option_text FROM question_options
         WHERE question_id = #{id}
     </select>
+
+    <!-- 설문 응답 등록 -->
+    <insert id="insertResponse" parameterType="com.woosan.hr_system.survey.model.Response">
+        INSERT INTO responses (survey_id, employee_id, question_id, answer)
+        VALUES (#{surveyId}, #{employeeId}, #{questionId}, #{answer})
+    </insert>
+
+    <!-- 설문 참여자 등록 -->
+    <insert id="insertParticipant" parameterType="map">
+        INSERT INTO survey_participants (survey_id, employee_id)
+        VALUES (#{surveyId}, #{employeeId})
+    </insert>
+
+    <!-- 설문 참여자 조회 -->
+    <select id="selectParticipantIds" parameterType="int" resultType="String">
+        SELECT employee_id
+        FROM survey_participants
+        WHERE survey_id = #{surveyId}
+    </select>
 </mapper>

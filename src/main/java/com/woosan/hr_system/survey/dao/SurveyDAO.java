@@ -1,6 +1,7 @@
 package com.woosan.hr_system.survey.dao;
 
 import com.woosan.hr_system.survey.model.Question;
+import com.woosan.hr_system.survey.model.Response;
 import com.woosan.hr_system.survey.model.Survey;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
@@ -47,5 +48,23 @@ public class SurveyDAO {
     // ID를 이용한 설문 조회
     public Survey selectSurveyById(int id) {
         return sqlSession.selectOne("survey.selectSurveyById", id);
+    }
+
+    // 설문 응답 등록
+    public void insertResponse(Response newResponse) {
+        sqlSession.insert("survey.insertResponse", newResponse);
+    }
+
+    // 설문 참여자 등록
+    public void insertParticipant(String employeeId, int surveyId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("employeeId", employeeId);
+        map.put("surveyId", surveyId);
+        sqlSession.insert("survey.insertParticipant", map);
+    }
+
+    // 설문 참여자 조회
+    public List<String> selectParticipantIds(int surveyId) {
+        return sqlSession.selectList("survey.selectParticipantIds", surveyId);
     }
 }
