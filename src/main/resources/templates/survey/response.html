@@ -8,7 +8,6 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/survey/response.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -18,22 +17,37 @@
                 <div class="content-header">
                     <div class="content-header-left"></div>
                     <div class="content-header-center">
-                        <a class="active" th:href="@{'/survey/' + ${survey.id}}">설문</a>
+                        <a class="" th:href="@{'/survey/' + ${survey.id}}">설문</a>
+                        <a class="active" th:href="@{#}">응답</a>
                         <a class="" th:href="@{'/survey/participants?surveyId=' + ${survey.id}}"
-                           th:if="${#authentication.principal.getUsername} == ${createdBy}">응답</a>
-                        <a class="" th:href="@{'/survey/response?surveyId=' + ${survey.id} + '&employeeId=' + ${#authentication.principal.getUsername}}"
-                           th:if="${#authentication.principal.getUsername} != ${createdBy}">내 응답</a>
+                           th:if="${#authentication.principal.getUsername} == ${createdBy}">응답 목록</a>
                         <a class="" th:href="@{'/survey/list'}">설문 목록</a>
                     </div>
-                    <div class="content-header-right">
-                        <button type="button" class="btn"
-                                th:if="${#authentication.principal.getUsername} == ${createdBy}">수정</button>
-                        <button type="button" class="btn"
-                                th:if="${#authentication.principal.getUsername} == ${createdBy}">삭제</button>
-                    </div>
+                    <div class="content-header-right"></div>
                 </div>
 
-                <div>
+                <div th:if="${info} == null">
+                    <p>현재 제출된 응답이 없습니다.</p>
+                    <p>설문에 참여하여 답변을 제출해주세요!</p>
+                </div>
+
+                <div th:if="${info} != null">
+                    <table border="1">
+                        <thead>
+                        <th>ID</th>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>설문참여일시</th>
+                        </thead>
+                        <tbody>
+                        <td th:text="${info?.employee.employeeId}"></td>
+                        <td th:text="${info?.employee.name}"></td>
+                        <td th:text="${info?.employee.department}"></td>
+                        <td th:text="${info?.employee.position}"></td>
+                        <td th:text="${#temporals.format(info.participationAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tbody>
+                    </table>
                     <h2 th:text="${survey.title}">설문 제목</h2>
                     <p th:text="${survey.description}">설문 설명</p>
 
@@ -43,42 +57,41 @@
 
                             <div class="options" th:switch="${question.questionType}">
                                 <div th:case="'text'"> <!-- 단답형 -->
-                                    <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                                    <p th:text="${question.response.answer}">응답 없음</p>
                                 </div>
 
                                 <div th:case="'textarea'"> <!-- 장문형 -->
-                                    <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                                    <p th:text="${question.response.answer}">응답 없음</p>
                                 </div>
 
                                 <div th:case="'radio'"> <!-- 단일 선택 -->
                                     <label th:each="option : ${question.options}">
-                                        <input type="radio" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
+                                        <input type="radio" th:attr="name=${'question_' + question.id}" th:value="${option}"
+                                               th:checked="${question.response.answer == option}" disabled/>
+                                        <span th:text="${option}"></span>
                                     </label>
                                 </div>
 
                                 <div th:case="'checkbox'"> <!-- 다중 선택 -->
                                     <label th:each="option : ${question.options}">
-                                        <input type="checkbox" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
+                                        <input type="checkbox" th:attr="name=${'question_' + question.id}" th:value="${option}"
+                                               th:checked="${#lists.contains(question.response.answer, option)}" disabled/>
+                                        <span th:text="${option}"></span>
                                     </label>
                                 </div>
 
                                 <div th:case="'date'"> <!-- 날짜 -->
-                                    <input type="date" th:attr="name=${'question_' + question.id}" />
+                                    <input type="date" th:value="${question.response.answer}" disabled/>
                                 </div>
 
                                 <div th:case="'time'"> <!-- 시간 -->
-                                    <input type="time" th:attr="name=${'question_' + question.id}" />
+                                    <input type="time" th:value="${question.response.answer}" disabled/>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="surveyId" name="surveyId" th:value="${survey.id}"/>
                 </div>
-            </div>
-            <div id="error-message" class="error-message"></div>
-            <div class="btn-container">
-                <button type="reset" class="btn">초기화</button>
-                <button type="submit" class="btn">제출</button>
+                </div>
             </div>
         </form>
     </div>

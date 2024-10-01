@@ -6,6 +6,7 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
+import com.woosan.hr_system.survey.model.Participant;
 import com.woosan.hr_system.survey.model.Question;
 import com.woosan.hr_system.survey.model.Response;
 import com.woosan.hr_system.survey.model.Survey;
@@ -112,7 +113,7 @@ public class SurveyServiceImpl implements SurveyService {
 
         // 사원이 설문에 참여했는지 조회
         int surveyId = responses.get(0).getSurveyId();
-        List<String> participantIds = selectParticipantIds(surveyId);
+        List<String> participantIds = getParticipantIds(surveyId);
         boolean isAlreadyParticipated = participantIds.stream()
                 .anyMatch(participantId -> participantId.equals(employeeId));
         if (isAlreadyParticipated) {
@@ -135,8 +136,48 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override // 설문 참여자 조회
-    public List<String> selectParticipantIds(int surveyId) {
+    public List<String> getParticipantIds(int surveyId) {
         return surveyDAO.selectParticipantIds(surveyId);
+    }
+
+    @Override // 설문 응답 참여자 검색 조회
+    public PageResult<Participant> searchParticipants(PageRequest pageRequest, int surveyId) {
+        // 페이징을 위해 조회할 데이터의 시작위치 계산
+        int offset = pageRequest.getPage() * pageRequest.getSize();
+        // 검색 결과 데이터
+        List<Participant> participants = surveyDAO.searchParticipants(pageRequest.getSize(), offset, surveyId);
+        // 검색 결과 총 개수
+        int total = participants.size();
+
+        return new PageResult<>(participants, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+    }
+
+    @Override // 응답이 포함된 설문 조회
+    public Survey getSurveyWithResponse(int surveyId, String employeeId) {
+        // 설문 조회
+        Survey survey = surveyDAO.selectSurveyById(surveyId);
+        List<Question> questions = survey.getQuestions();
+
+        // 설문 응답 조회
+        List<Response> responses = surveyDAO.selectResponses(surveyId, employeeId);
+
+        // 질문과 응답을 questionId로 매칭
+        List<Question> questionsWithResponses = questions.stream()
+                .peek(question -> responses.stream()
+                        .filter(response -> response.getQuestionId() == question.getId())
+                        .findFirst()
+                        .ifPresent(question::setResponse))
+                .toList();
+
+        // 응답이 포함된 설문 반환
+        return survey.toBuilder()
+                .questions(questionsWithResponses)
+                .build();
+    }
+
+    @Override // 설문 참여자 정보 조회
+    public Participant getParticipantInfo(int surveyId, String employeeId) {
+        return surveyDAO.selectParticipantInfo(surveyId, employeeId);
     }
 }
 

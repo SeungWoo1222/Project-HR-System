@@ -30,6 +30,17 @@
         <result property="answer" column="answer"/>
     </resultMap>
 
+    <resultMap id="ParticipantResultMap" type="com.woosan.hr_system.survey.model.Participant">
+        <id property="surveyId" column="survey_id"/>
+        <id property="employeeId" column="employee_id"/>
+        <result property="participationAt" column="participation_at"/>
+        <!-- 사원 관련 정보 -->
+        <result property="employee.employeeId" column="employee_id" />
+        <result property="employee.name" column="name" />
+        <result property="employee.department" column="department_id" />
+        <result property="employee.position" column="position_id" />
+    </resultMap>
+
     <!-- 설문 등록 -->
     <insert id="insertSurvey" parameterType="com.woosan.hr_system.survey.model.Survey" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO surveys (title, description, created_by, created_at, expires_at)
@@ -107,5 +118,30 @@
         SELECT employee_id
         FROM survey_participants
         WHERE survey_id = #{surveyId}
+    </select>
+
+    <!-- 설문 참여자 검색 조회 -->
+    <select id="searchParticipants" parameterType="map" resultMap="ParticipantResultMap">
+        SELECT sp.*, e.name, e.department_id, e.position_id
+        FROM survey_participants sp
+                 JOIN employees e ON sp.employee_id = e.employee_id
+        WHERE sp.survey_id = #{surveyId}
+        ORDER BY sp.participation_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 설문 응답 조회 -->
+    <select id="selectResponses" parameterType="map" resultMap="ResponseResultMap">
+        SELECT *
+        FROM responses
+        WHERE survey_id = #{surveyId} and employee_id = #{employeeId}
+    </select>
+
+    <!-- 설문 참여자 정보 조회 -->
+    <select id="selectParticipationInfo" parameterType="map" resultMap="ParticipantResultMap">
+        SELECT sp.*, e.name, e.department_id, e.position_id
+        FROM survey_participants sp
+                 JOIN employees e ON sp.employee_id = e.employee_id
+        WHERE sp.survey_id = #{surveyId} and sp.employee_id = #{employeeId}
     </select>
 </mapper>

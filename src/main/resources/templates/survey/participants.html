@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='설문조사')}" >
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/survey/detail.css}" rel="stylesheet" />
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        // 설문조사 페이지로 이동
+        function goToResponse(surveyId, employeeId) {
+            window.location.href = '/survey/response?surveyId=' + surveyId + '&employeeId=' + employeeId;
+        }
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <form onsubmit="submitSurveyResponses(event)">
+            <div class="survey-container">
+                <div class="content-header" th:if="${#authentication.principal.getUsername} == ${createdBy}">
+                    <div class="content-header-left"></div>
+                    <div class="content-header-center">
+                        <a class="" th:href="@{'/survey/' + ${surveyId}}">설문</a>
+                        <a class="active" th:href="@{'/survey/participants?surveyId=' + ${surveyId}}">응답</a>
+                        <a class="" th:href="@{'/survey/list'}">설문 목록</a>
+                    </div>
+                    <div class="content-header-right"></div>
+                </div>
+
+                <div>
+                    <h2>응답 <span th:text="${#lists.size(participants)}"></span>개</h2>
+                    <table border="1" class="list">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>이름</th>
+                            <th>부서</th>
+                            <th>직급</th>
+                            <th>설문참여일시</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${participants.isEmpty()}">
+                            <td colspan="5" style="text-align: center; padding: 20px;">
+                                응답을 기다리는 중입니다.
+                            </td>
+                        </tr>
+                        <tr th:each="participant : ${participants}"
+                            th:surveyId="${participant.surveyId}" th:employeeId="${participant.employeeId}"
+                            th:onclick="goToResponse(this.getAttribute('surveyId'), this.getAttribute('employeeId'))">
+                            <td th:text="${participant.employeeId}"></td>
+                            <td th:text="${participant.employee?.name}"></td>
+                            <td th:text="${participant.employee?.department}"></td>
+                            <td th:text="${participant.employee?.position}"></td>
+                            <td th:text="${#temporals.format(participant.participationAt, 'yyyy-MM-dd')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination" th:if="${totalPages > 0}">
+                        <span th:if="${currentPage > 1}">
+                            <a th:href="@{'/survey/participants?surveyId=' + ${surveyId} + '&page=' + (${currentPage - 1})}">
+                                <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                            </a>
+                        </span>
+                        <div class="page-area">
+                            <span th:if="${totalPages <= 5}">
+                                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                                    <a th:href="@{'/survey/participants?surveyId=' + ${surveyId} + '&page=' + ${i}}"
+                                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                                </span>
+                            </span>
+                            <span th:if="${totalPages > 5}">
+                                <span th:each="i : ${#numbers.sequence(
+                                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                                    <a th:href="@{'/survey/participants?surveyId=' + ${surveyId} + '&page=' + ${i}}"
+                                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                                </span>
+                            </span>
+                        </div>
+                        <span th:if="${currentPage < totalPages}">
+                            <a th:href="@{'/survey/participants?surveyId=' + ${surveyId} + '&page=' + (${currentPage + 1})}">
+                                <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

@@ -1,0 +1,27 @@
+.content-header {
+    padding-bottom: 10px;
+    border-bottom: solid #f1f1f1 2px ;
+}
+.content-header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.content-header-center a {
+    color: black;
+    text-decoration: none;
+    &:visited, &:hover, &:active {
+        color: inherit;
+    }
+    outline: none;
+    font-size: 18px;
+    padding: 5px;
+}
+
+.content-header-center .active {
+    position: relative;
+    bottom: -1px;
+    border-bottom: solid #18a8f1 3px;
+    color: #18a8f1 !important;
+}

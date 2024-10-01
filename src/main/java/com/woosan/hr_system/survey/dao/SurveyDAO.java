@@ -1,5 +1,6 @@
 package com.woosan.hr_system.survey.dao;
 
+import com.woosan.hr_system.survey.model.Participant;
 import com.woosan.hr_system.survey.model.Question;
 import com.woosan.hr_system.survey.model.Response;
 import com.woosan.hr_system.survey.model.Survey;
@@ -66,5 +67,30 @@ public class SurveyDAO {
     // 설문 참여자 조회
     public List<String> selectParticipantIds(int surveyId) {
         return sqlSession.selectList("survey.selectParticipantIds", surveyId);
+    }
+
+    // 설문 응답 참여자 검색 조회
+    public List<Participant> searchParticipants(int size, int offset, int surveyId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("size", size);
+        map.put("offset", offset);
+        map.put("surveyId", surveyId);
+        return sqlSession.selectList("survey.searchParticipants", map);
+    }
+
+    // 설문 응답 조회
+    public List<Response> selectResponses(int surveyId, String employeeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("surveyId", surveyId);
+        map.put("employeeId", employeeId);
+        return sqlSession.selectList("survey.selectResponses", map);
+    }
+
+    // 설문 참여자 정보 조회
+    public Participant selectParticipantInfo(int surveyId, String employeeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("surveyId", surveyId);
+        map.put("employeeId", employeeId);
+        return sqlSession.selectOne("survey.selectParticipationInfo", map);
     }
 }
