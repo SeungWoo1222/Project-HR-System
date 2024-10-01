@@ -8,7 +8,7 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/survey/response.js}"></script>
+    <script th:src="@{/js/survey/ajax.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
@@ -28,8 +28,9 @@
                     <div class="content-header-right">
                         <button type="button" class="btn"
                                 th:if="${#authentication.principal.getUsername} == ${createdBy}">수정</button>
-                        <button type="button" class="btn"
-                                th:if="${#authentication.principal.getUsername} == ${createdBy}">삭제</button>
+                        <button type="button" class="btn" id="delete-btn"
+                                th:if="${#authentication.principal.getUsername} == ${createdBy}"
+                                th:id="${survey.id}" th:onclick="deleteSurvey(this.getAttribute('id'))">삭제</button>
                     </div>
                 </div>
 

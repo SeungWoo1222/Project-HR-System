@@ -144,4 +144,9 @@
                  JOIN employees e ON sp.employee_id = e.employee_id
         WHERE sp.survey_id = #{surveyId} and sp.employee_id = #{employeeId}
     </select>
+
+    <!-- 설문 삭제 -->
+    <delete id="deleteSurvey" parameterType="int">
+        DELETE FROM surveys WHERE id = #{id}
+    </delete>
 </mapper>

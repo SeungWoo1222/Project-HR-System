@@ -68,6 +68,25 @@ public class SurveyServiceImpl implements SurveyService {
         return "";
     }
 
+    @Override // 설문 삭제
+    public String deleteSurvey(int id) {
+        // 설문 조회
+        Survey survey = surveyDAO.selectSurveyById(id);
+        if (survey == null) {
+            throw new IllegalArgumentException("해당 설문이 존재하지 않습니다.\n설문 ID : " + id);
+        }
+
+        // 작성자 본인인지 확인
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+        if (!extractEmployeeId(survey.getCreatedBy()).equals(employeeId)) {
+            throw new IllegalArgumentException("설문 작성자 본인만 삭제할 수 있습니다.");
+        }
+
+        // 설문 삭제
+        surveyDAO.deleteSurvey(id);
+        return "설문('" + id + "')이 삭제되었습니다.";
+    }
+
     // 설문 정보 등록
     private int addSurvey(Survey survey) {
         Survey newSurvey = Survey.builder()
@@ -178,6 +197,12 @@ public class SurveyServiceImpl implements SurveyService {
     @Override // 설문 참여자 정보 조회
     public Participant getParticipantInfo(int surveyId, String employeeId) {
         return surveyDAO.selectParticipantInfo(surveyId, employeeId);
+    }
+
+    @Override // 이름(사원ID)에서 사원 ID 추출하는 함수
+    public String extractEmployeeId(String fullNameWithId) {
+        String[] parts = fullNameWithId.split("\\(");
+        return parts[1].replace(")", "");
     }
 }
 

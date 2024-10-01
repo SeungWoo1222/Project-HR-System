@@ -93,4 +93,9 @@ public class SurveyDAO {
         map.put("employeeId", employeeId);
         return sqlSession.selectOne("survey.selectParticipationInfo", map);
     }
+
+    // 설문 삭제
+    public void deleteSurvey(int id) {
+        sqlSession.delete("survey.deleteSurvey", id);
+    }
 }

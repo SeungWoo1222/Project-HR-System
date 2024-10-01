@@ -1,5 +1,6 @@
 package com.woosan.hr_system.survey.controller;
 
+import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.model.Participant;
@@ -40,6 +41,7 @@ public class SurveyViewController {
         return "survey/list";
     }
 
+    @RequireManagerPermission
     @GetMapping("/form") // 설문조사 등록 폼
     public String viewSurveyForm(Model model) {
         return "survey/form";
@@ -51,7 +53,7 @@ public class SurveyViewController {
         model.addAttribute("survey", survey);
 
         // 설문 작성자 사원 ID 이름과 분리 후 모델에 추가
-        model.addAttribute("createdBy", extractEmployeeId(survey.getCreatedBy()));
+        model.addAttribute("createdBy", surveyService.extractEmployeeId(survey.getCreatedBy()));
         return "survey/detail";
     }
 
@@ -72,16 +74,12 @@ public class SurveyViewController {
 
         // 설문 작성자 사원 ID 이름과 분리 후 모델에 추가
         Survey survey = surveyService.getSurveyById(surveyId);
-        model.addAttribute("createdBy", extractEmployeeId(survey.getCreatedBy()));
+        model.addAttribute("createdBy", surveyService.extractEmployeeId(survey.getCreatedBy()));
 
         return "survey/participants";
     }
 
-    // 이름(사원ID)에서 사원 ID 추출하는 함수
-    private String extractEmployeeId(String fullNameWithId) {
-        String[] parts = fullNameWithId.split("\\(");
-        return parts[1].replace(")", "");
-    }
+
 
     @GetMapping("/response") // 응답이 포함된 설문조사 조회
     public String viewSurveyResponse(@RequestParam("surveyId") int surveyId,
@@ -93,7 +91,7 @@ public class SurveyViewController {
         // 설문 정보 조회 후 모델에 추가
         Survey survey = surveyService.getSurveyWithResponse(surveyId, employeeId);
         model.addAttribute("survey", survey);
-        model.addAttribute("createdBy", extractEmployeeId(survey.getCreatedBy()));
+        model.addAttribute("createdBy", surveyService.extractEmployeeId(survey.getCreatedBy()));
         return "survey/response";
     }
 }
