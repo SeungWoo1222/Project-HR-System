@@ -12,7 +12,6 @@ public interface SurveyService {
     Survey getSurveyById(int id);
     PageResult<Survey> searchSurvey(PageRequest pageRequest, String status);
     String submitSurvey(Survey survey);
-    String updateSurvey(Survey survey);
     String deleteSurvey(int id);
     String submitResponse(List<Response> responses);
     List<String> getParticipantIds(int surveyId);

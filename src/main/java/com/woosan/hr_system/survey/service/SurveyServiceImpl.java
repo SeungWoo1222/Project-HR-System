@@ -63,11 +63,6 @@ public class SurveyServiceImpl implements SurveyService {
         return "새로운 설문조사가 등록되었습니다.";
     }
 
-    @Override
-    public String updateSurvey(Survey survey) {
-        return "";
-    }
-
     @Override // 설문 삭제
     public String deleteSurvey(int id) {
         // 설문 조회

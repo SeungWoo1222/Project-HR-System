@@ -51,9 +51,9 @@
                     <h2 th:text="${survey.title}">설문 제목</h2>
                     <p th:text="${survey.description}">설문 설명</p>
 
-                    <div th:each="question : ${survey.questions}">
+                    <div th:each="question, stat : ${survey.questions}">
                         <div class="question">
-                            <p th:text="${question.questionText}">질문 텍스트</p>
+                            <p><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
 
                             <div class="options" th:switch="${question.questionType}">
                                 <div th:case="'text'"> <!-- 단답형 -->

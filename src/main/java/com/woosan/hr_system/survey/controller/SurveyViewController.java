@@ -79,8 +79,6 @@ public class SurveyViewController {
         return "survey/participants";
     }
 
-
-
     @GetMapping("/response") // 응답이 포함된 설문조사 조회
     public String viewSurveyResponse(@RequestParam("surveyId") int surveyId,
                                      @RequestParam("employeeId") String employeeId,
