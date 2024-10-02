@@ -19,6 +19,8 @@
                     <div class="content-header-center">
                         <a class="" th:href="@{'/survey/' + ${survey.id}}">설문</a>
                         <a class="active" th:href="@{#}">응답</a>
+                        <a class="" th:href="@{'/survey/statistics?surveyId=' + ${survey.id}}"
+                           th:if="${#authentication.principal.getUsername} == ${createdBy}">통계</a>
                         <a class="" th:href="@{'/survey/participants?surveyId=' + ${survey.id}}"
                            th:if="${#authentication.principal.getUsername} == ${createdBy}">응답 목록</a>
                         <a class="" th:href="@{'/survey/list'}">설문 목록</a>

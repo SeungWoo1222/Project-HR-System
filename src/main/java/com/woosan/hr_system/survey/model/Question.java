@@ -19,4 +19,6 @@ public class Question {
     private List<String> options;
 
     private Response response;
+
+    private Statistics statistics;
 }

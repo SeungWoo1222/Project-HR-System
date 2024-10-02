@@ -98,4 +98,12 @@ public class SurveyDAO {
     public void deleteSurvey(int id) {
         sqlSession.delete("survey.deleteSurvey", id);
     }
+
+    // 질문에 대한 모든 응답 조회
+    public List<Response> selectResponses(int surveyId, int questionId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("surveyId", surveyId);
+        map.put("questionId", questionId);
+        return sqlSession.selectList("survey.selectResponsesByQuestionId", map);
+    }
 }

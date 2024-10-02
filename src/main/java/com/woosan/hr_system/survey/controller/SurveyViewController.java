@@ -92,4 +92,19 @@ public class SurveyViewController {
         model.addAttribute("createdBy", surveyService.extractEmployeeId(survey.getCreatedBy()));
         return "survey/response";
     }
+
+    @GetMapping("/statistics") // 설문 통계 조회
+    public String viewSurveyStatistics(@RequestParam("surveyId") int surveyId,
+                                       Model model) {
+        // 모든 응답이 포함된 설문 조회
+        Survey survey = surveyService.getSurveyWithAllResponse(surveyId);
+        model.addAttribute("survey", survey);
+
+        // 설문 참여자 수 조회
+        model.addAttribute("participants", surveyService.getParticipantIds(surveyId).size());
+
+        // 설문 정보 조회 후 모델에 추가
+        model.addAttribute("createdBy", surveyService.extractEmployeeId(survey.getCreatedBy()));
+        return "survey/statistics";
+    }
 }

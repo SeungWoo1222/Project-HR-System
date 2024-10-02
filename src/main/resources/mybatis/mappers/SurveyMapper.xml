@@ -149,4 +149,11 @@
     <delete id="deleteSurvey" parameterType="int">
         DELETE FROM surveys WHERE id = #{id}
     </delete>
+
+    <!-- 질문에 해당하는 모든 응답 조회 -->
+    <select id="selectResponsesByQuestionId" parameterType="int" resultMap="ResponseResultMap">
+        SELECT *
+        FROM responses
+        WHERE survey_id = ${surveyId} and question_id = ${questionId}
+    </select>
 </mapper>

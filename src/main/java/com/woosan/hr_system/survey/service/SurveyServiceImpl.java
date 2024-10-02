@@ -6,10 +6,7 @@ import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
-import com.woosan.hr_system.survey.model.Participant;
-import com.woosan.hr_system.survey.model.Question;
-import com.woosan.hr_system.survey.model.Response;
-import com.woosan.hr_system.survey.model.Survey;
+import com.woosan.hr_system.survey.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -199,5 +196,50 @@ public class SurveyServiceImpl implements SurveyService {
         String[] parts = fullNameWithId.split("\\(");
         return parts[1].replace(")", "");
     }
-}
 
+    @Override // 모든 응답이 포함된 설문 조회
+    public Survey getSurveyWithAllResponse(int surveyId) {
+        // 설문 조회
+        Survey survey = surveyDAO.selectSurveyById(surveyId);
+        List<Question> questions = survey.getQuestions();
+
+        // 질문과 응답 매칭
+        List<Question> questionsWithResponses = questions.stream()
+                .peek(question -> {
+                    // 질문에 해당하는 모든 응답 조회 후 담기
+                    int questionId = question.getId();
+                    List<Response> responses = surveyDAO.selectResponses(surveyId, questionId);
+                    Statistics statistics = new Statistics();
+                    statistics.setResponses(responses);
+
+                    // 질문 타입이 단일 선택(radio) 또는 다중 선택(checkbox)인 경우
+                    if (question.getQuestionType().equals("radio") || question.getQuestionType().equals("checkbox")) {
+                        List<String> options = question.getOptions();
+                        Map<String, Integer> optionCounts = new HashMap<>();
+
+                        // 각 선택지에 대해 카운트 0으로 설정
+                        for (String option : options) {
+                            optionCounts.put(option, 0);
+                        }
+
+                        // 각 응답에 대해 선택된 값 카운트
+                        for (Response response : responses) {
+                            String selectedOption = response.getAnswer();
+                            optionCounts.put(selectedOption, optionCounts.get(selectedOption) + 1);
+                        }
+
+                        // 질문에 선택지에 대한 카운트 수 추가
+                        statistics.setResponseCounts(optionCounts);
+                    }
+                    // 통계 데이터 질문에 담기
+                    question.setStatistics(statistics);
+                })
+                .toList();
+
+
+        // 응답이 포함된 설문 반환
+        return survey.toBuilder()
+                .questions(questionsWithResponses)
+                .build();
+    }
+}

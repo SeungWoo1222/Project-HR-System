@@ -19,4 +19,5 @@ public interface SurveyService {
     Survey getSurveyWithResponse(int surveyId, String employeeId);
     Participant getParticipantInfo(int surveyId, String employeeId);
     String extractEmployeeId(String fullNameWithId);
+    Survey getSurveyWithAllResponse(int surveyId);
 }
