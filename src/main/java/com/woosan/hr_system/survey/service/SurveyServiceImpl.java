@@ -11,9 +11,11 @@ import com.woosan.hr_system.utils.KiwiSingleton;
 import kr.pe.bab2min.Kiwi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,8 +129,14 @@ public class SurveyServiceImpl implements SurveyService {
         // 로그인한 사원 ID 조회
         String employeeId = authService.getAuthenticatedUser().getUsername();
 
-        // 사원이 설문에 참여했는지 조회
         int surveyId = responses.get(0).getSurveyId();
+
+        // 조사가 종료된 설문인지 확인
+        if (getSurveyById(surveyId).getStatus().equals("조사 종료")) {
+            throw new IllegalArgumentException("조사가 종료된 설문입니다.");
+        }
+
+        // 사원이 설문에 참여했는지 조회
         List<String> participantIds = getParticipantIds(surveyId);
         boolean isAlreadyParticipated = participantIds.stream()
                 .anyMatch(participantId -> participantId.equals(employeeId));
@@ -316,5 +324,19 @@ public class SurveyServiceImpl implements SurveyService {
         });
 
         return wordList;
+    }
+
+    // 설문조사 만료일이 지나면 설문 상태 변경
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정 00:00에 실행
+    public void updateSurveyStatusIfExpired() {
+        // 조사 중인 설문 조회
+        List<Survey> surveys = surveyDAO.selectInvestigatingSurvey();
+
+        // 만료일이 지난 설문 조사 종료 처리
+        surveys.stream()
+                .filter(survey -> survey.getExpiresAt().isBefore(LocalDate.now()))
+                .forEach(expiredSurvey -> {
+                    surveyDAO.closeSurvey(expiredSurvey.getId());
+                });
     }
 }

@@ -106,4 +106,14 @@ public class SurveyDAO {
         map.put("questionId", questionId);
         return sqlSession.selectList("survey.selectResponsesByQuestionId", map);
     }
+
+    // 조사 중인 설문 조회
+    public List<Survey> selectInvestigatingSurvey() {
+        return sqlSession.selectList("survey.selectInvestigatingSurvey");
+    }
+
+    // 설문 조사 종료 처리
+    public void closeSurvey(int id) {
+        sqlSession.update("survey.closeStatus", id);
+    }
 }

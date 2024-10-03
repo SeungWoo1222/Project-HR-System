@@ -156,4 +156,18 @@
         FROM responses
         WHERE survey_id = ${surveyId} and question_id = ${questionId}
     </select>
+
+    <!-- 조사 중인 설문 조회 -->
+    <select id="selectInvestigatingSurvey">
+        SELECT *
+        FROM surveys
+        WHERE status = '조사 중'
+    </select>
+
+    <!-- 설문 조사 종료 처리 -->
+    <update id="closeSurvey" parameterType="int">
+        UPDATE surveys
+        SET status = '조사 종료'
+        WHERE id = #{id}
+    </update>
 </mapper>
