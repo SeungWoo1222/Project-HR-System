@@ -114,6 +114,6 @@ public class SurveyDAO {
 
     // 설문 조사 종료 처리
     public void closeSurvey(int id) {
-        sqlSession.update("survey.closeStatus", id);
+        sqlSession.update("survey.closeSurvey", id);
     }
 }

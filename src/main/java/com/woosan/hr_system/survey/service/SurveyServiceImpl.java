@@ -327,7 +327,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     // 설문조사 만료일이 지나면 설문 상태 변경
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정 00:00에 실행
+    @Scheduled(cron = "0 33 23 * * ?") // 매일 자정 00:00에 실행
     public void updateSurveyStatusIfExpired() {
         // 조사 중인 설문 조회
         List<Survey> surveys = surveyDAO.selectInvestigatingSurvey();

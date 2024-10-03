@@ -3,6 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="survey">
+    <resultMap id="SurveyInfoResultMap" type="com.woosan.hr_system.survey.model.Survey">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+        <result property="expiresAt" column="expires_at"/>
+    </resultMap>
+
     <resultMap id="SurveyResultMap" type="com.woosan.hr_system.survey.model.Survey">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
@@ -158,7 +168,7 @@
     </select>
 
     <!-- 조사 중인 설문 조회 -->
-    <select id="selectInvestigatingSurvey">
+    <select id="selectInvestigatingSurvey" resultMap="SurveyInfoResultMap">
         SELECT *
         FROM surveys
         WHERE status = '조사 중'
