@@ -86,7 +86,20 @@ public class ScheduleController {
         Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", scheduleInfo);
         BusinessTrip trip = businessTripService.getBusinessTripById(taskId);
-        model.addAttribute("trip", trip);
+
+        if (trip != null) {
+            String contactEmail = trip.getContactEmail();
+            if (contactEmail != null && contactEmail.contains("@")) {
+                String[] emailParts = contactEmail.split("@");
+                model.addAttribute("emailLocalPart", emailParts[0]);
+                model.addAttribute("emailDomainPart", emailParts[1]);
+            } else {
+                model.addAttribute("emailLocalPart", "");
+                model.addAttribute("emailDomainPart", "");
+            }
+            model.addAttribute("trip", trip);
+        }
+
         model.addAttribute("employee", employeeService.getEmployeeById(scheduleInfo.getMemberId()));
         return "schedule/edit";
     }
@@ -110,11 +123,12 @@ public class ScheduleController {
     @PutMapping("/edit") // 일정 수정
     public ResponseEntity<String> updateSchedule(@ModelAttribute Schedule schedule,
                                                  @ModelAttribute BusinessTrip businessTrip) {
-        log.info("수정 컨트롤러 schedule: {}", schedule);
-        log.info("수정 컨트롤러 businessTrip: {}", businessTrip);
+        log.info("일정 수정 컨트롤러 실행 : schedule : {}, businessTrip : {}", schedule, businessTrip);
         scheduleService.updateSchedule(schedule);
 
-        businessTripService.updateBusinessTrip(businessTrip);
+        if (businessTrip.getAddress() != null) {
+            businessTripService.updateBusinessTrip(businessTrip);
+        }
 
         return ResponseEntity.ok("일정 수정이 완료되었습니다.");
     }
@@ -123,7 +137,6 @@ public class ScheduleController {
     @Transactional
     @DeleteMapping("/delete/{taskId}")
     public ResponseEntity<String> deleteSchedule(@PathVariable("taskId") int taskId) {
-        log.info("컨트롤러 - 삭제 실행 taskID : {}", taskId);
         scheduleService.deleteSchedule(taskId);
         return ResponseEntity.ok("일정 삭제가 완료되었습니다.");
     }
@@ -134,9 +147,6 @@ public class ScheduleController {
                                                        @RequestBody Map<String, String> requestBody) {
         // "status" 필드만 추출
         String status = requestBody.get("status");
-
-        log.info("컨트롤러 - 일정 상태변경 실행 taskId : {}", taskId);
-        log.info("컨트롤러 - 일정 상태변경 실행 status : {}", status);
 
         // 서비스 호출하여 상태 업데이트
         scheduleService.updateScheduleStatus(taskId, status);

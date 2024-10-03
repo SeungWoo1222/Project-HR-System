@@ -79,13 +79,21 @@
         <table class="details">
             <tr>
                 <input type="hidden" id="sample6_address" th:value="${trip.address}"/>
-                <td class="section-title">주소</td>
-                <td th:value="${trip.address}" th:text="${trip.address}">주소</td>
-            </tr>
-            <tr>
                 <input type="hidden" id="sample6_detailAddress" th:value="${trip.detailedAddress}"/>
-                <td class="section-title">상세 주소</td>
-                <td th:value="${trip.detailedAddress}" th:text="${trip.detailedAddress}">상세 주소</td>
+                <td class="section-title">주소</td>
+                <td>
+                    <span th:text="${trip.address} + ' , ' + ${trip.detailedAddress}" >주소</span>
+                    <!-- 지도 보기 버튼 -->
+                    <button id="mapButton" type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}"
+                            onclick="viewMap()">
+                        지도 보기
+                    </button>
+                    <!-- 지도 표시 -->
+                    <div id="map-section" style="display: none;">
+                        <div id="map" style="width:500px; height:400px;"></div>
+                        <button type="button" onclick="closeMap()">지도 닫기</button>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td class="section-title">방문 상태</td>
@@ -107,19 +115,10 @@
                 <td class="section-title">이메일</td>
                 <td th:text="${trip.contactEmail}">이메일</td>
             </tr>
-            <tr>
+            <tr th:if="${trip.note} != null" >
                 <td class="section-title">비고</td>
                 <td th:text="${trip.note}">비고</td>
             </tr>
-            <!-- 지도 보기 버튼 -->
-            <button type="button" th:attr="data-address=${trip.address}, data-detail=${trip.detailedAddress}"
-                    onclick="viewMap()">
-                지도 보기
-            </button>
-            <!-- 지도 표시 -->
-            <div id="map-section" style="display: none;">
-                <div id="map" style="width:500px; height:400px;"></div>
-            </div>
         </table>
     </div>
 

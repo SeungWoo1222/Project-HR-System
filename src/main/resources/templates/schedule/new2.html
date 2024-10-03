@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-
-<form action="/schedule" onsubmit="submitInsertForm(event)">
+<head>
+</head>
+<body>
+<form action="/schedule" onsubmit="submitInsertForm(event)" novalidate>
   <div class="detail-container">
     <div class="insert-form-header">
       <div id="error-message" class="error-message"></div>
@@ -101,15 +103,53 @@
         </td>
       </tr>
       <tr>
-        <td class="section-title">연관된 출장</td>
+        <td class="section-title">출장지 주소</td>
         <td>
-          <select id="mapId" name="mapId">
-            <!-- 출장 구현 완료 되면 ajax로 불러올 예정 -->
-            <option value="" disabled selected>선택해주세요.</option>
+          <div>
+            <input type="text" id="sample6_postcode" placeholder="우편번호">
+            <input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+            <input type="text" id="sample6_address" placeholder="주소"><br>
+            <input type="text" id="sample6_detailAddress" placeholder="상세주소">
+            <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+            <button id="mapButton" type="button" onclick="viewMap()">지도 보기</button>
+          </div>
+          <div id="map-section" style="display: none;">
+            <!-- 지도와 수정 버튼 -->
+            <div id="map" style="width:500px; height:400px;"></div>
+            <button type="button" onclick="closeMap()">지도 닫기</button>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장지 이름</td>
+        <td><input id="tripName" type="text" placeholder="이름을 입력하세요"></td>
+      </tr>
+      <tr>
+        <td class="section-title">전화번호</td>
+        <td><input id="tripTel" type="tel" placeholder="전화번호를 입력하세요"></td>
+      </tr>
+      <tr>
+        <td class="section-title">이메일</td>
+        <td>
+          <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요" required> @
+          <input id="domainInput" type="text" placeholder="직접 입력" disabled>
+          <select id="domainSelect">
+            <option value="" disabled selected>도메인 선택</option>
+            <option value="naver.com">naver.com</option>
+            <option value="google.com">google.com</option>
+            <option value="hanmail.net">hanmail.net</option>
+            <option value="nate.com">nate.com</option>
+            <option value="kakao.com">kakao.com</option>
+            <option value="custom">직접 입력</option>
           </select>
         </td>
+      </tr>
+      <tr>
+        <td class="section-title">참고사항</td>
+        <td><input id="note" type="text" placeholder="참고사항을 입력하세요"></td>
       </tr>
     </table>
   </div>
 </form>
+</body>
 </html>

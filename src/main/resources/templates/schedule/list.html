@@ -81,6 +81,21 @@
                 }
             });
             calendar.render();
+
+            document.body.addEventListener('change', function (event) {
+                if (event.target.id === 'domainSelect') {
+                    const domainInput = document.getElementById('domainInput');
+                    console.log("new2 addEventListener 실행");
+                    if (event.target.value === 'custom') {
+                        domainInput.value = "";
+                        domainInput.disabled = false;
+                    } else {
+                        domainInput.value = event.target.value;
+                        domainInput.disabled = true;
+                    }
+                }
+            });
+
         });
     </script>
 </th:block>
