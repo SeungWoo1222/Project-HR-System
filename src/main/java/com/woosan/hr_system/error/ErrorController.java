@@ -44,6 +44,9 @@ public class ErrorController {
         return "/error/405";
     }
 
+    @RequestMapping("/ready")
+    public String viewReady() { return "/error/ready"; }
+
     // modal 오류 페이지
     @RequestMapping("/modal/404")
     public String handleNotFoundInModal() {
