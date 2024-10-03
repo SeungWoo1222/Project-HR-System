@@ -7,12 +7,15 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
 import com.woosan.hr_system.survey.model.*;
+import com.woosan.hr_system.utils.KiwiSingleton;
+import kr.pe.bab2min.Kiwi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,8 @@ public class SurveyServiceImpl implements SurveyService {
     private SurveyDAO surveyDAO;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private KiwiSingleton kiwiSingleton;
 
     @Override // ID를 이용한 설문 조회
     public Survey getSurveyById(int id) {
@@ -214,32 +219,102 @@ public class SurveyServiceImpl implements SurveyService {
 
                     // 질문 타입이 단일 선택(radio) 또는 다중 선택(checkbox)인 경우
                     if (question.getQuestionType().equals("radio") || question.getQuestionType().equals("checkbox")) {
-                        List<String> options = question.getOptions();
-                        Map<String, Integer> optionCounts = new HashMap<>();
+                        // 질문의 각 옵션에 대한 응답 수 처리
+                        Map<String, Integer> optionCounts = processOptionCounts(question, responses);
 
-                        // 각 선택지에 대해 카운트 0으로 설정
-                        for (String option : options) {
-                            optionCounts.put(option, 0);
-                        }
-
-                        // 각 응답에 대해 선택된 값 카운트
-                        for (Response response : responses) {
-                            String selectedOption = response.getAnswer();
-                            optionCounts.put(selectedOption, optionCounts.get(selectedOption) + 1);
-                        }
-
-                        // 질문에 선택지에 대한 카운트 수 추가
+                        // 통계 모델에 옵션에 대한 응답 수 추가
                         statistics.setResponseCounts(optionCounts);
+
+                    // 질문 타입이 단답형(text) 또는 장문형(textarea)인 경우
+                    } else if (question.getQuestionType().equals("text") || question.getQuestionType().equals("textarea")) {
+                        // 질문의 각 답변 형태소 분석 처리
+                        List<Map<String, Object>> wordList = processTextResponses(responses);
+                        // 통계 모델에 단어 구름으로 출력할 단어 리스트 추가
+                        statistics.setWordList(wordList);
+                    // 나머지 날짜(date) 또는 시간(time)인 경우
+                    } else {
+                        Map<String, Integer> answerCounts = new HashMap<>();
+
+                        for (Response response : responses) {
+                            String answer = response.getAnswer();
+                            // 각 응답에 대한 카운트
+                            answerCounts.put(answer, answerCounts.getOrDefault(answer, 0) + 1);
+                        }
+
+                        // 통계 모델에 응답에 대한 카운트 수 추가
+                        statistics.setResponseCounts(answerCounts);
                     }
                     // 통계 데이터 질문에 담기
                     question.setStatistics(statistics);
                 })
                 .toList();
 
-
         // 응답이 포함된 설문 반환
         return survey.toBuilder()
                 .questions(questionsWithResponses)
                 .build();
+    }
+
+    // 질문의 각 옵션에 대한 응답 수 처리
+    private Map<String, Integer> processOptionCounts(Question question, List<Response> responses) {
+        Map<String, Integer> optionCounts = new HashMap<>();
+        List<String> options = question.getOptions();
+
+        // 각 선택지에 대해 카운트 0으로 설정
+        for (String option : options) {
+            optionCounts.put(option, 0);
+        }
+
+        // 각 응답에 대해 선택된 값 카운트
+        for (Response response : responses) {
+            String selectedOption = response.getAnswer();
+            optionCounts.put(selectedOption, optionCounts.get(selectedOption) + 1);
+        }
+        return optionCounts;
+    }
+
+    // 질문의 각 텍스트 kiwi 형태소 분석기 이용하여 응답 형태소 분석 후 단어 구름으로 출력할 단어 리스트 처리
+    private List<Map<String, Object>> processTextResponses(List<Response> responses) {
+        // kiwi 라이브러리를 이용하여 자연어 처리
+        Kiwi kiwi = kiwiSingleton.getKiwi();
+
+        Map<String, Integer> wordCounts = new HashMap<>();
+
+        // 각 응답을 형태소 분석 후
+        for (Response response : responses) {
+            String answer = response.getAnswer();
+            // 형태소 분석
+            Kiwi.Token[] tokens = kiwi.tokenize(answer, Kiwi.Match.allWithNormalizing);
+            for (Kiwi.Token token : tokens) {
+                switch (token.tag) { // token.tag 타입이 byte
+                    case 1: // 일반 명사, NNG, 1
+                    case 2: // 고유 명사, NNP, 2
+                        wordCounts.put(token.form, wordCounts.getOrDefault(token.form, 0) + 1);
+                        break;
+                    case 5: // 형용사, VA, 5
+                        String word = token.form + "다"; // 형용사는 ~다 형태로
+                        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
+                        break;
+                }
+            }
+        }
+
+        // JQCloud 출력을 위한 Map을 List<Map<String, Object>>로 변환
+        List<Map<String, Object>> wordList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
+            Map<String, Object> word = new HashMap<>();
+            word.put("text", entry.getKey()); // 키를 첫 번째 요소로
+            word.put("weight", entry.getValue()); // 값을 두 번째 요소로 (String으로 변환)
+            wordList.add(word);
+        }
+
+        // 리스트 내림차순 정렬
+        wordList.sort((map1, map2) -> {
+            Integer weight1 = (Integer) map1.get("weight");
+            Integer weight2 = (Integer) map2.get("weight");
+            return weight2.compareTo(weight1);
+        });
+
+        return wordList;
     }
 }

@@ -14,10 +14,12 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class Statistics { // 통계 정보 모델
-    // 선택형 요소
+    // 모든 응답
     private List<Response> responses;
+
+    // 선택형 요소 및 시간 요소
     private Map<String, Integer> responseCounts;
 
     // 입력형 요소
-    private List<String[]> wordList;
+    private List<Map<String, Object>> wordList;
 }
