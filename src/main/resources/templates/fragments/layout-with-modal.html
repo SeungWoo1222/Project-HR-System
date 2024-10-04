@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <title th:text="${title}">하루하루</title>
 
+    <!-- 레이아웃 -->
     <link rel="stylesheet" th:href="@{/css/layout/layout.css}">
     <script th:src="@{/js/common/layout.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/layout/modal.css}">
 
+    <!-- 알림 -->
     <link rel="stylesheet" th:href="@{/css/common/notification.css}">
     <script th:src="@{/js/common/notification.js}"></script>
 
+    <!-- 근태 -->
     <link rel="stylesheet" th:href="@{/css/attendance/modal.css}">
     <script th:src="@{/js/attendance/attendance.js}"></script>
-
-    <script th:src="@{/js/common/format.js}"></script>
-
-    <link rel="stylesheet" th:href="@{/css/layout/modal.css}">
 
     <!-- 각 페이지의 script가 작성될 위치 -->
     <th:block layout:fragment="script"></th:block>
