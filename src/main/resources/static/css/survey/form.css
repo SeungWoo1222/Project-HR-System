@@ -1,0 +1,61 @@
+.content-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.survey-container, .survey-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.question-row {
+    width: 800px;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-container {
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    height: min-content;
+    position: relative;
+    top: 0;
+    gap: 5px;
+}
+
+.survey-form-btn {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.survey-form-btn, .option-remove-btn img, .question-remove-btn img {
+    padding: 5px;
+    width: 25px;
+    height: 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.survey-form-btn:hover, .option-remove-btn img:hover, .question-remove-btn img:hover {
+    background-color: #EDEDED;
+}
+
+.option-remove-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

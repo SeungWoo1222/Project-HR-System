@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<div>
+  <div>
+    <table border="1">
+      <thead>
+        <th>번호</th>
+        <th>단어</th>
+        <th>수</th>
+      </thead>
+      <tbody th:each="word, stat : ${wordList}">
+        <td th:text="${stat.index + 1}"></td>
+        <td th:text="${word['text']}"></td>
+        <td th:text="${word['weight']}"></td>
+      </tbody>
+    </table>
+  </div>
+</div>
+</html>

@@ -42,8 +42,13 @@
     <div class="section-sidebar">
         <p class="sidebar-category" onclick="toggleMenu('communication-section')">커뮤니케이션</p>
         <ul id="communication-section">
-            <li><a th:href="@{/announcement}"><img src="/images/icons/megaphone.png" alt="Announcement" width="20">
-                공지 및 설문</a></li>
+            <li>
+                <p onclick="toggleSubmenu('announcement-submenu')"><img src="/images/icons/megaphone.png" alt="Announcement" width="20">공지 및 설문</p>
+                <ul id="announcement-submenu" class="submenu">
+                    <li><a th:href="@{/error/ready}">- 공지 목록</a></li>
+                    <li><a th:href="@{/survey/list}">- 설문조사 목록</a></li>
+                </ul>
+            </li>
             <li>
                 <p onclick="toggleSubmenu('report-submenu')"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</p>
                 <ul id="report-submenu" class="submenu">
@@ -63,7 +68,7 @@
                     <li><a th:href="@{/admin/request/toApproveReportList}">- 결재 할 보고서 목록</a></li>
                 </ul>
             </li>
-            <li><a th:href="@{/forum}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>
+            <li><a th:href="@{/error/ready}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>
         </ul>
     </div>
 
