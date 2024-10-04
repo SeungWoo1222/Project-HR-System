@@ -5,9 +5,11 @@
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/login/login.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/layout.css}">
 </th:block>
 
 <th:block layout:fragment="script">
+    <script th:src="@{/js/common/layout.js}"></script>
     <script th:if="${logoutMessage}">
         alert("로그아웃 되었습니다.");
     </script>
@@ -99,7 +101,6 @@
                     errorMessage.textContent = '로그인 요청 중 오류가 발생했습니다.';
                 });
         }
-
     </script>
 </th:block>
 
