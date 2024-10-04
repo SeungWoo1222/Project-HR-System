@@ -16,8 +16,15 @@
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
+    border-radius: 10px;
     width: 80%;
+    transform: scale(0.7);
+    transition: transform 0.3s ease;
 }
+.modal.show .modal-content {
+    transform: scale(1);
+}
+
 .close {
     color: #aaa;
     float: right;

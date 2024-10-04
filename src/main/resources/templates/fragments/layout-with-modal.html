@@ -18,6 +18,9 @@
 
     <link rel="stylesheet" th:href="@{/css/modal.css}">
 
+    <script src="https://unpkg.com/@barba/core"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+
     <!-- 각 페이지의 script가 작성될 위치 -->
     <th:block layout:fragment="script"></th:block>
 
@@ -39,8 +42,8 @@
 </div>
 
 <!-- 모달 HTML 구조 -->
-<div class="modal" id="myModal">
-    <div class="modal-content">
+<div class="modal" id="myModal" data-barba="wrapper">
+    <div class="modal-content" data-barba="container">
         <span class="close" onclick="closeModal()">&times;</span>
         <div id="modal-body">
             <!-- 모달 컨텐츠 -->
@@ -84,6 +87,12 @@
                 modalBody.innerHTML = html;
                 modal.style.display = "block";
 
+                // 확대 애니메이션을 위해 'show' 클래스 추가
+                setTimeout(() => {
+                    modal.classList.add("show");
+                }, 10);
+
+
                 // 모달 컨텐츠가 로드된 후 포커스 설정
                 const firstInput = modalBody.querySelector(".first-input");
                 if (firstInput) {
@@ -104,14 +113,17 @@
     // 모달 닫기 함수
     function closeModal() {
         var modal = document.getElementById("myModal");
-        modal.style.display = "none";
+        modal.classList.remove("show"); // 'show' 클래스 제거하여 축소 애니메이션 적용
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 300); // 애니메이션이 끝난 후 모달 숨김
     }
 
     // 모달 외부 클릭 시 닫기
     window.onclick = function(event) {
         var modal = document.getElementById("myModal");
         if (event.target == modal) {
-            modal.style.display = "none";
+            closeModal();
         }
     }
 </script>
