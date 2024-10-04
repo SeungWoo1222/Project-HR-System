@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
-<form action="/schedule/edit" onsubmit="submitUpdateForm(event)">
+<form id="editForm" action="/schedule/edit" onsubmit="submitUpdateForm(event)">
     <div class="detail-container">
         <div class="insert-form-header">
             <div id="error-message" class="error-message"></div>
@@ -121,11 +121,11 @@
                             <input type="text" id="sample6_address" th:value="${trip.address}" placeholder="주소"><br>
                             <input type="text" id="sample6_detailAddress" th:value="${trip.detailedAddress}" placeholder="상세주소">
                             <input type="text" id="sample6_extraAddress" placeholder="참고항목">
-                            <button type="button" onclick="viewMap()">지도 보기</button>
+                            <button id="mapButton" type="button" onclick="viewMap()">지도 보기</button>
                             <!-- 지도 및 주소 수정 섹션 -->
                             <div id="map-section" style="display: none;">
                                 <div id="map" style="width:500px; height:400px;"></div>
-                                <button type="button" onclick="editAddress()">주소 수정</button>
+                                <button type="button" onclick="closeMap()">지도 닫기</button>
                             </div>
                         </div>
 
@@ -146,7 +146,41 @@
                 <tr>
                     <td class="section-title">이메일</td>
                     <td>
-                        <input type="email" id="email" th:value="${trip.contactEmail}" placeholder="이메일 입력">
+<!--                        <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요" required> @-->
+<!--                        <input id="domainInput" type="text" placeholder="직접 입력" disabled>-->
+<!--                        <select id="domainSelect">-->
+<!--                            <option value="" disabled selected>도메인 선택</option>-->
+<!--                            <option value="naver.com">naver.com</option>-->
+<!--                            <option value="google.com">google.com</option>-->
+<!--                            <option value="hanmail.net">hanmail.net</option>-->
+<!--                            <option value="nate.com">nate.com</option>-->
+<!--                            <option value="kakao.com">kakao.com</option>-->
+<!--                            <option value="custom">직접 입력</option>-->
+<!--                        </select>-->
+                        <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"
+                               th:value="${emailLocalPart}" required> @
+
+                        <select id="domainSelect">
+                            <option value="" disabled>도메인 선택</option>
+                            <option value="naver.com" th:selected="${emailDomainPart == 'naver.com'}">naver.com</option>
+                            <option value="google.com" th:selected="${emailDomainPart == 'google.com'}">google.com</option>
+                            <option value="hanmail.net" th:selected="${emailDomainPart == 'hanmail.net'}">hanmail.net</option>
+                            <option value="nate.com" th:selected="${emailDomainPart == 'nate.com'}">nate.com</option>
+                            <option value="kakao.com" th:selected="${emailDomainPart == 'kakao.com'}">kakao.com</option>
+                            <option value="custom" th:selected="${emailDomainPart != 'naver.com' &&
+                                           emailDomainPart != 'google.com' &&
+                                           emailDomainPart != 'hanmail.net' &&
+                                           emailDomainPart != 'nate.com' &&
+                                           emailDomainPart != 'kakao.com'}">직접 입력</option>
+                        </select>
+
+                        <input id="domainInput" type="text" placeholder="직접 입력"
+                               th:disabled="${emailDomainPart == 'naver.com' ||
+                                              emailDomainPart == 'google.com' ||
+                                              emailDomainPart == 'hanmail.net' ||
+                                              emailDomainPart == 'nate.com' ||
+                                              emailDomainPart == 'kakao.com'}"
+                               th:value="${emailDomainPart}" />
                     </td>
                 </tr>
                 <tr>

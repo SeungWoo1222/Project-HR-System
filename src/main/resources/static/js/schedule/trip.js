@@ -11,11 +11,8 @@ function viewMap() {
         return;
     }
 
-    // 주소 입력창 숨기기, 지도 보여주기
-    if (document.getElementById('address-input-section')) {
-        document.getElementById('address-input-section').style.display = 'none';
-    }
     document.getElementById('map-section').style.display = 'block';
+    document.getElementById('mapButton').style.visibility = 'hidden';
 
     var fullAddress = address + ' ' + detailAddress;
 
@@ -61,9 +58,9 @@ function viewMap() {
 }
 
 // 주소 수정 버튼 클릭 시 주소 입력창 다시 표시
-function editAddress() {
+function closeMap() {
     document.getElementById('map-section').style.display = 'none';
-    document.getElementById('address-input-section').style.display = 'block';
+    document.getElementById('mapButton').style.visibility = 'visible';
 }
 
 // 우편번호 입력 창 생성
@@ -101,63 +98,59 @@ function sample6_execDaumPostcode() {
         }
     }).open();
 }
-//
-// // 출장 정보 저장
-// function saveTripInfo() {
-//     // 유효성 검사 통과 후에만 등록 확인
-//     if (validateTripInfo()) {
-//         if (confirm('등록하시겠습니까?')) {
-//             const address = document.getElementById('sample6_address').value;
-//             const detailedAddress = document.getElementById('sample6_detailAddress').value;
-//             const clientName = document.getElementById('tripName').value;
-//             const contactTel = document.getElementById('tripTel').value;
-//             const contactEmail = document.getElementById('email') ? document.getElementById('email').value : null;
-//             const note = document.getElementById('note') ? document.getElementById('note').value : null;
-//
-//             console.log("주소:", address);
-//             console.log("상세 주소:", detailedAddress);
-//             console.log("거래처명:", clientName);
-//             console.log("전화번호:", contactTel);
-//             console.log("이메일:", contactEmail);
-//             console.log("참고사항:", note);
-//
-//             alert("등록이 완료되었습니다!");
-//         }
-//     }
-// }
 
 function validateTripInfo() {
+    console.log("validateTripInfo 실행");
+
     const address = document.getElementById('sample6_address')?.value || '';
     const detailedAddress = document.getElementById('sample6_detailAddress')?.value || '';
     const clientName = document.getElementById('tripName')?.value || '';
     const contactTel = document.getElementById('tripTel')?.value || '';
-    const contactEmail = document.getElementById('email') ?.value || '';
+    const contactEmail = getEmail().trim() || '';
+    console.log("contactEmail : ", contactEmail);
 
-    if (address || detailedAddress || clientName || contactTel) {
-        // 이메일 유효성 검사 (@와 .com 포함)
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (address || detailedAddress || clientName || contactTel || contactEmail) {
+        // 오류 메시지 초기화
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = '';
 
         if (!address) {
-            alert('주소를 입력해주세요.');
+            errorMessage.textContent = '주소를 입력해주세요.';
             return false;
         }
         if (!detailedAddress) {
-            alert('상세주소를 입력해주세요.');
+            errorMessage.textContent = '상세주소를 입력해주세요.';
             return false;
         }
         if (!clientName) {
-            alert('이름을 입력해주세요.');
+            errorMessage.textContent = '출장지 이름을 입력해주세요.';
             return false;
         }
         if (!contactTel) {
-            alert('전화번호를 입력해주세요.');
+            errorMessage.textContent = '전화번호를 입력해주세요.';
             return false;
         }
-        if (contactEmail && !emailPattern.test(contactEmail)) {
-            alert('유효한 이메일 주소를 입력해주세요.');
+        if (contactEmail.startsWith('@') || contactEmail.endsWith('@')) {
+            errorMessage.textContent = '이메일을 입력해주세요.';
             return false;
         }
+        // 이메일 형식 확인 (@뒤에 도메인이 있는지 확인, .com 등 형식 체크)
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(contactEmail)) {
+            errorMessage.textContent = '유효한 이메일을 입력해주세요.';
+            return false;
+        }
+
     }
 
     return true;
+}
+
+function getEmail() {
+    const localPart = document.getElementById('emailLocalPart').value;
+    const domainPart = document.getElementById('domainSelect').value === 'custom'
+        ? document.getElementById('domainInput').value
+        : document.getElementById('domainSelect').value;
+
+    return localPart + '@' + domainPart;
 }

@@ -49,9 +49,6 @@ public class BusinessTripServiceImpl implements BusinessTripService {
     public void updateBusinessTrip(BusinessTrip businessTrip) {
         BusinessTrip existingBusinessTrip = businessTripDAO.getBusinessTripByTripId(businessTrip.getTripId());
 
-        log.info("기존 출장 : {}", existingBusinessTrip);
-        log.info("수정 요청 받은 출장 : {}", businessTrip);
-
         // 빌더 패턴을 사용하여 기존 스케줄에서 수정된 부분만 반영하여 새 객체 생성
         BusinessTrip newBusinessTrip = existingBusinessTrip.toBuilder()
                 .address(Optional.ofNullable(businessTrip.getAddress()).orElse(existingBusinessTrip.getAddress()))
@@ -63,8 +60,6 @@ public class BusinessTripServiceImpl implements BusinessTripService {
                 .build();
 
         newBusinessTrip.setTripId(existingBusinessTrip.getTripId());
-
-        log.info("최종 업데이트할 일정: {}", newBusinessTrip);
 
         businessTripDAO.updateBusinessTrip(newBusinessTrip);
     }
