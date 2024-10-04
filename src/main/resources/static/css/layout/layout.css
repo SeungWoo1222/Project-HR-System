@@ -161,6 +161,7 @@ img {
 .open {
     display: block;
 }
+/* Sidebar styles */
 
 /* Logout styles */
 #logout-area {
@@ -176,11 +177,18 @@ img {
     padding: 20px;
 }
 
-.content {
+.content-container {
+    height: calc(100vh - 160px);
+    display: flex;
+    justify-content: center;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.content {
+    width: 1000px;
 }
 
 /* Fotter styles */

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='비밀번호 관리')}">
+      layout:decorate="~{fragments/layout :: layout(title='비밀번호 관리')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee/employee.css}"/>
@@ -61,10 +61,8 @@
 <th:block layout:fragment="script">
     <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
     <script th:src="@{/js/common/pwd.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            updateDateTimeElements();
             calculateDateDifference();
             updateBatteryLevel();
         });

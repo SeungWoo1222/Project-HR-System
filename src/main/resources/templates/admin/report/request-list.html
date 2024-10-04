@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='요청 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='요청 조회')}">
 
 <th:block layout:fragment="css"></th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/report/report.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            updateDateTimeElements();
             toggleCustomDateFields();
 
             // searchDate 선택 시 사용자 지정 날짜 필드 토글

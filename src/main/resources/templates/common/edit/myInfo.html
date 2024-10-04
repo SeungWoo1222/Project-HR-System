@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 정보 수정')}">
+      layout:decorate="~{fragments/layout :: layout(title='내 정보 수정')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee/employee.css}"/>
@@ -10,12 +10,10 @@
 <th:block layout:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/common/daum-postcode-API.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
     <script th:src="@{/js/common/file.js}"></script>
     <script th:src="@{/js/employee/employee.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            updateDateTimeElements();
             separateEmail();
             updatePhoneNumberElement();
             errorMessage = document.querySelector(".error-message");

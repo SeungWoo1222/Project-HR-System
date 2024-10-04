@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='사원정보 상세 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='사원정보 상세 조회')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee/employee.css}"/>
@@ -10,12 +10,6 @@
 <th:block layout:fragment="script">
     <script th:src="@{/js/employee/employee.js}"></script>
     <script th:src="@{/js/employee/employee-detail-edit.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            updateDateTimeElements();
-        });
-    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
