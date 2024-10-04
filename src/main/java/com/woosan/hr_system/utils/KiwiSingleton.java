@@ -18,7 +18,7 @@ public class KiwiSingleton {
     private final Kiwi kiwi;
 
     public KiwiSingleton() {
-        try (KiwiBuilder builder = new KiwiBuilder("/Users/san/Desktop/Programing/Projects/HR_System_Side_Project/hr-system/kiwi/ModelGenerator")) {
+        try (KiwiBuilder builder = new KiwiBuilder("/Users/san/kiwi/models/base")) {
             // 오타 교정 기능을 사용하여 Kiwi 인스턴스 생성
             this.kiwi = builder.build(KiwiBuilder.basicTypoSet, 2.0f);
             log.info("Kiwi instance created");
