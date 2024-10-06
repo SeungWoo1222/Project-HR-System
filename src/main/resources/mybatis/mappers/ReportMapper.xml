@@ -59,6 +59,14 @@
         FROM reports
         <where>
             writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%') OR
+                reject_reason LIKE CONCAT('%', #{keyword}, '%') OR
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 title LIKE CONCAT('%', #{keyword}, '%') OR
@@ -84,6 +92,14 @@
         SELECT COUNT(writer_id) FROM reports
         <where>
             writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%') OR
+                reject_reason LIKE CONCAT('%', #{keyword}, '%') OR
+                approver_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 title LIKE CONCAT('%', #{keyword}, '%') OR
@@ -117,6 +133,14 @@
         FROM reports r JOIN employees e ON r.writer_id = e.employee_id
         <where>
             r.approver_id = #{approverId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%') OR
+                reject_reason LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 r.title LIKE CONCAT('%', #{keyword}, '%') OR
@@ -144,6 +168,14 @@
         SELECT COUNT(r.writer_id) FROM reports r JOIN employees e ON r.writer_id = e.employee_id
         <where>
             r.approver_id = #{approverId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                content LIKE CONCAT('%', #{keyword}, '%') OR
+                reject_reason LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 r.title LIKE CONCAT('%', #{keyword}, '%') OR

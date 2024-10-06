@@ -54,6 +54,8 @@ function addFile(obj){
     for (var i = 0; i < Math.min(curFileCnt, remainFileCnt); i++) {
         const file = obj.files[i];
 
+        console.log("파일 크기 확인:", obj.size);
+
         // 첨부파일 검증
         if (validateFile(file)) {
             // 파일 배열에 담기
@@ -69,6 +71,7 @@ function addFile(obj){
             fileNo++;
         }
     }
+    console.log("filesArr", filesArr);
     // 초기화
     document.querySelector("input[type=file]").value = "";
 }
@@ -85,7 +88,7 @@ function validateFile(obj){
     } else if (obj.name.lastIndexOf('.') == -1) {
         alert("확장자가 없는 파일은 제외되었습니다.");
         return false;
-    } else if (filesArr.some(existingFile => existingFile.name === obj.name && existingFile.size === obj.size)) {
+    } else if (filesArr.some(existingFile => existingFile.name === obj.name && existingFile.size === obj.size && !existingFile.is_delete)) {
         alert("동일한 파일이 이미 추가되어 있습니다.");
         return false;
     } else {
@@ -98,5 +101,8 @@ function deleteFile(num) {
     // UI에서 파일을 삭제
     document.querySelector("#file" + num).remove();
     // 'filesArr' 배열에서 해당 파일 객체의 'is_delete' 속성 설정
+    // filesArr[num].is_delete = true;
+    console.log("filesArr 에서 파일 삭제처리 전 : ", filesArr);
     filesArr[num].is_delete = true;
+    console.log("filesArr 에서 파일 삭제처리 후 : ", filesArr);
 }

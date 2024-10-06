@@ -154,6 +154,8 @@ public class ExecutiveController {
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
+        log.info("searchType : {}", searchType);
+        log.info("keyword : {}", keyword);
         // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String approverId = userSessionInfo.getCurrentEmployeeId();

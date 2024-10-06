@@ -300,6 +300,8 @@ function submitReportForm(event) {
 
     // filesArr에 저장된 파일들을 FormData에 추가
     if (filesArr != null) {
+        console.log("filesArr", filesArr);
+
         filesArr.forEach((file, index) => {
             if (!file.is_delete) { // 삭제된 파일 제외
                 formData.append('reportFiles', file);
