@@ -1,0 +1,120 @@
+.content-header-left, .content-header-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.content-header-left {
+    justify-content: left;
+}
+
+.content-header-center {
+    justify-content: center;
+}
+
+.content-header-right {
+    justify-content: right;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.reset-btn, .search-btn {
+    background-color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.reset-img, .search-img {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.reset-btn:hover .reset-img {
+    transform: rotate(90deg);
+}
+
+.search-btn:hover, .reset-btn:hover {
+    background-color: #EDEDED;
+}
+
+.search-text {
+
+}
+
+.search-text {
+    width: 150px;
+    padding: 10px;
+    border: 2px solid #eaeaea;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.search-text:focus {
+    border-color: #18a8f1;
+    outline: none;
+}
+
+.search-select {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #eaeaea;
+    border-radius: 5px;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-select:hover, .search-select:focus {
+    border-color: #18a8f1;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #808080;
+    cursor: pointer;
+}
+
+.pagination .active {
+    color: #18a8f1;
+    font-weight: bold;
+}
+
+.page-area {
+    margin-top: 2px;
+}
+.btn-container {
+    margin-left: auto;
+}

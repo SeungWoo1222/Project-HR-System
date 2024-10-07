@@ -6,7 +6,7 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
-    <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/common/search.css}" rel="stylesheet">
     <link th:href="@{/css/common/table.css}" rel="stylesheet">
     <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
@@ -22,14 +22,31 @@
             <div class="content-header-left">
                 <form id="pageSizeForm" th:action="@{/attendance/list}" method="get">
                     <input type="hidden" name="page" th:value="1"/>
-                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
                         <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">1개씩 보기</option>
                         <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                         <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
                     </select>
                     <input type="hidden" name="keyword" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                </form>
+                <form id="statusForm" th:action="@{/attendance/list}" method="get">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
+                        <option value="" th:selected="${status == ''}">근태 상태</option>
+                        <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
+                        <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
+                        <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
+                        <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
+                        <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
+                        <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
+                    </select>
                     <input type="hidden" name="yearmonth" th:value="${yearmonth}">
                 </form>
             </div>
@@ -48,33 +65,21 @@
                     <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
                 </form>
             </div>
-            <div class="search-option content-header-right">
-                <form id="statusForm" th:action="@{/attendance/list}" method="get">
+            <div class="content-header-right">
+                <form th:action="@{/attendance/list}" class="search-form" method="get">
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="hidden" name="keyword" th:value="${keyword}"/>
-                    <input type="hidden" name="department" th:value="${department}">
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
-                        <option value="" th:selected="${status == ''}">근태 상태</option>
-                        <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
-                        <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
-                        <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
-                        <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
-                        <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
-                        <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
-                    </select>
-                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                </form>
-                <form th:action="@{/attendance/list}" method="get">
-                    <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="status" th:value="${status}">
                     <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                    <button type="submit">검색</button>
+                    <button type="submit" class="search-btn">
+                        <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                    </button>
                 </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/attendance/list'"/>
+                <button type="button" class="reset-btn" onclick="window.location.href='/attendance/list'">
+                    <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+                </button>
             </div>
         </div>
         <form th:action="@{/attendance/list}" method="get" id="department-nav">
