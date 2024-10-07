@@ -1,6 +1,6 @@
 /* Text */
 input[type="text"] {
-    width: 50%;
+    width: auto;
     padding: 10px;
     border: none;
     border-bottom: 2px solid #f1f1f1;
@@ -13,6 +13,29 @@ input[type="text"]:focus {
     border-color: #18a8f1;
     outline: none;
 }
+
+/* Textarea */
+textarea {
+    font-family: Arial, sans-serif;
+    width: auto;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #f1f1f1;
+    border-radius: 5px;
+    color: #333;
+    resize: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: none;
+    background-color: #fff;
+    appearance: none;
+}
+
+textarea:focus {
+    border-color: #18a8f1;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
 
 /* Select */
 select {
