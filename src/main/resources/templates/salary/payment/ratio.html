@@ -4,6 +4,8 @@
       layout:decorate="~{fragments/layout :: layout(title='급여 및 공제 비율 조회')}">
 
 <th:block layout:fragment="css">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
         .ratio-section-header, .ratio-edit-header {
             display: flex;
@@ -31,7 +33,7 @@
                 <h3>급여 비율</h3>
                 <button type="button" id="edit-payroll-ratio" class="btn" onclick="openModal('/salary/payment/payroll/edit')">급여 비율 수정</button>
             </div>
-            <table border="1">
+            <table border="1" class="list">
                 <thead>
                 <tr>
                     <th>기본급</th>
@@ -64,7 +66,7 @@
                 <h3>공제 비율</h3>
                 <button type="button" id="edit-deduction-ratio" class="btn" onclick="openModal('/salary/payment/deduction/edit')">공제 비율 수정</button>
             </div>
-            <table border="1">
+            <table border="1" class="list">
                 <thead>
                 <tr>
                     <th>근로소득세</th>

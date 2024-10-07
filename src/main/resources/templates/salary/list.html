@@ -6,6 +6,8 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
         .content-header-left {
             display: flex;
@@ -126,7 +128,7 @@
                     <td th:text="${#numbers.formatInteger(salary.annualSalary, 3, 'COMMA')}" class="annualSalary">연봉</td>
                     <td th:text="${salary.createdAt}">등록된 날짜</td>
                     <td th:text="${salary.status} ? '사용 중' : '사용 중지'"
-                        th:classappend="${salary.status} ? 'true' : 'false'">사용 여부</td>
+                        th:classappend="${salary.status} ? 'green' : 'red'">사용 여부</td>
                 </tr>
             </tbody>
         </table>

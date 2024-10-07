@@ -4,25 +4,10 @@
       layout:decorate="~{fragments/layout :: layout(title='휴가 내역 조회')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}"/>
-    <link rel="stylesheet" th:href="@{/css/common/pagination.css}"/>
-    <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-        .pending {
-            color: #18a8f1;
-            font-weight: bold;
-        }
-        .approved {
-            color: green;
-            font-weight: bold;
-        }
-        .rejected {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+    <link th:href="@{/css/vacation/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/pagination.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -81,9 +66,9 @@
                 <td th:text="${vacation.vacationType}">휴가 유형</td>
                 <td th:text="${vacation.reason}">휴가 사유</td>
                 <td th:text="${vacation.approvalStatus}"
-                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'pending' :
-                                    (${vacation.approvalStatus == '승인'} ? 'approved' :
-                                    (${vacation.approvalStatus == '거절'} ? 'rejected' : ''))">승인 상태</td>
+                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'gray' :
+                                    (${vacation.approvalStatus == '승인'} ? 'green' :
+                                    (${vacation.approvalStatus == '거절'} ? 'red' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>
                 <td th:text="${vacation.processingAt}" class="dateTime">처리 일시</td>
             </tr>

@@ -313,12 +313,6 @@ img {
     margin-bottom: 15px;
 }
 
-/* Table styles */
-/* 테이블에 list 클래스를 추가해주세요. */
- .list tbody tr:hover {
-     background-color: #C3E8FB;
- }
-
  /* Text styles */
 .disabled {
     text-decoration: line-through !important;

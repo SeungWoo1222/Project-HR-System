@@ -5,18 +5,9 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-        .true {
-            color: green;
-            font-weight: bold;
-        }
-        .false {
-            color: red;
-            font-weight: bold;
-        }
         .section-header {
             display: flex;
             flex-direction: row;
@@ -81,16 +72,14 @@
                 <h3>나의 급여 정보</h3>
                 <button type="button" class="btn" th:employeeId="${salaryList.get(0).employeeId}" onclick="openModal('/salary/' + this.getAttribute('employeeId') + '/account/edit')">계좌 정보 수정</button>
             </div>
-            <table border="1">
+            <table border="1" class="list">
                 <thead>
-                <tr>
-                    <td>직급</td>
-                    <td>계좌은행</td>
-                    <td>계좌번호</td>
-                    <td>연봉</td>
-                    <td>등록된 날짜</td>
-                    <td>사용 여부</td>
-                </tr>
+                <th>직급</th>
+                <th>계좌은행</th>
+                <th>계좌번호</th>
+                <th>연봉</th>
+                <th>등록된 날짜</th>
+                <th>사용 여부</th>
                 </thead>
                 <tbody>
                 <tr th:each="salaryInfo : ${salaryList}">
@@ -100,7 +89,7 @@
                     <td th:text="${#numbers.formatInteger(salaryInfo.annualSalary, 3, 'COMMA')}"></td>
                     <td th:text="${salaryInfo.createdAt}"></td>
                     <td th:text="${salaryInfo.status} ? '사용 중' : '사용 중지'"
-                        th:classappend="${salaryInfo.status} ? 'true' : 'false'"></td>
+                        th:classappend="${salaryInfo.status} ? 'green' : 'red'"></td>
                 </tr>
                 </tbody>
             </table>
@@ -120,21 +109,19 @@
             </div>
             <table border="1" class="list">
                 <thead>
-                <tr>
-                    <td>지급대상 월</td>
-                    <td>지급일</td>
-                    <td>기본급</td>
-                    <td>직책수당</td>
-                    <td>식대</td>
-                    <td>교통비</td>
-                    <td>추가수당</td>
-                    <td>성과급</td>
-                    <td>보너스</td>
-                    <td>총 급여</td>
-                    <td>총 공제금액</td>
-                    <td>실 지급액</td>
-                    <td>비고</td>
-                </tr>
+                <th>지급대상 월</th>
+                <th>지급일</th>
+                <th>기본급</th>
+                <th>직책수당</th>
+                <th>식대</th>
+                <th>교통비</th>
+                <th>추가수당</th>
+                <th>성과급</th>
+                <th>보너스</th>
+                <th>총 급여</th>
+                <th>총 공제금액</th>
+                <th>실 지급액</th>
+                <th>비고</th>
                 </thead>
                 <tbody>
                 <tr th:each="payslip : ${payslips}"  th:paymentId="${payslip.paymentId}" th:onclick="openModal('/salary/payment/' + this.getAttribute('paymentId'))">

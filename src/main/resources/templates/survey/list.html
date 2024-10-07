@@ -7,6 +7,7 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
     <style>
         .btn-container {
             margin-bottom: 10px;
@@ -79,8 +80,8 @@
                 <th>제목</th>
                 <th>생성자</th>
                 <th>생성날짜</th>
+                <th>종료날짜</th>
                 <th>설문 상태</th>
-                <th>조사 종료일</th>
             </tr>
             </thead>
             <tbody>
@@ -94,8 +95,8 @@
                 <td th:text="${survey.title}"></td>
                 <td th:text="${survey.createdBy}"></td>
                 <td th:text="${#temporals.format(survey.createdAt, 'yyyy-MM-dd')}"></td>
-                <td th:text="${survey.status}" th:classappend="${survey.status} == '조사 중' ? 'green' : 'red'"></td>
                 <td th:text="${#temporals.format(survey.expiresAt, 'yyyy-MM-dd')}"></td>
+                <td th:text="${survey.status}" th:classappend="${survey.status} == '조사 중' ? 'green' : 'red'"></td>
             </tr>
             </tbody>
         </table>

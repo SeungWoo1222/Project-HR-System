@@ -3,7 +3,14 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout :: layout(title='퇴사 사원 관리')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <style>
+        .list {
+            table-layout: fixed;
+        }
+    </style>
+</th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/common/file.js}"></script>
@@ -55,37 +62,28 @@
         <table class="list">
             <thead>
             <tr>
-                <th>사원 ID</th>
-                <th>이름</th>
-                <th>부서</th>
-                <th>직급</th>
-                <th>입사일</th>
-                <th>상태</th>
-                <th>퇴사 날짜</th>
-                <th>퇴사 사유</th>
-                <th>퇴사 코드</th>
-                <th>구체적 사유</th>
-                <th>상세 정보</th>
+                <th style="width: 10%">사원 ID</th>
+                <th style="width: 10%">이름</th>
+                <th style="width: 10%">퇴사 날짜</th>
+                <th style="width: 20%">퇴사 사유</th>
+                <th style="width: 25%">퇴사 코드</th>
+                <th style="width: 25%">구체적 사유</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${resignedEmployees.isEmpty()}">
-                <td colspan="7">최근 2개월이내 퇴사한 사원이 없습니다.</td>
+                <td colspan="6">최근 2개월이내 퇴사한 사원이 없습니다.</td>
             </tr>
             <tr th:each="employee : ${resignedEmployees}">
-                <td th:text="${employee.employeeId}">사원 ID</td>
-                <td th:text="${employee.name}">이름</td>
-                <td th:text="${employee.department}">부서</td>
-                <td th:text="${employee.position}">직급</td>
-                <td th:text="${employee.hireDate}">입사일</td>
-                <td th:text="${employee.status}">상태</td>
-                <td th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
-                <td th:text="${employee.resignation?.resignationReason}">퇴사 사유</td>
-                <td th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
-                <td th:text="${employee.resignation?.specificReason}">구체적 사유</td>
-                <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">상세정보 조회</button>
-                </td>
+                <td style="width: 8%" th:text="${employee.employeeId}">사원 ID</td>
+                <td style="width: 8%" th:text="${employee.name}">이름</td>
+                <td style="width: 8%" th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
+                <td style="width: 25%" th:text="${employee.resignation?.resignationReason}">퇴사 사유</td>
+                <td style="width: 25%" th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
+                <td style="width: 25%" th:text="${employee.resignation?.specificReason}">구체적 사유</td>
+<!--                <td>-->
+<!--                    <button type="button" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">상세정보 조회</button>-->
+<!--                </td>-->
             </tr>
             </tbody>
         </table>

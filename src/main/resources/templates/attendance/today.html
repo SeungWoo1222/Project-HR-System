@@ -5,8 +5,9 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <link th:href="@{/css/attendance/status.css}" rel="stylesheet">
-    <link th:href="@{/css/attendance/today-container.css}" rel="stylesheet">
     <style>
         .content-header {
             border-top: #DCDCDC 1px solid;
@@ -30,7 +31,7 @@
     <div class="content">
         <div class="today-container">
             <h3>근태 통계 <span th:text="${#temporals.format(#temporals.createToday(), '(yy년 MM월 dd일 EEEE)')}" style="color: #A9A9A9; font-size: 15px"></span></h3>
-            <table>
+            <table class="summary-table">
                 <thead>
                 <tr>
                     <th>전체 사원 수</th>

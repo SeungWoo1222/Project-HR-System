@@ -7,6 +7,8 @@
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
         .content-header {
             margin-top: 10px;
@@ -109,7 +111,6 @@
                 <th>은행</th>
                 <th>계좌번호</th>
                 <th>연봉</th>
-                <th>등록된 날짜</th>
                 <th>지급 여부</th>
                 <th>사원 정보</th>
             </tr>
@@ -134,9 +135,8 @@
                 <td th:text="${salary.bank}">은행</td>
                 <td th:text="${salary.accountNumber}">계좌번호</td>
                 <td th:text="${salary.annualSalary}" class="annualSalary">연봉</td>
-                <td th:text="${salary.createdAt}">등록된 날짜</td>
                 <td th:text="${paymentStatus[salary.salaryId] ? '지급 완료' : '미지급'}"
-                    th:classappend="${paymentStatus[salary.salaryId] ? 'true' : 'false'}"></td>
+                    th:classappend="${paymentStatus[salary.salaryId] ? 'green' : 'red'}"></td>
                 <td>
                     <button type="button" th:employeeId="${salary.employeeId}" onclick="openEmployeeDetailModal(event, this)">상세 보기</button>
                 </td>

@@ -3,7 +3,10 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout :: layout(title='보고서 조회')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
+</th:block>
 
 <th:block layout:fragment="script">
   <script th:src="@{/js/report/report.js}"></script>

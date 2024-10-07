@@ -1,0 +1,44 @@
+.red {
+    color: #FF0000;
+    font-weight: bold;
+}
+
+.orange {
+    color: #FF8000;
+    font-weight: bold;
+}
+
+.yellow {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.green {
+    color: #32CD32;
+    font-weight: bold;
+}
+
+.skyblue {
+    color: #18A8F1;
+    font-weight: bold;
+}
+
+.blue {
+    color: #000080;
+    font-weight: bold;
+}
+
+.purple {
+    color: #8A2BE2;
+    font-weight: bold;
+}
+
+.pink {
+    color: #FF1493;
+    font-weight: bold;
+}
+
+.gray {
+    color: #808080;
+    font-weight: bold;
+}

@@ -5,6 +5,8 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -64,8 +66,8 @@
                 <td th:text="${payslip.compensationMonth}">지급대상 월</td>
                 <td th:text="${payslip.paymentDate}">지급일</td>
                 <td th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}">총 급여</td>
-                <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}" style="color: red; font-weight: bold">총 공제 금액</td>
-                <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" style="color: green; font-weight: bold">실 지급액</td>
+                <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}" class="red">총 공제 금액</td>
+                <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" class="green">실 지급액</td>
                 <td th:text="${payslip.remarks}">비고</td>
             </tr>
             </tbody>

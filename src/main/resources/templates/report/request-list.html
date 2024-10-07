@@ -4,8 +4,8 @@
       layout:decorate="~{fragments/layout :: layout(title='요청 조회')}">
 
 <th:block layout:fragment="css">
-    <style>
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common/table.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -91,24 +91,24 @@
         <table class="list">
             <thead>
             <tr>
-                <th>작성한 보고서</th>
+                <th>요청 사항</th>
                 <th>요청자</th>
                 <th>마감 기한</th>
                 <th>요청 일자</th>
-                <th>요청 사항</th>
+                <th>작성한 보고서</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="request : ${requests}" th:requestId="${request.requestId}">
+                <td class="view" th:text="${request.requestNote}"></td>
+                <td class="view" th:text="${request.requesterName}"></td>
+                <td class="view" th:text="${request.dueDate}"></td>
+                <td class="view dateTime" th:text="${request.requestDate}"></td>
                 <td>
                     <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
                        th:onclick="openModal('/report/requestedReport/' + this.getAttribute('reportId'))">조회</a>
                     <a th:if="${request.reportId == null}" th:href="@{/report/writeFromRequest(requestId=${request.requestId})}">작성하기</a>
                 </td>
-                <td class="view" th:text="${request.requesterName}"></td>
-                <td class="view" th:text="${request.dueDate}"></td>
-                <td class="view dateTime" th:text="${request.requestDate}"></td>
-                <td class="view" th:text="${request.requestNote}"></td>
             </tr>
             </tbody>
         </table>

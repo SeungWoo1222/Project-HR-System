@@ -6,6 +6,8 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -88,13 +90,12 @@
                 <th>사원 ID</th>
                 <th>이름</th>
                 <th>생년월일</th>
-                <th>전화번호</th>
-                <th>이메일</th>
                 <th>부서</th>
                 <th>직급</th>
-                <th>입사일</th>
                 <th>상태</th>
-                <th>남은 연차</th>
+                <th>전화번호</th>
+                <th>이메일</th>
+                <th>입사일</th>
             </tr>
             </thead>
             <tbody>
@@ -107,13 +108,16 @@
                 <td th:text="${employee.employeeId}">사원 ID</td>
                 <td th:text="${employee.name}">이름</td>
                 <td th:text="${employee.birth}">생년월일</td>
-                <td th:text="${employee.phone}">전화번호</td>
-                <td th:text="${employee.email}">이메일</td>
                 <td th:text="${employee.department.name}">부서</td>
                 <td th:text="${employee.position.name}">직급</td>
+                <td th:text="${employee.status}"
+                    th:classappend="${employee.status == '재직'} ? 'green' :
+                                    (${employee.status == '퇴사'} ? 'red' :
+                                    (${employee.status == '퇴사 예정'} ? 'orange' :
+                                    (${employee.status == '휴직'} ? 'yellow' : '')))">상태</td>
+                <td th:text="${employee.phone}">전화번호</td>
+                <td th:text="${employee.email}">이메일</td>
                 <td th:text="${employee.hireDate}">입사일</td>
-                <td th:text="${employee.status}">상태</td>
-                <td th:text="${employee.remainingLeave}">남은 연차</td>
             </tr>
             </tbody>
         </table>

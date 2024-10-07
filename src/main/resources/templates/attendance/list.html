@@ -7,7 +7,8 @@
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/pagination.css}" rel="stylesheet">
-    <link th:href="@{/css/attendance/status.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -136,12 +137,12 @@
                 <td th:text="${attendance.employee?.department.name}">부서</td>
                 <td th:text="${attendance.employee?.position.name}">직급</td>
                 <td th:text="${attendance.status}"
-                    th:classappend="${attendance.status == '출근'} ? 'present' :
-                                    (${attendance.status == '결근'} ? 'absent' :
-                                    (${attendance.status == '지각'} ? 'late' :
-                                    (${attendance.status == '조퇴'} ? 'early-leave' :
-                                    (${attendance.status == '출장'} ? 'business-trip' :
-                                    (${attendance.status == '휴가'} ? 'vacation' : '')))))">근태 상태</td>
+                    th:classappend="${attendance.status == '출근'} ? 'green' :
+                                    (${attendance.status == '결근'} ? 'red' :
+                                    (${attendance.status == '지각'} ? 'orange' :
+                                    (${attendance.status == '조퇴'} ? 'yellow' :
+                                    (${attendance.status == '출장'} ? 'purple' :
+                                    (${attendance.status == '휴가'} ? 'skyblue' : '')))))">근태 상태</td>
                 <td th:text="${#temporals.format(attendance.date, 'yy년 MM월 dd일')}">날짜</td>
                 <td th:text="${#temporals.format(attendance.checkIn, 'HH:mm')}">출근 시간</td>
                 <td th:text="${#temporals.format(attendance.checkOut, 'HH:mm')}">퇴근 시간</td>

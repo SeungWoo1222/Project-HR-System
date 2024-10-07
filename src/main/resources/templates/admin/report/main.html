@@ -4,7 +4,8 @@
       layout:decorate="~{fragments/layout :: layout(title='')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout/layout.css}">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -79,8 +80,8 @@
 
         <!-- 작성 요청 목록 -->
         <h1>보고서 작성된 요청 목록</h1>
-        <div class="list">
-            <table>
+        <div>
+            <table class="list">
                 <thead>
                 <tr>
                     <th>작성된 보고서</th>
