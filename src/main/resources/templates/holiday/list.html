@@ -6,6 +6,7 @@
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
     <style>
         .list {
             width: 70%;
@@ -59,8 +60,8 @@
                     <td th:text="${holiday.holidayId}"></td>
                     <td th:text="${holiday.dateName}"></td>
                     <td th:text="${#temporals.format(holiday.locDate, 'yyyy년 MM월 dd일')}"></td>
-                    <td><button type="button" th:holidayId="${holiday.holidayId}" th:onclick="openModal('/holiday/edit/' + this.getAttribute('holidayId'))">수정</button></td>
-                    <td><button type="button" th:holidayId="${holiday.holidayId}" th:onclick="deleteHoliday(this.getAttribute('holidayId'))">삭제</button></td>
+                    <td><button type="button" class="inner-btn tomato-btn" th:holidayId="${holiday.holidayId}" th:onclick="openModal('/holiday/edit/' + this.getAttribute('holidayId'))">수정</button></td>
+                    <td><button type="button" class="inner-btn red-btn" th:holidayId="${holiday.holidayId}" th:onclick="deleteHoliday(this.getAttribute('holidayId'))">삭제</button></td>
                 </tr>
                 </tbody>
             </table>

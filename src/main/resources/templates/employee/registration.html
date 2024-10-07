@@ -5,6 +5,8 @@
 
 <th:block layout:fragment="css">
   <link rel="stylesheet" th:href="@{/css/employee/employee.css}"/>
+  <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+  <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -61,7 +63,7 @@
       <div class="form-group">
         <label for="address">주소</label>
         <input type="text" id="address" name="address" readonly>
-        <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
+        <input type="button" class="btn" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
       </div>
       <div class="form-group">
         <label for="detailAddress">상세 주소</label>
@@ -109,10 +111,10 @@
       </div>
       <div class="form-group">
         <label for="hireDate">입사일</label>
-        <input type="date" id="hireDate" name="hireDate">
+        <input type="datetime-local" id="hireDate" name="hireDate">
       </div>
       <div class="error-message"></div>
-      <button type="submit" class="btn">등록</button>
+      <button type="submit">등록</button>
     </form>
   </div>
 </div>
