@@ -8,34 +8,55 @@
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/table.css}" rel="stylesheet">
     <link th:href="@{/css/common/color.css}" rel="stylesheet">
+    <link th:href="@{/css/common/search.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/employee/employee.js}"></script>
     <script th:src="@{/js/employee/employee-detail-edit.js}"></script>
+    <script>
+        function togglePassword() {
+            const passwordMasked = document.getElementById('password-masked'); // 마스킹된 비밀번호 (*)
+            const passwordRaw = document.getElementById('password-raw');       // 실제 비밀번호
+            const togglePasswordBtn = document.getElementById('togglePasswordBtn'); // 보이기/숨기기 버튼
+            let isVisible = togglePasswordBtn.textContent !== '보기';
+
+            // 버튼 클릭 시 비밀번호 표시/감추기
+            if (isVisible) {
+                passwordRaw.style.display = 'none';
+                passwordMasked.style.display = 'block';
+                togglePasswordBtn.textContent = '보기';
+            } else {
+                passwordRaw.style.display = 'block';
+                passwordMasked.style.display = 'none';
+                togglePasswordBtn.textContent = '숨기기';
+            }
+        }
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form th:action="@{/employee/list}" method="get" id="pageSizeForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="department" th:value="${department}">
-                <input type="hidden" name="status" th:value="${status}">
-            </form>
-            <div class="search-option">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form th:action="@{/employee/list}" method="get" id="pageSizeForm">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">1개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <input type="hidden" name="status" th:value="${status}">
+                </form>
                 <form th:action="@{/employee/list}" method="get" id="statusForm">
                     <input type="hidden" name="page" th:value="1"/>
                     <input type="hidden" name="size" th:value="${pageSize}"/>
                     <input type="hidden" name="keyword" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
+                    <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
                         <option value="" th:selected="${status == ''}" disabled>재직 상태</option>
                         <option th:value="재직" th:text="재직" th:selected="${status == '재직'}">재직</option>
                         <option th:value="휴직" th:text="휴직" th:selected="${status == '휴직'}">휴직</option>
@@ -43,15 +64,22 @@
                         <option th:value="퇴사예정" th:text="퇴사예정" th:selected="${status == '퇴사예정'}">퇴사 예정</option>
                     </select>
                 </form>
-                <form th:action="@{/employee/list}" method="get">
+            </div>
+            <div class="content-header-center"></div>
+            <div class="content-header-right">
+                <form th:action="@{/employee/list}" class="search-form" method="get">
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="status" th:value="${status}">
-                    <button type="submit">검색</button>
+                    <button type="submit" class="search-btn">
+                        <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                    </button>
                 </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/employee/list'"/>
+                <button type="button" class="reset-btn" onclick="window.location.href='/employee/list'">
+                    <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화"/>
+                </button>
             </div>
         </div>
         <form th:action="@{/employee/list}" method="get" id="department-nav">

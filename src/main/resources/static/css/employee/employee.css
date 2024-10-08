@@ -1,21 +1,66 @@
-.employee-picture {
-    width : 280px;
-    height: 360px;
+/* detail */
+.detail-wrapper {
+    width: 756px;
 }
 
-.file-area .file-list .filebox {
+.picture-area {
+    width : 188px;
+    height: 264px;
+    border-top: black 1px solid;
+    border-left: black 1px solid;
+    flex-shrink: 0;
+}
+
+.picture-area img {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-container {
+    margin: 10px 40px 15px 0;
     display: flex;
+    justify-content: left;
     align-items: center;
-    margin-bottom: 10px;
+    gap: 15px
 }
 
-.file-area .file-list .filebox p {
-    font-size: 14px;
-    margin: 0;
-    display: inline-block;
+.detail-container table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
-.file-area .file-list .delete .delete-btn {
-    margin-left: 10px;
-    cursor: pointer;
+.detail-container td {
+    padding: 4px 6px;
+    border-top: 1px solid #000;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+}
+
+.none-border-top {
+    border-top: none !important;
+}
+
+.last-td {
+    border-bottom: 1px solid #000;
+}
+
+.section-title {
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.personal-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.sub-text {
+    font-size: 13px;
+}
+
+.w-25 {
+    width: 25%;
 }

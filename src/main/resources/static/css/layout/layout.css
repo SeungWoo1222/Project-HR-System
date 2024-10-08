@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    line-height: 1.5;
 }
 
 img {
@@ -12,6 +13,14 @@ img {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+p {
+    margin: 0;
 }
 
 .container {
@@ -55,7 +64,6 @@ img {
 }
 
 .sidebar p {
-    margin: 0;
     padding: 0;
 }
 

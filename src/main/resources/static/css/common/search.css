@@ -48,10 +48,6 @@
 }
 
 .search-text {
-
-}
-
-.search-text {
     width: 150px;
     padding: 10px;
     border: 2px solid #eaeaea;
@@ -96,8 +92,9 @@
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-grow: 1;
-    gap: 5px;
+    gap: 30px;
     margin-top: 10px;
 }
 
@@ -105,6 +102,8 @@
     text-decoration: none;
     color: #808080;
     cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
 }
 
 .pagination .active {
@@ -113,8 +112,9 @@
 }
 
 .page-area {
-    margin-top: 2px;
+    margin-bottom: 2px;
 }
+
 .btn-container {
     margin-left: auto;
 }
