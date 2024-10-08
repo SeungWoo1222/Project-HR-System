@@ -52,11 +52,13 @@ form {
     box-sizing: border-box;
     border: 1px solid #e4e4e4;
     border-radius: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-group input:focus {
-    border-color: #000000;
+    border-color: #18a8f1;
     outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .btn {
@@ -107,5 +109,4 @@ form {
 .custom-checkbox:hover {
     background-color: #f0f0f0;
 }
-
 
