@@ -140,7 +140,7 @@
                 <tr>
                     <td class="section-title">전화번호</td>
                     <td>
-                        <input type="tel" id="tripTel" th:value="${trip.contactTel}" placeholder="전화번호 입력">
+                        <input id="tripTel" type="text" th:value="${trip.contactTel}" oninput="localAutoHyphen(this)" maxlength="13" placeholder="전화번호를 입력하세요"/>
                     </td>
                 </tr>
                 <tr>

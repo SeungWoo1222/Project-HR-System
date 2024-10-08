@@ -74,8 +74,6 @@ public class ReportDAO {
 
     // 내가 쓴 보고서 검색
     public List<Report> search(String keyword, int pageSize, int offset, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
-        log.info("DAO searchType: {}", searchType);
-        log.info("DAO keyword: {}", keyword);
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);

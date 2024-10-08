@@ -120,7 +120,7 @@
                 e.name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="keyword != null and keyword != '' and searchType == 1">
+            <if test="keyword != null and keyword != '' and searchType == 1">a
                 AND (
                 request_note LIKE CONCAT('%', #{keyword}, '%')
                 )

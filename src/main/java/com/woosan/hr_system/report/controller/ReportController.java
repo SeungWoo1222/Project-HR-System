@@ -104,11 +104,6 @@ public class ReportController {
         LocalDateTime currentTime = userSessionInfo.getNow();
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
-        log.info("생성 컨트롤러 도착");
-
-        for (MultipartFile multipartFile : reportDocuments) {
-            log.info("보고서 파일 : {}", multipartFile);
-        }
 
         if (reportDocuments == null || reportDocuments.isEmpty()) {
             reportService.createReport(report);
@@ -181,8 +176,6 @@ public class ReportController {
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        log.info("컨트롤러 searchType: {}", searchType);
-        log.info("컨트롤러 keyword: {}", keyword);
 
         // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();

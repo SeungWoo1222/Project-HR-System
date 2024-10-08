@@ -56,7 +56,6 @@ public class ExecutiveController {
                               @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               Model model) throws JsonProcessingException {
-        log.info("컨트롤러 - 시작날짜 {}, 마지막날짜 {}, IDList{}", startDate, endDate, writerIdList);
         // 로그인한 계정 기준 employee_id를 approvalId(결재자)와 requestId(요청자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String employeeId = userSessionInfo.getCurrentEmployeeId();
@@ -126,7 +125,6 @@ public class ExecutiveController {
                                   @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                   @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        log.info("컨트롤러로 오는 size : {}", size);
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String requesterId = userSessionInfo.getCurrentEmployeeId();
@@ -154,8 +152,6 @@ public class ExecutiveController {
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
-        log.info("searchType : {}", searchType);
-        log.info("keyword : {}", keyword);
         // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String approverId = userSessionInfo.getCurrentEmployeeId();
@@ -213,7 +209,6 @@ public class ExecutiveController {
             endDate = LocalDate.parse((String) payload.get("endDate"));
         }
 
-        log.info("업데이트 요청 수신 - 시작 날짜: {}, 종료 날짜: {}, 선택된 임원 목록: {}", startDate, endDate, writerIdList);
         // 통계 데이터 조회
         List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerIdList);
         return prepareStatsResponse(stats);

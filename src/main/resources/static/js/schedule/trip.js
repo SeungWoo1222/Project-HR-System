@@ -127,23 +127,78 @@ function validateTripInfo() {
             return false;
         }
         if (!contactTel) {
-            errorMessage.textContent = '전화번호를 입력해주세요.';
+            errorMessage.textContent = "전화번호를 입력해주세요";
+            return false;
+        }
+        // 전화번호 검사
+        const telValidationResult = validatePhoneNumber(contactTel);
+        if (telValidationResult) {
+            errorMessage.textContent = telValidationResult;
             return false;
         }
         if (contactEmail.startsWith('@') || contactEmail.endsWith('@')) {
             errorMessage.textContent = '이메일을 입력해주세요.';
             return false;
         }
-        // 이메일 형식 확인 (@뒤에 도메인이 있는지 확인, .com 등 형식 체크)
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(contactEmail)) {
-            errorMessage.textContent = '유효한 이메일을 입력해주세요.';
+        // 이메일 검사
+        const emailValidationResult = validateEmail();
+        if (emailValidationResult) {
+            errorMessage.textContent = emailValidationResult;
             return false;
         }
-
     }
 
     return true;
+}
+
+// 전화번호 유효성 검사 함수 추가
+function validatePhoneNumber(phoneNumber) {
+    const cleaned = phoneNumber.replace(/[^0-9]/g, ''); // 숫자만 남기기
+
+    // 유효한 시작 번호 패턴 (지역번호 또는 휴대전화 번호 패턴)
+    const validStartPatterns = /^(010\d{8}|02\d{7,8}|0[3-6][1-5]\d{6,7})$/;
+
+    // 자릿수 확인: 9자리 이상 11자리 이하
+    const isValidLength = cleaned.length >= 9 && cleaned.length <= 11;
+    if (!isValidLength) {
+        return "전화번호 자리 수는 9자리 이상 11자리 이하입니다."
+    }
+
+    // 시작 번호가 올바른지 확인
+    const isValidStart = validStartPatterns.test(cleaned);
+    if (!isValidStart) {
+        return "지역번호 또는 휴대전화 번호 형태가 아닙니다."
+    }
+
+    // 최종 유효성 결과 반환
+    return "";
+}
+
+// 이메일 유효성 검사 함수
+function validateEmail() {
+    const emailLocalPart = document.getElementById('emailLocalPart').value;
+    const domainInput = document.getElementById('domainInput').value;
+
+    // 이메일 아이디 부분 유효성 검사
+    const localPartRegex = /^[a-zA-Z0-9._-]*$/;
+    if (!localPartRegex.test(emailLocalPart)) {
+        return "이메일 아이디는 영어, 특수문자(. _ -)로 입력해주세요.";
+    }
+
+    // 도메인 부분 유효성 검사
+    const domainRegex = /^[a-zA-Z0-9.]*$/;
+    if (!domainRegex.test(domainInput)) {
+        return "이메일 도메인은 '주소.com' 형태로 입력해주세요.";
+    }
+
+    // 이메일 전체 유효성 검사
+    const fullEmail = emailLocalPart + '@' + domainInput;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(fullEmail)) {
+        return "유효한 이메일 형식이 아닙니다.";
+    }
+
+    return ""; // 모든 검사를 통과했을 때 빈 문자열 반환
 }
 
 function getEmail() {
