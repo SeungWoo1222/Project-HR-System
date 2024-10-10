@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='사원 등록')}">
+
+<th:block layout:fragment="css">
+  <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+  <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+  <link rel="stylesheet" th:href="@{/css/employee/register.css}"/>
+</th:block>
+
+<th:block layout:fragment="script">
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script th:src="@{/js/common/daum-postcode-API.js}"></script>
+  <script th:src="@{/js/common/file.js}"></script>
+  <script th:src="@{/js/employee/employee.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+  <div class="content">
+    <form th:action="@{/api/employee/register}" onsubmit="submitInsertForm(event)" enctype="multipart/form-data">
+      <div class="section upper-part">
+        <div class="form-group">
+          <div id="picture-area" class="picture-area">
+            <img id="employee-picture" class="employee-picture"/>
+          </div>
+          <div class="file-area">
+            <p>사진은 10MB까지 업로드 가능합니다.</p>
+            <p>파일 형식은 JPEG, PNG, SVG, WebP, HEIF만을 지원합니다.</p>
+            <div class="upload-area" id="uploadArea">
+              <div id="file-name" class="file-name">파일 정보가 없습니다.</div>
+              <div class="file-btn-area">
+                <label for="picture" class="input-file-btn">사진 업로드</label>
+              </div>
+              <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="form-group">
+          <div class="label-area"><label for="name">이름</label></div>
+          <input type="text" id="name" name="name" maxlength="100" placeholder="한글 또는 영문 이름을 입력해주세요.">
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="birth">주민등록번호</label></div>
+          <input type="text" id="birth" name="birth" maxlength="6" placeholder="생년월일 6자리">
+          <div class="characters">ㅡ</div>
+          <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber" maxlength="7">
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="phone">전화번호</label></div>
+          <input type="text" class="phoneInput" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요.">
+          <input type="hidden" id="phone" name="phone">
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="emailLocal">이메일</label></div>
+          <input type="text" id="emailLocal" name="emailLocal">
+          <div class="characters">@</div>
+          <input type="text" id="customEmailDomain" name="customEmailDomain">
+          <select id="emailDomain" name="emailDomain" onchange="updateCustomField()">
+            <option value="custom">직접입력</option>
+            <option value="naver.com">naver.com</option>
+            <option value="gmail.com">gmail.com</option>
+            <option value="icloud.com">icloud.com</option>
+            <option value="outlook.com">outlook.com</option>
+            <option value="nate.com">nate.com</option>
+            <option value="daum.net">daum.net</option>
+            <option value="yahoo.com">yahoo.com</option>
+          </select>
+          <input type="hidden" id="email" name="email">
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="address">주소</label></div>
+          <input type="text" id="address" name="address" placeholder="우편번호 찾기를 클릭해주세요." readonly>
+          <div class="inner-btn-area"><input type="button" class="inner-btn blue-btn" onclick="execDaumPostcode()" value="우편번호 찾기"></div>
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="detailAddress">상세 주소</label></div>
+          <input type="text" id="detailAddressInput" name="detailAddressInput" placeholder="상세 주소를 입력해주세요.">
+          <input type="text" id="extraAddress" placeholder="(참고항목)" readonly>
+          <input type="hidden" id="detailAddress" name="detailAddress">
+        </div>
+      </div>
+      <div class="section">
+        <div class="form-group">
+          <div class="label-area"><label>결혼 상태</label></div>
+          <div class="radio-group" id="radioGroup">
+            <input type="radio" class="hidden-radio" id="marriedYes" name="maritalStatus" value="1" onchange="updateDependents()">
+            <label for="marriedYes" class="radio-label">기혼</label>
+            <input type="radio" class="hidden-radio" id="marriedNo" name="maritalStatus" value="0" onchange="updateDependents()">
+            <label for="marriedNo" class="radio-label">미혼 또는 이혼</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="fgw-50">
+            <div class="label-area"><label for="numDependents">부양 가족 수</label> <span style="font-size: 12px">(본인 포함)</span></div>
+            <input type="number" id="numDependents" name="numDependents" min="1" max="11" value="1">
+            <div class="characters">인</div>
+          </div>
+          <div class="fgw-50">
+            <div class="label-area"><label for="numChildren">8세 이상 20세 이하 자녀 수</label></div>
+            <input type="number" id="numChildren" name="numChildren" min="0" max="11" value="0">
+            <div class="characters">명</div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="form-group">
+          <div class="fgw-50">
+            <div class="label-area"><label for="department">부서</label></div>
+            <select id="department" name="department">
+              <option value="">선택하세요</option>
+              <option value="PR">생산</option>
+              <option value="QC">품질관리</option>
+              <option value="SA">영업</option>
+              <option value="MK">마케팅</option>
+              <option value="FI">재무</option>
+              <option value="HR">인사</option>
+              <option value="RD">연구개발</option>
+            </select>
+          </div>
+          <div class="fgw-50">
+            <div class="label-area"><label for="position">직위</label></div>
+            <select id="position" name="position">
+              <option value="">선택하세요</option>
+              <option value="사원">사원</option>
+              <option value="대리">대리</option>
+              <option value="과장">과장</option>
+              <option value="차장">차장</option>
+              <option value="부장">부장</option>
+              <option value="사장">사장</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="label-area"><label for="hireDate">입사일</label></div>
+          <input type="date" id="hireDate" name="hireDate">
+        </div>
+      </div>
+      <div id="error-message" class="error-message"></div>
+      <div class="btn-container">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">등록</button>
+      </div>
+    </form>
+  </div>
+</div>
+</html>

@@ -46,7 +46,6 @@
 }
 
 .input-file-btn {
-    width : 280px;
     font-size: 13px;
     padding: 10px;
     background-color: #cfedfc;
@@ -90,4 +89,10 @@
 
 .blue-btn {
     background-color: #1386C1;
+}
+
+.inner-btn-area {
+    margin: 5px 10px;
+    display: flex;
+    align-items: center;
 }

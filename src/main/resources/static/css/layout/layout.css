@@ -186,7 +186,7 @@ p {
 }
 
 .content-container {
-    height: calc(100vh - 160px);
+    height: auto;
     display: flex;
     justify-content: center;
     background-color: #fff;

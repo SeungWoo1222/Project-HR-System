@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee/employee.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
     <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
     <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
     <style>
@@ -16,7 +16,8 @@
 
 <div class="detail-wrapper">
     <div class="btn-container">
-        <button type="button" class="inner-btn tomato-btn" th:employeeId="${employee.employeeId}"
+        <button type="button"
+                class="inner-btn tomato-btn" th:employeeId="${employee.employeeId}"
                                                 onclick="editEmployee(this)">사원 정보 수정</button>
         <button type="button" class="inner-btn tomato-btn" th:employeeId="${employee.employeeId}"
                                                 th:if="${employee.status} == '퇴사'"
@@ -154,7 +155,8 @@
         </div>
         <div class="section">
             <table th:if="${employee.salary == null}">
-                <td>현재 등록된 급여 정보가 없습니다.</td>
+                <td class="section-title last-td w-25">급여 정보</td>
+                <td class="last-td" colspan="3">현재 등록된 급여 정보가 없습니다.</td>
             </table>
             <table th:if="${employee.salary != null}">
                 <tr>

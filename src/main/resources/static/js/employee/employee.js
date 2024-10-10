@@ -1,9 +1,8 @@
-let errorMessage;
-
 // 유효성 검사 - 사원 등록, 사원 정보 수정
 function validateForm(event) {
     event.preventDefault();
 
+    const pic = document.getElementById("picture").files;
     const name = document.getElementById("name").value.trim();
     const birth = document.getElementById("birth").value.trim();
     const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
@@ -19,77 +18,90 @@ function validateForm(event) {
     const position = document.getElementById("position").value;
     const hireDate = document.getElementById("hireDate").value;
 
+    let errorMessage = document.getElementById("error-message");
+
     if (errorMessage) {
         errorMessage.textContent = "";
     } else {
         console.error("에러 메세지 요소를 찾을 수 없습니다.");
     }
 
-    if (name === "" || !validateName(name)) {
-        errorMessage.textContent = "유효한 이름을 입력해주세요. (한글 또는 영어만 허용)";
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
+    }
+
+    // 각 필드 유효성 검사
+    if (pic.length === 0) {
+        return showError("uploadArea", "사원 사진을 업로드해주세요");
+    }
+    if (name === "" || !validateName(name)) {
+        return showError("name", "유효한 이름을 입력해주세요. (한글 또는 영어만 허용)", true);
     }
     if (!validateBirthDate(birth)) {
-        errorMessage.textContent = "유효한 생년월일(6자리 숫자)을 입력해주세요.";
-        return false;
+        return showError("birth", "유효한 생년월일(6자리 숫자)을 입력해주세요.", true);
     }
     if (residentRegistrationNumber === "" || residentRegistrationNumber.length !== 7 || !/^\d+$/.test(residentRegistrationNumber)) {
-        errorMessage.textContent = "유효한 주민번호 뒷자리(7자리 숫자)를 입력해주세요.";
-        return false;
+        return showError("residentRegistrationNumber", "유효한 주민번호 뒷자리(7자리 숫자)를 입력해주세요.", true);
     }
     if (phoneInput === "" || !/^\d{11}$/.test(phoneInput)) {
-        errorMessage.textContent = "'-'를 제외한 유효한 전화번호를 입력해주세요.";
-        return false;
+        return showError("phoneInput", "'-'를 제외한 유효한 전화번호를 입력해주세요.", true);
     }
     if (emailLocal === "") {
-        errorMessage.textContent = "이메일을 입력해주세요.";
-        return false;
+        return showError("emailLocal", "이메일을 입력해주세요.", true);
     }
     if (emailDomain === "") {
-        errorMessage.textContent = "이메일 도메인을 선택해주세요.";
-        return false;
+        return showError("emailDomain", "이메일 도메인을 선택해주세요.");
     }
-    if (emailDomain === 'custom') {
-        if (document.getElementById("customEmailDomain").value.trim() === "") {
-            errorMessage.textContent = "이메일 도메인을 입력해주세요.";
-            return false;
-        }
+    if (emailDomain === 'custom' && document.getElementById("customEmailDomain").value.trim() === "") {
+        return showError("customEmailDomain", "이메일 도메인을 입력해주세요.", true);
     }
     if (address === "") {
-        errorMessage.textContent = "주소를 입력해주세요.";
-        return false;
+        return showError("address", "주소를 입력해주세요.", true);
     }
     if (detailAddressInput === "") {
-        errorMessage.textContent = "상세 주소를 입력해주세요.";
-        return false;
+        return showError("detailAddressInput", "상세 주소를 입력해주세요.", true);
     }
     if (!maritalStatus) {
-        errorMessage.textContent = "결혼 여부를 선택해주세요.";
-        return false;
+        return showError("radioGroup", "결혼 여부를 선택해주세요.");
     }
     if (numDependents === "" || !/^\d+$/.test(numDependents) || parseInt(numDependents) < 0) {
-        errorMessage.textContent = "유효한 부양 가족 수를 입력해주세요.";
-        return false;
+        return showError("numDependents", "유효한 부양 가족 수를 입력해주세요.");
     }
     if (numChildren === "" || !/^\d+$/.test(numChildren) || parseInt(numChildren) < 0) {
-        errorMessage.textContent = "유효한 자녀 수를 입력해주세요.";
-        return false;
+        return showError("numChildren", "유효한 자녀 수를 입력해주세요.");
     }
     if (parseInt(numChildren) > parseInt(numDependents)) {
-        errorMessage.textContent = "자녀 수는 부양 가족 수보다 많을 수 없습니다.";
-        return false;
+        return showError("numChildren", "자녀 수는 부양 가족 수보다 많을 수 없습니다.");
     }
     if (department === "") {
-        errorMessage.textContent = "부서를 선택해주세요.";
-        return false;
+        return showError("department", "부서를 선택해주세요.");
     }
     if (position === "") {
-        errorMessage.textContent = "직위를 선택해주세요.";
-        return false;
+        return showError("position", "직위를 선택해주세요.");
     }
     if (hireDate === "") {
-        errorMessage.textContent = "입사일을 선택해주세요.";
-        return false;
+        return showError("hireDate", "입사일을 선택해주세요.", true);
     }
 
     // DB 데이터 형식에 맞게 처리
