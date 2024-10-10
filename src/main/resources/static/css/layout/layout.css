@@ -187,6 +187,7 @@ p {
 
 .content-container {
     height: auto;
+    min-height: 85vh;
     display: flex;
     justify-content: center;
     background-color: #fff;
