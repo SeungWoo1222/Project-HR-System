@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -83,13 +84,13 @@ public class ScheduleController {
     }
 
     @GetMapping("/new2") // 본인 일정 등록 페이지
-    public String newScheduleForm(Model model) {
+    public String viewMyScheduleForm(Model model) {
         model.addAttribute("employee", employeeService.getEmployeeById(authService.getAuthenticatedUser().getUsername()));
         return "schedule/new2";
     }
 
     @GetMapping("/{taskId}/edit") // 일정 수정 페이지
-    public String newScheduleForm(@PathVariable("taskId") int taskId, Model model) {
+    public String viewEditScheduleForm (@PathVariable("taskId") int taskId, Model model) {
         Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", scheduleInfo);
         BusinessTrip trip = businessTripService.getBusinessTripById(taskId);
@@ -115,7 +116,6 @@ public class ScheduleController {
     public ResponseEntity<String> insertSchedule(@Valid @ModelAttribute Schedule schedule,
                                                  @Valid @ModelAttribute BusinessTrip businessTrip,
                                                  Errors errors) {
-        log.info("일정 등록 컨트롤러 도착");
         // 유효성 검사가 실패했을 경우 처리
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors.getAllErrors().get(0).getDefaultMessage());
@@ -131,22 +131,24 @@ public class ScheduleController {
         return ResponseEntity.ok("일정 생성이 완료되었습니다.");
     }
 
+    @Transactional
     @PutMapping("/edit") // 일정 수정
     public ResponseEntity<String> updateSchedule(@Valid @ModelAttribute Schedule schedule,
                                                  @Valid @ModelAttribute BusinessTrip businessTrip,
                                                  Errors errors) {
+        log.info("schedule 형태 : {}", schedule);
+        log.info("businessTrip 형태 : {}", businessTrip);
         // 유효성 검사가 실패했을 경우 처리
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
         scheduleService.updateSchedule(schedule);
+        // 출장이 없던 일정에 출장지가 생긴 경우를 대비하여 taskId를 설정해줌
+        businessTrip.setTaskId(schedule.getTaskId());
 
-        if (businessTrip.getAddress() != null) {
-            ResponseEntity<String> response =  businessTripService.updateBusinessTrip(businessTrip);
-            return response;
-        }
-        return ResponseEntity.ok("일정 수정이 완료되었습니다.");
+        ResponseEntity<String> response =  businessTripService.updateBusinessTrip(businessTrip);
+        return response;
     }
 
     // 일정 삭제

@@ -109,12 +109,14 @@
         </table>
 
         <!-- 출장 정보 표시 -->
-        <button id="addTripButton" th:if="${trip} == null" type="button" onclick="addTripFields()">출장지 추가</button>
-        <button id="closeTripButton" type="button" onclick="closeTripFields()" style="display:none" >출장지 제거</button>
+        <button class="addTripButton" th:if="${trip} == null" type="button" onclick="addTripFields()">출장지 추가</button>
+        <button class="closeTripButton" th:if="${trip} == null" type="button" onclick="closeTripFields()" style="display:none" >출장지 제거</button>
 
         <div th:if="${trip} != null">
             <h3>출장 정보</h3>
-            <input type="hidden" id="tripId" th:value="${trip.tripId}" >
+            <button class="closeTripButton" type="button" onclick="closeTripFields()">출장지 제거</button>
+            <button class="addTripButton" type="button" onclick="addTripFields()" style="display:none">출장지 추가</button>
+            <input type="hidden" id="tripId" th:value="${trip.tripId}">
             <table id="tripTable" class="details">
                 <tr>
                     <td class="section-title">주소</td>
@@ -151,7 +153,7 @@
                     <td class="section-title">이메일</td>
                     <td>
                         <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"
-                               th:value="${emailLocalPart}" required> @
+                               th:value="${emailLocalPart}"> @
                         <select id="domainSelect">
                             <option value="" disabled>도메인 선택</option>
                             <option value="naver.com" th:selected="${emailDomainPart == 'naver.com'}">naver.com</option>

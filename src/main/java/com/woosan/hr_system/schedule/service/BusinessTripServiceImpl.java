@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -74,29 +76,52 @@ public class BusinessTripServiceImpl implements BusinessTripService {
 
     @Override
     public ResponseEntity <String> updateBusinessTrip(BusinessTrip businessTrip) {
-        // 이메일 도메인 부분 추출
-        String domain = businessTrip.getContactEmail().substring(businessTrip.getContactEmail().indexOf("@") + 1);
+        log.info("taskId 확인 : {}", businessTrip.getTaskId());
+        BusinessTrip existingBusinessTrip = businessTripDAO.getBusinessTripById(businessTrip.getTaskId());
+        log.info("existingBusinessTrip 호출 : {}", existingBusinessTrip);
 
-        boolean validEmailresult = isValidEmailDomain(domain);
-        if (!validEmailresult) {
-            return ResponseEntity.badRequest().body("유효하지 않은 이메일 도메인입니다.");
+        if (Objects.nonNull(existingBusinessTrip)) {
+            if (Objects.isNull(businessTrip.getAddress())) {
+                log.info("O X인 경우");
+                businessTripDAO.deleteBusinessTrip(existingBusinessTrip.getTripId());
+            } else {
+                log.info("O O인 경우");
+                // 이메일 도메인 유효성 검사
+                String domain = businessTrip.getContactEmail().substring(businessTrip.getContactEmail().indexOf("@") + 1);
+
+                boolean validEmailresult = isValidEmailDomain(domain);
+                if (!validEmailresult) {
+                    return ResponseEntity.badRequest().body("유효하지 않은 이메일 도메인입니다.");
+                }
+
+                // 빌더 패턴을 사용하여 기존 스케줄에서 수정된 부분만 반영하여 새 객체 생성
+                BusinessTrip newBusinessTrip = existingBusinessTrip.toBuilder()
+                        .address(Optional.ofNullable(businessTrip.getAddress()).orElse(existingBusinessTrip.getAddress()))
+                        .detailedAddress(Optional.ofNullable(businessTrip.getDetailedAddress()).orElse(existingBusinessTrip.getDetailedAddress()))
+                        .tripName(Optional.ofNullable(businessTrip.getTripName()).orElse(existingBusinessTrip.getTripName()))
+                        .contactTel(Optional.ofNullable(businessTrip.getContactTel()).orElse(existingBusinessTrip.getContactTel()))
+                        .contactEmail(Optional.ofNullable(businessTrip.getContactEmail()).orElse(existingBusinessTrip.getContactEmail()))
+                        .note(Optional.ofNullable(businessTrip.getNote()).orElse(existingBusinessTrip.getNote()))
+                        .build();
+
+                newBusinessTrip.setTripId(existingBusinessTrip.getTripId());
+
+                businessTripDAO.updateBusinessTrip(newBusinessTrip);
+            }
+        } else {
+            log.info("X O인 경우");
+            // 이메일 도메인 유효성 검사
+            String domain = businessTrip.getContactEmail().substring(businessTrip.getContactEmail().indexOf("@") + 1);
+
+            boolean validEmailresult = isValidEmailDomain(domain);
+            if (!validEmailresult) {
+                return ResponseEntity.badRequest().body("유효하지 않은 이메일 도메인입니다.");
+            }
+
+            businessTrip.setCreatedDate(LocalDateTime.now());
+            businessTripDAO.insertBusinessTrip(businessTrip);
         }
 
-        BusinessTrip existingBusinessTrip = businessTripDAO.getBusinessTripByTripId(businessTrip.getTripId());
-
-        // 빌더 패턴을 사용하여 기존 스케줄에서 수정된 부분만 반영하여 새 객체 생성
-        BusinessTrip newBusinessTrip = existingBusinessTrip.toBuilder()
-                .address(Optional.ofNullable(businessTrip.getAddress()).orElse(existingBusinessTrip.getAddress()))
-                .detailedAddress(Optional.ofNullable(businessTrip.getDetailedAddress()).orElse(existingBusinessTrip.getDetailedAddress()))
-                .tripName(Optional.ofNullable(businessTrip.getTripName()).orElse(existingBusinessTrip.getTripName()))
-                .contactTel(Optional.ofNullable(businessTrip.getContactTel()).orElse(existingBusinessTrip.getContactTel()))
-                .contactEmail(Optional.ofNullable(businessTrip.getContactEmail()).orElse(existingBusinessTrip.getContactEmail()))
-                .note(Optional.ofNullable(businessTrip.getNote()).orElse(existingBusinessTrip.getNote()))
-                .build();
-
-        newBusinessTrip.setTripId(existingBusinessTrip.getTripId());
-
-        businessTripDAO.updateBusinessTrip(newBusinessTrip);
         return ResponseEntity.ok("일정 수정이 완료되었습니다.");
     }
 

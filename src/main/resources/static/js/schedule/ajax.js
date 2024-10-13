@@ -12,10 +12,8 @@ function goToUpdateForm(taskId) {
 }
 
 function checkForUpdates() {
-    console.log("checkForUpdates 실행");
     const inputs = document.querySelectorAll('#editForm input, #editForm textarea, #editForm select');
     let isChanged = false;
-    console.log("inputs : ", inputs);
 
     inputs.forEach(input => {
         let currentValue = input.value;
@@ -32,11 +30,29 @@ function checkForUpdates() {
             defaultValue = input.querySelector('option[selected]') ? input.querySelector('option[selected]').value : null;
         }
 
-        console.log("수정 값, 기존 값", currentValue, defaultValue);
         if (currentValue !== defaultValue) {
             isChanged = true;
         }
     })
+
+    // 추가로 출장 정보의 값도 기본값과 비교
+    const addressInput = document.getElementById('sample6_address');
+    const detailedAddressInput = document.getElementById('sample6_detailAddress');
+    const tripNameInput = document.getElementById('tripName');
+    const contactTelInput = document.getElementById('tripTel');
+    const contactEmailInput = document.getElementById('emailLocalPart');
+
+    // console.log("addressInput 수정값 : ", addressInput.value);
+    // console.log("addressInput 기존값 : ", addressInput.defaultValue);
+    if (
+        addressInput.value !== addressInput.defaultValue ||
+        detailedAddressInput.value !== detailedAddressInput.defaultValue ||
+        tripNameInput.value !== tripNameInput.defaultValue ||
+        contactTelInput.value !== contactTelInput.defaultValue ||
+        contactEmailInput.value !== contactEmailInput.defaultValue
+    ) {
+        isChanged = true;  // 출장 정보가 변경된 경우
+    }
 
     if (!isChanged) {
         alert('변경 사항이 없습니다.');
@@ -68,7 +84,6 @@ function fetchEmployeeInfo(employeeId) {
 
 // 유효성 검사
 function validateForm() {
-    console.log("validateForm 실행");
 
     const taskName = document.getElementById('taskName').value.trim();
     const memberId = document.getElementById('memberId').value;
@@ -172,10 +187,6 @@ function submitInsertForm(event) {
             formData.append('note', document.getElementById('note').value);
         }
     }
-
-    formData.forEach((value, key) => {
-        console.log(key + ': ' + value);
-    });
 
     // 일정 등록
     if (confirm('새로운 일정을 등록하시겠습니까?')) {

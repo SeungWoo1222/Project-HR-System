@@ -51,8 +51,8 @@ public class BusinessTripDAO {
     }
 
     // 출장 정보 삭제
-    public void deleteBusinessTrip(int mapId) {
-        sqlSession.delete(NAMESPACE + "deleteBusinessTrip", mapId);
+    public void deleteBusinessTrip(int tripId) {
+        sqlSession.delete(NAMESPACE + "deleteBusinessTrip", tripId);
     }
 
     // 출장 정보 아카이브 테이블 삽입

@@ -3,9 +3,6 @@ function viewMap() {
     const address = document.getElementById('sample6_address').value;
     const detailAddress = document.getElementById('sample6_detailAddress').value;
 
-    console.log("address", address);
-    console.log("detailAddress", detailAddress);
-
     if (!address) {
         alert('주소를 입력하세요.');
         return;
@@ -100,14 +97,12 @@ function sample6_execDaumPostcode() {
 }
 
 function validateTripInfo() {
-    console.log("validateTripInfo 실행");
 
     const address = document.getElementById('sample6_address')?.value || '';
     const detailedAddress = document.getElementById('sample6_detailAddress')?.value || '';
     const tripName = document.getElementById('tripName')?.value || '';
     const contactTel = document.getElementById('tripTel')?.value || '';
     const contactEmail = getEmail().trim() || '';
-    console.log("contactEmail : ", contactEmail);
 
     if (address || detailedAddress || tripName || contactTel || contactEmail) {
         // 오류 메시지 초기화
@@ -214,8 +209,6 @@ function getEmail() {
 function addTripFields() {
     let tripFieldsContainer = document.getElementById('tripTable');
 
-    console.log("tripFieldsContainer 생성 전", tripFieldsContainer);
-
     if (!tripFieldsContainer) {
         // tripTable이 없으면 새롭게 생성
         tripFieldsContainer = document.createElement('table');
@@ -226,8 +219,6 @@ function addTripFields() {
         const detailContainer = document.querySelector('.detail-container'); // 적절한 부모 요소 선택
         detailContainer.appendChild(tripFieldsContainer);  // 부모 요소에 추가
     }
-
-    console.log("tripFieldsContainer 생성 후", tripFieldsContainer);
 
     const tripFieldsHTML = `
             <tr>
@@ -282,12 +273,21 @@ function addTripFields() {
     // 새로운 HTML 추가
     tripFieldsContainer.innerHTML = tripFieldsHTML;
     tripFieldsContainer.style.display = 'block';
-    document.getElementById('addTripButton').style.display = 'none';
-    document.getElementById('closeTripButton').style.display = 'block';
+    document.querySelector('.addTripButton').style.display = 'none';
+    document.querySelector('.closeTripButton').style.display = 'block';
 }
 
 function closeTripFields() {
     document.getElementById('tripTable').style.display = 'none';
-    document.getElementById('closeTripButton').style.display = 'none';
-    document.getElementById('addTripButton').style.display= 'block';
+    document.querySelector('.closeTripButton').style.display = 'none';
+    document.querySelector('.addTripButton').style.display= 'block';
+
+    // 출장 정보 필드를 비워서 제출되지 않도록 설정
+    document.getElementById('sample6_address').value = '';
+    document.getElementById('sample6_detailAddress').value = '';
+    document.getElementById('tripName').value = '';
+    document.getElementById('tripTel').value = '';
+    document.getElementById('emailLocalPart').value = '';
+    document.getElementById('domainSelect').value = '';
+    document.getElementById('domainInput').value = '';
 }
