@@ -11,7 +11,7 @@
         <result property="detailedAddress" column="detailed_address" />
         <result property="createdDate" column="created_date" />
         <result property="status" column="status" />
-        <result property="clientName" column="client_name" />
+        <result property="tripName" column="trip_name" />
         <result property="contactTel" column="contact_tel" />
         <result property="contactEmail" column="contact_email" />
         <result property="note" column="note" />
@@ -21,7 +21,7 @@
     <select id="getAllBusinessTrips" parameterType="int" resultMap="BusinessTripResultMap">
         SELECT
             trip_id, task_id, address, detailed_address, created_date, status,
-            client_name, contact_tel, contact_email, note
+            trip_name, contact_tel, contact_email, note
         FROM business_trips
         WHERE task_id = #{taskId}
     </select>
@@ -30,7 +30,7 @@
     <select id="getBusinessTripById" parameterType="int" resultMap="BusinessTripResultMap">
         SELECT
             trip_id, task_id, address, detailed_address, created_date, status,
-            client_name, contact_tel, contact_email, note
+            trip_name, contact_tel, contact_email, note
         FROM business_trips
         WHERE task_id = #{taskId}
     </select>
@@ -39,7 +39,7 @@
     <select id="getBusinessTripByTripId" parameterType="int" resultMap="BusinessTripResultMap">
         SELECT
             trip_id, task_id, address, detailed_address, created_date, status,
-            client_name, contact_tel, contact_email, note
+            trip_name, contact_tel, contact_email, note
         FROM business_trips
         WHERE trip_id = #{tripId}
     </select>
@@ -47,9 +47,9 @@
     <!-- 새로운 출장 정보 삽입 -->
     <insert id="insertBusinessTrip" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
         INSERT INTO business_trips
-        (task_id, address, detailed_address, created_date, status, client_name, contact_tel, contact_email, note)
+        (task_id, address, detailed_address, created_date, status, trip_name, contact_tel, contact_email, note)
         VALUES
-            (#{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{clientName}, #{contactTel}, #{contactEmail}, #{note})
+            (#{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{tripName}, #{contactTel}, #{contactEmail}, #{note})
     </insert>
 
     <!-- 출장 정보 업데이트 -->
@@ -58,7 +58,7 @@
         SET
             address = #{address},
             detailed_address = #{detailedAddress},
-            client_name = #{clientName},
+            trip_name = #{tripName},
             contact_tel = #{contactTel},
             contact_email = #{contactEmail},
             note = #{note}
@@ -80,9 +80,9 @@
 
     <insert id="insertTripInfoInArchive" parameterType="com.woosan.hr_system.schedule.model.BusinessTrip">
         INSERT INTO business_trip_archive
-        (trip_id, task_id, address, detailed_address, created_date, status, client_name, contact_tel, contact_email, note)
+        (trip_id, task_id, address, detailed_address, created_date, status, trip_name, contact_tel, contact_email, note)
         VALUES
-            (#{tripId}, #{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{clientName}, #{contactTel}, #{contactEmail}, #{note})
+            (#{tripId}, #{taskId}, #{address}, #{detailedAddress}, #{createdDate}, '미방문', #{tripName}, #{contactTel}, #{contactEmail}, #{note})
     </insert>
 
 </mapper>

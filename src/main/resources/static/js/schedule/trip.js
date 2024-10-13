@@ -17,7 +17,7 @@ function viewMap() {
     var fullAddress = address + ' ' + detailAddress;
 
     // 지도를 페이지 내에 표시
-    naver.maps.Service.geocode({ query: fullAddress }, function (status, response) {
+    naver.maps.Service.geocode({query: fullAddress}, function (status, response) {
         if (status === naver.maps.Service.Status.ERROR) {
             alert('Geocode Error');
             return;
@@ -104,12 +104,12 @@ function validateTripInfo() {
 
     const address = document.getElementById('sample6_address')?.value || '';
     const detailedAddress = document.getElementById('sample6_detailAddress')?.value || '';
-    const clientName = document.getElementById('tripName')?.value || '';
+    const tripName = document.getElementById('tripName')?.value || '';
     const contactTel = document.getElementById('tripTel')?.value || '';
     const contactEmail = getEmail().trim() || '';
     console.log("contactEmail : ", contactEmail);
 
-    if (address || detailedAddress || clientName || contactTel || contactEmail) {
+    if (address || detailedAddress || tripName || contactTel || contactEmail) {
         // 오류 메시지 초기화
         const errorMessage = document.getElementById('error-message');
         errorMessage.textContent = '';
@@ -122,7 +122,7 @@ function validateTripInfo() {
             errorMessage.textContent = '상세주소를 입력해주세요.';
             return false;
         }
-        if (!clientName) {
+        if (!tripName) {
             errorMessage.textContent = '출장지 이름을 입력해주세요.';
             return false;
         }
@@ -158,7 +158,7 @@ function validatePhoneNumber(phoneNumber) {
     // 유효한 시작 번호 패턴 (지역번호 또는 휴대전화 번호 패턴)
     const validStartPatterns = /^(010\d{8}|02\d{7,8}|0[3-6][1-5]\d{6,7})$/;
 
-    // 자릿수 확인: 9자리 이상 11자리 이하
+    // 자릿수 확인: 9자리 이상 11자리 이하ㅁ
     const isValidLength = cleaned.length >= 9 && cleaned.length <= 11;
     if (!isValidLength) {
         return "전화번호 자리 수는 9자리 이상 11자리 이하입니다."
@@ -188,7 +188,7 @@ function validateEmail() {
     // 도메인 부분 유효성 검사
     const domainRegex = /^[a-zA-Z0-9.]*$/;
     if (!domainRegex.test(domainInput)) {
-        return "이메일 도메인은 '주소.com' 형태로 입력해주세요.";
+        return "이메일 도메인은 'example.com' 형태로 입력해주세요.";
     }
 
     // 이메일 전체 유효성 검사
@@ -208,4 +208,86 @@ function getEmail() {
         : document.getElementById('domainSelect').value;
 
     return localPart + '@' + domainPart;
+}
+
+// 출장 필드를 동적으로 추가하는 함수
+function addTripFields() {
+    let tripFieldsContainer = document.getElementById('tripTable');
+
+    console.log("tripFieldsContainer 생성 전", tripFieldsContainer);
+
+    if (!tripFieldsContainer) {
+        // tripTable이 없으면 새롭게 생성
+        tripFieldsContainer = document.createElement('table');
+        tripFieldsContainer.id = 'tripTable';
+        tripFieldsContainer.classList.add('details');
+
+        // 새로운 테이블을 일정 상세 정보 아래에 추가 (적절한 부모 요소 찾아서 append)
+        const detailContainer = document.querySelector('.detail-container'); // 적절한 부모 요소 선택
+        detailContainer.appendChild(tripFieldsContainer);  // 부모 요소에 추가
+    }
+
+    console.log("tripFieldsContainer 생성 후", tripFieldsContainer);
+
+    const tripFieldsHTML = `
+            <tr>
+                <td class="section-title">출장지 주소</td>
+                <td>
+                    <div>
+                        <input type="text" id="sample6_postcode" placeholder="우편번호">
+                        <input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+                        <input type="text" id="sample6_address" placeholder="주소"><br>
+                        <input type="text" id="sample6_detailAddress" placeholder="상세주소">
+                        <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+                        <button id="mapButton" type="button" onclick="viewMap()">지도 보기</button>
+                    </div>
+                    <div id="map-section" style="display: none;">
+                        <!-- 지도와 수정 버튼 -->
+                        <div id="map" style="width:500px; height:400px;"></div>
+                        <button type="button" onclick="closeMap()">지도 닫기</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">출장지 이름</td>
+                <td><input id="tripName" type="text" placeholder="이름을 입력하세요"></td>
+            </tr>
+            <tr>
+                <td class="section-title">전화번호</td>
+                <td>
+                    <input id="tripTel" type="text" oninput="localAutoHyphen(this)" maxlength="13" placeholder="전화번호를 입력하세요"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">이메일</td>
+                <td>
+                    <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요" required> @
+                    <select id="domainSelect">
+                        <option value="" disabled selected>도메인 선택</option>
+                        <option value="naver.com">naver.com</option>
+                        <option value="google.com">google.com</option>
+                        <option value="hanmail.net">hanmail.net</option>
+                        <option value="nate.com">nate.com</option>
+                        <option value="kakao.com">kakao.com</option>
+                        <option value="custom">직접 입력</option>
+                    </select>
+                    <input id="domainInput" type="text" placeholder="직접 입력" disabled>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">참고사항</td>
+                <td><input id="note" type="text" placeholder="참고사항을 입력하세요"></td>
+            </tr>`;
+
+    // 새로운 HTML 추가
+    tripFieldsContainer.innerHTML = tripFieldsHTML;
+    tripFieldsContainer.style.display = 'block';
+    document.getElementById('addTripButton').style.display = 'none';
+    document.getElementById('closeTripButton').style.display = 'block';
+}
+
+function closeTripFields() {
+    document.getElementById('tripTable').style.display = 'none';
+    document.getElementById('closeTripButton').style.display = 'none';
+    document.getElementById('addTripButton').style.display= 'block';
 }

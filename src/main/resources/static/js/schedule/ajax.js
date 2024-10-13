@@ -132,8 +132,6 @@ function validateForm() {
 function submitInsertForm(event) {
     event.preventDefault();
 
-    console.log("submitInsertForm 실행");
-
     // 유효성 검사
     if (!validateForm()) {
         return;
@@ -151,30 +149,33 @@ function submitInsertForm(event) {
     const detailedAddressElement = document.getElementById('sample6_detailAddress');
     const detailedAddress = detailedAddressElement ? detailedAddressElement.value : null;
 
-    const clientNameElement = document.getElementById('tripName');
-    const clientName = clientNameElement ? clientNameElement.value : null;
+    const tripNameElement = document.getElementById('tripName');
+    const tripName = tripNameElement ? tripNameElement.value : null;
 
     const contactTelElement = document.getElementById('tripTel');
     const contactTel = contactTelElement ? contactTelElement.value : null;
 
     const contactEmail = getEmail().trim() || '';
 
-    if (address || detailedAddress || clientName || contactTel) {
+    if (address || detailedAddress || tripName || contactTel) {
         if (!validateTripInfo()) {
-            console.log("validateTripInfo 검사완료");
             return;  // 유효성 검사 실패 시 종료
         }
 
         // 유효성 통과 시 출장 정보를 formData에 추가
         formData.append('address', address);
         formData.append('detailedAddress', detailedAddress);
-        formData.append('clientName', clientName);
+        formData.append('tripName', tripName);
         formData.append('contactTel', contactTel);
         formData.append('contactEmail', contactEmail);
         if (document.getElementById('note') && document.getElementById('note').value.trim() !== '') {
             formData.append('note', document.getElementById('note').value);
         }
     }
+
+    formData.forEach((value, key) => {
+        console.log(key + ': ' + value);
+    });
 
     // 일정 등록
     if (confirm('새로운 일정을 등록하시겠습니까?')) {
@@ -192,7 +193,7 @@ function submitInsertForm(event) {
                     alert(response.text);
                     window.location.reload();
                 } else if (errorStatuses.includes(response.status)) {
-                    alert(response.text);
+                    document.getElementById('error-message').textContent = response.text;
                 } else {
                     alert('일정 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                     window.location.reload();
@@ -216,8 +217,8 @@ function createFormData(form) {
     if (allDayCheckbox.checked) {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-        startTime = `${startDate}T00:00:00`;
-        endTime = `${endDate}T00:00:00`;
+        startTime = startDate ? `${startDate}T00:00:00` : null;
+        endTime = endDate ? `${endDate}T00:00:00` : null;
     } else {
         startTime = document.getElementById('startDateTime').value;
         endTime = document.getElementById('endDateTime').value;
@@ -227,8 +228,12 @@ function createFormData(form) {
     const formData = new FormData(form);
 
     // 기존 값 업데이트
-    formData.set("startTime", startTime);
-    formData.set("endTime", endTime);
+    if (startTime) {
+        formData.set("startTime", startTime);
+    }
+    if (endTime) {
+        formData.set("endTime", endTime);
+    }
 
     return formData;
 }
@@ -257,24 +262,27 @@ function submitUpdateForm(event) {
     const detailedAddressElement = document.getElementById('sample6_detailAddress');
     const detailedAddress = detailedAddressElement ? detailedAddressElement.value : null;
 
-    const clientNameElement = document.getElementById('tripName');
-    const clientName = clientNameElement ? clientNameElement.value : null;
+    const tripNameElement = document.getElementById('tripName');
+    const tripName = tripNameElement ? tripNameElement.value : null;
 
     const contactTelElement = document.getElementById('tripTel');
     const contactTel = contactTelElement ? contactTelElement.value : null;
 
-    if (address || detailedAddress || clientName || contactTel) {
+    if (address || detailedAddress || tripName || contactTel) {
         if (!validateTripInfo()) {
             return;  // 유효성 검사 실패 시 종료
         }
-        const tripId = document.getElementById('tripId').value;
+        const tripId = document.getElementById('tripId');
+        if (tripId) {
+            tripId.value;
+            formData.append('tripId', tripId);
+        }
         const contactEmail = getEmail().trim() || '';
 
         // 유효성 통과 시 출장 정보를 formData에 추가
-        formData.append('tripId', tripId);
         formData.append('address', address);
         formData.append('detailedAddress', detailedAddress);
-        formData.append('clientName', clientName);
+        formData.append('tripName', tripName);
         formData.append('contactTel', contactTel);
         formData.append('contactEmail', contactEmail);
         if (document.getElementById('note') && document.getElementById('note').value.trim() !== '') {
@@ -297,7 +305,7 @@ function submitUpdateForm(event) {
                     alert(response.text);
                     window.location.reload();
                 } else if (errorStatuses.includes(response.status)) {
-                    alert(response.text);
+                    document.getElementById('error-message').textContent = response.text;
                 } else {
                     alert('일정 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                     window.location.reload();

@@ -23,6 +23,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.data:spring-data-commons'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Thymeleaf

@@ -1,6 +1,7 @@
 package com.woosan.hr_system.schedule.service;
 
 import com.woosan.hr_system.schedule.model.BusinessTrip;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -9,9 +10,9 @@ public interface BusinessTripService {
 
     BusinessTrip getBusinessTripById(int taskId);
 
-    void insertBusinessTrip(BusinessTrip businessTrip, int taskId);
+    ResponseEntity <String> insertBusinessTrip(BusinessTrip businessTrip, int taskId);
 
-    void updateBusinessTrip(BusinessTrip businessTrip);
+    ResponseEntity<String> updateBusinessTrip(BusinessTrip businessTrip);
 
     void updateTripStatus(int tripId, String status);
 
