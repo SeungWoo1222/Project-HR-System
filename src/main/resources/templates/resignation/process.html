@@ -3,104 +3,156 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/employee/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/employee/resignation.css}" rel="stylesheet"/>
+    <style>
+        .resignation-wrapper {
+            margin-top: 40px;
+        }
+        .personal-info {
+            width: 756px;
+        }
+    </style>
 </th:block>
 
 <div>
     <div>
-        <img class="employee-picture" th:src="${pictureUrl}"/>
-        <img>
-        <div>
-            <table>
-                <tr>
-                    <th>사원 ID</th>
-                    <td th:text="${employee.employeeId}"></td>
-                </tr>
-                <tr>
-                    <th>이름</th>
-                    <td th:text="${employee.name}"></td>
-                </tr>
-                <tr>
-                    <th>주민등록번호</th>
-                    <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
-                </tr>
-                <tr>
-                    <th>전화번호</th>
-                    <td th:text="${employee.phone}"></td>
-                </tr>
-                <tr>
-                    <th>이메일</th>
-                    <td th:text="${employee.email}"></td>
-                </tr>
-                <tr>
-                    <th>주소</th>
-                    <td th:text="${employee.address}"></td>
-                </tr>
-                <tr>
-                    <th>상세 주소</th>
-                    <td th:text="${employee.detailAddress}"></td>
-                </tr>
-                <tr>
-                    <th>부서</th>
-                    <td th:text="${employee.department.name}"></td>
-                </tr>
-                <tr>
-                    <th>직급</th>
-                    <td th:text="${employee.position.name}"></td>
-                </tr>
-                <tr>
-                    <th>입사 날짜</th>
-                    <td th:text="${employee.hireDate}"></td>
-                </tr>
-                <tr>
-                    <th>재직 상태</th>
-                    <td th:text="${employee.status}"></td>
-                </tr>
-                <tr>
-                    <th>남은 연차</th>
-                    <td th:text="${employee.remainingLeave}"></td>
-                </tr>
-            </table>
-        </div>
+        <div class="resignation-wrapper">
+            <div class="detail-container">
+                <div class="personal-info">
+                    <div class="picture-area">
+                        <img th:src="${pictureUrl}" alt="사원 사진"/>
+                    </div>
+                    <table>
+                        <tr>
+                            <td class="section-title" style="width: 33%">사원 ID</td>
+                            <td th:text="${employee.employeeId}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">이름</td>
+                            <td th:text="${employee.name}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">주민등록번호</td>
+                            <td th:text="${employee.birth} + '-' + ${employee.residentRegistrationNumber}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">부서 / 직급</td>
+                            <td th:text="${employee.department == 'HR' ? 'HR(인사)' :
+                                      (employee.department == 'FI' ? 'FI(재무)' :
+                                      (employee.department == 'SA' ? 'SA(영업)' :
+                                      (employee.department == 'MK' ? 'MK(마케팅)' :
+                                      (employee.department == 'QC' ? 'QC(품질관리)' :
+                                      (employee.department == 'RD' ? 'RD(연구개발)' : 'PR(생산)')))))}
+                                      + ' / ' + ${employee.position}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">입사 날짜</td>
+                            <td th:text="${employee.hireDate}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">재직 상태</td>
+                            <td th:text="${employee.status}"
+                                th:classappend="${employee.status == '재직'} ? 'green' :
+                                        (${employee.status == '퇴사'} ? 'red' :
+                                        (${employee.status == '퇴사 예정'} ? 'orange' :
+                                        (${employee.status == '휴직'} ? 'yellow' : '')))"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">전화번호</td>
+                            <td th:text="${employee.phone}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">이메일</td>
+                            <td th:text="${employee.email}"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <table>
+                        <tr>
+                            <td class="section-title">주소</td>
+                            <td th:text="${employee.address + ', ' + employee.detailAddress}" colspan="3"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title">잔여 연차</td>
+                            <td th:text="${employee.remainingLeave} + '일'"></td>
+                            <td class="section-title">결혼 관계</td>
+                            <td th:text="${employee.maritalStatus == 1 ? '기혼' : '미혼'}"></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title w-25" >부양 가족 수<span class="sub-text">(본인 포함)</span></td>
+                            <td class="w-25" th:text="${employee.numDependents} + '명'" ></td>
+                            <td class="section-title w-25" >자녀 수<span class="sub-text">(8~20세)</span></td>
+                            <td class="w-25" th:text="${employee.numChildren} + '명'" ></td>
+                        </tr>
+                        <tr>
+                            <td class="section-title last-td">사원 정보 수정자</td>
+                            <td class="last-td" th:text="${employee.modifiedBy}"></td>
+                            <td class="section-title last-td">사원 정보 수정일시</td>
+                            <td class="last-td" th:text="${#temporals.format(employee.lastModified, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                    </table>
+                </div>
 
-        <div>
-            <!-- 퇴사 처리 폼 -->
-            <form th:action="@{/api/resignation/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data" onsubmit="submitResignationForm(event)">
-                <div class="file-area">
-                    <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다..</p>
-                    <label for="resignationDocuments" class="input-file-btn">문서 업로드</label>
-                    <input type="file" id="resignationDocuments" class="hidden" name="resignationDocuments" onchange="addFile(this)" multiple/>
-                    <div class="file-list"></div>
+                <div class="resignation-container">
+                    <form th:action="@{/api/resignation/{employeeId}(employeeId=${employee.employeeId})}" enctype="multipart/form-data" onsubmit="submitResignationForm(event)">
+                        <table style="table-layout: fixed;">
+                            <tr>
+                                <td class="section-title" style="width: 175px">퇴사 문서</td>
+                                <td>
+                                    <div class="upload-area">
+                                        <p>최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
+                                        <div class="file-btn-area">
+                                            <label for="resignationDocuments" class="input-file-btn">문서 업로드</label>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="resignationDocuments" class="hidden" name="resignationDocuments" onchange="addFile(this)" multiple/>
+                                    <div class="file-list"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">퇴사일</td>
+                                <td>
+                                    <input type="date" id="resignationDate" name="resignationDate">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">퇴사 사유</td>
+                                <td>
+                                    <select id="resignationReason" name="resignationReason" onchange="updateCodeNumber()">
+                                        <option value="">선택하세요</option>
+                                        <option value="1">1. 자진퇴사</option>
+                                        <option value="2">2. 권고사직</option>
+                                        <option value="3">3. 정년 등 기간만료에 의한 이직</option>
+                                        <option value="4">4. 기타</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">퇴사 코드</td>
+                                <td>
+                                    <select id="codeNumber" name="codeNumber">
+                                        <option value="">선택하세요</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title last-td">구체적 사유<span class="sub-text">(10자 이상)</span></td>
+                                <td class="last-td">
+                                    <textarea id="specificReason" name="specificReason" rows="2" cols="20"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="btn-container">
+                            <div id="error-message" class="error-message"></div>
+                            <button type="submit" class="btn" style="width: 40%">퇴사 처리</button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <label for="resignationDate">퇴사 날짜</label>
-                    <input type="date" id="resignationDate" name="resignationDate">
-                </div>
-                <div>
-                    <label for="resignationReason">퇴사 사유</label>
-                    <select id="resignationReason" name="resignationReason" onchange="updateCodeNumber()">
-                        <option value="">선택하세요</option>
-                        <option value="1">1. 자진퇴사</option>
-                        <option value="2">2. 권고사직</option>
-                        <option value="3">3. 정년 등 기간만료에 의한 이직</option>
-                        <option value="4">4. 기타</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="codeNumber">코드 번호</label>
-                    <select id="codeNumber" name="codeNumber">
-                        <option value="">선택하세요</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="specificReason">구체적 사유 (10자 이상 기재)</label>
-                    <textarea id="specificReason" name="specificReason" rows="2" cols="20"></textarea>
-                </div>
-                <div id="error-message" class="error-message"></div>
-                <div>
-                    <button type="submit">퇴사 처리</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

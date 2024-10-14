@@ -19,7 +19,8 @@ input[type="text"]:focus {
 textarea {
     font-family: Arial, sans-serif;
     width: auto;
-    padding: 12px;
+    padding: 10px;
+    margin: 5px 10px;
     font-size: 16px;
     border: 2px solid #EEE;
     border-radius: 5px;

@@ -16,7 +16,7 @@
     height: 100%;
 }
 
-.btn-container {
+.detail-wrapper .btn-container {
     margin: 10px 40px 15px 0;
     display: flex;
     justify-content: left;
@@ -63,4 +63,9 @@
 
 .w-25 {
     width: 25%;
+}
+
+#togglePasswordBtn {
+    font-size: 12px;
+    padding: 5px 10px;
 }
