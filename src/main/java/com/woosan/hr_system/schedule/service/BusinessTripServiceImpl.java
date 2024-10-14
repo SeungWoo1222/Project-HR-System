@@ -82,10 +82,8 @@ public class BusinessTripServiceImpl implements BusinessTripService {
 
         if (Objects.nonNull(existingBusinessTrip)) {
             if (Objects.isNull(businessTrip.getAddress())) {
-                log.info("O X인 경우");
                 businessTripDAO.deleteBusinessTrip(existingBusinessTrip.getTripId());
             } else {
-                log.info("O O인 경우");
                 // 이메일 도메인 유효성 검사
                 String domain = businessTrip.getContactEmail().substring(businessTrip.getContactEmail().indexOf("@") + 1);
 
@@ -109,7 +107,6 @@ public class BusinessTripServiceImpl implements BusinessTripService {
                 businessTripDAO.updateBusinessTrip(newBusinessTrip);
             }
         } else {
-            log.info("X O인 경우");
             // 이메일 도메인 유효성 검사
             String domain = businessTrip.getContactEmail().substring(businessTrip.getContactEmail().indexOf("@") + 1);
 
@@ -117,7 +114,6 @@ public class BusinessTripServiceImpl implements BusinessTripService {
             if (!validEmailresult) {
                 return ResponseEntity.badRequest().body("유효하지 않은 이메일 도메인입니다.");
             }
-
             businessTrip.setCreatedDate(LocalDateTime.now());
             businessTripDAO.insertBusinessTrip(businessTrip);
         }
