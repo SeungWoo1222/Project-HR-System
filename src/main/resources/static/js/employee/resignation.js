@@ -184,7 +184,7 @@ function submitDelete(event) {
 
     let actionUrl = '/api/admin/employee/' + employeeId;
 
-    if (confirm('\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?')) {
+    if (confirm('\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.')) {
         fetch(actionUrl, {
             method: 'DELETE'
         })
