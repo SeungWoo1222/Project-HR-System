@@ -1,4 +1,4 @@
-// 유효성 검사 - 사원 등록, 사원 정보 수정
+// 유효성 검사 - 사원 등록
 function validateForm(event) {
     event.preventDefault();
 
@@ -235,10 +235,113 @@ function submitInsertForm(event) {
     }
 }
 
+// 유효성 검사 - 사원 정보 수정
+function validateEditForm(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const birth = document.getElementById("birth").value.trim();
+    const residentRegistrationNumber = document.getElementById("residentRegistrationNumber").value.trim();
+    const phoneInput = document.getElementById("phoneInput").value.trim();
+    const emailLocal = document.getElementById("emailLocal").value.trim();
+    const emailDomain = document.getElementById("emailDomain").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const detailAddressInput = document.getElementById("detailAddressInput").value.trim();
+    const maritalStatus = document.querySelector('input[name="maritalStatus"]:checked');
+    const numDependents = document.getElementById("numDependents").value.trim();
+    const numChildren = document.getElementById("numChildren").value.trim();
+    const remainingLeave = document.getElementById("remainingLeave").value.trim();
+
+    let errorMessage = document.getElementById("error-message");
+
+    if (errorMessage) {
+        errorMessage.textContent = "";
+    } else {
+        console.error("에러 메세지 요소를 찾을 수 없습니다.");
+    }
+
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
+        return false;
+    }
+
+    // 각 필드 유효성 검사
+    if (name === "" || !validateName(name)) {
+        return showError("name", "유효한 이름을 입력해주세요. (한글 또는 영어만 허용)", true);
+    }
+    if (!validateBirthDate(birth)) {
+        return showError("birth", "유효한 생년월일(6자리 숫자)을 입력해주세요.", true);
+    }
+    if (residentRegistrationNumber === "" || residentRegistrationNumber.length !== 7 || !/^\d+$/.test(residentRegistrationNumber)) {
+        return showError("residentRegistrationNumber", "유효한 주민번호 뒷자리(7자리 숫자)를 입력해주세요.", true);
+    }
+    if (phoneInput === "" || !/^\d{11}$/.test(phoneInput)) {
+        return showError("phoneInput", "'-'를 제외한 유효한 전화번호를 입력해주세요.", true);
+    }
+    if (emailLocal === "") {
+        return showError("emailLocal", "이메일을 입력해주세요.", true);
+    }
+    if (emailDomain === "") {
+        return showError("emailDomain", "이메일 도메인을 선택해주세요.");
+    }
+    if (emailDomain === 'custom' && document.getElementById("customEmailDomain").value.trim() === "") {
+        return showError("customEmailDomain", "이메일 도메인을 입력해주세요.", true);
+    }
+    if (address === "") {
+        return showError("address", "주소를 입력해주세요.", true);
+    }
+    if (detailAddressInput === "") {
+        return showError("detailAddressInput", "상세 주소를 입력해주세요.", true);
+    }
+    if (!maritalStatus) {
+        return showError("radioGroup", "결혼 여부를 선택해주세요.");
+    }
+    if (numDependents === "" || !/^\d+$/.test(numDependents) || parseInt(numDependents) < 0) {
+        return showError("numDependents", "유효한 부양 가족 수를 입력해주세요.");
+    }
+    if (numChildren === "" || !/^\d+$/.test(numChildren) || parseInt(numChildren) < 0) {
+        return showError("numChildren", "유효한 자녀 수를 입력해주세요.");
+    }
+    if (remainingLeave === "" || !/^(\d+(\.[05])?)$/.test(remainingLeave)) {
+        console.log(remainingLeave);
+        return showError("remainingLeave", "유효한 잔여 연차일을 입력해주세요.");
+    }
+    if (parseInt(numChildren) > parseInt(numDependents)) {
+        return showError("numChildren", "자녀 수는 부양 가족 수보다 많을 수 없습니다.");
+    }
+
+    // DB 데이터 형식에 맞게 처리
+    combineEmail();
+    combineDetailAddress();
+    formatPhoneNumber();
+
+    return true;
+}
+
 // AJAX PUT 요청 - 사원 정보 수정
 function submitUpdateForm(event) {
     // 유효성 검사 실행
-    if (!validateForm(event)) { return; }
+    if (!validateEditForm(event)) { return; }
 
     // form 제출 처리
     const { form, actionUrl } = handleFormSubmit(event);
@@ -254,16 +357,10 @@ function submitUpdateForm(event) {
             email: form.email.value,
             address: form.address.value,
             detailAddress: form.detailAddress.value,
-            status: form.status.value,
-            department: form.department.value,
-            position: form.position.value,
-            hireDate: form.hireDate.value,
             maritalStatus: Boolean(parseInt(document.querySelector('input[name="maritalStatus"]:checked').value)),
             numDependents: form.numDependents.value,
             numChildren: form.numChildren.value,
             remainingLeave: form.remainingLeave.value,
-            modifiedBy: form.modifiedBy.value,
-            lastModified: form.lastModified.value,
             picture: form['original-picture'].value
     };
     formData.append("employee", new Blob([JSON.stringify(employee)], { type: "application/json" }));
@@ -277,7 +374,6 @@ function submitUpdateForm(event) {
     // 수정 성공 후 이동할 URL
     const submitButton = document.querySelector('button[type="submit"]');
     const dataUrl = submitButton.getAttribute('data-url');
-    console.log('URL : ', dataUrl);
 
     // 데이터를 서버로 전송
     if (confirm("사원 정보를 수정하시겠습니까?")) {

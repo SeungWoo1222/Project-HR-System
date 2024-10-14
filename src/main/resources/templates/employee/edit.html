@@ -4,7 +4,17 @@
       layout:decorate="~{fragments/layout :: layout(title='사원 정보 수정')}">
 
 <th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
     <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/register.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/edit.css}"/>
+    <style>
+        .content {
+            width: 750px;
+        }
+    </style>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -16,203 +26,267 @@
         document.addEventListener("DOMContentLoaded", function() {
             separateEmail();
             updatePhoneNumberElement();
-            errorMessage = document.querySelector(".error-message");
         });
     </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <form th:action="@{/api/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
-            <div id="file-area">
-                <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/><br>
-                <p>사진은 10MB까지 업로드 가능합니다.</p>
-                <span id="file-name" th:text="${originalFileName}"></span>
-                <label for="picture" class="input-file-btn">사진 업로드</label>
-                <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
-                <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">
+        <div class="detail-wrapper">
+            <div class="detail-container">
+                <form th:action="@{/api/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
+                    <div class="input-area upper-part">
+                        <div id="picture-area" class="picture-area">
+                            <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/>
+                        </div>
+                        <div id="file-area" class="file-area">
+                            <p>사진은 10MB까지 업로드 가능합니다.</p>
+                            <p>파일 형식은 JPEG, PNG, SVG, WebP, HEIF만을 지원합니다.</p>
+                            <div class="upload-area">
+                                <div id="file-name" class="file-name" th:text="${originalFileName}"></div>
+                                <div class="file-btn-area">
+                                    <label for="picture" class="input-file-btn">사진 업로드</label>
+                                </div>
+                            </div>
+                            <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+                            <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">
+                        </div>
+                    </div>
+                    <div class="personal-info">
+                        <table>
+                            <tr>
+                                <td class="section-title" style="width: 25%">사원 ID</td>
+                                <td th:text="${employee.employeeId}" colspan="3"></td>
+                                <input type="hidden" id="employeeId" name="employeeId" th:value="${employee.employeeId}" readonly/>
+                            </tr>
+                            <tr>
+                                <td class="section-title">이름</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="name" name="name" th:value="${employee.name}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">주민등록번호</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="birth" name="birth" maxlength="6" placeholder="생년월일 6자리" th:value="${employee.birth}"/>
+                                        <div class="characters">ㅡ</div>
+                                        <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber" maxlength="7" th:value="${employee.residentRegistrationNumber}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">전화번호</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요." th:value="${employee.phone}"/>
+                                    </div>
+                                    <input type="hidden" id="phone" name="phone"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">이메일</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="emailLocal" name="emailLocal"/>
+                                        @
+                                        <input type="text" id="customEmailDomain" name="customEmailDomain" class="hidden">
+                                        <select id="emailDomain" name="emailDomain" onchange="updateCustomField()">
+                                            <option value="custom">직접입력</option>
+                                            <option value="naver.com">naver.com</option>
+                                            <option value="gmail.com">gmail.com</option>
+                                            <option value="icloud.com">icloud.com</option>
+                                            <option value="outlook.com">outlook.com</option>
+                                            <option value="nate.com">nate.com</option>
+                                            <option value="daum.net">daum.net</option>
+                                            <option value="yahoo.com">yahoo.com</option>
+                                        </select>
+                                        <input type="hidden" id="email" name="email" th:value="${employee.email}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">주소</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="address" name="address" th:value="${employee.address}"/>
+                                        <input type="button" class="inner-btn blue-btn" onclick="execDaumPostcode()" value="우편번호 찾기"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">상세 주소</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="detailAddressInput" name="detailAddressInput" th:value="${employee.detailAddress}">
+                                        <input type="text" id="extraAddress" placeholder="참고항목" readonly>
+                                    </div>
+                                    <input type="hidden" id="detailAddress" name="detailAddress" th:value="${employee.detailAddress}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">결혼 관계</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <div class="radio-group" id="radioGroup">
+                                            <input type="radio" class="hidden-radio" id="marriedYes" name="maritalStatus" value="1"
+                                                   th:checked="${employee.maritalStatus == true}" onchange="updateDependents()">
+                                            <label for="marriedYes" class="radio-label">기혼</label>
+                                            <input type="radio" class="hidden-radio" id="marriedNo" name="maritalStatus" value="0"
+                                                   th:checked="${employee.maritalStatus == false}" onchange="updateDependents()">
+                                            <label for="marriedNo" class="radio-label">미혼 또는 이혼</label>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25" >부양 가족 수<span class="sub-text">(본인 포함)</span></td>
+                                <td class="w-25">
+                                    <div class="input-area">
+                                        <input type="number" id="numDependents" name="numDependents" min="1" max="11" th:value="${employee.numDependents}">
+                                        <div class="characters">인</div>
+                                    </div>
+                                </td>
+                                <td class="section-title w-25" >자녀 수<span class="sub-text">(8~20세)</span></td>
+                                <td class="w-25">
+                                    <div class="input-area">
+                                        <input type="number" id="numChildren" name="numChildren" min="0" max="11" th:value="${employee.numChildren}">
+                                        <div class="characters">명</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">부서 / 직급</td>
+                                <td th:text="${employee.department == 'HR' ? 'HR(인사)' :
+                                  (employee.department == 'FI' ? 'FI(재무)' :
+                                  (employee.department == 'SA' ? 'SA(영업)' :
+                                  (employee.department == 'MK' ? 'MK(마케팅)' :
+                                  (employee.department == 'QC' ? 'QC(품질관리)' :
+                                  (employee.department == 'RD' ? 'RD(연구개발)' : 'PR(생산)')))))}
+                                  + ' / ' + ${employee.position}"></td>
+                                <td class="section-title">잔여 연차</td>
+                                <td>
+                                    <div class="input-area">
+                                        <input type="number" step="0.5" min="0" max="25" id="remainingLeave" name="remainingLeave" th:value="${employee.remainingLeave}"/>
+                                        <div class="characters">일</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25">입사 날짜</td>
+                                <td class="w-25" th:text="${employee.hireDate}"></td>
+                                <td class="section-title w-25">재직 상태</td>
+                                <td class="w-25" th:text="${employee.status}"
+                                    th:classappend="${employee.status == '재직'} ? 'green' :
+                                    (${employee.status == '퇴사'} ? 'red' :
+                                    (${employee.status == '퇴사 예정'} ? 'orange' :
+                                    (${employee.status == '휴직'} ? 'yellow' : '')))"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">사원 정보 수정자</td>
+                                <td th:text="${employee.modifiedBy}"></td>
+                                <td class="section-title">사원 정보 수정일시</td>
+                                <td th:text="${#temporals.format(employee.lastModified, 'yyyy-MM-dd HH:mm')}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        <table>
+                            <tr>
+                                <td class="section-title">비밀번호
+                                    <button type="button" class="inner-btn blue-btn" id="togglePasswordBtn"
+                                            onclick="togglePassword()">보기</button>
+                                </td>
+                                <td colspan="3">
+                                    <span id="password-masked" th:text="${employee.password?.password != null ? '*'.repeat(employee.password.password.length()) : ''}"></span>
+                                    <span id="password-raw" th:text="${employee.password?.password}" style="display: none;"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25">비밀번호 강도</td>
+                                <td class="w-25"
+                                    th:text="${employee.password?.strength == 4 ? '매우 강함' :
+                                          (employee.password?.strength == 3 ? '강함' :
+                                          (employee.password?.strength == 2 ? '보통' :
+                                          (employee.password?.strength == 1 ? '약함' :
+                                          (employee.password?.strength == 0 ? '매우 약함' : '알 수 없음'))))}"
+                                    th:classappend="${employee.password?.strength == 4} ? 'skyblue' :
+                                            (${employee.password?.strength == 3} ? 'green' :
+                                            (${employee.password?.strength == 2} ? 'yellow' :
+                                            (${employee.password?.strength == 1} ? 'orange' :
+                                            (${employee.password?.strength == 0 ? 'red' : 'grey'}))))">
+                                </td>
+
+                                <td class="section-title w-25">비밀번호 오류 횟수</td>
+                                <td class="w-25" th:text="${employee.password?.passwordCount} + '회'"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">비밀번호 수정자</td>
+                                <td th:text="${employee.password?.modifiedBy}"></td>
+                                <td class="section-title">비밀번호 수정일시</td>
+                                <td th:text="${#temporals.format(employee.password?.lastModified, 'yyyy-MM-dd HH:mm')}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        <table th:if="${employee.salary == null}">
+                            <td class="section-title last-td w-25">급여 정보</td>
+                            <td class="last-td" colspan="3">현재 등록된 급여 정보가 없습니다.</td>
+                        </table>
+                        <table th:if="${employee.salary != null}">
+                            <tr>
+                                <td class="section-title w-25">급여 ID</td>
+                                <td class="w-25" th:text="${employee.salary?.salaryId}" ></td>
+                                <td class="section-title w-25">등록된 날짜</td>
+                                <td class="w-25" th:text="${#temporals.format(employee.salary?.createdAt, 'yyyy-MM-dd')}" ></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">계좌 번호</td>
+                                <td th:text="${employee.salary?.bank + ' ' + employee.salary?.accountNumber}" colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title last-td">연봉</td>
+                                <td class="last-td" th:text="${#numbers.formatInteger(employee.salary?.annualSalary, 3 ,'COMMA') + '원'}" colspan="3"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div th:if="${employee.status} == '퇴사'">
+                        <table>
+                            <tr>
+                                <td class="section-title none-border-top">퇴사일</td>
+                                <td class="none-border-top" th:text="${employee.resignation?.resignationDate}" colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">퇴사 사유</td>
+                                <td th:text="${employee.resignation?.getResignationReason()}" colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">퇴사 코드</td>
+                                <td th:text="${employee.resignation?.codeNumber}" colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">구체적 사유</td>
+                                <td th:text="${employee.resignation?.specificReason}" colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25 last-td">퇴사 처리한 사원 ID</td>
+                                <td class="w-25 last-td" th:text="${employee.resignation?.getProcessedBy()}"></td>
+                                <td class="section-title w-25 last-td">퇴사 처리 일시</td>
+                                <td class="w-25 last-td" th:text="${#temporals.format(employee.resignation?.getProcessedDate(), 'yyyy-MM-dd HH:mm')}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="error-message" class="error-message"></div>
+                    <div class="button-container">
+                        <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
+                        <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/list\''">수정 취소</button>
+                        <button type="submit" class="btn" data-url="/employee/list">사원 정보 수정</button>
+                    </div>
+                </form>
             </div>
-            <table>
-                <tr>
-                    <th>사원 ID</th>
-                    <td th:text="${employee.employeeId}"></td>
-                    <input type="hidden" id="employeeId" name="employeeId" th:value="${employee.employeeId}" readonly/>
-                </tr>
-                <tr>
-                    <th>이름</th>
-                    <td>
-                        <input type="text" id="name" name="name" th:value="${employee.name}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>생년월일</th>
-                    <td>
-                        <input type="text" id="birth" name="birth" maxlength="6" th:value="${employee.birth}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>주민등록번호</th>
-                    <td >
-                        <input type="text" id="residentRegistrationNumber" name="residentRegistrationNumber"  maxlength="7" th:value="${employee.residentRegistrationNumber}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>전화번호</th>
-                    <td>
-                        <input type="text" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요." th:value="${employee.phone}"/>
-                        <input type="hidden" id="phone" name="phone"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>이메일</th>
-                    <td>
-                        <input type="text" id="emailLocal" name="emailLocal"/>
-                        @
-                        <input type="text" id="customEmailDomain" name="customEmailDomain" class="hidden">
-                        <select id="emailDomain" name="emailDomain" onchange="updateCustomField()">
-                            <option value="custom">직접입력</option>
-                            <option value="naver.com">naver.com</option>
-                            <option value="gmail.com">gmail.com</option>
-                            <option value="icloud.com">icloud.com</option>
-                            <option value="outlook.com">outlook.com</option>
-                            <option value="nate.com">nate.com</option>
-                            <option value="daum.net">daum.net</option>
-                            <option value="yahoo.com">yahoo.com</option>
-                        </select>
-                        <input type="hidden" id="email" name="email" th:value="${employee.email}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>주소</th>
-                    <td>
-                        <input type="text" id="address" name="address" th:value="${employee.address}"/>
-                        <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기">
-                    </td>
-                </tr>
-                <tr>
-                    <th>상세 주소</th>
-                    <td>
-                        <input type="text" id="detailAddressInput" name="detailAddressInput" th:value="${employee.detailAddress}">
-                        <input type="text" id="extraAddress" placeholder="참고항목" readonly>
-                        <input type="hidden" id="detailAddress" name="detailAddress" th:value="${employee.detailAddress}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>결혼 관계</th>
-                    <td>
-                        <input type="radio" id="marriedYes" name="maritalStatus" value="1"
-                               th:checked="${employee.maritalStatus == true}" onchange="updateDependents()"> 기혼
-                        <input type="radio" id="marriedNo" name="maritalStatus" value="0"
-                               th:checked="${employee.maritalStatus == false}" onchange="updateDependents()"> 미혼
-                    </td>
-                </tr>
-                <tr>
-                    <th>부양 가족 수</th>
-                    <td>
-                        <input type="number" id="numDependents" name="numDependents" min="1" max="11" th:value="${employee.numDependents}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>자녀 수 (8~20세)</th>
-                    <td>
-                        <input type="number" id="numChildren" name="numChildren" min="0" max="11" th:value="${employee.numChildren}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>부서</th>
-                    <td th:text="${employee.department}"></td>
-                    <input type="hidden" id="department" name="department" th:value="${employee.department}" readonly/>
-                </tr>
-                <tr>
-                    <th>직급</th>
-                    <td th:text="${employee.employeeId}"></td>
-                    <input type="hidden" id="position" name="position" th:value="${employee.position}" readonly/>
-                </tr>
-                <tr>
-                    <th>입사 날짜</th>
-                    <td th:text="${employee.hireDate}"></td>
-                    <input type="hidden" id="hireDate" name="hireDate" th:value="${employee.hireDate}" readonly/>
-                </tr>
-                <tr>
-                    <th>재직 상태</th>
-                    <td th:text="${employee.status}"></td>
-                    <input type="hidden" id="status" name="status" th:value="${employee.status}" readonly/>
-                </tr>
-                <tr>
-                    <th>남은 연차</th>
-                    <td th:text="${employee.remainingLeave}"></td>
-                    <input type="hidden" id="remainingLeave" name="remainingLeave" th:value="${employee.remainingLeave}" readonly/>
-                </tr>
-            </table>
-            <table>
-                <tr>
-                    <th>사원 정보 수정자</th>
-                    <td th:if="${employee.modifiedBy} != null" th:text="${employee.modifiedBy}"></td>
-                    <td th:unless="${employee.modifiedBy} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
-                    <input type="hidden" name="modifiedBy" th:value="${employee.modifiedBy}" readonly/>
-                </tr>
-                <tr>
-                    <th>사원 정보 수정일시</th>
-                    <td th:if="${employee.lastModified} != null" th:text="${employee.lastModified}" class="dateTime"></td>
-                    <td th:unless="${employee.lastModified} != null">사원 정보에 대한 수정 내역이 없습니다.</td>
-                    <input type="hidden" name="lastModified" th:value="${employee.lastModified}" readonly/>
-                </tr>
-            </table>
-            <table>
-                <tr>
-                    <th>비밀번호</th>
-                    <td th:text="${employee.password?.password}"></td>
-                </tr>
-                <tr>
-                    <th>비밀번호 강도</th>
-                    <td th:text="${employee.password?.strength}"></td>
-                </tr>
-                <tr>
-                    <th>비밀번호 오류 횟수</th>
-                    <td th:text="${employee.password?.passwordCount}"></td>
-                </tr>
-                <tr>
-                    <th>비밀번호 수정자</th>
-                    <td th:text="${employee.password?.modifiedBy}"></td>
-                </tr>
-                <tr>
-                    <th>비밀번호 수정일시</th>
-                    <td th:text="${employee.password?.lastModified}" class="dateTime"></td>
-                </tr>
-            </table>
-            <table th:if="${employee.status} == '퇴사'">
-                <tr>
-                    <th>퇴사일</th>
-                    <td th:text="${employee.resignation?.resignationDate}"></td>
-                </tr>
-                <tr>
-                    <th>퇴사 사유</th>
-                    <td th:text="${employee.resignation?.getResignationReason()}"></td>
-                </tr>
-                <tr>
-                    <th>퇴사 코드</th>
-                    <td th:text="${employee.resignation?.codeNumber}"></td>
-                </tr>
-                <tr>
-                    <th>구체적 사유</th>
-                    <td th:text="${employee.resignation?.specificReason}"></td>
-                </tr>
-                <tr>
-                    <th>퇴사 처리한 사원 ID</th>
-                    <td th:text="${employee.resignation?.getProcessedBy()}"></td>
-                </tr>
-                <tr>
-                    <th>퇴사 처리 일시</th>
-                    <td th:text="${employee.resignation?.getProcessedDate()}" class="dateTime"></td>
-                </tr>
-            </table>
-            <div class="error-message"></div>
-            <div class="btn-area">
-                <button type="submit" class="btn" data-url="/employee/list">사원 정보 수정</button>
-                <button type="button" class="btn" th:onclick="'window.location.href=\'/employee/list\''">수정 취소</button>
-                <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 </html>
