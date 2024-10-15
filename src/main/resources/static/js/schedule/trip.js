@@ -1,3 +1,4 @@
+var hadTripInfo = false;
 // 지도 표시 로직
 function viewMap() {
     const address = document.getElementById('sample6_address').value;
@@ -241,7 +242,7 @@ function addTripFields() {
             </tr>
             <tr>
                 <td class="section-title">출장지 이름</td>
-                <td><input id="tripName" type="text" placeholder="이름을 입력하세요"></td>
+                <td><input id="tripName" type="text" placeholder="출장지 이름을 입력하세요"></td>
             </tr>
             <tr>
                 <td class="section-title">전화번호</td>
@@ -252,7 +253,7 @@ function addTripFields() {
             <tr>
                 <td class="section-title">이메일</td>
                 <td>
-                    <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요" required> @
+                    <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"> @
                     <select id="domainSelect">
                         <option value="" disabled selected>도메인 선택</option>
                         <option value="naver.com">naver.com</option>
@@ -278,6 +279,10 @@ function addTripFields() {
 }
 
 function closeTripFields() {
+    // 기존에 출장 정보가 있다면 플래그 변수 true
+    if (document.getElementById('sample6_address').defaultValue) {
+        hadTripInfo = true;
+    }
     document.getElementById('tripTable').style.display = 'none';
     document.querySelector('.closeTripButton').style.display = 'none';
     document.querySelector('.addTripButton').style.display= 'block';

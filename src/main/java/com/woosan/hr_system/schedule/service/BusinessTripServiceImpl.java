@@ -82,6 +82,7 @@ public class BusinessTripServiceImpl implements BusinessTripService {
 
         if (Objects.nonNull(existingBusinessTrip)) {
             if (Objects.isNull(businessTrip.getAddress())) {
+                businessTripDAO.insertTripInfoInArchive(existingBusinessTrip);
                 businessTripDAO.deleteBusinessTrip(existingBusinessTrip.getTripId());
             } else {
                 // 이메일 도메인 유효성 검사

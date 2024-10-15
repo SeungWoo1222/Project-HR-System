@@ -12,6 +12,7 @@ function goToUpdateForm(taskId) {
 }
 
 function checkForUpdates() {
+    console.log("checkForupdates 실행");
     const inputs = document.querySelectorAll('#editForm input, #editForm textarea, #editForm select');
     let isChanged = false;
 
@@ -35,23 +36,32 @@ function checkForUpdates() {
         }
     })
 
-    // 추가로 출장 정보의 값도 기본값과 비교
+    // 출장 정보의 값 비교
     const addressInput = document.getElementById('sample6_address');
     const detailedAddressInput = document.getElementById('sample6_detailAddress');
     const tripNameInput = document.getElementById('tripName');
     const contactTelInput = document.getElementById('tripTel');
     const contactEmailInput = document.getElementById('emailLocalPart');
 
-    // console.log("addressInput 수정값 : ", addressInput.value);
-    // console.log("addressInput 기존값 : ", addressInput.defaultValue);
-    if (
-        addressInput.value !== addressInput.defaultValue ||
-        detailedAddressInput.value !== detailedAddressInput.defaultValue ||
-        tripNameInput.value !== tripNameInput.defaultValue ||
-        contactTelInput.value !== contactTelInput.defaultValue ||
-        contactEmailInput.value !== contactEmailInput.defaultValue
-    ) {
-        isChanged = true;  // 출장 정보가 변경된 경우
+    console.log("hadTripInfo 상태", hadTripInfo);
+    console.log("addressInput 상태", addressInput);
+
+    if (hadTripInfo && addressInput.value) {
+        console.log("O O");
+        console.log("defaultValue값 : ", addressInput.defaultValue);
+        console.log("value값 : ", addressInput.value);
+        if ( // 수정필요함 여기는
+            addressInput.value !== addressInput.defaultValue ||
+            detailedAddressInput.value !== detailedAddressInput.defaultValue ||
+            tripNameInput.value !== tripNameInput.defaultValue ||
+            contactTelInput.value !== contactTelInput.defaultValue ||
+            contactEmailInput.value !== contactEmailInput.defaultValue
+        ) {
+            isChanged = true;  // 출장 정보가 변경된 경우
+        }
+    } else if (hadTripInfo && !addressInput.value || !hadTripInfo && addressInput.value) {
+        console.log("O X or X O");
+        isChanged = true;
     }
 
     if (!isChanged) {
@@ -285,8 +295,7 @@ function submitUpdateForm(event) {
         }
         const tripId = document.getElementById('tripId');
         if (tripId) {
-            tripId.value;
-            formData.append('tripId', tripId);
+            formData.append('tripId', tripId.value);
         }
         const contactEmail = getEmail().trim() || '';
 
@@ -299,6 +308,10 @@ function submitUpdateForm(event) {
         if (document.getElementById('note') && document.getElementById('note').value.trim() !== '') {
             formData.append('note', document.getElementById('note').value);
         }
+
+        formData.forEach((value, key) => {
+            console.log(key + ': ' + value);
+        });
     }
 
     // 일정 수정
