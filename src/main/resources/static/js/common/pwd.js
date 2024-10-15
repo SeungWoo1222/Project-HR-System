@@ -30,9 +30,9 @@ function submitPassword(event) {
             if (response.status === 200) {
                 window.location.href = response.text;
             } else if (errorStatuses.includes(response.status)) {
-                errorMessage.textContent = response.text;
+                errorMessage.innerHTML = response.text.replace(/\n/g, "<br>");
             } else {
-                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다. 관리자에게 문의해주세요.";
+                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다.\n관리자에게 문의해주세요.";
             }
         })
         .catch(error => {

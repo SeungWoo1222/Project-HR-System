@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @Controller
-@RequestMapping("/common")
+@RequestMapping
 public class CommonController {
     @Autowired
     private AuthService authService;
@@ -23,7 +23,7 @@ public class CommonController {
     @Autowired
     private FileService fileService;
 
-    @GetMapping("/home") // 홈 화면으로 이동
+    @GetMapping("home") // 홈 화면으로 이동
     public String home(Model model) {
         String result = authService.isPasswordChangeRequired();
         switch (result) {
@@ -34,17 +34,17 @@ public class CommonController {
         return "common/home";
     }
 
-    @GetMapping("/myInfo") // 내 정보 조회
+    @GetMapping("my") // 내 정보 조회
     public String viewMyInfo(Model model) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
-        Employee employee = employeeService.getEmployeeById(employeeId);
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
         model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
-        return "common/myInfo";
+        return "common/my";
     }
 
-    @GetMapping("/edit/myInfo/{employeeId}") // 내 정보 수정 페이지 이동
+    @GetMapping("{employeeId}/edit") // 내 정보 수정 페이지 이동
     public String viewMyInfoEditForm(@PathVariable("employeeId") String employeeId, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         model.addAttribute("employee", employee);
@@ -54,6 +54,6 @@ public class CommonController {
         model.addAttribute("pictureUrl", fileService.getUrl(fileId));
         model.addAttribute("originalFileName", fileService.getFileInfo(fileId).getOriginalFileName());
 
-        return "common/edit/myInfo";
+        return "common/my-edit";
     }
 }

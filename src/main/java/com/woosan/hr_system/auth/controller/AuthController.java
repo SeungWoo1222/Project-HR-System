@@ -38,18 +38,17 @@ public class AuthController {
     }
 
     @GetMapping("/pwd") // 비밀번호 검증 페이지 이동
-    public String viewPasswordForm(@RequestParam("redirectUrl") String redirectUrl, Model model) {
-        model.addAttribute("redirectUrl", redirectUrl);
+    public String viewPasswordForm() {
         return "/auth/pwd";
     }
 
-    @PostMapping("/verifyPassword") // 비밀번호 검증 로직
-    public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
+    @PostMapping("/verifyPassword") // 비밀번호 검증 후 내 정보 수정 페이지 이동
+    public ResponseEntity<String> verifyPassword(@RequestParam("password") String password) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         int message = authService.verifyPasswordAttempts(password, employeeId);
         return switch (message) {
-            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
-            case 0 -> ResponseEntity.ok(url + employeeId);
+            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("계정이 차단되었습니다.\n관리자에게 문의해주세요.");
+            case 0 -> ResponseEntity.ok(employeeId + "/edit");
             default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
         };
     }

@@ -91,7 +91,7 @@
                             localStorage.removeItem('rememberedUserId');
                         }
                         // 홈페이지로 이동
-                        window.location.href = "/common/home";
+                        window.location.href = "/home";
                     } else {
                         return response.json().then(data => {
                             errorMessage.textContent = decodeURIComponent(data.message).replace(/\+/g, ' ');

@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div class="sidebar" th:fragment="sidebar">
     <ul>
-        <li><a th:href="@{/common/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
+        <li><a th:href="@{/home}"><img src="/images/icons/home.png" alt="Home" width="20"> 홈</a></li>
         <li id="notification-li">
             <div onclick="toggleNotificationBox()">
                 <p><img src="/images/icons/notification.png" alt="Home" width="20">수신함</p>
@@ -130,7 +130,7 @@
             <li>
                 <p onclick="toggleSubmenu('myinfo-submenu')"><img src="/images/icons/myinfo.png" alt="MyInfo" width="20" >내 정보</p>
                 <ul id="myinfo-submenu" class="submenu">
-                    <li><a th:href="@{/common/myInfo}">- 내 정보 관리</a></li>
+                    <li><a th:href="@{/my}">- 내 정보 관리</a></li>
                     <li><a th:href="@{/auth/pwd-management}">- 비밀번호 관리</a></li>
                     <li><a th:href="@{/salary/payment/myPayslips}">- 내 급여 관리</a></li>
                 </ul>
