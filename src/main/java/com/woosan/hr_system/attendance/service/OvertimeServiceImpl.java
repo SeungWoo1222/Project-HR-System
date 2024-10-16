@@ -207,7 +207,7 @@ public class OvertimeServiceImpl implements OvertimeService{
         params.put("yearMonth", yearMonth);
 
         List<Attendance> overtimeList = overtimeDAO.searchOvertime(params);
-        int total = overtimeList.size();
+        int total = overtimeDAO.countOvertime(params);
 
         return new PageResult<>(overtimeList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

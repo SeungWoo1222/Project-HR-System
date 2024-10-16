@@ -76,4 +76,9 @@ public class OvertimeDAO {
     public List<Attendance> searchOvertime(Map<String, Object> params) {
         return sqlSession.selectList("overtime.searchOvertime", params);
     }
+
+    // 초과근무 목록 검색값 개수 조회
+    public int countOvertime(Map<String, Object> params) {
+        return sqlSession.selectOne("overtime.countOvertime", params);
+    }
 }
