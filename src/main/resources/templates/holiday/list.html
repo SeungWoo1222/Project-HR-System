@@ -11,10 +11,6 @@
         .list {
             width: 70%;
         }
-        .table-area {
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </th:block>
 
@@ -41,7 +37,7 @@
                 <button type="button" class="btn" onclick="openModal('/holiday/add')">공휴일 추가</button>
             </div>
         </div>
-        <div class="table-area">
+        <div class="flex-center">
             <table border="1" class="list">
                 <thead>
                 <th>공휴일 ID</th>
@@ -60,8 +56,14 @@
                     <td th:text="${holiday.holidayId}"></td>
                     <td th:text="${holiday.dateName}"></td>
                     <td th:text="${#temporals.format(holiday.locDate, 'yyyy년 MM월 dd일')}"></td>
-                    <td><button type="button" class="inner-btn tomato-btn" th:holidayId="${holiday.holidayId}" th:onclick="openModal('/holiday/edit/' + this.getAttribute('holidayId'))">수정</button></td>
-                    <td><button type="button" class="inner-btn red-btn" th:holidayId="${holiday.holidayId}" th:onclick="deleteHoliday(this.getAttribute('holidayId'))">삭제</button></td>
+                    <td style="text-align: center">
+                        <button type="button" class="inner-btn tomato-btn" th:holidayId="${holiday.holidayId}" th:onclick="openModal('/holiday/edit/' + this.getAttribute('holidayId'))">수정</button>
+                    </td>
+                    <td style="text-align: center">
+                        <button type="button" class="inner-btn red-btn" th:holidayId="${holiday.holidayId}"
+                                th:dateName="${holiday.dateName}"
+                                th:onclick="deleteHoliday(this.getAttribute('dateName'), this.getAttribute('holidayId'))">삭제</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>

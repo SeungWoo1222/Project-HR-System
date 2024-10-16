@@ -189,8 +189,8 @@ function submitUpdateForm(event) {
 }
 
 // AJAX DELETE 요청 - 공휴일 삭제
-function deleteHoliday(holidayId) {
-    if (confirm("해당 공휴일('" + holidayId + "')을 정말 삭제하시겠습니까?")) {
+function deleteHoliday(dateName, holidayId) {
+    if (confirm(dateName + "('" + holidayId + "')을 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.")) {
         fetch('/api/holiday/' + holidayId, {
             method: "DELETE"
         })

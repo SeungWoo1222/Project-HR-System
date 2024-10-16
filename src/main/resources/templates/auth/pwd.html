@@ -4,35 +4,20 @@
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
-    <style>
-        #modal-body {
-            width: 300px;
-        }
-        .btn-container, .input-container {
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        input[type="password"] {
-            width: auto;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
 </th:block>
 
-<div>
-    <div>
-        <h3>비밀번호 확인</h3>
-        <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitPassword(event)">
-            <div class="input-container">
-                <label for="password" style="font-size: 17px; font-weight: bold">비밀번호 : </label>
-                <input type="password" id="password" class="first-input" name="password"/>
-            </div>
-            <div class="btn-container">
-                <div class="error-message" id="error-message"></div>
-                <button type="submit" class="btn">확인</button>
-            </div>
-        </form>
-    </div>
+<div class="input-modal">
+    <h3>비밀번호 확인</h3>
+    <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitPassword(event)">
+        <div class="input-container">
+            <label for="password" style="font-size: 17px; font-weight: bold">비밀번호 : </label>
+            <input type="password" id="password" class="first-input" name="password"/>
+        </div>
+        <div class="btn-container">
+            <div class="error-message" id="error-message"></div>
+            <button type="submit" class="btn">확인</button>
+        </div>
+    </form>
 </div>
 </html>
