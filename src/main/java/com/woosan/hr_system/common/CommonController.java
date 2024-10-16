@@ -1,5 +1,6 @@
 package com.woosan.hr_system.common;
 
+import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
@@ -37,8 +38,12 @@ public class CommonController {
     @GetMapping("my") // 내 정보 조회
     public String viewMyInfo(Model model) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
+        // 내 정보 조회
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
+        // 비밀번호 정보 조회
+        Password password = authService.getPasswordInfoById(employeeId);
+        model.addAttribute("password", password);
 
         model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
         return "common/my";

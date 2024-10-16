@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='내 정보 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='내 정보')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
@@ -10,26 +10,107 @@
         .content {
             width: 756px;
         }
-        .single-btn-container {
-            margin-top: 20px;
+        .detail-wrapper, .pwd-wrapper {
+            padding: 20px;
+            border: #f1f1f1 solid 2px;
+            border-radius: 10px;
+        }
+
+        .detail-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .pwd-wrapper {
+            width: 100%;
+        }
+
+        .pwd-container {
             display: flex;
-            justify-content: right;
+            justify-content: left;
+            gap: 50px;
         }
-        .single-btn-container .btn {
-            width: 40%;
-            font-size: 16px;
+
+        #date-difference {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #CC0000;
         }
+
+        .battery {
+            position: relative;
+            width: 150px;
+            height: 50px;
+            border: 3px solid #333;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: inline-block;
+            background-color: white;
+            overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .battery::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            right: -15px;
+            width: 12px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+        .battery-level {
+            height: 100%;
+            display: flex;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+        .battery-cell {
+            flex: 1;
+            margin: 5px 3px;
+            border-radius: 3px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+        .battery-cell:first-child {
+            margin-left: 6px;
+        }
+        .battery-cell:last-child {
+            margin-right: 6px;
+        }
+        .battery-cell.on {
+            background-color: #18A8F1;
+        }
+        .battery-indicator {
+            text-align: left;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
     </style>
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/employee/pwd.js}"></script>
     <script th:src="@{/js/common/pwd.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            calculateDateDifference();
+            updateBatteryLevel();
+        });
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="detail-wrapper">
+            <div class="content-header">
+                <h3 class="content-header-left">내 정보 관리</h3>
+                <div class="content-header-right">
+                    <button type="button" class="btn" onclick="openModal('/auth/pwd')">내 정보 수정</button>
+                </div>
+            </div>
             <div class="detail-container">
                 <div class="personal-info">
                     <div class="picture-area">
@@ -194,8 +275,31 @@
                 </div>
             </div>
         </div>
-        <div class="single-btn-container">
-            <button type="button" class="btn" onclick="openModal('/auth/pwd')">내 정보 수정</button>
+        <div class="pwd-wrapper">
+            <div class="content-header">
+                <h3 class="content-header-left">비밀번호 관리</h3>
+                <div class="content-header-right">
+                    <button type="button" class="btn" th:onclick="openModal('/auth/pwd-change')">비밀번호 변경</button>
+                </div>
+            </div>
+            <div class="pwd-container">
+                <div>
+                    <h4>현재 비밀번호 강도 : <span class="battery-indicator"></span></h4>
+                    <div id="password-strength-meter" class="battery">
+                        <div class="battery-level"></div>
+                    </div>
+                    <div id="password-strength" class="hidden" th:text="${password.strength}"></div>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <h4>마지막 비밀번호 변경 날짜 : <span th:text="${#temporals.format(password.lastModified, 'yyyy년 MM월 dd일')}" style="color: #18a8f1;"></span></h4>
+                    </div>
+                    <p>
+                        <span id="lastModified" class="hidden" th:text="${password.lastModified}"></span>
+                        <div id="date-difference"></div>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

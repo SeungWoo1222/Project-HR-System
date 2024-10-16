@@ -1,6 +1,5 @@
 package com.woosan.hr_system.auth.controller;
 
-import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,13 +50,6 @@ public class AuthController {
             case 0 -> ResponseEntity.ok(employeeId + "/edit");
             default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
         };
-    }
-
-    @GetMapping("/pwd-management") // 비밀번호 관리 페이지 이동
-    public String viewPasswordManagement(Model model) {
-        Password password = authService.getPasswordInfoById(authService.getAuthenticatedUser().getUsername());
-        model.addAttribute("password", password);
-        return "/auth/pwd-management";
     }
 
     @GetMapping("/pwd-change") // 비밀번호 변경 페이지 이동
