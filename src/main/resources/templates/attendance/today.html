@@ -14,6 +14,15 @@
             padding-top: 15px;
             margin-top: 10px;
         }
+        .summary {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .table-area {
+            width: 700px;
+        }
+
         .pagination, .pagination-container {
             margin-top: 0;
         }
@@ -22,38 +31,98 @@
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/attendance/overtime.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            const attendanceChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['정상 출근', '지각', '조퇴', '결근', '출장', '휴가'],
+                    datasets: [{
+                        label: '근태 통계',
+                        data: [
+                            [[${statusCount['출근']}]],
+                            [[${statusCount['지각']}]],
+                            [[${statusCount['조퇴']}]],
+                            [[${statusCount['결근']}]],
+                            [[${statusCount['출장']}]],
+                            [[${statusCount['휴가']}]]
+                        ],
+                        backgroundColor: [
+                            '#90EE90',  // 정상 출근 - Light Green
+                            '#FFA500',  // 지각 - Light Orange
+                            '#FFEC8B',  // 조퇴 - Light Yellow
+                            '#FF7F7F',  // 결근 - Light Red
+                            '#BCA0DC',  // 출장 - Light Purple
+                            '#87CEEB'   // 휴가 - Light Skyblue
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw + '명';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="today-container">
             <h3>근태 통계 <span th:text="${#temporals.format(#temporals.createToday(), '(yy년 MM월 dd일 EEEE)')}" style="color: #A9A9A9; font-size: 15px"></span></h3>
-            <table class="summary-table">
-                <thead>
-                <tr>
-                    <th>전체 사원 수</th>
-                    <th>출근율</th>
-                    <th>정상 출근</th>
-                    <th>지각</th>
-                    <th>조퇴</th>
-                    <th>결근</th>
-                    <th>출장</th>
-                    <th>휴가</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td th:text="${total}">0</td>
-                    <td th:text="${rate} + '%'">0</td>
-                    <td th:text="${statusCount['출근']}">0</td>
-                    <td th:text="${statusCount['지각']}">0</td>
-                    <td th:text="${statusCount['조퇴']}">0</td>
-                    <td th:text="${statusCount['결근']}">0</td>
-                    <td th:text="${statusCount['출장']}">0</td>
-                    <td th:text="${statusCount['휴가']}">0</td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="summary">
+                <div class="table-area">
+                    <table class="summary-table">
+                        <thead>
+                        <tr>
+                            <th>전체 사원 수</th>
+                            <th>출근율</th>
+                            <th>정상 출근</th>
+                            <th>지각</th>
+                            <th>조퇴</th>
+                            <th>결근</th>
+                            <th>출장</th>
+                            <th>휴가</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td th:text="${total}">0</td>
+                            <td th:text="${rate} + '%'">0</td>
+                            <td th:text="${statusCount['출근']}">0</td>
+                            <td th:text="${statusCount['지각']}">0</td>
+                            <td th:text="${statusCount['조퇴']}">0</td>
+                            <td th:text="${statusCount['결근']}">0</td>
+                            <td th:text="${statusCount['출장']}">0</td>
+                            <td th:text="${statusCount['휴가']}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="chart-area">
+                    <canvas id="attendanceChart" width="300" height="200"></canvas>
+                </div>
+            </div>
 
             <div class="today-section">
                 <div class="content-header">
@@ -187,9 +256,9 @@
                         <td th:text="${attendance.employee?.department}">부서</td>
                         <td th:text="${attendance.employee?.position}">직급</td>
                         <td th:text="${attendance.status}"
-                            th:classappend="${attendance.status == '결근'} ? 'absent' :
-                                            (${attendance.status == '지각'} ? 'late' :
-                                            (${attendance.status == '조퇴'} ? 'early-leave' : ''))">근태 상태</td>
+                            th:classappend="${attendance.status == '결근'} ? 'red' :
+                                            (${attendance.status == '지각'} ? 'orange' :
+                                            (${attendance.status == '조퇴'} ? 'yellow' : ''))">근태 상태</td>
                         <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
                         <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
                     </tr>
@@ -261,8 +330,8 @@
                         <td th:text="${attendance.employee?.department}">부서</td>
                         <td th:text="${attendance.employee?.position}">직급</td>
                         <td th:text="${attendance.status}"
-                            th:classappend="${attendance.status == '출장'} ? 'business-trip' :
-                                            (${attendance.status == '휴가'} ? 'vacation' : '')">근태 상태</td>
+                            th:classappend="${attendance.status == '출장'} ? 'purple' :
+                                            (${attendance.status == '휴가'} ? 'skyblue' : '')">근태 상태</td>
                         <td th:text="${#temporals.format(attendance.checkIn,'HH:mm')}">출근 시간</td>
                         <td th:text="${#temporals.format(attendance.checkOut,'HH:mm')}">퇴근 시간</td>
                     </tr>
