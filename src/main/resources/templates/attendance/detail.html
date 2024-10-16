@@ -5,7 +5,7 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
-    <link th:href="@{/css/survey/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
 </th:block>
 
 <div class="attendance-detail-container">
@@ -57,8 +57,10 @@
         </tr>
         <tr>
             <td class="section-title">휴가 정보</td>
-            <td th:text="${#temporals.format(attendance.vacation?.processingAt, 'yy.MM.dd') + ' '
-                    + attendance?.vacation.vacationType} + ' (' + ${attendance.vacation?.reason} + ')'" colspan="3"></td>
+            <td th:if="${attendance.vacationId} == null" colspan="3"></td>
+            <td th:if="${attendance.vacationId} != null" colspan="3"
+                th:text="${#temporals.format(attendance.vacation?.processingAt, 'yy.MM.dd') + ' '
+                    + attendance?.vacation.vacationType} + ' (' + ${attendance.vacation?.reason} + ')'" ></td>
         </tr>
         <tr>
             <td class="section-title">출장 정보</td>

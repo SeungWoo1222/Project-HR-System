@@ -5,8 +5,7 @@
 
 <th:block layout:fragment="css">
   <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
-  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
-  <link th:href="@{/css/survey/detail.css}" rel="stylesheet"/>
+  <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
 </th:block>
 
 <div class="attendance-detail-container">
@@ -20,13 +19,13 @@
         <td th:text="${employee.name + ' (' + attendance.employeeId} + ')'"></td>
       </tr>
       <tr>
-        <td class="section-title">출근 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></td>
+        <td class="section-title">출근 시간<span class="sub-time">  (00:00:00)</span></td>
         <td class="input-area">
           <input type="text" id="checkIn" name="checkIn" th:value="${#temporals.format(attendance.checkIn, 'HH:mm:ss')}"/>
         </td>
       </tr>
       <tr>
-        <td class="section-title">퇴근 시간<span style="font-size:12px; color: #F44336;">  (00:00:00)</span></td>
+        <td class="section-title">퇴근 시간<span class="sub-time">  (00:00:00)</span></td>
         <td class="input-area">
           <input type="text" id="checkOut" name="checkOut" th:value="${#temporals.format(attendance.checkOut, 'HH:mm:ss')}"/>
         </td>

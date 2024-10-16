@@ -6,6 +6,7 @@
 <th:block layout:fragment="css">
   <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
   <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
+  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
   <link th:href="@{/css/common/search.css}" rel="stylesheet">
   <link th:href="@{/css/common/button.css}" rel="stylesheet">
   <link th:href="@{/css/common/table.css}" rel="stylesheet">
@@ -25,7 +26,6 @@
           <input type="hidden" name="page" th:value="1"/>
           <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
             <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-            <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">1개씩 보기</option>
             <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
             <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
           </select>
