@@ -93,7 +93,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         params.put("yearMonth", yearMonth);
 
         List<Attendance> attendanceList = attendanceDAO.searchAttendance(params);
-        int total = attendanceList.size();
+        int total = attendanceDAO.countAttendance(params);
 
         return new PageResult<>(attendanceList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

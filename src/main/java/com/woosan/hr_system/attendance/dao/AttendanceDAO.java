@@ -66,6 +66,11 @@ public class AttendanceDAO {
         return sqlSession.selectList("attendance.searchAttendance", params);
     }
 
+    // 근태 목록 검색값들의 전체 개수 조회
+    public int countAttendance(Map<String, Object> params) {
+        return sqlSession.selectOne("attendance.countAttendance", params);
+    }
+
     // 사원의 이번 주 근무시간 조회
     public float getTotalWeeklyWorkingTime(String employeeId, LocalDate date) {
         Map<String, Object> param = new HashMap<>();
