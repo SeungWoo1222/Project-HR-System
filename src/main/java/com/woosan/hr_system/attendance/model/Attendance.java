@@ -1,6 +1,7 @@
 package com.woosan.hr_system.attendance.model;
 
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.vacation.model.Vacation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +31,6 @@ public class Attendance {
     private String modifiedBy;          // 마지막 수정 사원 ID
 
     private Employee employee;          // 사원 정보
+    private Vacation vacation;          // 휴가 정보
     private Overtime overtime;          // 초과근무 정보
 }

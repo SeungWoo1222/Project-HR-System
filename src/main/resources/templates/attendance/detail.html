@@ -57,7 +57,8 @@
         </tr>
         <tr>
             <td class="section-title">휴가 정보</td>
-            <td th:text="${attendance.vacationId}" colspan="3"></td>
+            <td th:text="${#temporals.format(attendance.vacation?.processingAt, 'yy.MM.dd') + ' '
+                    + attendance?.vacation.vacationType} + ' (' + ${attendance.vacation?.reason} + ')'" colspan="3"></td>
         </tr>
         <tr>
             <td class="section-title">출장 정보</td>

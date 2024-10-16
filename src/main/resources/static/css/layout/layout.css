@@ -266,6 +266,13 @@ p {
     display: none;
 }
 
+/* Flex center */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Content Header styles*/
  .content-header {
      display: flex;

@@ -33,3 +33,34 @@
 .attendance-detail-container .btn-container .inner-btn {
     font-size: 16px;
 }
+
+/* edit */
+.input-area {
+    padding: 0 !important;
+    text-align: center;
+}
+
+.input-area input[type="text"] {
+    width: 90%;
+}
+.input-area select {
+    width: 95%;
+}
+.input-area textarea {
+    width: 90%;
+}
+
+.bottom-container .error-message {
+    margin: 15px 0 10px;
+}
+
+.bottom-container .btn-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.bottom-container .btn-container .btn {
+    width: 50%;
+    font-size: 16px;
+}
