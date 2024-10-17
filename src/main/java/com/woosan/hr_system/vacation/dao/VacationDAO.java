@@ -35,8 +35,8 @@ public class VacationDAO {
     }
 
     // 해당 사원의 모든 휴가 내역 개수 조회
-    public int countVacationsByEmployeeId(String employeeId) {
-        return sqlSession.selectOne("vacation.countVacationsByEmployeeId", employeeId);
+    public int countVacationsByEmployeeId(HashMap<String, Object> params) {
+        return sqlSession.selectOne("vacation.countVacationsByEmployeeId", params);
     }
 
     // 해당 사원의 모든 휴가 정보 조회

@@ -46,7 +46,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override // 모든 휴가 정보 조회
-    public PageResult<Vacation> searchVacation(PageRequest pageRequest, String department, String status) {
+    public PageResult<Vacation> searchVacation(PageRequest pageRequest, String department, String status, String startDate, String endDate) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
         HashMap<String, Object> params = new HashMap<>();
@@ -55,6 +55,8 @@ public class VacationServiceImpl implements VacationService {
         params.put("offset", offset);
         params.put("department", department);
         params.put("status", status);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         // 휴가 정보 조회
         List<Vacation> vacationList = vacationDAO.searchVacation(params);
@@ -64,16 +66,18 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override //  해당 사원의 모든 휴가 내역 조회
-    public PageResult<Vacation> getVacationsByEmployeeId(PageRequest pageRequest, String employeeId) {
+    public PageResult<Vacation> getVacationsByEmployeeId(PageRequest pageRequest, String employeeId, String startDate, String endDate) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산
         int offset = pageRequest.getPage() * pageRequest.getSize();
         HashMap<String, Object> params = new HashMap<>();
         params.put("pageSize", pageRequest.getSize());
         params.put("offset", offset);
         params.put("employeeId", employeeId);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         List<Vacation> vacationList = vacationDAO.selectVacationsByEmployeeId(params);  // 검색 결과 데이터
-        int total = vacationDAO.countVacationsByEmployeeId(employeeId); // 검색 결과 개수
+        int total = vacationDAO.countVacationsByEmployeeId(params); // 검색 결과 개수
 
         return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
@@ -84,7 +88,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override // 해당 부서의 모든 휴가 정보 조회
-    public PageResult<Vacation> getVacationsByDepartmentId(PageRequest pageRequest, String departmentId, String status) {
+    public PageResult<Vacation> getVacationsByDepartmentId(PageRequest pageRequest, String departmentId, String status, String startDate, String endDate) {
         // 해당 부서 사원 조회 후 아이디 리스트로 반환
         List<Employee> employeeList = employeeDAO.getEmployeesByDepartment(departmentId);
         List<String> employeeIdList = employeeList.stream()
@@ -99,6 +103,8 @@ public class VacationServiceImpl implements VacationService {
         params.put("offset", offset);
         params.put("employeeIdList", employeeIdList);
         params.put("status", status);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         // 해당 부서 사원들 휴가 정보 조회
         List<Vacation> vacationList = vacationDAO.selectVacationsByDepartmentId(params);

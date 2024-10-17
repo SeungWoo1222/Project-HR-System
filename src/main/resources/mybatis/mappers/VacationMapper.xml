@@ -46,6 +46,17 @@
             <if test="status != null and status != ''">
                 AND approval_status = #{status}
             </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
         </where>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
@@ -75,12 +86,35 @@
             <if test="status != null and status != ''">
                 AND approval_status = #{status}
             </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
         </where>
     </select>
 
     <!-- 해당 사원의 모든 휴가 내역 조회 -->
     <select id="selectVacationsByEmployeeId" parameterType="map" resultMap="VacationResultMap">
-        SELECT * FROM vacation WHERE employee_id = #{employeeId}
+        SELECT * FROM vacation
+        WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (start_at BETWEEN #{startDate} AND #{endDate})
+            OR (end_at BETWEEN #{startDate} AND #{endDate})
+            OR (start_at &lt;= #{startDate} AND end_at >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN start_at AND end_at)
+            OR (#{endDate} BETWEEN start_at AND end_at)
+            )
+        </if>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
@@ -90,6 +124,17 @@
         SELECT COUNT(*)
         FROM vacation
         WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
     </select>
 
     <!-- 해당 사원의 모든 휴가 정보 조회 -->
@@ -108,6 +153,17 @@
         <if test="status != null and status != ''">
             AND approval_status = #{status}
         </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
@@ -122,6 +178,17 @@
         </foreach>
         <if test="status != null and status != ''">
             AND approval_status = #{status}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
         </if>
     </select>
 

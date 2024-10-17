@@ -84,6 +84,33 @@
     outline: none !important;
 }
 
+.search-date-form {
+    display: flex;
+    align-items: center;
+    margin-left: 5px;
+    gap: 5px;
+}
+
+.search-date {
+    width: auto !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border: 2px solid #eaeaea !important;
+    border-radius: 5px !important;
+    color: #333 !important;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.search-date:focus {
+    border-color: #18a8f1 !important;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5) !important;
+    outline: none !important;
+}
+
 /* Pagination */
 .pagination-container {
     display: flex;
@@ -120,4 +147,24 @@
 
 .btn-container {
     margin-left: auto;
+}
+
+/* Error */
+.input-error {
+    border: 2px solid #FF5C5C !important;
+}
+
+.input-error-bottom {
+    border-bottom: 2px solid #FF5C5C !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+.shake {
+    animation: shake 0.3s;
 }

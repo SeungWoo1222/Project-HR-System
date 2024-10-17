@@ -36,9 +36,11 @@ public class VacationViewController {
                                    @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                    @RequestParam(name = "department", defaultValue = "") String department,
                                    @RequestParam(name = "status", defaultValue = "") String status,
+                                   @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                   @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                    Model model) {
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.searchVacation(pageRequest, department, status);
+        PageResult<Vacation> pageResult = vacationService.searchVacation(pageRequest, department, status, startDate, endDate);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
@@ -47,6 +49,8 @@ public class VacationViewController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("department", department);
         model.addAttribute("status", status);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
         return "vacation/list";
     }
@@ -72,17 +76,22 @@ public class VacationViewController {
     @GetMapping("/employee") // 내 휴가 내역 조회
     public String viewEmployeeVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
                                            @RequestParam(name = "size", defaultValue = "10") int size,
+                                           @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                           @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                            Model model) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         model.addAttribute("remainingLeave", employeeDAO.getEmployeeById(employeeId).getRemainingLeave());
 
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.getVacationsByEmployeeId(pageRequest, employeeId);
+        PageResult<Vacation> pageResult = vacationService.getVacationsByEmployeeId(pageRequest, employeeId, startDate, endDate);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
         return "/vacation/employee";
     }
 
@@ -91,15 +100,20 @@ public class VacationViewController {
     public String viewDepartmentVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
                                              @RequestParam(name = "size", defaultValue = "10") int size,
                                              @RequestParam(name = "status", defaultValue = "") String status,
+                                             @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                             @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                              Model model) {
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.getVacationsByDepartmentId(pageRequest, authService.getAuthenticatedUser().getDepartment(), status);
+        PageResult<Vacation> pageResult = vacationService.getVacationsByDepartmentId(pageRequest, authService.getAuthenticatedUser().getDepartment(), status, startDate, endDate);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("status", status);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
         return "/vacation/department";
     }
 
