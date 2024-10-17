@@ -69,7 +69,7 @@ public class VacationViewController {
         return "/vacation/detail-process";
     }
 
-    @GetMapping("/employee") // 해당 사원의 모든 휴가 정보 조회
+    @GetMapping("/employee") // 내 휴가 내역 조회
     public String viewEmployeeVacationInfo(@RequestParam(name = "page", defaultValue = "1") int page,
                                            @RequestParam(name = "size", defaultValue = "10") int size,
                                            Model model) {
@@ -77,7 +77,7 @@ public class VacationViewController {
         model.addAttribute("remainingLeave", employeeDAO.getEmployeeById(employeeId).getRemainingLeave());
 
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.getVacationByEmployeeId(pageRequest, employeeId);
+        PageResult<Vacation> pageResult = vacationService.getVacationsByEmployeeId(pageRequest, employeeId);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1

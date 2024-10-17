@@ -29,9 +29,14 @@ public class VacationDAO {
         return sqlSession.selectOne("vacation.countVacation", params);
     }
 
-    // 해당 사원의 모든 휴가 정보 조회 (페이징)
-    public List<Vacation> selectVacationByEmployeeId(HashMap<String, Object> params) {
-        return sqlSession.selectList("vacation.selectVacationByEmployeeId", params);
+    // 해당 사원의 모든 휴가 내역 조회
+    public List<Vacation> selectVacationsByEmployeeId(HashMap<String, Object> params) {
+        return sqlSession.selectList("vacation.selectVacationsByEmployeeId", params);
+    }
+
+    // 해당 사원의 모든 휴가 내역 개수 조회
+    public int countVacationsByEmployeeId(String employeeId) {
+        return sqlSession.selectOne("vacation.countVacationsByEmployeeId", employeeId);
     }
 
     // 해당 사원의 모든 휴가 정보 조회
@@ -72,5 +77,4 @@ public class VacationDAO {
     public List<Vacation> getEmployeesOnVacationToday(LocalDate today) {
         return sqlSession.selectList("vacation.getEmployeesOnVacationToday", today);
     }
-
 }

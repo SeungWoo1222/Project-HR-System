@@ -38,7 +38,7 @@
                 </select>
             </form>
         </div>
-        <table border="1" class="list">
+        <table class="list" style="table-layout: auto;">
             <thead>
             <tr>
                 <th>휴가 ID</th>
@@ -64,9 +64,9 @@
                 <td th:text="${vacation.endAt}" class="dateTime">종료일</td>
                 <td th:text="${vacation.usedDays}">사용 연차</td>
                 <td th:text="${vacation.vacationType}">휴가 유형</td>
-                <td th:text="${vacation.reason}">휴가 사유</td>
+                <td th:text="${vacation.reason}" style="max-width: 250px">휴가 사유</td>
                 <td th:text="${vacation.approvalStatus}"
-                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'gray' :
+                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'grey' :
                                     (${vacation.approvalStatus == '승인'} ? 'green' :
                                     (${vacation.approvalStatus == '거절'} ? 'red' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>

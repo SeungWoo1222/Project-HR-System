@@ -78,11 +78,18 @@
         </where>
     </select>
 
-    <!-- 해당 사원의 모든 휴가 정보 조회 (페이징) -->
-    <select id="selectVacationByEmployeeId" parameterType="map" resultMap="VacationResultMap">
+    <!-- 해당 사원의 모든 휴가 내역 조회 -->
+    <select id="selectVacationsByEmployeeId" parameterType="map" resultMap="VacationResultMap">
         SELECT * FROM vacation WHERE employee_id = #{employeeId}
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 개수 조회 -->
+    <select id="countVacationsByEmployeeId" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM vacation
+        WHERE employee_id = #{employeeId}
     </select>
 
     <!-- 해당 사원의 모든 휴가 정보 조회 -->
