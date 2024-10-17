@@ -1,0 +1,25 @@
+.content {
+    width: 210mm;
+}
+
+.insert-form-container input[type="text"] {
+    width: 90%;
+}
+
+.insert-form-container select {
+    width: 95%;
+}
+
+.insert-form-container textarea {
+    width: 90%;
+}
+
+.insert-form-container .btn-container {
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.insert-form-container .btn-container .btn {
+    width: 48%;
+    font-size: 16px;
+}

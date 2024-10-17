@@ -16,38 +16,66 @@ function validateForm() {
     const reason = document.getElementById("reason").value;
     const remainingLeave = document.getElementById("remainingLeave").textContent;
 
-    // 휴가 유형 체크
-    if (!vacationType) {
-        document.getElementById("error-message").textContent = "휴가 유형을 선택해주세요.";
+    let errorMessage = document.getElementById("error-message");
+
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
     }
 
+    // 휴가 유형 체크
+    if (!vacationType) {
+        return showError("vacationType", "휴가 유형을 선택해주세요.");
+    }
+
     // 시작일과 종료일 체크
-    if (!startAt || !endAt) {
-        document.getElementById("error-message").textContent = "휴가 시작일과 종료일을 입력해주세요.";
-        return false;
+    if (!startAt) {
+        if (vacationType === '오전 반차' || vacationType === '오후 반차')  {
+            return showError("dateAt", "휴가 시작일을 입력해주세요.", true);
+        }
+        return showError("startAt", "휴가 시작일을 입력해주세요.", true);
+    }
+    if (!endAt) {
+        return showError("endAt", "휴가 종료일을 입력해주세요.", true);
     }
 
     // 사용 일수가 잔여 연차보다 많으면 오류 메세지 출력
     if (parseFloat(usedDays) > parseFloat(remainingLeave)) {
-        document.getElementById("error-message").textContent = "사용 일수가 잔여 연차보다 많습니다.";
-        return false;
+        return showError("endAt", "사용 일수가 잔여 연차보다 많습니다.", true);
     }
 
     // 사용 일수 체크
     if (parseFloat(usedDays) < 0) {
-        document.getElementById("error-message").textContent = "유효한 연차 사용 일수를 입력해주세요.";
-        return false;
+        return showError("usedDays", "유효한 연차 사용 일수를 입력해주세요.", true);
     }
 
     // 휴가 사유 체크
     if (!reason.trim()) {
-        document.getElementById("error-message").textContent = "휴가 사유를 입력해주세요.";
-        return false;
+        return showError("reason", "휴가 사유를 입력해주세요.");
     }
 
     // 오류 메시지 없애기
-    document.getElementById("error-message").textContent = "";
+    errorMessage.textContent = "";
     return true;
 }
 
@@ -189,7 +217,7 @@ function submitUpdateForm(event) {
 
 // AJAX DELETE 요청 - 휴가 정보 삭제
 function deleteVacation(vacationId) {
-    if (confirm('휴가 정보를 정말 삭제하시겠습니까?')) {
+    if (confirm('휴가 정보를 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.')) {
         fetch('/api/vacation/' + vacationId, {
             method: "DELETE"
         })
