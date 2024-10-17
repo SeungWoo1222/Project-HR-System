@@ -346,7 +346,7 @@ public class AttendanceViewController {
                 .collect(Collectors.groupingBy(Attendance::getStatus, Collectors.counting()));
 
         // 출석률 계산
-        int total = employeeService.getAllEmployee().size();
+        int total = employeeService.getEmployeesByDepartment(department).size();
         Long rate = (long) ((((attendanceList.size())
                 - Objects.requireNonNullElse(statusCount.get("결근"), 0L)
                 - Objects.requireNonNullElse(statusCount.get("출장"), 0L)
@@ -376,7 +376,7 @@ public class AttendanceViewController {
         model.addAttribute("tripCurrentPage", tripPage);
         model.addAttribute("tripTotalPages", (int) Math.ceil((double) vacationOrBusinessList.size() / size));
 
-        return "attendance/today";
+        return "attendance/today-department";
     }
 
     // 페이지 처리
