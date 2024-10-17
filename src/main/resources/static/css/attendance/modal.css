@@ -59,32 +59,31 @@
 }
 
 /* 조퇴 페이지 */
-#early-leave-form {
+.early-leave-form {
     display: flex;
     flex-direction: column;
     align-content: center;
     justify-content: center;
 }
 
-#early-leave-form p {
+.early-leave-form p {
     text-align: center;
     font-weight: bold;
     color: #F44336;
 }
 
-#early-leave-form .form-group {
+.early-leave-form .input-area {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
 }
 
-#early-leave-form textarea {
-    width: 300px;
-    font-size: 16px;
-    resize: none;
+.early-leave-form textarea {
+    width: 90%;
+    margin-top: 10px;
 }
 
-#early-leave-form button {
+.early-leave-form button {
     width: 100%;
 }

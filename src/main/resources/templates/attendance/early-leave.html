@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<div class="attendance-modal">
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+</th:block>
+
+<div class="attendance-modal early-leave-container">
     <h3 style="margin: 0;">조퇴 ></h3>
     <p th:text="${#dates.format(#dates.createToday(), 'yyyy.MM.dd EE')}" style="margin: 10px 0 10px; color: #C8C8C8"></p>
     <div class="time-container">
@@ -9,11 +14,10 @@
         <div th:if="${attendance == null or (attendance.checkIn != null and attendance.checkOut != null)}" class="attendance-status"><img src="/images/icons/switch-off.png"/></div>
         <div id="currentTime" class="current-time"> </div>
     </div>
-    <form id="early-leave-form" onsubmit="earlyLeave(event)">
+    <form id="early-leave-form" class="early-leave-form" onsubmit="earlyLeave(event)">
         <p>* 조퇴를 진행하기 전에 반드시 관리자에게 보고해 주세요. *</p>
-        <div class="form-group">
-            <label for="notes"><strong>조퇴 사유 : </strong></label>
-            <textarea id="notes" name="notes" placeholder="사유를 입력해주세요." rows="1"></textarea>
+        <div class="input-area">
+            <textarea id="notes" name="notes" placeholder="조퇴사유를 입력해주세요." rows="2"></textarea>
         </div>
         <div class="commute-btn-container">
             <button type="submit" class="attendance-btn"
