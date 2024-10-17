@@ -1,6 +1,7 @@
 package com.woosan.hr_system.schedule.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
 import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
@@ -20,6 +21,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     private ScheduleDAO scheduleDAO;
     @Autowired
     private BusinessTripService businessTripService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<Schedule> getAllSchedules() {
@@ -77,7 +80,15 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override // 일정 상태 변경
-    public void updateScheduleStatus(int taskId, String status) {
+    public void updateScheduleStatus(int taskId, String status, String taskName) {
+        log.info("updateScheduleStatus 서비스 도착");
+        // String employeeId, String message, String url
+        if ("완료".equals(status)) {
+            log.info("status가 완료이므로 알림 생성");
+            UserSessionInfo userSessionInfo = new UserSessionInfo();
+            String employeeId = userSessionInfo.getCurrentEmployeeId();
+            notificationService.createNotification(employeeId, taskName + "일정이 완료되었습니다. 보고서를 작성해주세요.", "/report/writeFromSchedule" + taskId);
+        }
         scheduleDAO.updateScheduleStatus(taskId, status);
     }
 

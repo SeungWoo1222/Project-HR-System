@@ -2,6 +2,7 @@ package com.woosan.hr_system.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 //import com.woosan.hr_system.schedule.service.ValidScheduleDates;
+import com.woosan.hr_system.schedule.service.ValidScheduleDates;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-//@ValidScheduleDates
+@ValidScheduleDates
 public class Schedule {
     private int taskId;
     private String memberId;

@@ -65,6 +65,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override // 단일 알림 생성
     public void createNotification(String employeeId, String message, String url) {
+        log.info("createNotification 서비스 도착");
+        log.info("employeeId : {}", employeeId);
+        log.info("message : {}", message);
+        log.info("url : {}", url);
         // 새로운 알림 객체 생성
         Notification notification = Notification.builder()
                 .employeeId(employeeId)

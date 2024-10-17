@@ -118,7 +118,7 @@ public class ScheduleController {
                                                  Errors errors) {
         // 유효성 검사가 실패했을 경우 처리
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getAllErrors().get(0).getDefaultMessage());
+            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
         int taskId = scheduleService.insertSchedule(schedule);
@@ -136,11 +136,9 @@ public class ScheduleController {
     public ResponseEntity<String> updateSchedule(@Valid @ModelAttribute Schedule schedule,
                                                  @Valid @ModelAttribute BusinessTrip businessTrip,
                                                  Errors errors) {
-        log.info("schedule 형태 : {}", schedule);
-        log.info("businessTrip 형태 : {}", businessTrip);
         // 유효성 검사가 실패했을 경우 처리
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getAllErrors().get(0).getDefaultMessage());
+            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
         scheduleService.updateSchedule(schedule);
@@ -162,12 +160,11 @@ public class ScheduleController {
     // 일정 상태 변경
     @PutMapping("/status/{taskId}")
     public ResponseEntity<String> updateScheduleStatus(@PathVariable("taskId") int taskId,
-                                                       @RequestBody Map<String, String> requestBody) {
-        // "status" 필드만 추출
-        String status = requestBody.get("status");
-
+                                                       @RequestParam("status") String status,
+                                                       @RequestParam("taskName") String taskName) {
+        log.info("updateScheduleStatus 컨트롤러 도착");
         // 서비스 호출하여 상태 업데이트
-        scheduleService.updateScheduleStatus(taskId, status);
+        scheduleService.updateScheduleStatus(taskId, status, taskName);
 
         return ResponseEntity.ok("일정 상태 변경이 완료되었습니다.");
     }

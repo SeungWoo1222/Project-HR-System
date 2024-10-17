@@ -214,6 +214,8 @@ function submitInsertForm(event) {
                     alert(response.text);
                     window.location.reload();
                 } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else if (response.status === 422) { // 유효성 검사 오류 시
                     document.getElementById('error-message').textContent = response.text;
                 } else {
                     alert('일정 등록 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
@@ -290,9 +292,9 @@ function submitUpdateForm(event) {
     const contactTel = contactTelElement ? contactTelElement.value : null;
 
     if (address || detailedAddress || tripName || contactTel) {
-        if (!validateTripInfo()) {
-            return;  // 유효성 검사 실패 시 종료
-        }
+        // if (!validateTripInfo()) {
+        //     return;  // 유효성 검사 실패 시 종료
+        // }
         const tripId = document.getElementById('tripId');
         if (tripId) {
             formData.append('tripId', tripId.value);
@@ -329,6 +331,8 @@ function submitUpdateForm(event) {
                     alert(response.text);
                     window.location.reload();
                 } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else if (response.status === 422) { // 유효성 검사 오류 시
                     document.getElementById('error-message').textContent = response.text;
                 } else {
                     alert('일정 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
@@ -375,12 +379,26 @@ function updateScheduleStatus(taskId) {
     if (confirm("상태 변경하시겠습니까?")) {
         const selectedStatus = document.querySelector('input[name="scheduleStatus"]:checked').value;
 
+        // 폼데이터 생성
+        const formData = new FormData();
+        formData.append("status", selectedStatus);
+        if (selectedStatus === "완료") {
+            const taskName = document.getElementById('taskName');
+            console.log(taskName);
+            console.log(taskName.value);
+            formData.append("taskName", taskName.value);
+        }
+
+        formData.forEach((value, key) => {
+            console.log(key, value);
+        });
+
         fetch(`/schedule/status/${taskId}`, {
             method: "PUT",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({status: selectedStatus}) // 상태값을 JSON으로 전송
+            // headers: {
+            //     'Content-Type': 'application/json',
+            // },
+            body: formData
         }).then(response => response.text().then(data => ({
             status: response.status,
             text: data
@@ -401,6 +419,41 @@ function updateScheduleStatus(taskId) {
                 console.error('Error :', error.message);
                 alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
             });
+
+        // 스케줄을 완료했다면 보고서 생성 알림 생성
+        // const scheduleStatus = document.querySelector('input[name="scheduleStatus"]:checked').value;;
+        // console.log("scheduleStatus : ", scheduleStatus);
+        // if (scheduleStatus == "완료") {
+        //     const taskId = document.getElementById('taskId');
+        //     const formData = ('taskId', taskId);
+        //
+        //     fetch(`/report/writeFromSchedule`, {
+        //         method: "POST",
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: formData
+        //     }).then(response => response.text().then(data => ({
+        //         status: response.status,
+        //         text: data
+        //     })))
+        //         .then(response => {
+        //             const errorStatuses = [400, 403, 404, 500];
+        //             if (response.status === 200) {
+        //                 alert(response.text);
+        //                 window.location.reload();
+        //             } else if (errorStatuses.includes(response.status)) {
+        //                 alert(response.text);
+        //             } else {
+        //                 alert('일정 알림 생성 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+        //                 window.location.reload();
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error :', error.message);
+        //             alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+        //         });
+        // }
     }
 }
 
