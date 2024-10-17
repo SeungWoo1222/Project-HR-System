@@ -169,7 +169,7 @@ public class AttendanceViewController {
         model.addAttribute("employee", employeeService.getEmployeeById(employeeId));
 
         // 사원의 휴가 정보 조회 후 승인된 휴가 정보만 모델에 추가
-        List<Vacation> vacationList = vacationService.getVacationByEmployeeId(employeeId).stream()
+        List<Vacation> vacationList = vacationService.getVacationsByEmployeeId(employeeId).stream()
                 .filter(vacation -> vacation.getApprovalStatus().equals("승인"))
                 .toList();
 

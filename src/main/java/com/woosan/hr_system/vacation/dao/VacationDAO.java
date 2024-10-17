@@ -40,13 +40,18 @@ public class VacationDAO {
     }
 
     // 해당 사원의 모든 휴가 정보 조회
-    public List<Vacation> getVacationByEmployeeId(String employeeId) {
-        return sqlSession.selectList("vacation.getVacationByEmployeeId", employeeId);
+    public List<Vacation> getVacationsByEmployeeId(String employeeId) {
+        return sqlSession.selectList("vacation.getVacationsByEmployeeId", employeeId);
     }
 
-    // 해당 부서의 모든 휴가 정보 조회
-    public List<Vacation> selectVacationByDepartmentId(HashMap<String, Object> params) {
-        return sqlSession.selectList("vacation.selectVacationByDepartmentId", params);
+    // 해당 부서의 모든 휴가 내역 조회
+    public List<Vacation> selectVacationsByDepartmentId(HashMap<String, Object> params) {
+        return sqlSession.selectList("vacation.selectVacationsByDepartmentId", params);
+    }
+
+    // 해당 부서의 모든 휴가 내역 개수 조회
+    public int countVacationsByDepartmentId(HashMap<String, Object> params) {
+        return sqlSession.selectOne("vacation.countVacationsByDepartmentId", params);
     }
 
     // 휴가 등록

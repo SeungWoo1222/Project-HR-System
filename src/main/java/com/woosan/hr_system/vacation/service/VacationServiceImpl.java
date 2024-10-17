@@ -79,12 +79,12 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override // 해당 사원의 모든 휴가 정보 조회
-    public List<Vacation> getVacationByEmployeeId(String employeeId) {
-        return vacationDAO.getVacationByEmployeeId(employeeId);
+    public List<Vacation> getVacationsByEmployeeId(String employeeId) {
+        return vacationDAO.getVacationsByEmployeeId(employeeId);
     }
 
     @Override // 해당 부서의 모든 휴가 정보 조회
-    public PageResult<Vacation> getVacationByDepartmentId(PageRequest pageRequest, String departmentId, String status) {
+    public PageResult<Vacation> getVacationsByDepartmentId(PageRequest pageRequest, String departmentId, String status) {
         // 해당 부서 사원 조회 후 아이디 리스트로 반환
         List<Employee> employeeList = employeeDAO.getEmployeesByDepartment(departmentId);
         List<String> employeeIdList = employeeList.stream()
@@ -101,9 +101,9 @@ public class VacationServiceImpl implements VacationService {
         params.put("status", status);
 
         // 해당 부서 사원들 휴가 정보 조회
-        List<Vacation> vacationList = vacationDAO.selectVacationByDepartmentId(params);
+        List<Vacation> vacationList = vacationDAO.selectVacationsByDepartmentId(params);
 
-        int total = vacationList.size(); // 검색 결과 개수
+        int total = vacationDAO.countVacationsByDepartmentId(params); // 검색 결과 개수
 
         return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

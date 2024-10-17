@@ -4,10 +4,9 @@
       layout:decorate="~{fragments/layout :: layout(title='휴가 내역 조회')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}"/>
-    <link rel="stylesheet" th:href="@{/css/common/search.css}"/>
-    <link rel="stylesheet" th:href="@{/css/common/table.css}"/>
-    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
+    <link th:href="@{/css/common/search.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">

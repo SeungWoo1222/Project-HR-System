@@ -93,7 +93,7 @@ public class VacationViewController {
                                              @RequestParam(name = "status", defaultValue = "") String status,
                                              Model model) {
         PageRequest pageRequest = new PageRequest(page - 1, size); // 페이지 번호 인덱싱을 위해 다시 -1
-        PageResult<Vacation> pageResult = vacationService.getVacationByDepartmentId(pageRequest, authService.getAuthenticatedUser().getDepartment(), status);
+        PageResult<Vacation> pageResult = vacationService.getVacationsByDepartmentId(pageRequest, authService.getAuthenticatedUser().getDepartment(), status);
 
         model.addAttribute("vacationList", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
