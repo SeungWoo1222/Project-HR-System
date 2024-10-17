@@ -113,6 +113,7 @@
                 (
                 a.attendance_id LIKE CONCAT('%', #{keyword}, '%') OR
                 a.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.date LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_in LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_out LIKE CONCAT('%', #{keyword}, '%') OR
                 a.notes LIKE CONCAT('%', #{keyword}, '%') OR
@@ -144,6 +145,7 @@
                 (
                 a.attendance_id LIKE CONCAT('%', #{keyword}, '%') OR
                 a.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.date LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_in LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_out LIKE CONCAT('%', #{keyword}, '%') OR
                 a.notes LIKE CONCAT('%', #{keyword}, '%') OR
