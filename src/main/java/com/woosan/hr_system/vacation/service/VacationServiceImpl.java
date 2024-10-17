@@ -58,7 +58,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 휴가 정보 조회
         List<Vacation> vacationList = vacationDAO.searchVacation(params);
-        int total = vacationList.size(); // 검색 결과 개수
+        int total = vacationDAO.countVacation(params); // 검색 결과 개수
 
         return new PageResult<>(vacationList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
