@@ -1,16 +1,26 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<div class="vacation-detail-container">
+<th:block layout:fragment="css">
+    <link th:href="@{/css/vacation/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/vacation/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+</th:block>
+
+<div class="vacation-edit-container">
     <form action="/api/vacation" onsubmit="submitUpdateForm(event)">
-        <div class="vacation-header">
-            <div id="error-message" class="error-message"></div>
-            <div class="btn-container">
+        <div class="content-header">
+            <div class="content-header-left">
+                <div id="error-message" class="error-message"></div>
+            </div>
+            <div class="title content-header-center">휴가 신청서</div>
+            <div class="content-header-right">
                 <button type="reset" class="btn">초기화</button>
                 <button type="submit" class="btn">수정 완료</button>
             </div>
         </div>
-        <div class="title">휴가 신청서</div>
         <table class="employee-details">
             <tr>
                 <td class="section-title">사원 ID</td>
@@ -84,7 +94,10 @@
     <table class="details">
         <tr>
             <td class="section-title">승인 상태</td>
-            <td th:text="${vacationInfo.approvalStatus}"></td>
+            <td th:text="${vacationInfo.approvalStatus}"
+                th:classappend="${vacationInfo.approvalStatus == '미처리'} ? 'skyblue' :
+                                    (${vacationInfo.approvalStatus == '승인'} ? 'green' :
+                                    (${vacationInfo.approvalStatus == '거절'} ? 'red' : ''))"></td>
         </tr>
         <tr>
             <td class="section-title">처리자</td>
@@ -92,7 +105,7 @@
         </tr>
         <tr>
             <td class="section-title">처리 일시</td>
-            <td th:text="${vacationInfo.processingAt}" class="dateTime"></td>
+            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy-MM-dd HH:mm')}"></td>
         </tr>
     </table>
     <div class="submission-declaration">

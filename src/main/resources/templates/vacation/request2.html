@@ -5,9 +5,14 @@
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/vacation/detail.css}"/>
-    <link rel="stylesheet" th:href="@{/css/vacation/request.css}"/>
+    <link rel="stylesheet" th:href="@{/css/vacation/input.css}"/>
     <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
     <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <style>
+        .content {
+            width: 210mm;
+        }
+    </style>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -15,7 +20,7 @@
         let holidays = /*[[${holidays}]]*/ [];
     </script>
     <script th:src="@{/js/vacation/ajax.js}"></script>
-    <script th:src="@{/js/vacation/request.js}"></script>
+    <script th:src="@{/js/vacation/handler.js}"></script>
     <script>
         // 사원 선택 시 이벤트 핸들러 설정
         document.addEventListener("DOMContentLoaded", function() {
@@ -36,7 +41,7 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="insert-form-container">
+        <div class="vacation-add-container">
             <form action="/api/vacation" onsubmit="submitInsertForm(event, 'HR')">
                 <div class="title">휴가 신청서</div>
                 <table class="employee-details">
