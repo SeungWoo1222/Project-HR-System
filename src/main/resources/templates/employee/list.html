@@ -25,7 +25,6 @@
                     <input type="hidden" name="page" th:value="1"/>
                     <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
                         <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                        <option th:value="1" th:text="'1개씩 보기'" th:selected="${pageSize == 1}">1개씩 보기</option>
                         <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                         <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
                     </select>
