@@ -44,7 +44,7 @@ function submitUpdateForm(event) {
 
 // AJAX DELETE 요청 - 급여명세서 삭제
 function deletePayslip(button) {
-    if (!confirm("급여명세서를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+    if (!confirm("급여명세서를 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.")) {
         return;
     }
 

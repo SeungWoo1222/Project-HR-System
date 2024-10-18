@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<link rel="stylesheet" th:href="@{/css/salary/payslip.css}">
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <link th:href="@{/css/salary/payslip.css}" rel="stylesheet">
+</th:block>
 
 <div class="payslip-container" id="payslip-container">
     <div class="btn-container">
@@ -9,8 +14,8 @@
             인쇄하기, PDF로 저장
         </button>
         <div sec:authorize="principal.department == 'HR' and hasAnyRole('ROLE_MANAGER')">
-            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제하기</button>
-            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정하기</button>
+            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정</button>
+            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제</button>
         </div>
     </div>
     <div class="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>
@@ -24,7 +29,7 @@
                 <td style="width: 12.5%;">생년월일</td>
                 <td style="width: 14%;" th:text="${employee.birth}"></td>
                 <td style="width: 12.5%;">지급일</td>
-                <td style="width: 15%;" th:text="${#temporals.format(payslip.paymentDate, 'yy년 MM월 dd일')}"></td>
+                <td style="width: 15%;" th:text="${#temporals.format(payslip.paymentDate, 'yyyy-MM-dd')}"></td>
             </tr>
             <tr>
                 <td style="width: 12.5%;">부서</td>
