@@ -24,8 +24,6 @@ function submitSelectedSalaries() {
         selectedSalaries.push(checkbox.getAttribute('data-salary-id'));
     });
 
-    console.log(selectedSalaries);
-
     if (selectedSalaries.length === 0) {
         alert("급여를 지급할 사원을 선택해 주세요.");
         return;
@@ -41,7 +39,6 @@ function submitSelectedSalaries() {
 
     const url = '/salary/payment/confirm?' + params.toString();
 
-    console.log(url);
     openModal(url);  // openModal 함수 호출
 }
 
@@ -75,7 +72,6 @@ function submitPayForm(event) {
             text: data
         })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text);
 

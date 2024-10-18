@@ -2,35 +2,42 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <style>
+        .modal-content {
+            width: 600px;
+        }
 
-<th:block layout:fragment="script">
-    <script th:src="@{/js/salary/list.js}"></script>
-    <script th:src="@{/js/salary/pay.js}"></script>
+        .pay-complete-container {
+            width: 600px;
+        }
+    </style>
 </th:block>
 
-<div>
-    <h3>급여 지급 완료 목록</h3>
+<div class="pay-complete-container">
+    <h3>
+        <span th:text="${#temporals.format(payments.get(0).compensationMonth, 'yyyy년 MM월')}"></span> 급여 지급 완료 목록
+    </h3>
     <div>
-        <table border="1" class="list">
+        <table class="list" style="table-layout: auto;">
             <thead>
             <tr>
-                <th>급여 정보 ID</th>
+                <th>번호</th>
+                <th>사원 ID</th>
                 <th>급여 지급 ID</th>
-                <th>해당 년월</th>
                 <th>총 급여</th>
                 <th>공제 금액</th>
                 <th>실 지급액</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="payment : ${payments}">
-                <td th:text="${payment.salaryId}">급여 정보 ID</td>
+            <tr th:each="payment, stat : ${payments}">
+                <td th:text="${stat.index + 1}"></td>
+                <td th:text="${payment.salary?.name + '(' + payment.salary?.employeeId + ')'}"></td>
                 <td th:text="${payment.paymentId}">급여 지급 ID</td>
-                <td th:text="${payment.compensationMonth}">해당 년월</td>
                 <td th:text="${#numbers.formatInteger(payment.grossSalary, 3, 'COMMA')}">총 급여</td>
-                <td th:text="${#numbers.formatInteger(payment.deductions, 3, 'COMMA')}" style="color: red; font-weight: bold">공제 금액</td>
-                <td th:text="${#numbers.formatInteger(payment.netSalary, 3, 'COMMA')}" style="color: green; font-weight: bold">실 지급액</td>
+                <td th:text="${#numbers.formatInteger(payment.deductions, 3, 'COMMA')}" class="red">공제 금액</td>
+                <td th:text="${#numbers.formatInteger(payment.netSalary, 3, 'COMMA')}" class="green">실 지급액</td>
             </tr>
             </tbody>
         </table>
