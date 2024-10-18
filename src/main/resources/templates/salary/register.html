@@ -3,7 +3,31 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout :: layout(title='급여정보 등록')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/input.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <style>
+        .content {
+            width: 650px;
+        }
+        .label-area {
+            display: flex;
+            justify-content: center;
+            width: 60px;
+        }
+        .error-message {
+            margin-bottom: 15px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-container .btn {
+            width: 48%;
+            font-size: 16px;
+        }
+    </style>
+</th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/salary/register.js}"></script>
@@ -17,56 +41,58 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <form action="/api/salary/register" method="POST" onsubmit="submitForm(event)">
-            <div class="form-group">
-                <label for="employeeSelect">사원</label>
-                <select id="employeeSelect" name="employeeId" onchange="updateEmployeeDetails()">
-                    <option value="" disabled selected>사원을 선택해주세요.</option>
-                    <option id="employeeId" th:each="employee : ${employeeList}" th:value="${employee.employeeId}"
-                            th:selected="${employee.employeeId == selectedEmployeeId}"
-                            th:data-name="${employee.name}"
-                            th:data-department="${employee.department}"
-                            th:data-position="${employee.position}"
-                            th:text="${employee.name} + ' (' + ${employee.employeeId} + ')'">
-                    </option>
-                </select>
-                <input type="hidden" id="name" name="name"/>
-            </div>
-            <div class="form-group">
-                <label for="department">부서</label>
-                <input type="text" id="department" name="department" readonly/>
-            </div>
-            <div class="form-group">
-                <label for="position">직급</label>
-                <input type="text" id="position" name="position" readonly/>
-            </div>
-            <div class="form-group">
-                <label>은행</label>
-                <select id="bank" name="bank">
-                    <option value="" disabled selected>은행을 선택해주세요.</option>
-                    <option value="KB국민은행">KB국민은행</option>
-                    <option value="카카오뱅크">카카오뱅크</option>
-                    <option value="신한은행">신한은행</option>
-                    <option value="NH농협은행">NH농협은행</option>
-                    <option value="하나은행">하나은행</option>
-                    <option value="우리은행">우리은행</option>
-                    <option value="IBK기업은행">IBK기업은행</option>
-                    <option value="케이뱅크">케이뱅크</option>
-                    <option value="새마을금고">새마을금고</option>
-                    <option value="우체국">우체국</option>
-                    <option value="신협">신협</option>
-                    <option value="SC제일은행">SC제일은행</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>계좌번호</label>
-                <input type="text" id="accountNumber" name="accountNumber" maxlength="30" placeholder="'-' 없이 숫자만 입력해주세요" oninput="validateAccountNumber()"/>
-            </div>
-            <div class="form-group">
-                <label>연봉</label>
-                <input type="text" id="annualSalary" name="annualSalary" maxlength="11" placeholder="금액을 입력해주세요." oninput="formatAnnualSalary()"/>
+            <div class="section">
+                <div class="form-group">
+                    <div class="label-area"><label for="employeeSelect">사원</label></div>
+                    <select id="employeeSelect" name="employeeId" onchange="updateEmployeeDetails()">
+                        <option value="" disabled selected>사원을 선택해주세요.</option>
+                        <option id="employeeId" th:each="employee : ${employeeList}" th:value="${employee.employeeId}"
+                                th:selected="${employee.employeeId == selectedEmployeeId}"
+                                th:data-name="${employee.name}"
+                                th:data-department="${employee.department}"
+                                th:data-position="${employee.position}"
+                                th:text="${employee.name} + ' (' + ${employee.employeeId} + ')'">
+                        </option>
+                    </select>
+                    <input type="hidden" id="name" name="name"/>
+                </div>
+                <div class="form-group">
+                    <div class="label-area"><label for="department">부서</label></div>
+                    <input type="text" id="department" name="department" readonly/>
+                </div>
+                <div class="form-group">
+                    <div class="label-area"><label for="position">직급</label></div>
+                    <input type="text" id="position" name="position" readonly/>
+                </div>
+                <div class="form-group">
+                    <div class="label-area"><label>은행</label></div>
+                    <select id="bank" name="bank">
+                        <option value="" disabled selected>은행을 선택해주세요.</option>
+                        <option value="KB국민은행">KB국민은행</option>
+                        <option value="카카오뱅크">카카오뱅크</option>
+                        <option value="신한은행">신한은행</option>
+                        <option value="NH농협은행">NH농협은행</option>
+                        <option value="하나은행">하나은행</option>
+                        <option value="우리은행">우리은행</option>
+                        <option value="IBK기업은행">IBK기업은행</option>
+                        <option value="케이뱅크">케이뱅크</option>
+                        <option value="새마을금고">새마을금고</option>
+                        <option value="우체국">우체국</option>
+                        <option value="신협">신협</option>
+                        <option value="SC제일은행">SC제일은행</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="label-area"><label>계좌번호</label></div>
+                    <input type="text" id="accountNumber" name="accountNumber" maxlength="30" placeholder="'-' 없이 숫자만 입력해주세요" oninput="validateAccountNumber()"/>
+                </div>
+                <div class="form-group">
+                    <div class="label-area"><label>연봉</label></div>
+                    <input type="text" id="annualSalary" name="annualSalary" maxlength="11" placeholder="금액을 입력해주세요." oninput="formatAnnualSalary()"/>
+                </div>
             </div>
             <div class="error-message"></div>
-            <div class="btn-are">
+            <div class="btn-container">
                 <button type="reset" class="btn">초기화</button>
                 <button type="submit" class="btn">급여 정보 등록</button>
             </div>

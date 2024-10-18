@@ -37,8 +37,7 @@ function formatAnnualSalary() {
 function validateForm(event) {
     event.preventDefault();
 
-    const employeeId = document.getElementById("employeeId").value.trim();
-    const name = document.getElementById("name").value.trim();
+    const employeeId = document.getElementById("employeeSelect").value.trim();
     const department = document.getElementById("department").value.trim();
     const position = document.getElementById("position").value.trim();
     const bank = document.getElementById("bank").value.trim();
@@ -47,34 +46,52 @@ function validateForm(event) {
 
     let errorMessage = document.querySelector(".error-message");
 
-    if (employeeId === "") {
-        errorMessage.textContent = "사원을 선택해주세요.";
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
     }
-    if (name === "") {
-        errorMessage.textContent = "이름을 입력해주세요.";
-        return false;
+
+    if (employeeId === "") {
+        return showError("employeeSelect", "사원을 선택해주세요.");
     }
     if (department === "") {
-        errorMessage.textContent = "부서 정보가 없습니다.";
-        return false;
+        return showError("department", "부서 정보가 없습니다.", true);
     }
     if (position === "") {
-        errorMessage.textContent = "직급 정보가 없습니다.";
-        return false;
+        return showError("position", "직급 정보가 없습니다.", true);
     }
     if (bank === "") {
-        errorMessage.textContent = "은행을 선택해주세요.";
-        return false;
+        return showError("bank", "은행을 선택해주세요.");
     }
     if (accountNumber === "") {
-        errorMessage.textContent = "계좌번호를 입력해주세요.";
-        return false;
+        errorMessage.textContent = "";
+        return showError("accountNumber", "계좌번호를 입력해주세요.", true);
     }
     if (annualSalary === "") {
-        errorMessage.textContent = "연봉을 입력해주세요.";
-        return false;
+        return showError("annualSalary", "연봉을 입력해주세요.", true);
     }
+
+    errorMessage.textContent = '';
     return true;
 }
 
