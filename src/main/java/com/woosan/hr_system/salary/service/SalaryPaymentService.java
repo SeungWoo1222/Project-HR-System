@@ -15,7 +15,7 @@ public interface SalaryPaymentService {
     SalaryPayment getPaymentWithSalaryById(int paymentId);
     List<SalaryPayment> getPaymentsByEmployeeId(String employeeId);
     List<SalaryPayment> getPaymentBySalaryAndMonth(List<Integer> salaryIdList, String yearMonthString);
-    PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest);
+    PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest, String department, YearMonth yearMonth);
     PageResult<SalaryPayment> searchMyPayslips(PageRequest pageRequest, String employeeId);
     List<SalaryPayment> getAllPayments();
     String addPayment(int salaryId);

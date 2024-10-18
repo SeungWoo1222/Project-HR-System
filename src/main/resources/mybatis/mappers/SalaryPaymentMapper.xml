@@ -164,6 +164,12 @@
                 s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
+            </if>
         </where>
         ORDER BY sp.payment_date DESC
         LIMIT #{pageSize} OFFSET #{offset}
@@ -210,6 +216,12 @@
                 s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
                 s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
             </if>
         </where>
     </select>

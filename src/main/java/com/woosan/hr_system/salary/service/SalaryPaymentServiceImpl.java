@@ -63,12 +63,19 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
     }
 
-    @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
-    public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
+    @Override // 모든 사원의 급여 내역 검색
+    public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest, String department, YearMonth yearMonth) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
 
-        List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
-        int total = salaryPaymentDAO.countPayslips(pageRequest.getKeyword());
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", pageRequest.getKeyword());
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("yearMonth", yearMonth);
+
+        List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(params);
+        int total = salaryPaymentDAO.countPayslips(params);
 
         if (!payslips.isEmpty()) {
             // 급여명세서에 급여 정보 삽입
