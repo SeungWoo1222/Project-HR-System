@@ -81,16 +81,6 @@ public class SalaryPaymentViewController {
         return "salary/payment/pay-list";
     }
 
-    @RequireHRPermission
-    @GetMapping("/complete") // 급여 지급 완료 목록 페이지 이동
-    public String viewPayComplete(@RequestParam(name = "yearmonth") String yearMonthString,
-                                  @RequestParam(name = "salaryIdList") List<Integer> salaryIdList,
-                                  Model model) {
-        List<SalaryPayment> payments = salaryPaymentService.getPaymentBySalaryAndMonth(salaryIdList, yearMonthString);
-        model.addAttribute("payments", payments);
-        return "salary/payment/pay-complete";
-    }
-
     @GetMapping("/{paymentId}") // 특정 사원의 급여 지급 내역 페이지 이동
     public String viewPayslip(@PathVariable("paymentId") int paymentId, Model model) {
         // 급여명세서 조회

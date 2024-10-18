@@ -42,12 +42,6 @@ public class SalaryPaymentDAO {
         return sqlSession.selectList(NAMESPACE + "selectPaymentByMonth", yearMonthString);
     }
 
-    // salaryId와 yearMonth를 이용한 급여명세서 리스트 조회
-    public List<SalaryPayment> selectPaymentBySalaryAndMonth(List<Integer> salaryIdList, YearMonth yearMonth) {
-        return sqlSession.selectList(NAMESPACE + "selectPaymentBySalaryAndMonth",
-                Map.of("salaryIdList", salaryIdList, "yearMonth", yearMonth));
-    }
-
     // 모든 급여명세서 - 검색어에 해당하는 데이터 결과 조회
     public List<SalaryPayment> searchPayslips(Map<String, Object> params) {
         return sqlSession.selectList(NAMESPACE + "searchPayslips", params);

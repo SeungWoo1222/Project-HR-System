@@ -115,18 +115,6 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.selectAllPayments();
     }
 
-    @Override // salaryId와 yearMonth를 이용한 급여명세서 리스트 조회
-    public List<SalaryPayment> getPaymentBySalaryAndMonth(List<Integer> salaryIdList, String yearMonthString) {
-//        // 문자열 -> 리스트로 변환
-//        String[] salaryIdArr = salaryIds.split(",");
-//        Integer[] salaryIdArrInt = Arrays.stream(salaryIdArr).map(Integer::parseInt).toArray(Integer[]::new);
-//        List<Integer> salaryIdList = Arrays.asList(salaryIdArrInt);
-
-        // 문자열 -> YearMonth로 변환
-        YearMonth yearMonth = YearMonth.parse(yearMonthString);
-
-        return salaryPaymentDAO.selectPaymentBySalaryAndMonth(salaryIdList, yearMonth);
-    }
 
     @LogBeforeExecution
     @LogAfterExecution
