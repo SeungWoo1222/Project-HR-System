@@ -8,20 +8,12 @@
     <link th:href="@{/css/common/search.css}" rel="stylesheet">
     <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
     <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
-        .btn-container {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: end;
-        }
-
-        .green {
-            color: #32CD32;
-            font-weight: bold;
-        }
-        .red {
-            color: #FF0000;
-            font-weight: bold;
+        .btn-container .survey-btn {
+            font-size: 15px;
+            padding: 10px 15px;
         }
     </style>
 </th:block>
@@ -37,41 +29,43 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form th:action="@{/survey/list}" method="get" id="pageSizeForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="keyword" th:value="${keyword}"/>
-                <input type="hidden" name="status" th:value="${status}">
-            </form>
-            <div class="search-option">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form th:action="@{/survey/list}" method="get" id="pageSizeForm">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="status" th:value="${status}">
+                </form>
                 <form th:action="@{/survey/list}" method="get" id="statusForm">
                     <input type="hidden" name="page" th:value="1"/>
                     <input type="hidden" name="size" th:value="${pageSize}"/>
                     <input type="hidden" name="keyword" th:value="${keyword}"/>
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
-                        <option value="" th:selected="${status == ''}" disabled>전체</option>
+                    <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
+                        <option value="" th:selected="${status == ''}">설문 상태</option>
                         <option value="조사 중" th:selected="${status == '조사 중'}">조사 중</option>
                         <option value="조사 종료" th:selected="${status == '조사 종료'}">조사 종료</option>
                     </select>
                 </form>
-                <form th:action="@{/survey/list}" method="get">
+            </div>
+            <div class="content-header-right">
+                <form th:action="@{/survey/list}" class="search-form" method="get">
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                     <input type="hidden" name="status" th:value="${status}">
-                    <button type="submit">검색</button>
+                    <button type="submit" class="search-btn">
+                        <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                    </button>
                 </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/survey/list'"/>
+                <button type="button" class="reset-btn" onclick="window.location.href='/survey/list'">
+                    <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+                </button>
             </div>
-        </div>
-        <div class="btn-container">
-            <button sec:authorize="hasRole('ROLE_MANAGER')"
-                    type="button" class="btn" onclick="window.location.href='/survey/form'">새 설문 등록</button>
         </div>
         <table border="1" class="list">
             <thead>
@@ -100,33 +94,40 @@
             </tr>
             </tbody>
         </table>
-        <div class="pagination" th:if="${totalPages > 0}">
-            <span th:if="${currentPage > 1}">
-                <a th:href="@{'/survey/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}">
-                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
-                </a>
-            </span>
-            <div class="page-area">
-                <span th:if="${totalPages <= 5}">
-                    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                        <a th:href="@{'/survey/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
-                    </span>
+        <div class="content-header">
+            <div class="content-header-left"></div>
+            <div class="pagination content-header-center" th:if="${totalPages > 0}">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/survey/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
                 </span>
-                <span th:if="${totalPages > 5}">
-                    <span th:each="i : ${#numbers.sequence(
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                        <a th:href="@{'/survey/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/survey/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
                     </span>
+                    <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/survey/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                </div>
+                <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/survey/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
                 </span>
             </div>
-            <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/survey/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&status=' + ${status}}">
-                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
-                </a>
-            </span>
+            <div class="btn-container content-header-right">
+                <button sec:authorize="hasRole('ROLE_MANAGER')"
+                        type="button" class="btn survey-btn" onclick="window.location.href='/survey/form'">새 설문 등록</button>
+            </div>
         </div>
     </div>
 </div>
