@@ -1,49 +1,52 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+</th:block>
 
-<form id="payroll-edit-form" class="ratio-edit-form" th:action="@{/api/salary/payment/payroll}" onsubmit="submitUpdateForm(event)">
-    <div class="ratio-edit-header">
-        <h3>급여 비율 수정</h3>
+<div class="input-modal">
+    <h3>급여 비율 수정</h3>
+    <form id="payroll-edit-form" class="ratio-edit-form" th:action="@{/api/salary/payment/payroll}" onsubmit="submitUpdateForm(event)">
+        <div class="input-container">
+            <label for="baseSalaryRatio">기본급</label>
+            <input type="number" step="0.5" id="baseSalaryRatio" name="baseSalaryRatio" th:value="${payrollRatios.baseSalaryRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="positionAllowanceRatio">직책 수당</label>
+            <input type="number" step="0.5" id="positionAllowanceRatio" name="positionAllowanceRatio" th:value="${payrollRatios.positionAllowanceRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="mealAllowanceRatio">직책 수당</label>
+            <input type="number" step="0.5" id="mealAllowanceRatio" name="mealAllowanceRatio" th:value="${payrollRatios.mealAllowanceRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="transportAllowanceRatio">교통비</label>
+            <input type="number" step="0.5" id="transportAllowanceRatio" name="transportAllowanceRatio" th:value="${payrollRatios.transportAllowanceRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="personalBonusRatio">개인 성과급</label>
+            <input type="number" step="0.5" id="personalBonusRatio" name="personalBonusRatio" th:value="${payrollRatios.personalBonusRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="teamBonusRatio">팀 성과급</label>
+            <input type="number" step="0.5" id="teamBonusRatio" name="teamBonusRatio" th:value="${payrollRatios.teamBonusRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="holidayBonusRatio">명절 보너스</label>
+            <input type="number" step="0.5" id="holidayBonusRatio" name="holidayBonusRatio" th:value="${payrollRatios.holidayBonusRatio}"/>
+        </div>
+        <div class="input-container">
+            <label for="yearEndBonusRatio">연말 보너스</label>
+            <input type="number" step="0.5" id="yearEndBonusRatio" name="yearEndBonusRatio" th:value="${payrollRatios.yearEndBonusRatio}"/>
+        </div>
         <div class="btn-container">
             <button type="reset" class="btn">초기화</button>
             <button type="submit" id="edit-payroll-ratio" class="btn">수정 완료</button>
         </div>
-    </div>
-    <table border="1">
-        <tr>
-            <td>기본급</td>
-            <td><input type="text" name="baseSalaryRatio" th:value="${payrollRatios.baseSalaryRatio}"/></td>
-        </tr>
-        <tr>
-            <td>직책 수당</td>
-            <td><input type="text" name="positionAllowanceRatio" th:value="${payrollRatios.positionAllowanceRatio}"/></td>
-        </tr>
-        <tr>
-            <td>직책 수당</td>
-            <td><input type="text" name="mealAllowanceRatio" th:value="${payrollRatios.mealAllowanceRatio}"/></td>
-        </tr>
-        <tr>
-            <td>교통비</td>
-            <td><input type="text" name="transportAllowanceRatio" th:value="${payrollRatios.transportAllowanceRatio}"/></td>
-        </tr>
-        <tr>
-            <td>개인 성과급</td>
-            <td><input type="text" name="personalBonusRatio" th:value="${payrollRatios.personalBonusRatio}"/></td>
-        </tr>
-        <tr>
-            <td>팀 성과급</td>
-            <td><input type="text" name="teamBonusRatio" th:value="${payrollRatios.teamBonusRatio}"/></td>
-        </tr>
-        <tr>
-            <td>명절 보너스</td>
-            <td><input type="text" name="holidayBonusRatio" th:value="${payrollRatios.holidayBonusRatio}"/></td>
-        </tr>
-        <tr>
-            <td>연말 보너스</td>
-            <td><input type="text" name="yearEndBonusRatio" th:value="${payrollRatios.yearEndBonusRatio}"/></td>
-        </tr>
-    </table>
-</form>
+    </form>
+</div>
 </html>
      
