@@ -48,6 +48,7 @@
                 <div th:style="'width: 10px; height: 10px; border-radius: 50px; display: inline-block; background-color: ' + ${schedule.color}"></div>
             </td>
             <td>
+                <input type="hidden" id="taskName" th:value="${schedule.taskName}">
                 <input type="radio" name="scheduleStatus" value="미완료" th:checked="${schedule.status == '미완료'}">미완료
                 <input type="radio" name="scheduleStatus" value="진행중" th:checked="${schedule.status == '진행중'}">진행중
                 <input type="radio" name="scheduleStatus" value="완료" th:checked="${schedule.status == '완료'}">완료
@@ -104,8 +105,8 @@
                 </td>
             </tr>
             <tr>
-                <td class="section-title">고객명</td>
-                <td th:text="${trip.clientName}">고객명</td>
+                <td class="section-title">출장지 이름</td>
+                <td th:text="${trip.tripName}">출장지 이름</td>
             </tr>
             <tr>
                 <td class="section-title">전화번호</td>

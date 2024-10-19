@@ -1,10 +1,8 @@
+var hadTripInfo = false;
 // 지도 표시 로직
 function viewMap() {
     const address = document.getElementById('sample6_address').value;
     const detailAddress = document.getElementById('sample6_detailAddress').value;
-
-    console.log("address", address);
-    console.log("detailAddress", detailAddress);
 
     if (!address) {
         alert('주소를 입력하세요.');
@@ -17,7 +15,7 @@ function viewMap() {
     var fullAddress = address + ' ' + detailAddress;
 
     // 지도를 페이지 내에 표시
-    naver.maps.Service.geocode({ query: fullAddress }, function (status, response) {
+    naver.maps.Service.geocode({query: fullAddress}, function (status, response) {
         if (status === naver.maps.Service.Status.ERROR) {
             alert('Geocode Error');
             return;
@@ -100,16 +98,14 @@ function sample6_execDaumPostcode() {
 }
 
 function validateTripInfo() {
-    console.log("validateTripInfo 실행");
 
     const address = document.getElementById('sample6_address')?.value || '';
     const detailedAddress = document.getElementById('sample6_detailAddress')?.value || '';
-    const clientName = document.getElementById('tripName')?.value || '';
+    const tripName = document.getElementById('tripName')?.value || '';
     const contactTel = document.getElementById('tripTel')?.value || '';
     const contactEmail = getEmail().trim() || '';
-    console.log("contactEmail : ", contactEmail);
 
-    if (address || detailedAddress || clientName || contactTel || contactEmail) {
+    if (address || detailedAddress || tripName || contactTel || contactEmail) {
         // 오류 메시지 초기화
         const errorMessage = document.getElementById('error-message');
         errorMessage.textContent = '';
@@ -122,28 +118,83 @@ function validateTripInfo() {
             errorMessage.textContent = '상세주소를 입력해주세요.';
             return false;
         }
-        if (!clientName) {
+        if (!tripName) {
             errorMessage.textContent = '출장지 이름을 입력해주세요.';
             return false;
         }
         if (!contactTel) {
-            errorMessage.textContent = '전화번호를 입력해주세요.';
+            errorMessage.textContent = "전화번호를 입력해주세요";
+            return false;
+        }
+        // 전화번호 검사
+        const telValidationResult = validatePhoneNumber(contactTel);
+        if (telValidationResult) {
+            errorMessage.textContent = telValidationResult;
             return false;
         }
         if (contactEmail.startsWith('@') || contactEmail.endsWith('@')) {
             errorMessage.textContent = '이메일을 입력해주세요.';
             return false;
         }
-        // 이메일 형식 확인 (@뒤에 도메인이 있는지 확인, .com 등 형식 체크)
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(contactEmail)) {
-            errorMessage.textContent = '유효한 이메일을 입력해주세요.';
+        // 이메일 검사
+        const emailValidationResult = validateEmail();
+        if (emailValidationResult) {
+            errorMessage.textContent = emailValidationResult;
             return false;
         }
-
     }
 
     return true;
+}
+
+// 전화번호 유효성 검사 함수 추가
+function validatePhoneNumber(phoneNumber) {
+    const cleaned = phoneNumber.replace(/[^0-9]/g, ''); // 숫자만 남기기
+
+    // 유효한 시작 번호 패턴 (지역번호 또는 휴대전화 번호 패턴)
+    const validStartPatterns = /^(010\d{8}|02\d{7,8}|0[3-6][1-5]\d{6,7})$/;
+
+    // 자릿수 확인: 9자리 이상 11자리 이하ㅁ
+    const isValidLength = cleaned.length >= 9 && cleaned.length <= 11;
+    if (!isValidLength) {
+        return "전화번호 자리 수는 9자리 이상 11자리 이하입니다."
+    }
+
+    // 시작 번호가 올바른지 확인
+    const isValidStart = validStartPatterns.test(cleaned);
+    if (!isValidStart) {
+        return "지역번호 또는 휴대전화 번호 형태가 아닙니다."
+    }
+
+    // 최종 유효성 결과 반환
+    return "";
+}
+
+// 이메일 유효성 검사 함수
+function validateEmail() {
+    const emailLocalPart = document.getElementById('emailLocalPart').value;
+    const domainInput = document.getElementById('domainInput').value;
+
+    // 이메일 아이디 부분 유효성 검사
+    const localPartRegex = /^[a-zA-Z0-9._-]*$/;
+    if (!localPartRegex.test(emailLocalPart)) {
+        return "이메일 아이디는 영어, 특수문자(. _ -)로 입력해주세요.";
+    }
+
+    // 도메인 부분 유효성 검사
+    const domainRegex = /^[a-zA-Z0-9.]*$/;
+    if (!domainRegex.test(domainInput)) {
+        return "이메일 도메인은 'example.com' 형태로 입력해주세요.";
+    }
+
+    // 이메일 전체 유효성 검사
+    const fullEmail = emailLocalPart + '@' + domainInput;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(fullEmail)) {
+        return "유효한 이메일 형식이 아닙니다.";
+    }
+
+    return ""; // 모든 검사를 통과했을 때 빈 문자열 반환
 }
 
 function getEmail() {
@@ -153,4 +204,95 @@ function getEmail() {
         : document.getElementById('domainSelect').value;
 
     return localPart + '@' + domainPart;
+}
+
+// 출장 필드를 동적으로 추가하는 함수
+function addTripFields() {
+    let tripFieldsContainer = document.getElementById('tripTable');
+
+    if (!tripFieldsContainer) {
+        // tripTable이 없으면 새롭게 생성
+        tripFieldsContainer = document.createElement('table');
+        tripFieldsContainer.id = 'tripTable';
+        tripFieldsContainer.classList.add('details');
+
+        // 새로운 테이블을 일정 상세 정보 아래에 추가 (적절한 부모 요소 찾아서 append)
+        const detailContainer = document.querySelector('.detail-container'); // 적절한 부모 요소 선택
+        detailContainer.appendChild(tripFieldsContainer);  // 부모 요소에 추가
+    }
+
+    const tripFieldsHTML = `
+            <tr>
+                <td class="section-title">출장지 주소</td>
+                <td>
+                    <div>
+                        <input type="text" id="sample6_postcode" placeholder="우편번호">
+                        <input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+                        <input type="text" id="sample6_address" placeholder="주소"><br>
+                        <input type="text" id="sample6_detailAddress" placeholder="상세주소">
+                        <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+                        <button id="mapButton" type="button" onclick="viewMap()">지도 보기</button>
+                    </div>
+                    <div id="map-section" style="display: none;">
+                        <!-- 지도와 수정 버튼 -->
+                        <div id="map" style="width:500px; height:400px;"></div>
+                        <button type="button" onclick="closeMap()">지도 닫기</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">출장지 이름</td>
+                <td><input id="tripName" type="text" placeholder="출장지 이름을 입력하세요"></td>
+            </tr>
+            <tr>
+                <td class="section-title">전화번호</td>
+                <td>
+                    <input id="tripTel" type="text" oninput="localAutoHyphen(this)" maxlength="13" placeholder="전화번호를 입력하세요"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">이메일</td>
+                <td>
+                    <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"> @
+                    <select id="domainSelect">
+                        <option value="" disabled selected>도메인 선택</option>
+                        <option value="naver.com">naver.com</option>
+                        <option value="google.com">google.com</option>
+                        <option value="hanmail.net">hanmail.net</option>
+                        <option value="nate.com">nate.com</option>
+                        <option value="kakao.com">kakao.com</option>
+                        <option value="custom">직접 입력</option>
+                    </select>
+                    <input id="domainInput" type="text" placeholder="직접 입력" disabled>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">참고사항</td>
+                <td><input id="note" type="text" placeholder="참고사항을 입력하세요"></td>
+            </tr>`;
+
+    // 새로운 HTML 추가
+    tripFieldsContainer.innerHTML = tripFieldsHTML;
+    tripFieldsContainer.style.display = 'block';
+    document.querySelector('.addTripButton').style.display = 'none';
+    document.querySelector('.closeTripButton').style.display = 'block';
+}
+
+function closeTripFields() {
+    // 기존에 출장 정보가 있다면 플래그 변수 true
+    if (document.getElementById('sample6_address').defaultValue) {
+        hadTripInfo = true;
+    }
+    document.getElementById('tripTable').style.display = 'none';
+    document.querySelector('.closeTripButton').style.display = 'none';
+    document.querySelector('.addTripButton').style.display= 'block';
+
+    // 출장 정보 필드를 비워서 제출되지 않도록 설정
+    document.getElementById('sample6_address').value = '';
+    document.getElementById('sample6_detailAddress').value = '';
+    document.getElementById('tripName').value = '';
+    document.getElementById('tripTel').value = '';
+    document.getElementById('emailLocalPart').value = '';
+    document.getElementById('domainSelect').value = '';
+    document.getElementById('domainInput').value = '';
 }

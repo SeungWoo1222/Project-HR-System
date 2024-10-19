@@ -89,6 +89,12 @@
         JOIN employees e ON r.requester_id = e.employee_id
         <where>
             writer_id = #{writerId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                r.request_note LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (r.request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
@@ -108,7 +114,13 @@
         SELECT COUNT(writer_id) FROM report_requests JOIN employees e ON requester_id = employee_id
         <where>
             writer_id = #{writerId}
-            <if test="keyword != null and keyword != '' and searchType == 1">
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                request_note LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 1">a
                 AND (
                 request_note LIKE CONCAT('%', #{keyword}, '%')
                 )
@@ -136,7 +148,13 @@
         FROM report_requests
         <where>
             requester_id = #{requesterId}
-        <if test="keyword != null and keyword != '' and searchType == 1">
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                request_note LIKE CONCAT('%', #{keyword}, '%') OR
+                writer_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (request_note LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="keyword != null and keyword != '' and searchType == 2">
@@ -155,6 +173,12 @@
         SELECT COUNT(requester_id) FROM report_requests
         <where>
             requester_id = #{requesterId}
+            <if test="keyword != null and keyword != '' and searchType == 0">
+                AND (
+                request_note LIKE CONCAT('%', #{keyword}, '%') OR
+                writer_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="keyword != null and keyword != '' and searchType == 1">
                 AND (
                 request_note LIKE CONCAT('%', #{keyword}, '%')

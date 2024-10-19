@@ -8,6 +8,8 @@ import com.woosan.hr_system.holiday.service.HolidayService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.schedule.service.ScheduleService;
+import com.woosan.hr_system.survey.model.Response;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,11 +17,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -80,14 +84,13 @@ public class ScheduleController {
     }
 
     @GetMapping("/new2") // 본인 일정 등록 페이지
-    public String newScheduleForm(Model model) {
+    public String viewMyScheduleForm(Model model) {
         model.addAttribute("employee", employeeService.getEmployeeById(authService.getAuthenticatedUser().getUsername()));
         return "schedule/new2";
     }
 
     @GetMapping("/{taskId}/edit") // 일정 수정 페이지
-    public String newScheduleForm(@PathVariable("taskId") int taskId, Model model) {
-        log.info("일정 수정 컨트롤러 호출");
+    public String viewEditScheduleForm (@PathVariable("taskId") int taskId, Model model) {
         Schedule scheduleInfo = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", scheduleInfo);
         BusinessTrip trip = businessTripService.getBusinessTripById(taskId);
@@ -110,32 +113,40 @@ public class ScheduleController {
     }
 
     @PostMapping // 일정 등록
-    public ResponseEntity<String> insertSchedule(@ModelAttribute Schedule schedule,
-                                                 @ModelAttribute BusinessTrip businessTrip) {
-        log.info("컨트롤러 schedule: {}", schedule);
-        log.info("컨트롤러 businessTrip: {}", businessTrip);
+    public ResponseEntity<String> insertSchedule(@Valid @ModelAttribute Schedule schedule,
+                                                 @Valid @ModelAttribute BusinessTrip businessTrip,
+                                                 Errors errors) {
+        // 유효성 검사가 실패했을 경우 처리
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
+        }
 
         int taskId = scheduleService.insertSchedule(schedule);
-        log.info("taskId 반환 완료 : {}", taskId);
+
         if (businessTrip.getAddress() != null) {
-            log.info("tripInfoJson 기반 출장정보 삽입 시작");
-            businessTripService.insertBusinessTrip(businessTrip, taskId);
+            ResponseEntity<String> response = businessTripService.insertBusinessTrip(businessTrip, taskId);
+            return response;
         }
 
         return ResponseEntity.ok("일정 생성이 완료되었습니다.");
     }
 
+    @Transactional
     @PutMapping("/edit") // 일정 수정
-    public ResponseEntity<String> updateSchedule(@ModelAttribute Schedule schedule,
-                                                 @ModelAttribute BusinessTrip businessTrip) {
-        log.info("일정 수정 컨트롤러 실행 : schedule : {}, businessTrip : {}", schedule, businessTrip);
-        scheduleService.updateSchedule(schedule);
-
-        if (businessTrip.getAddress() != null) {
-            businessTripService.updateBusinessTrip(businessTrip);
+    public ResponseEntity<String> updateSchedule(@Valid @ModelAttribute Schedule schedule,
+                                                 @Valid @ModelAttribute BusinessTrip businessTrip,
+                                                 Errors errors) {
+        // 유효성 검사가 실패했을 경우 처리
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
-        return ResponseEntity.ok("일정 수정이 완료되었습니다.");
+        scheduleService.updateSchedule(schedule);
+        // 출장이 없던 일정에 출장지가 생긴 경우를 대비하여 taskId를 설정해줌
+        businessTrip.setTaskId(schedule.getTaskId());
+
+        ResponseEntity<String> response =  businessTripService.updateBusinessTrip(businessTrip);
+        return response;
     }
 
     // 일정 삭제
@@ -149,12 +160,11 @@ public class ScheduleController {
     // 일정 상태 변경
     @PutMapping("/status/{taskId}")
     public ResponseEntity<String> updateScheduleStatus(@PathVariable("taskId") int taskId,
-                                                       @RequestBody Map<String, String> requestBody) {
-        // "status" 필드만 추출
-        String status = requestBody.get("status");
-
+                                                       @RequestParam("status") String status,
+                                                       @RequestParam("taskName") String taskName) {
+        log.info("updateScheduleStatus 컨트롤러 도착");
         // 서비스 호출하여 상태 업데이트
-        scheduleService.updateScheduleStatus(taskId, status);
+        scheduleService.updateScheduleStatus(taskId, status, taskName);
 
         return ResponseEntity.ok("일정 상태 변경이 완료되었습니다.");
     }
@@ -164,9 +174,6 @@ public class ScheduleController {
     public ResponseEntity<String> updateTripStatus(@PathVariable("tripId") int tripId,
                                                    @RequestBody Map<String, String> requestBody) {
         String status = requestBody.get("status");
-
-        log.info("컨트롤러 - 출장 상태변경 실행 tripId : {}", tripId);
-        log.info("컨트롤러 - 출장 상태변경 실행 status : {}", status);
         businessTripService.updateTripStatus(tripId, status);
         return ResponseEntity.ok("출장 상태 변경이 완료되었습니다.");
     }

@@ -11,6 +11,8 @@ import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.ReportFileService;
 import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
+import com.woosan.hr_system.schedule.model.Schedule;
+import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.file.model.File;
@@ -44,6 +46,8 @@ public class ReportController {
     private RequestService requestService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ScheduleService scheduleService;
     @Autowired
     private EmployeeDAO employeeDAO;
     @Autowired
@@ -114,7 +118,7 @@ public class ReportController {
     }
 
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
-    public String showCreateFromRequestPage(@RequestParam("requestId") int requestId,
+    public String showCreatePageFromRequest(@RequestParam("requestId") int requestId,
                                             Model model) {
 
         Request request = requestService.getRequestById(requestId);
@@ -148,6 +152,25 @@ public class ReportController {
         return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
     }
 
+    // 일정 완료 된 보고서 생성 페이지 이동
+    @GetMapping("/writeFromSchedule/{taskId}")
+    public String showCreatePageFromSchedule(@PathVariable("taskId") int taskId,
+                                            Model model) {
+
+        log.info("showCreatePageFromSchedule 도착 taskId : {}", taskId);
+
+        Schedule schedule = scheduleService.getScheduleById(taskId);
+        model.addAttribute("schedule", schedule);
+        model.addAttribute("report", new Report());
+        return "/report/write-from-schedule";
+    }
+
+    // 일정 완료 된 보고서 생성
+//    @PostMapping("writeFromSchedule")
+//    public ResponseEntity<String> createReportFromSchedule() {
+//        return "보고서 생성이 완료되었습니다.";
+//    }
+
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
 
@@ -176,6 +199,7 @@ public class ReportController {
                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                                  Model model) {
+
         // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();

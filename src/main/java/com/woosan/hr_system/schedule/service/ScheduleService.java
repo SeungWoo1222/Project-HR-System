@@ -10,7 +10,7 @@ public interface ScheduleService {
     Schedule getScheduleById(int taskId);
     int insertSchedule(Schedule schedule);
     void updateSchedule(Schedule schedule);
-    void updateScheduleStatus(int taskId, String status);
+    void updateScheduleStatus(int taskId, String status, String taskName);
     void deleteSchedule(int taskId);
 
 }

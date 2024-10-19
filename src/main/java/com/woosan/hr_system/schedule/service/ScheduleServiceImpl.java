@@ -1,6 +1,7 @@
 package com.woosan.hr_system.schedule.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
 import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
@@ -20,6 +21,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     private ScheduleDAO scheduleDAO;
     @Autowired
     private BusinessTripService businessTripService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<Schedule> getAllSchedules() {
@@ -42,16 +45,23 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.setCreatedDate(LocalDateTime.now());
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         schedule.setMemberId(userSessionInfo.getCurrentEmployeeId());
+
+        boolean validTimeResult = isValidTimeRange(schedule);
+        if (!validTimeResult) {
+            throw new IllegalArgumentException("시작일이 종료일보다 빠르거나 같아야 합니다.");
+        }
+
         return scheduleDAO.insertSchedule(schedule);
+    }
+
+    public boolean isValidTimeRange(Schedule schedule) {
+        return schedule.getStartTime() != null && schedule.getEndTime() != null && !schedule.getStartTime().isAfter(schedule.getEndTime());
     }
 
     @Override // 일정 수정
     public void updateSchedule(Schedule schedule) {
         // 기존 스케줄 정보 가져오기
         Schedule existingSchedule = scheduleDAO.getScheduleById(schedule.getTaskId());
-
-        log.info("기존 일정: {}", existingSchedule);
-        log.info("수정 요청 받은 일정: {}", schedule);
 
         // 빌더 패턴을 사용하여 기존 스케줄에서 수정된 부분만 반영하여 새 객체 생성
         Schedule newSchedule = existingSchedule.toBuilder()
@@ -65,14 +75,20 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         newSchedule.setTaskId(existingSchedule.getTaskId());
 
-        log.info("최종 업데이트할 일정: {}", newSchedule);
-
         // 새로운 객체로 데이터베이스 업데이트
         scheduleDAO.updateSchedule(newSchedule);
     }
 
     @Override // 일정 상태 변경
-    public void updateScheduleStatus(int taskId, String status) {
+    public void updateScheduleStatus(int taskId, String status, String taskName) {
+        log.info("updateScheduleStatus 서비스 도착");
+        // String employeeId, String message, String url
+        if ("완료".equals(status)) {
+            log.info("status가 완료이므로 알림 생성");
+            UserSessionInfo userSessionInfo = new UserSessionInfo();
+            String employeeId = userSessionInfo.getCurrentEmployeeId();
+            notificationService.createNotification(employeeId, taskName + "일정이 완료되었습니다. 보고서를 작성해주세요.", "/report/writeFromSchedule" + taskId);
+        }
         scheduleDAO.updateScheduleStatus(taskId, status);
     }
 

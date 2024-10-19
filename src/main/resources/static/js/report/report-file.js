@@ -19,15 +19,12 @@ function initializeRegisteredFiles() {
                 registeredFileIdList.push(fileId);
             }
         });
-        console.log(registeredFileIdList);
     }
 }
 
 // x버튼을 누르면 registeredFileIdList에서 파일 ID를 제거
 function deleteRegisteredFile(button, fileId) {
-    console.log(fileId);
     const index = registeredFileIdList.indexOf(fileId);
-    console.log(index);
     if (index > -1) {
         registeredFileIdList.splice(index, 1);
     }
@@ -35,8 +32,6 @@ function deleteRegisteredFile(button, fileId) {
     // UI에서 파일 항목을 삭제
     const fileItem = button.closest('li');
     fileItem.remove();
-
-    console.log('현재 등록된 파일 ID 목록:', registeredFileIdList);
 }
 
 // 첨부 파일 추가
@@ -85,7 +80,7 @@ function validateFile(obj){
     } else if (obj.name.lastIndexOf('.') == -1) {
         alert("확장자가 없는 파일은 제외되었습니다.");
         return false;
-    } else if (filesArr.some(existingFile => existingFile.name === obj.name && existingFile.size === obj.size)) {
+    } else if (filesArr.some(existingFile => existingFile.name === obj.name && existingFile.size === obj.size && !existingFile.is_delete)) {
         alert("동일한 파일이 이미 추가되어 있습니다.");
         return false;
     } else {
@@ -98,5 +93,6 @@ function deleteFile(num) {
     // UI에서 파일을 삭제
     document.querySelector("#file" + num).remove();
     // 'filesArr' 배열에서 해당 파일 객체의 'is_delete' 속성 설정
+    // filesArr[num].is_delete = true;
     filesArr[num].is_delete = true;
 }

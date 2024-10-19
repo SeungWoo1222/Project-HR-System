@@ -74,6 +74,7 @@ public class ReportDAO {
 
     // 내가 쓴 보고서 검색
     public List<Report> search(String keyword, int pageSize, int offset, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -101,6 +102,8 @@ public class ReportDAO {
 
     // 결재할 보고서 검색
     public List<Report> toApproveSearch(String keyword, int pageSize, int offset, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+        log.info("DAO keyword : {}", keyword);
+        log.info("DAO searchType : {}", searchType);
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);

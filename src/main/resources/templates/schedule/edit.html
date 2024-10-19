@@ -109,8 +109,14 @@
         </table>
 
         <!-- 출장 정보 표시 -->
+        <button class="addTripButton" th:if="${trip} == null" type="button" onclick="addTripFields()">출장지 추가</button>
+        <button class="closeTripButton" th:if="${trip} == null" type="button" onclick="closeTripFields()" style="display:none" >출장지 제거</button>
+
         <div th:if="${trip} != null">
             <h3>출장 정보</h3>
+            <button class="closeTripButton" type="button" onclick="closeTripFields()">출장지 제거</button>
+            <button class="addTripButton" type="button" onclick="addTripFields()" style="display:none">출장지 추가</button>
+            <input type="hidden" id="tripId" th:value="${trip.tripId}">
             <table id="tripTable" class="details">
                 <tr>
                     <td class="section-title">주소</td>
@@ -128,38 +134,25 @@
                                 <button type="button" onclick="closeMap()">지도 닫기</button>
                             </div>
                         </div>
-
                     </td>
                 </tr>
                 <tr>
-                    <td class="section-title">거래처명</td>
+                    <td class="section-title">출장지 이름</td>
                     <td>
-                        <input type="text" id="tripName" th:value="${trip.clientName}" placeholder="거래처명 입력">
+                        <input type="text" id="tripName" th:value="${trip.tripName}" placeholder="출장지 이름 입력">
                     </td>
                 </tr>
                 <tr>
                     <td class="section-title">전화번호</td>
                     <td>
-                        <input type="tel" id="tripTel" th:value="${trip.contactTel}" placeholder="전화번호 입력">
+                        <input id="tripTel" type="text" th:value="${trip.contactTel}" oninput="localAutoHyphen(this)" maxlength="13" placeholder="전화번호를 입력하세요"/>
                     </td>
                 </tr>
                 <tr>
                     <td class="section-title">이메일</td>
                     <td>
-<!--                        <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요" required> @-->
-<!--                        <input id="domainInput" type="text" placeholder="직접 입력" disabled>-->
-<!--                        <select id="domainSelect">-->
-<!--                            <option value="" disabled selected>도메인 선택</option>-->
-<!--                            <option value="naver.com">naver.com</option>-->
-<!--                            <option value="google.com">google.com</option>-->
-<!--                            <option value="hanmail.net">hanmail.net</option>-->
-<!--                            <option value="nate.com">nate.com</option>-->
-<!--                            <option value="kakao.com">kakao.com</option>-->
-<!--                            <option value="custom">직접 입력</option>-->
-<!--                        </select>-->
                         <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"
-                               th:value="${emailLocalPart}" required> @
-
+                               th:value="${emailLocalPart}"> @
                         <select id="domainSelect">
                             <option value="" disabled>도메인 선택</option>
                             <option value="naver.com" th:selected="${emailDomainPart == 'naver.com'}">naver.com</option>
@@ -190,10 +183,8 @@
                     </td>
                 </tr>
             </table>
-            <input type="hidden" id="tripId" th:value="${trip.tripId}" >
         </div>
     </div>
 </form>
-<script th:src="@{/js/schedule/edit.js}"></script>
 </body>
 </html>
