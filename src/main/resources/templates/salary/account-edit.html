@@ -6,6 +6,20 @@
     <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
     <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
     <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+    <style>
+        .input-container select {
+            width: 65%;
+        }
+        .input-container input[type="text"] {
+            width: 58%;
+        }
+        .input-container label {
+            font-weight: bold;
+        }
+        .error-message {
+            margin: 10px 0;
+        }
+    </style>
 </th:block>
 
 <div class="input-modal">
@@ -32,6 +46,7 @@
             <label for="accountNumber">계좌번호</label>
             <input type="text" id="accountNumber" name="accountNumber" th:value="${salaryInfo.accountNumber}" oninput="this.value = this.value.replace(/[^0-9]/g, '');"/>
         </div>
+        <div class="error-message" id="error-message"></div>
         <div class="btn-container">
             <button type="reset" class="btn">초기화</button>
             <button type="submit" class="btn">수정 완료</button>

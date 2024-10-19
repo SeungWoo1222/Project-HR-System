@@ -88,10 +88,18 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     public PageResult<SalaryPayment> searchMyPayslips(PageRequest pageRequest, String employeeId) {
         List<SalaryPayment> payslips = getPaymentsByEmployeeId(employeeId);
         int total = payslips.size();
-        return new PageResult<>(payslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+
+        // 인덱스를 계산하여 페이징 처리
+        int start = pageRequest.getPage() * pageRequest.getSize();
+        int end = Math.min(start + pageRequest.getSize(), total);
+
+        // 해당 범위의 데이터만 반환
+        List<SalaryPayment> pagedPayslips = payslips.subList(start, end);
+
+        return new PageResult<>(pagedPayslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-    // SalaryPayment에 Salary 정보 담기
+    // SalaryPayment에 급여 정보 담기
     private void setSalaryInfoToPayslips(List<SalaryPayment> salaryPaymentList) {
         // 급여명세서에서 salaryId 추출 후 리스트로 변환
         List<Integer> salaryIdList = salaryPaymentList.stream()

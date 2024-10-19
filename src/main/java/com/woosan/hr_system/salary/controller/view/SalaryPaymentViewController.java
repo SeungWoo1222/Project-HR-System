@@ -193,8 +193,9 @@ public class SalaryPaymentViewController {
 
     @GetMapping("/myPayslips") // 내 급여명세서 조회
     public String viewMyPayslips(@RequestParam(name = "page", defaultValue = "1") int page,
-                                 @RequestParam(name = "size", defaultValue = "10") int size,
                                  Model model) {
+        final int size = 10;
+
         // 내 급여 정보
         String employeeId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Integer> salaryIds = salaryService.getSalaryIdList(employeeId);

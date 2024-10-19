@@ -7,14 +7,7 @@
     <link th:href="@{/css/common/search.css}" rel="stylesheet">
     <link th:href="@{/css/common/table.css}" rel="stylesheet">
     <link th:href="@{/css/common/color.css}" rel="stylesheet">
-    <style>
-        .section-header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-        }
-    </style>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -23,44 +16,74 @@
         function submitUpdateForm(event) {
             event.preventDefault();
 
+            // 유효성 검사 - 빈 필드 여부 확인
+            const bank = document.getElementById('bank').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+
+            let errorMessage = document.getElementById('error-message');
+
+            function showError(inputId, message, isBottomBorder = false) {
+                const inputElement = document.getElementById(inputId);
+                errorMessage.textContent = message;
+
+                // 빨간 테두리와 흔들림 효과 추가
+                if (isBottomBorder) {
+                    inputElement.classList.add("input-error-bottom", "shake");
+                } else {
+                    inputElement.classList.add("input-error", "shake");
+                }
+
+                // 5초 후 빨간 테두리 제거
+                setTimeout(() => {
+                    inputElement.classList.remove("input-error", "input-error-bottom");
+                }, 5000);
+
+                // 애니메이션이 끝난 후 흔들림 제거
+                setTimeout(() => {
+                    inputElement.classList.remove("shake");
+                }, 300);
+
+                return false;
+            }
+
+            if (bank === '') {
+                return showError('bank', '은행을 선택해주세요.');
+            }
+            if (accountNumber === '' || parseInt(accountNumber) < 0) {
+                return showError('accountNumber', '유효한 계좌번호를 입력해주세요.', true);
+            }
+
+            errorMessage.textContent = '';
+
             const form = event.currentTarget;
             const formData = new FormData(form);
             const actionUrl = form.action;
 
-            // 유효성 검사 - 빈 필드 여부 확인
-            let isValid = true;
-            for (let [name, value] of formData.entries()) {
-                if (!value.trim()) {
-                    alert("'" + name + "' 항목이 비어있습니다.\n모든 계좌정보를 채워주세요.");
-                    isValid = false;
-                    break;
-                }
-            }
-            if (!isValid) return;
-
-            fetch(actionUrl, {
-                method: 'PATCH',
-                body: formData
-            })
-                .then(response => response.text().then(data => ({
-                    status: response.status,
-                    text: data
-                })))
-                .then(response => {
-                    console.log('서버 응답 데이터 :', response.text);
-                    if (response.status === 200) {
-                        alert(response.text);
-                        window.location.reload();
-                    } else if (response.status === 400) {
-                        alert(response.text);
-                    } else {
-                        alert('계좌정보 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
-                    }
+            if (confirm('계좌정보를 수정하시겠습니까?')) {
+                fetch(actionUrl, {
+                    method: 'PATCH',
+                    body: formData
                 })
-                .catch(error => {
-                    console.error('Error :', error.message);
-                    alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-                });
+                    .then(response => response.text().then(data => ({
+                        status: response.status,
+                        text: data
+                    })))
+                    .then(response => {
+                        console.log('서버 응답 데이터 :', response.text);
+                        if (response.status === 200) {
+                            alert(response.text);
+                            window.location.reload();
+                        } else if (response.status === 400) {
+                            alert(response.text);
+                        } else {
+                            alert('계좌정보 수정 중 오류가 발생하였습니다.\n재시도 후 문제가 지속하여 발생시 관리자에게 문의해주세요');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error :', error.message);
+                        alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+                    });
+            }
         }
     </script>
 </th:block>
@@ -68,24 +91,28 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="salary-section">
-            <div class="section-header">
-                <h3>나의 급여 정보</h3>
-                <button type="button" class="btn" th:employeeId="${salaryList.get(0).employeeId}" onclick="openModal('/salary/' + this.getAttribute('employeeId') + '/account/edit')">계좌 정보 수정</button>
+            <div class="content-header">
+                <div class="content-header-left">
+                    <h3>내 급여 정보</h3>
+                </div>
+                <div class="content-header-right">
+                    <button type="button" class="btn" th:employeeId="${salaryList.get(0).employeeId}" onclick="openModal('/salary/' + this.getAttribute('employeeId') + '/account/edit')">현재 계좌 정보 수정</button>
+                </div>
             </div>
-            <table border="1" class="list">
+            <table class="list" style="table-layout: auto">
                 <thead>
+                <th>번호</th>
                 <th>직급</th>
-                <th>계좌은행</th>
                 <th>계좌번호</th>
                 <th>연봉</th>
                 <th>등록된 날짜</th>
                 <th>사용 여부</th>
                 </thead>
                 <tbody>
-                <tr th:each="salaryInfo : ${salaryList}">
+                <tr th:each="salaryInfo, stat : ${salaryList}">
+                    <td th:text="${stat.index + 1}"></td>
                     <td th:text="${salaryInfo.position}"></td>
-                    <td th:text="${salaryInfo.bank}"></td>
-                    <td th:text="${salaryInfo.accountNumber}"></td>
+                    <td th:text="${salaryInfo.bank + ' ' + salaryInfo.accountNumber}"></td>
                     <td th:text="${#numbers.formatInteger(salaryInfo.annualSalary, 3, 'COMMA')}"></td>
                     <td th:text="${salaryInfo.createdAt}"></td>
                     <td th:text="${salaryInfo.status} ? '사용 중' : '사용 중지'"
@@ -96,41 +123,27 @@
         </div>
 
         <div class="payslip-section">
-            <div class="section-header">
-                <h3>급여명세서 목록</h3>
-                <form th:action="@{/salary/payment/myPayslips}" method="get" id="pageSizeForm">
-                    <input type="hidden" name="page" th:value="1"/>
-                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                    </select>
-                </form>
-            </div>
-            <table border="1" class="list">
+            <h3>급여명세서 목록</h3>
+            <table class="list" style="table-layout: auto">
                 <thead>
                 <th>지급대상 월</th>
                 <th>지급일</th>
-                <th>기본급</th>
-                <th>직책수당</th>
-                <th>식대</th>
-                <th>교통비</th>
+                <th>고정수당</th>
                 <th>추가수당</th>
                 <th>성과급</th>
                 <th>보너스</th>
                 <th>총 급여</th>
                 <th>총 공제금액</th>
                 <th>실 지급액</th>
-                <th>비고</th>
                 </thead>
                 <tbody>
                 <tr th:each="payslip : ${payslips}"  th:paymentId="${payslip.paymentId}" th:onclick="openModal('/salary/payment/' + this.getAttribute('paymentId'))">
                     <td th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월'"></td>
                     <td th:text="${payslip.paymentDate}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.baseSalary, 3, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.positionAllowance, 3, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.mealAllowance, 3, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.transportAllowance, 3, 'COMMA')}"></td>
+                    <td th:text="${#numbers.formatInteger(payslip.baseSalary
+                                                        + payslip.positionAllowance
+                                                        + payslip.mealAllowance
+                                                        + payslip.transportAllowance, 3, 'COMMA')}"></td>
                     <td th:text="${payslip.overtimePay == null || payslip.overtimePay == 0 ? '0' :
                                                         #numbers.formatInteger(payslip.overtimePay, 3, 'COMMA')}"></td>
                     <td th:text="${(payslip.personalBonus ?: 0) + (payslip.teamBonus ?: 0) == 0 ? '0' :
@@ -138,39 +151,38 @@
                     <td th:text="${(payslip.holidayBonus ?: 0) + (payslip.yearEndBonus ?: 0) == 0 ? '0' :
                     #numbers.formatInteger((payslip.holidayBonus ?: 0) + (payslip.yearEndBonus ?: 0), 3, 'COMMA')}"></td>
                     <td th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}"></td>
-                    <td th:text="${payslip.remarks}"></td>
+                    <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}" class="red"></td>
+                    <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" class="green"></td>
                 </tr>
                 </tbody>
             </table>
             <div class="pagination" th:if="${totalPages > 0}">
-            <span th:if="${currentPage > 1}">
-                <a th:href="@{'/salary/payment/myPayslips?page=' + (${currentPage - 1}) + '&size=' + ${pageSize}}">
-                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
-                </a>
-            </span>
-                <div class="page-area">
-                <span th:if="${totalPages <= 5}">
-                    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                        <a th:href="@{'/salary/payment/myPayslips?page=' + ${i} + '&size=' + ${pageSize}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
-                    </span>
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/salary/payment/myPayslips?page=' + (${currentPage - 1})}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
                 </span>
-                    <span th:if="${totalPages > 5}">
-                    <span th:each="i : ${#numbers.sequence(
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                        <a th:href="@{'/salary/payment/list?page=' + ${i} + '&size=' + ${pageSize}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                    <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/salary/payment/myPayslips?page=' + ${i}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
                     </span>
+                        <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/salary/payment/myPayslips?page=' + ${i}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                    </div>
+                    <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/salary/payment/myPayslips?page=' + (${currentPage + 1})}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
                 </span>
-                </div>
-                <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/salary/payment/myPayslips?page=' + (${currentPage + 1}) + '&size=' + ${pageSize}}">
-                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
-                </a>
-            </span>
             </div>
         </div>
     </div>
