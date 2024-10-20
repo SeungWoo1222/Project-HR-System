@@ -4,7 +4,10 @@
       layout:decorate="~{fragments/layout :: layout(title='설문조사')}" >
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/attendance/detail.css}" rel="stylesheet" />
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/survey/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/table.css}" rel="stylesheet"/>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -13,7 +16,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <form onsubmit="submitSurveyResponses(event)">
-            <div class="survey-container">
+            <div class="survey-container flex-center">
                 <div class="content-header">
                     <div class="content-header-left"></div>
                     <div class="content-header-center">
@@ -28,13 +31,13 @@
                     <div class="content-header-right"></div>
                 </div>
 
-                <div th:if="${info} == null">
+                <div th:if="${info} == null" class="section" style="text-align: center; font-weight: bold;">
                     <p>현재 제출된 응답이 없습니다.</p>
                     <p>설문에 참여하여 답변을 제출해주세요!</p>
                 </div>
 
                 <div th:if="${info} != null">
-                    <table border="1">
+                    <table class="summary-table">
                         <thead>
                         <th>ID</th>
                         <th>이름</th>
@@ -50,43 +53,44 @@
                         <td th:text="${#temporals.format(info.participationAt, 'yyyy-MM-dd HH:mm')}"></td>
                         </tbody>
                     </table>
-                    <h2 th:text="${survey.title}">설문 제목</h2>
-                    <p th:text="${survey.description}">설문 설명</p>
-
+                    <div class="section">
+                        <h1 class="title" th:text="${survey.title}">설문 제목</h1>
+                        <p class="description" th:text="${survey.description}">설문 설명</p>
+                    </div>
                     <div th:each="question, stat : ${survey.questions}">
-                        <div class="question">
-                            <p><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
+                        <div class="question section">
+                            <p class="question-title"><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
 
                             <div class="options" th:switch="${question.questionType}">
-                                <div th:case="'text'"> <!-- 단답형 -->
+                                <div th:case="'text'" class="input-area"> <!-- 단답형 -->
                                     <p th:text="${question.response.answer}">응답 없음</p>
                                 </div>
 
-                                <div th:case="'textarea'"> <!-- 장문형 -->
+                                <div th:case="'textarea'" class="input-area"> <!-- 장문형 -->
                                     <p th:text="${question.response.answer}">응답 없음</p>
                                 </div>
 
-                                <div th:case="'radio'"> <!-- 단일 선택 -->
-                                    <label th:each="option : ${question.options}">
+                                <div th:case="'radio'" class="input-area selection-group"> <!-- 단일 선택 -->
+                                    <label class="selection-label" th:each="option : ${question.options}">
                                         <input type="radio" th:attr="name=${'question_' + question.id}" th:value="${option}"
                                                th:checked="${question.response.answer == option}" disabled/>
                                         <span th:text="${option}"></span>
                                     </label>
                                 </div>
 
-                                <div th:case="'checkbox'"> <!-- 다중 선택 -->
-                                    <label th:each="option : ${question.options}">
+                                <div th:case="'checkbox'" class="input-area selection-group"> <!-- 다중 선택 -->
+                                    <label class="selection-label" th:each="option : ${question.options}">
                                         <input type="checkbox" th:attr="name=${'question_' + question.id}" th:value="${option}"
                                                th:checked="${#lists.contains(question.response.answer, option)}" disabled/>
                                         <span th:text="${option}"></span>
                                     </label>
                                 </div>
 
-                                <div th:case="'date'"> <!-- 날짜 -->
+                                <div th:case="'date'" class="input-area"> <!-- 날짜 -->
                                     <input type="date" th:value="${question.response.answer}" disabled/>
                                 </div>
 
-                                <div th:case="'time'"> <!-- 시간 -->
+                                <div th:case="'time'" class="input-area"> <!-- 시간 -->
                                     <input type="time" th:value="${question.response.answer}" disabled/>
                                 </div>
                             </div>
