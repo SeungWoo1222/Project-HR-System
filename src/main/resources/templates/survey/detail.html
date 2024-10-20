@@ -4,7 +4,9 @@
       layout:decorate="~{fragments/layout :: layout(title='설문조사')}" >
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/attendance/detail.css}" rel="stylesheet" />
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/survey/detail.css}" rel="stylesheet"/>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -14,7 +16,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <form onsubmit="submitSurveyResponses(event)">
-            <div class="survey-container">
+            <div class="survey-container flex-center">
                 <div class="content-header">
                     <div class="content-header-left"></div>
                     <div class="content-header-center">
@@ -34,40 +36,41 @@
                     </div>
                 </div>
 
-                <div>
-                    <h2 th:text="${survey.title}">설문 제목</h2>
-                    <p th:text="${survey.description}">설문 설명</p>
-
+                <div class="detail-container">
+                    <div class="section">
+                        <h1 class="title" th:text="${survey.title}">설문 제목</h1>
+                        <p class="description" th:text="${survey.description}">설문 설명</p>
+                    </div>
                     <div th:each="question, stat : ${survey.questions}">
-                        <div class="question">
-                            <p><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
+                        <div class="question section">
+                            <p class="question-title"><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
 
                             <div class="options" th:switch="${question.questionType}">
-                                <div th:case="'text'"> <!-- 단답형 -->
-                                    <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                                <div th:case="'text'" class="input-area"> <!-- 단답형 -->
+                                    <input type="text" th:attr="name=${'question_' + question.id}" placeholder="내 답변"/>
                                 </div>
 
-                                <div th:case="'textarea'"> <!-- 장문형 -->
-                                    <textarea th:attr="name=${'question_' + question.id}" placeholder="답변을 입력하세요"></textarea>
+                                <div th:case="'textarea'" class="input-area"> <!-- 장문형 -->
+                                    <textarea th:attr="name=${'question_' + question.id}" placeholder="내 답변" rows="3"></textarea>
                                 </div>
 
-                                <div th:case="'radio'"> <!-- 단일 선택 -->
-                                    <label th:each="option : ${question.options}">
+                                <div th:case="'radio'" class="input-area selection-group"> <!-- 단일 선택 -->
+                                    <label class="selection-label" th:each="option : ${question.options}">
                                         <input type="radio" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
                                     </label>
                                 </div>
 
-                                <div th:case="'checkbox'"> <!-- 다중 선택 -->
-                                    <label th:each="option : ${question.options}">
+                                <div th:case="'checkbox'" class="input-area selection-group"> <!-- 다중 선택 -->
+                                    <label class="selection-label" th:each="option : ${question.options}">
                                         <input type="checkbox" th:attr="name=${'question_' + question.id}" th:value="${option}" th:text="${option}" />
                                     </label>
                                 </div>
 
-                                <div th:case="'date'"> <!-- 날짜 -->
+                                <div th:case="'date'" class="input-area"> <!-- 날짜 -->
                                     <input type="date" th:attr="name=${'question_' + question.id}" />
                                 </div>
 
-                                <div th:case="'time'"> <!-- 시간 -->
+                                <div th:case="'time'" class="input-area"> <!-- 시간 -->
                                     <input type="time" th:attr="name=${'question_' + question.id}" />
                                 </div>
                             </div>
@@ -75,11 +78,11 @@
                     </div>
                     <input type="hidden" id="surveyId" name="surveyId" th:value="${survey.id}"/>
                 </div>
-            </div>
-            <div id="error-message" class="error-message"></div>
-            <div class="btn-container">
-                <button type="reset" class="btn">초기화</button>
-                <button type="submit" class="btn">제출</button>
+                <div id="error-message" class="error-message"></div>
+                <div class="btn-container">
+                    <button type="reset" class="btn">초기화</button>
+                    <button type="submit" class="btn">제출</button>
+                </div>
             </div>
         </form>
     </div>

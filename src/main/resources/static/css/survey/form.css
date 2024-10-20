@@ -30,13 +30,16 @@
 }
 .survey-header .input-area #title {
     font-size: 24px;
+    margin-bottom: 15px;
 }
 .survey-header .input-area input[type="text"] {
     width: 95%;
 }
+.survey-header textarea {
+    width: 95%;
+}
 
 .expire-container {
-    margin: 5px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -124,7 +127,4 @@
     border-radius: 10px;
     color: #6C6C6C;
     transition: background-color 0.3s ease;
-}
-.option-add-btn:hover {
-
 }
