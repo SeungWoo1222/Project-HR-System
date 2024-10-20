@@ -20,10 +20,10 @@ function addNewQuestion() {
     const newQuestion = document.createElement('div');
     newQuestion.classList.add('question-row');
     newQuestion.innerHTML = `
-                <div class="content question">
+                <div class="question">
                     <div class="question-header">
-                        <input type="text" id="questionText${questionCount}" name="questionText${questionCount}" placeholder="질문"/>
-                        <select id="questionType${questionCount}" name="questionType${questionCount}">
+                        <input type="text" class="question-text" id="questionText${questionCount}" name="questionText${questionCount}" placeholder="질문"/>
+                        <select class="question-type" id="questionType${questionCount}" name="questionType${questionCount}">
                             <option value="text">단답형</option>
                             <option value="textarea">장문형</option>
                             <option value="radio">단일 선택</option>
@@ -31,8 +31,8 @@ function addNewQuestion() {
                             <option value="date">날짜</option>
                             <option value="time">시간</option>
                         </select>
-                        <div class="question-remove-btn">
-                            <img src="/images/icons/trash.png"/>
+                        <div class="survey-btn question-remove-btn">
+                            <img src="/images/icons/trash.png" alt="질문 삭제" title="질문 삭제"/>
                         </div>
                     </div>
                     <div class="options-container" style="display:none;">
@@ -93,7 +93,7 @@ function addNewOptionField(button) {
     newOption.classList.add('option-row');
     newOption.innerHTML = `
                 <input type="text" name="option${optionCount}" value="옵션 ${optionCount + 1}" />
-                <span class="option-remove-btn"><img src="/images/icons/minus.png"></span>
+                <span class="survey-btn option-remove-btn"><img src="/images/icons/minus.png"></span>
             `;
 
     // 삭제 버튼에 이벤트 리스너 추가
@@ -120,7 +120,9 @@ function removeQuestion(button) {
 }
 
 // AJAX POST 요청 - 새로운 설문지 등록
-function submitSurvey() {
+function submitSurvey(event) {
+    event.preventDefault();
+
     const surveyData = collectSurveyData();
 
     // 유효성 검사
@@ -128,33 +130,35 @@ function submitSurvey() {
         return;
     }
 
-    fetch('/api/survey', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(surveyData)
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            const errorStatuses = [400, 403, 404, 500];
-            if (response.status === 200) {
-                alert(response.text);
-                window.location.href = '/survey/list';
-            } else if (errorStatuses.includes(response.status)) {
-                alert(response.text);
-            } else {
-                alert('설문 등록 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm('설문을 등록하시겠습니까?')) {
+        fetch('/api/survey', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(surveyData)
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.href = '/survey/list';
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('설문 등록 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 설문조사 입력 필드 데이터 수집하는 함수
@@ -197,16 +201,36 @@ function collectSurveyData() {
 function validateSurvey(surveyData) {
     const { title, expiresAt, questions } = surveyData;
 
-    if (!title || title.trim() === "") {
-        alert('설문 제목을 입력해주세요.');
-        document.querySelector('#title').focus();
+    // 유효성 검사 함수
+    function showError(inputId, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
     }
 
+    if (!title || title.trim() === "") {
+        return showError('title', true);
+    }
+
     if (!expiresAt || expiresAt.trim() === "") {
-        alert('설문 종료일을 입력해주세요.');
-        document.querySelector('#expiresAt').focus();
-        return false;
+        return showError('expiresAt', true);
     }
 
     if (questions.length === 0) {
@@ -217,18 +241,21 @@ function validateSurvey(surveyData) {
     // 각 질문의 내용 유효성 검사
     for (let i = 0; i < questions.length; i++) {
         if (!questions[i].questionText || questions[i].questionText.trim() === "") {
-            alert(`질문 ${i + 1}의 내용을 입력해주세요.`);
-            document.querySelector(`input[name="questionText${i}"]`).focus();
-            return false;
+            return showError(`questionText${i}`, true);
         }
 
         // 옵션 필드가 있는 경우 (radio, checkbox) 옵션이 누락되지 않았는지 확인
         if ((questions[i].questionType === 'radio' || questions[i].questionType === 'checkbox') && questions[i].options.length === 0) {
-            alert(`질문 ${i + 1}에 최소한 하나의 옵션을 추가해주세요.`);
+            alert(`${i + 1}번째 질문에 최소한 하나의 옵션을 추가해주세요.`);
             document.querySelector(`input[name="option${i}_0"]`).focus();
             return false;
         }
     }
 
     return true;
+}
+
+// 설문 목록으로 이동
+function goToList () {
+    if (confirm('설문 목록으로 이동하시겠습니까?')) window.location.href='/survey/list';
 }
