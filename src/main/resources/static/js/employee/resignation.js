@@ -4,27 +4,53 @@ let errorMessage;
 function validateResignationForm(event) {
     event.preventDefault();
 
-    var resignationDate = document.getElementById('resignationDate').value;
-    var resignationReason = document.getElementById('resignationReason').value;
-    var codeNumber = document.getElementById('codeNumber').value;
-    var specificReason = document.getElementById('specificReason').value;
-    var errorMessage = document.getElementById('error-message');
+    const resignationDate = document.getElementById('resignationDate').value;
+    const resignationReason = document.getElementById('resignationReason').value;
+    const codeNumber = document.getElementById('codeNumber').value;
+    const specificReason = document.getElementById('specificReason').value;
 
-    // 에러 메시지를 초기화
+    let errorMessage = document.getElementById('error-message');
     errorMessage.textContent = '';
 
-    if (resignationReason === "" || resignationDate === "" || codeNumber === "" || specificReason.length < 10) {
-        if (resignationDate === "") {
-            errorMessage.textContent = '퇴사 날짜를 입력해주세요.';
-        } else if (resignationReason === "") {
-            errorMessage.textContent = '퇴사 사유를 선택해주세요.';
-        } else if (codeNumber === "") {
-            errorMessage.textContent = '퇴사 코드를 선택해주세요.';
-        } else if (specificReason.length < 10) {
-            errorMessage.textContent = '구체적 사유를 10자 이상 기재해주세요.';
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
         }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
     }
+
+    // 각 필드 유효성 검사
+    if (resignationDate === "") {
+        return showError('resignationDate', '퇴사 날짜를 입력해주세요.', true);
+    }
+    if (resignationReason === "") {
+        return showError('resignationReason', '퇴사 사유를 선택해주세요.');
+    }
+    if (codeNumber === "") {
+        return showError('codeNumber', '퇴사 코드를 선택해주세요.');
+    }
+    if (specificReason.length < 10) {
+        return showError('specificReason', '구체적 사유를 10자 이상 기재해주세요.');
+    }
+
     return true;
 }
 
@@ -184,7 +210,7 @@ function submitDelete(event) {
 
     let actionUrl = '/api/admin/employee/' + employeeId;
 
-    if (confirm('\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?')) {
+    if (confirm('\'' + employeeName + '\' 사원을 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.')) {
         fetch(actionUrl, {
             method: 'DELETE'
         })

@@ -113,6 +113,7 @@
                 (
                 a.attendance_id LIKE CONCAT('%', #{keyword}, '%') OR
                 a.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.date LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_in LIKE CONCAT('%', #{keyword}, '%') OR
                 a.check_out LIKE CONCAT('%', #{keyword}, '%') OR
                 a.notes LIKE CONCAT('%', #{keyword}, '%') OR
@@ -132,6 +133,36 @@
         </where>
         ORDER BY a.date DESC, a.check_in ASC
         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 근태 목록 검색값들의 전체 개수 조회 -->
+    <select id="countAttendance" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM attendance a
+        JOIN employees e ON a.employee_id = e.employee_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                a.attendance_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                a.date LIKE CONCAT('%', #{keyword}, '%') OR
+                a.check_in LIKE CONCAT('%', #{keyword}, '%') OR
+                a.check_out LIKE CONCAT('%', #{keyword}, '%') OR
+                a.notes LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%') OR
+                e.position_id LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND e.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(a.date, '%Y-%m') = #{yearMonth}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
     </select>
 
     <!-- 사원의 이번 주 근무시간 조회 -->

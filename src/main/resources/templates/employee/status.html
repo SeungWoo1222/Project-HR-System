@@ -3,21 +3,36 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+    <style>
+        .input-modal select {
+            width: auto;
+            margin: 0;
+        }
+
+        .input-modal .btn-container {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </th:block>
 
-<div>
-    <div>
-        <h3>'<span th:text="${employee.name}"></span>' 사원의 재직상태 수정</h3>
-        <form th:action="@{/api/admin/employee/{employeeId}/status(employeeId=${employee.employeeId})}" onsubmit="updateStatus(event)">
+<div class="input-modal">
+    <h3>'<span th:text="${employee.name}"></span>' 사원의 재직상태 수정</h3>
+    <form th:action="@{/api/admin/employee/{employeeId}/status(employeeId=${employee.employeeId})}" onsubmit="updateStatus(event)">
+        <input type="hidden" name="originalStatus" th:value="${employee.status}">
+        <div class="btn-container">
             <select id="status" name="status">
                 <option value="재직" th:selected="${employee.status == '재직'}">재직</option>
                 <option value="휴직" th:selected="${employee.status == '휴직'}">휴직</option>
                 <option value="퇴사 예정" th:selected="${employee.status == '퇴사 예정'}">퇴사 예정</option>
             </select>
-            <input type="hidden" name="originalStatus" th:value="${employee.status}">
-            <button type="submit" class="btn">수정</button>
-        </form>
-    </div>
+            <button type="submit" class="btn">재직 상태 수정</button>
+        </div>
+    </form>
 </div>
 </html>

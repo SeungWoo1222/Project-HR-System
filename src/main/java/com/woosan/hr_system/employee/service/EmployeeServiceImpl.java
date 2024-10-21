@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -243,11 +244,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee originalEmployee = findEmployeeById(employeeId);
         checkForEmployeeChanges(originalEmployee, updatedEmployee);
 
-        // 수정 사원번호와 수정 일시 설정
-        setModificationInfoToEmployee(updatedEmployee);
+        // 수정된 사원 객체 생성
+        Employee newEmployee = updatedEmployee.toBuilder()
+                .department(originalEmployee.getDepartment())
+                .position(originalEmployee.getPosition())
+                .hireDate(originalEmployee.getHireDate())
+                .status(originalEmployee.getStatus())
+                .lastModified(LocalDateTime.now())
+                .modifiedBy(authService.getAuthenticatedUser().getNameWithId())
+                .build();
+
 
         // 사원 정보 수정 처리
-        employeeDAO.updateEmployee(updatedEmployee);
+        employeeDAO.updateEmployee(newEmployee);
 
         return "'" + originalEmployee.getName() + "' 사원의 정보가 수정되었습니다.";
     }
@@ -256,8 +265,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private void checkForEmployeeChanges(Employee original, Employee updated) {
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(
                 "name", "birth", "residentRegistrationNumber", "phone", "email",
-                "address", "detailAddress", "department", "position", "hireDate",
-                "status", "remainingLeave", "picture", "maritalStatus", "numDependents", "numChildren"
+                "address", "detailAddress",
+                "remainingLeave", "picture", "maritalStatus", "numDependents", "numChildren"
         ));
         commonService.processFieldChanges(original, updated, fieldsToCompare);
 
@@ -266,13 +275,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (originalFileId != updated.getPicture()) {
             fileService.deleteFile(originalFileId);
         }
-    }
-
-    // 사원 정보에 수정 정보 설정
-    private void setModificationInfoToEmployee(Employee employee) {
-        UserSessionInfo info = new UserSessionInfo();
-        employee.setModifiedBy(info.getCurrentEmployeeId());
-        employee.setLastModified(info.getNow());
     }
 
     @LogBeforeExecution

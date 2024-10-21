@@ -24,8 +24,6 @@ function submitSelectedSalaries() {
         selectedSalaries.push(checkbox.getAttribute('data-salary-id'));
     });
 
-    console.log(selectedSalaries);
-
     if (selectedSalaries.length === 0) {
         alert("급여를 지급할 사원을 선택해 주세요.");
         return;
@@ -41,7 +39,6 @@ function submitSelectedSalaries() {
 
     const url = '/salary/payment/confirm?' + params.toString();
 
-    console.log(url);
     openModal(url);  // openModal 함수 호출
 }
 
@@ -75,45 +72,9 @@ function submitPayForm(event) {
             text: data
         })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text);
-
-                // GET 요청을 위한 URL 쿼리 파라미터 생성
-                const params = new URLSearchParams();
-                formData.forEach((value, key) => {
-                    params.append(key, value);
-                });
-
-                var modal = document.getElementById("myModal");
-                var modalBody = document.getElementById("modal-body");
-
-                // 컨텐츠 로드
-                fetch('/salary/payment/complete?' + params.toString(), {
-                    method: 'GET'
-                })
-                    .then(response => {
-                        if (response.status === 404) {
-                            return fetch('/error/modal/404').then(res => res.text());
-                        }
-                        if (response.status === 401) {
-                            return fetch('/error/modal/401').then(res => res.text());
-                        }
-                        if (response.status === 403) {
-                            return fetch('/error/modal/403').then(res => res.text());
-                        }
-                        if (response.status === 500) {
-                            return fetch('/error/modal/500').then(res => res.text());
-                        }
-                        if (!response.ok) { // 다른 HTTP 오류 처리
-                            throw new Error('서버 오류 발생: ' + response.status);
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        modalBody.innerHTML = html;
-                        modal.style.display = "block";
-                    });
+                window.location.href = '/salary/payment/list';
             } else {
                 alert('급여 지급 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                 window.location.reload();

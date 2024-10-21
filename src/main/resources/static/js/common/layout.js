@@ -58,3 +58,82 @@ function toggleSubmenu(sectionId) {
         section.style.display = "none";
     }
 }
+
+// 페이지 이동 시 로딩 화면 보여주기
+window.addEventListener('beforeunload', function() {
+    document.getElementById('loader').style.display = 'flex';
+});
+
+// 페이지가 완전히 로드된 후 로딩 화면 숨기기
+window.addEventListener('load', function() {
+    document.getElementById('loader').style.display = 'none';
+});
+
+// 모달 열기 함수
+function openModal(contentUrl) {
+    var modal = document.getElementById("myModal");
+    var modalBody = document.getElementById("modal-body");
+
+    // 컨텐츠 로드
+    fetch(contentUrl)
+        .then(response => {
+            if (response.status === 400) {
+                response.text().then(errorMessage => {
+                    alert(errorMessage);
+                });
+            }
+            if (response.status === 404) {
+                return fetch('/error/modal/404').then(res => res.text());
+            }
+            if (response.status === 401) {
+                return fetch('/error/modal/401').then(res => res.text());
+            }
+            if (response.status === 403) {
+                return fetch('/error/modal/403').then(res => res.text());
+            }
+            if (response.status === 500) {
+                return fetch('/error/modal/500').then(res => res.text());
+            }
+            if (!response.ok) { // 다른 HTTP 오류 처리
+                throw new Error('서버 오류 발생: ' + response.status);
+            }
+            return response.text();
+        })
+        // .then(response => response.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+            modal.style.display = "flex";
+
+            // 확대 애니메이션을 위해 'show' 클래스 추가
+            setTimeout(() => {
+                modal.classList.add("show");
+            }, 10);
+
+
+            // 모달 컨텐츠가 로드된 후 포커스 설정
+            const firstInput = modalBody.querySelector(".first-input");
+            if (firstInput) {
+                firstInput.focus();
+                console.log('Focus set on:', firstInput);
+            } else {
+                console.error('First input field not found');
+            }
+        });
+}
+
+// 모달 닫기 함수
+function closeModal() {
+    var modal = document.getElementById("myModal");
+    modal.classList.remove("show"); // 'show' 클래스 제거하여 축소 애니메이션 적용
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, 300); // 애니메이션이 끝난 후 모달 숨김
+}
+
+// 모달 외부 클릭 시 닫기
+window.onclick = function(event) {
+    var modal = document.getElementById("myModal");
+    if (event.target === modal) {
+        closeModal();
+    }
+}

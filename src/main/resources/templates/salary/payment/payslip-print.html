@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>급여명세서</title>
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
-    <link rel="stylesheet" th:href="@{/css/salary/payslip.css}">
+    <link th:href="@{/css/layout/layout.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <link th:href="@{/css/salary/payslip.css}" rel="stylesheet">
     <style>
         p {
             margin: 0;
@@ -45,6 +46,14 @@
             .no-print {
                 display: none;
             }
+        }
+        .btn-container {
+            margin-bottom: 15px;
+            justify-content: right;
+            gap: 10px;
+        }
+        .btn-container .inner-btn {
+            font-size: 14px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
@@ -97,9 +106,9 @@
 
 <body>
 <div class="payslip-container" id="payslip-container">
-    <div class="buttons no-print">
-        <button class="btn" onclick="saveAsPDF()">PDF로 저장</button>
-        <button class="btn" onclick="printPayslip()">인쇄하기</button>
+    <div class="btn-container no-print">
+        <button class="inner-btn tomato-btn" onclick="saveAsPDF()">PDF로 저장</button>
+        <button class="inner-btn green-btn" onclick="printPayslip()">인쇄하기</button>
     </div>
     <div class="title" id="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>
     <table class="header">

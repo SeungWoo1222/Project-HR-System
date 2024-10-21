@@ -45,14 +45,22 @@ public class AttendanceServiceImpl implements AttendanceService {
     public Attendance getAttendanceById(int attendanceId) {
         // 근태 정보 상세 조회
         Attendance attendance = findAttendanceById(attendanceId);
+
+        // 빌더 시작
+        Attendance.AttendanceBuilder builder = attendance.toBuilder();
+
+        // 휴가일 경우, 휴가 정보를 함께 조회하여 반환
+        if (attendance.getStatus().equals("휴가")) {
+            Integer vacationId = attendance.getVacationId();
+            builder.vacation(vacationService.getVacationById(vacationId));
+        }
+
         // 초과근무 정보가 있을 경우, 초과근무 정보를 함께 조회하여 반환
         Integer overtimeId = attendance.getOvertimeId();
         if (overtimeId != null) {
-            return attendance.toBuilder()
-                    .overtime(overtimeService.getOvertimeById(overtimeId))
-                    .build();
+            builder.overtime(overtimeService.getOvertimeById(overtimeId));
         }
-        return attendance;
+        return builder.build();
     }
 
     // 근태 ID를 통한 근태 상세 조회
@@ -93,7 +101,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         params.put("yearMonth", yearMonth);
 
         List<Attendance> attendanceList = attendanceDAO.searchAttendance(params);
-        int total = attendanceList.size();
+        int total = attendanceDAO.countAttendance(params);
 
         return new PageResult<>(attendanceList, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }

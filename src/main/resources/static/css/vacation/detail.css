@@ -1,35 +1,16 @@
-.detail-container {
+.detail-container, .vacation-edit-container {
     line-height: 1.6;
     width: 210mm;
     margin: 0 auto;
     padding: 15mm;
     box-sizing: border-box;
-    border: 1px solid #000;
     font-family: Arial, sans-serif;
-}
-
-.insert-form-container {
-    line-height: 1.6;
-    width: 210mm;
-}
-
-.insert-form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .btn-container {
     display: flex;
     justify-content: end;
     gap: 10px;
-}
-
-textarea {
-    width: 550px;
-    height: 200px;
-    font-size: 16px;
-    resize: none;
 }
 
 .title {

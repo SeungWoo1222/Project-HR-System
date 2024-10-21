@@ -5,7 +5,7 @@
 
 <head>
     <th:block layout:fragment="css">
-        <link rel="stylesheet" th:href="@{/css/httpstatus.css}">
+        <link rel="stylesheet" th:href="@{/css/error/httpstatus.css}">
     </th:block>
 </head>
 
@@ -22,7 +22,7 @@
                     <p>죄송합니다. 해당 사원의 정보를 찾을 수 없습니다.</p>
                     <p>사원 정보가 삭제되었거나 오류가 발생하였습니다.</p>
                     <p>관리자에게 문의해주세요.</p>
-                    <a th:href="@{/common/home}" class="a-btn">홈페이지로 이동</a>
+                    <a th:href="@{/home}" class="a-btn">홈페이지로 이동</a>
                 </div>
             </div>
         </section>

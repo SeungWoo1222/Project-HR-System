@@ -63,12 +63,19 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
     }
 
-    @Override // 모든 사원의 급여 정보 조회 (검색 기능 추가)
-    public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest) {
+    @Override // 모든 사원의 급여 내역 검색
+    public PageResult<SalaryPayment> searchPayslips(PageRequest pageRequest, String department, YearMonth yearMonth) {
         int offset = pageRequest.getPage() * pageRequest.getSize();
 
-        List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(pageRequest.getKeyword(), pageRequest.getSize(), offset);
-        int total = salaryPaymentDAO.countPayslips(pageRequest.getKeyword());
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", pageRequest.getKeyword());
+        params.put("pageSize", pageRequest.getSize());
+        params.put("offset", offset);
+        params.put("department", department);
+        params.put("yearMonth", yearMonth);
+
+        List<SalaryPayment> payslips = salaryPaymentDAO.searchPayslips(params);
+        int total = salaryPaymentDAO.countPayslips(params);
 
         if (!payslips.isEmpty()) {
             // 급여명세서에 급여 정보 삽입
@@ -81,10 +88,18 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     public PageResult<SalaryPayment> searchMyPayslips(PageRequest pageRequest, String employeeId) {
         List<SalaryPayment> payslips = getPaymentsByEmployeeId(employeeId);
         int total = payslips.size();
-        return new PageResult<>(payslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
+
+        // 인덱스를 계산하여 페이징 처리
+        int start = pageRequest.getPage() * pageRequest.getSize();
+        int end = Math.min(start + pageRequest.getSize(), total);
+
+        // 해당 범위의 데이터만 반환
+        List<SalaryPayment> pagedPayslips = payslips.subList(start, end);
+
+        return new PageResult<>(pagedPayslips, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-    // SalaryPayment에 Salary 정보 담기
+    // SalaryPayment에 급여 정보 담기
     private void setSalaryInfoToPayslips(List<SalaryPayment> salaryPaymentList) {
         // 급여명세서에서 salaryId 추출 후 리스트로 변환
         List<Integer> salaryIdList = salaryPaymentList.stream()
@@ -108,18 +123,6 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         return salaryPaymentDAO.selectAllPayments();
     }
 
-    @Override // salaryId와 yearMonth를 이용한 급여명세서 리스트 조회
-    public List<SalaryPayment> getPaymentBySalaryAndMonth(List<Integer> salaryIdList, String yearMonthString) {
-//        // 문자열 -> 리스트로 변환
-//        String[] salaryIdArr = salaryIds.split(",");
-//        Integer[] salaryIdArrInt = Arrays.stream(salaryIdArr).map(Integer::parseInt).toArray(Integer[]::new);
-//        List<Integer> salaryIdList = Arrays.asList(salaryIdArrInt);
-
-        // 문자열 -> YearMonth로 변환
-        YearMonth yearMonth = YearMonth.parse(yearMonthString);
-
-        return salaryPaymentDAO.selectPaymentBySalaryAndMonth(salaryIdList, yearMonth);
-    }
 
     @LogBeforeExecution
     @LogAfterExecution

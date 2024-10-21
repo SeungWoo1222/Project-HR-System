@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<style>
-  .attendance-modal h3 {
-    margin: 0;
-  }
+<th:block layout:fragment="css">
+  <style>
   .attendance-modal h4 {
     margin: 15px 0 10px;
   }
@@ -62,7 +61,8 @@
   .commute-icon {
     width: 30px;
   }
-</style>
+  </style>
+</th:block>
 
 <div class="attendance-modal">
   <h3>출퇴근 ></h3>

@@ -1,0 +1,89 @@
+.content {
+    width: 650px;
+}
+
+.upper-part .form-group {
+    display: flex;
+    flex-direction: row;
+    border: none;
+}
+
+.picture-area {
+    width: 240px;
+    height: 320px;
+    border: #EEE solid 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    background-color: #f0f0f0;
+    position: relative;
+}
+
+.picture-area::before {
+    content: "사원 사진을 업로드해주세요.";
+    position: absolute;
+    bottom: 10px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+.picture-uploaded::before {
+    content: "";
+}
+
+.employee-picture {
+    width: 100%;
+    height: 100%;
+}
+
+.file-area {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.file-area p {
+    font-style: italic;
+    color: #888;
+    margin-top: 10px;
+}
+
+.upload-area {
+    border: #EEE 2px solid;
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 160px;
+}
+
+.file-btn-area {
+    width: 80px;
+}
+
+.section .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    width: 48%;
+    font-size: 16px;
+}

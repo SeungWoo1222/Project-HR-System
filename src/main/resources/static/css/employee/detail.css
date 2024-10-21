@@ -1,0 +1,71 @@
+/* detail */
+.detail-wrapper {
+    width: 756px;
+}
+
+.picture-area {
+    width : 188px;
+    height: 264px;
+    border-top: black 1px solid;
+    border-left: black 1px solid;
+    flex-shrink: 0;
+}
+
+.picture-area img {
+    width: 100%;
+    height: 100%;
+}
+
+.detail-wrapper .btn-container {
+    margin: 10px 40px 15px 0;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 15px
+}
+
+.detail-container table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.detail-container td {
+    padding: 4px 6px;
+    border-top: 1px solid #000;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+}
+
+.none-border-top {
+    border-top: none !important;
+}
+
+.last-td {
+    border-bottom: 1px solid #000;
+}
+
+.section-title {
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.personal-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.sub-text {
+    font-size: 13px;
+}
+
+.w-25 {
+    width: 25%;
+}
+
+#togglePasswordBtn {
+    font-size: 12px;
+    padding: 5px 10px;
+}

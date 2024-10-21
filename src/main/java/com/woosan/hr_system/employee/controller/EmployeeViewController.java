@@ -82,7 +82,7 @@ public class EmployeeViewController {
     @RequireHRPermission
     @GetMapping("/register") // 신규 사원 등록 페이지 이동
     public String viewEmployeeForm() {
-        return "employee/registration";
+        return "employee/register";
     }
 
     @RequireHRPermission

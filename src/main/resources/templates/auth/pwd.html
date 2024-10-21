@@ -3,21 +3,21 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/employee.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
 </th:block>
 
-<div>
-    <div>
-        <h2>비밀번호 확인</h2>
-        <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitPassword(event)">
-            <div class="form-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" class="first-input" name="password"/>
-                <input type="hidden" id="url" name="url" th:value="${redirectUrl}"/>
-            </div>
+<div class="input-modal">
+    <h3>비밀번호 확인</h3>
+    <form id="passwordForm" th:action="@{/auth/verifyPassword}" method="post" onsubmit="submitPassword(event)">
+        <div class="input-container">
+            <label for="password" style="font-size: 17px; font-weight: bold">비밀번호 : </label>
+            <input type="password" id="password" class="first-input" name="password"/>
+        </div>
+        <div class="btn-container">
             <div class="error-message" id="error-message"></div>
             <button type="submit" class="btn">확인</button>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 </html>

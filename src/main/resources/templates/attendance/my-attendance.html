@@ -1,29 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='근태 현황')}">
+      layout:decorate="~{fragments/layout :: layout(title='근태 현황')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/calander.css}">
+    <link rel="stylesheet" th:href="@{/css/common/table.css}">
+    <link rel="stylesheet" th:href="@{/css/common/calander.css}">
     <style>
-        .this-month-summary {
-            width: 1000px;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .this-month-summary, th, td {
-            border: 1px solid #ddd;
-        }
-
-        .this-month-summary th, .this-month-summary td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        .this-month-summary thead th {
-            background-color: #f2f2f2;
-            color: #333;
+        .table-container {
+            padding-bottom: 10px;
+            border-bottom: #f1f1f1 solid 2px;
+            margin-bottom: 20px;
         }
     </style>
 </th:block>
@@ -161,7 +148,7 @@
 
         // 테이블 업데이트 함수
         function updateTable(data) {
-            const tbody = document.querySelector('.this-month-summary tbody');
+            const tbody = document.querySelector('.summary-table tbody');
             const title = document.querySelector('h3');
 
             tbody.innerHTML = '';  // 기존 데이터 초기화
@@ -188,17 +175,19 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div>
+        <div class="table-container">
             <h3></h3>
-            <table border="1" class="this-month-summary">
+            <table class="summary-table">
                 <thead>
-                <th>ID</th>
-                <th>이름</th>
-                <th>잔여 연차</th>
-                <th>근무 일수</th>
-                <th>근무 시간</th>
-                <th>초과근무 시간</th>
-                <th>야간근무 시간</th>
+                <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>잔여 연차</th>
+                    <th>근무 일수</th>
+                    <th>근무 시간</th>
+                    <th>초과근무 시간</th>
+                    <th>야간근무 시간</th>
+                </tr>
                 </thead>
                 <tbody>
                 </tbody>

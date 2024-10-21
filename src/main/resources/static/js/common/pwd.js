@@ -30,9 +30,9 @@ function submitPassword(event) {
             if (response.status === 200) {
                 window.location.href = response.text;
             } else if (errorStatuses.includes(response.status)) {
-                errorMessage.textContent = response.text;
+                errorMessage.innerHTML = response.text.replace(/\n/g, "<br>");
             } else {
-                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다. 관리자에게 문의해주세요.";
+                errorMessage.textContent = "비밀번호 확인 중 오류가 발생했습니다.\n관리자에게 문의해주세요.";
             }
         })
         .catch(error => {
@@ -58,13 +58,31 @@ function checkPasswordStrength() {
     // zxcvbn을 사용하여 비밀번호 강도 측정
     const result = zxcvbn(newPassword);
 
-    // // 강도 점수에 따른 메시지 표시
+    // 강도 점수에 따른 메시지 표시
     const strength = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
-    passwordStrength.textContent = `${strength[result.score]}`
+    passwordStrength.textContent = `${strength[result.score]}`;
+    let passwordColor;
+    switch (result.score) {
+        case 0:
+            passwordColor = 'red';
+            break;
+        case 1:
+            passwordColor = 'orange';
+            break;
+        case 2:
+            passwordColor = 'yellow';
+            break;
+        case 3:
+            passwordColor = 'green';
+            break;
+        case 4:
+            passwordColor = 'skyblue';
+            break;
+    }
+    passwordStrength.classList.add(passwordColor);
 
     // 강도 점수 입력
     passwordStrengthInput.value = result.score;
-    console.log("나 실행됨!");
 }
 
 // 새로운 비밀번호 확인 함수
@@ -74,7 +92,7 @@ function checkNewPassword() {
     const errorMessage = document.getElementById('pwd-error-message');
 
     if (!validatePassword(newPassword)) {
-        errorMessage.textContent = '새로운 비밀번호는 8~20자 사이여야 하며, 대문자, 소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
+        errorMessage.innerHTML = '비밀번호는 8~20자 사이여야 하며,<br>대•소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
         newPasswordInput.focus();
     } else {
         errorMessage.textContent = '';
@@ -126,7 +144,7 @@ function summitUpdatePassword(event) {
     }
 
     if (!validatePassword(newPassword)) {
-        errorMessage.textContent = '새로운 비밀번호는 8~20자 사이여야 하며, 대문자, 소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
+        errorMessage.innerHTML = '비밀번호는 8~20자 사이여야 하며,<br>대•소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
         newPasswordInput.focus();
         return false;
     }
@@ -193,7 +211,9 @@ function calculateDateDifference() {
     const timeDiff = nextChangeDate.getTime() - today.getTime();
     const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
 
-    if (dayDiff < 0) {
+    if (isNaN(dayDiff)) {
+        document.getElementById('date-difference').textContent = '비밀번호 변경 기록이 없습니다. 비밀번호를 변경해주세요.';
+    } else if (dayDiff <= 0) {
         document.getElementById('date-difference').textContent = '비밀번호 변경 기간이 지났습니다. 비밀번호를 즉시 변경해주세요.';
     } else {
         document.getElementById('date-difference').textContent = `다음 비밀번호 변경일까지 ${dayDiff}일 남았습니다.`;

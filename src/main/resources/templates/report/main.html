@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='')}">
+      layout:decorate="~{fragments/layout :: layout(title='')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/common/table.css}">
+    <link rel="stylesheet" th:href="@{/css/common/color.css}">
 </th:block>
 
 <th:block layout:fragment="script">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/report/report.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            updateDateTimeElements();
             toggleCustomDateFields();
 
             // searchDate 선택 시 사용자 지정 날짜 필드 토글
@@ -58,7 +57,7 @@
     <div class="content">
         <h1>최근 보고서 목록</h1>
         <div>
-            <table >
+            <table class="list">
                 <thead>
                 <tr>
                     <th>제목</th>
@@ -83,7 +82,7 @@
         <div>
             <h1>최근 요청 목록</h1>
             <div>
-                <table>
+                <table class="list">
                     <thead>
                     <tr>
                         <th>보고서</th>

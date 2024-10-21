@@ -1,30 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='내 일정 목록 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='내 일정 목록 조회')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}">
-    <link rel="stylesheet" th:href="@{/css/switch.css}">
-    <link rel="stylesheet" th:href="@{/css/schedule/create.css}">
-    <link rel="stylesheet" th:href="@{/css/calander.css}">
-    <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-        .notStarted {
-            color: #FFD700;
-            font-weight: bold;
-        }
-        .inProcess {
-            color: #FF8C00;
-            font-weight: bold;
-        }
-        .done {
-            color: #32CD32;
-            font-weight: bold;
-        }
-    </style>
+    <link th:href="@{/css/vacation/detail.css}" rel="stylesheet">
+    <link th:href="@{/css/schedule/create.css}" rel="stylesheet">
+    <link th:href="@{/css/common/switch.css}" rel="stylesheet">
+    <link th:href="@{/css/common/calander.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -158,9 +143,9 @@
                     <td th:text="${#temporals.format(schedule.startTime, 'MM월 dd일(EE)') + ' ~ '
                     + #temporals.format(schedule.endTime, 'MM월 dd일(EE)')}">일정 기한</td>
                     <td th:text="${schedule.status}"
-                        th:classappend="${schedule.status == '미완료'} ? 'notStarted' :
-                                       (${schedule.status == '진행중'} ? 'inProcess' :
-                                       (${schedule.status == '완료'} ? 'done' : ''))">일정 상태</td>
+                        th:classappend="${schedule.status == '미완료'} ? 'yellow' :
+                                       (${schedule.status == '진행중'} ? 'orange' :
+                                       (${schedule.status == '완료'} ? 'green' : ''))">일정 상태</td>
                     <td th:text="${#temporals.format(schedule.createdDate, 'MM월 dd일(EE)')}">일정 생성일</td>
                     <td th:text="${schedule.projectId}">프로젝트 번호</td>
                 </tr>

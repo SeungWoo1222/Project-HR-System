@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='설문조사')}" >
+      layout:decorate="~{fragments/layout :: layout(title='설문조사')}" >
 
 <th:block layout:fragment="css">
-  <link th:href="@{/css/pagination.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/search.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/table.css}" rel="stylesheet"/>
   <link th:href="@{/css/survey/detail.css}" rel="stylesheet"/>
   <link th:href="@{/css/survey/jqcloud.css}" rel="stylesheet"/>
+  <style>
+    .section h1 {
+      margin-bottom: 0;
+    }
+    .detail-container h2 {
+      margin-bottom: 10px;
+    }
+    .header-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .header-section p .label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    .list thead th, .list tbody td {
+      padding: 10px;
+    }
+    .btn-container {
+      width: 40%;
+      margin-bottom: 10px;
+    }
+  </style>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -14,9 +41,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script th:src="@{/js/survey/jqcloud.js}"></script>
   <script>
-    function toggleResponses() {
-      var responsesDiv = document.getElementById("responses");
-      var wordsDiv = document.getElementById("words");
+    function toggleResponses(questionId) {
+      var responsesDiv = document.getElementById("responses_" + questionId);
+      var wordsDiv = document.getElementById("words_" + questionId);
 
       // 만약 단어 통계가 열려있다면 닫고, 전체 응답을 열기
       if (wordsDiv.style.display === "block") {
@@ -27,9 +54,9 @@
       responsesDiv.style.display = responsesDiv.style.display === "block" ? "none" : "block";
     }
 
-    function toggleWords() {
-      var responsesDiv = document.getElementById("responses");
-      var wordsDiv = document.getElementById("words");
+    function toggleWords(questionId) {
+      var responsesDiv = document.getElementById("responses_" + questionId);
+      var wordsDiv = document.getElementById("words_" + questionId);
 
       // 만약 전체 응답이 열려있다면 닫고, 단어 통계를 열기
       if (responsesDiv.style.display === "block") {
@@ -44,30 +71,40 @@
 
 <div layout:fragment="~{content}">
   <div class="content">
-    <div class="survey-container" th:if="${#authentication.principal.getUsername} == ${createdBy}">
+    <div class="survey-container flex-center" th:if="${#authentication.principal.getUsername} == ${createdBy}">
       <div class="content-header">
         <div class="content-header-left"></div>
         <div class="content-header-center">
-        <a class="" th:href="@{'/survey/' + ${survey.id}}">설문</a>
+          <a class="" th:href="@{'/survey/' + ${survey.id}}">설문</a>
           <a class="" th:href="@{'/survey/participants?surveyId=' + ${survey.id}}">응답</a>
           <a class="active" th:href="@{'/survey/statistics?surveyId=' + ${survey.id}}">통계</a>
           <a class="" th:href="@{'/survey/list'}">설문 목록</a>
         </div>
         <div class="content-header-right"></div>
       </div>
-      <div>
-        <h2 th:text="${survey.title}">설문 제목</h2>
-        <p th:text="${survey.description}">설문 설명</p>
-        <p>설문기간 : <span th:text="${#temporals.format(survey.createdAt, 'yyyy-MM-dd')}"></span> ~
-          <span th:text="${#temporals.format(survey.expiresAt, 'yyyy-MM-dd')}"></span></p>
-        <p>설문 작성자 : <span th:text="${survey.createdBy}"></span></p>
-
+      <div class="detail-container">
+        <div class="section header-section">
+          <h1 class="title" th:text="${survey.title}">설문 제목</h1>
+          <p class="description" th:text="${survey.description}">설문 설명</p>
+          <div>
+            <p>
+              <span class="label">설문 기간 : </span>
+              <span th:text="${#temporals.format(survey.createdAt, 'yyyy-MM-dd')}"></span>
+              ~
+              <span th:text="${#temporals.format(survey.expiresAt, 'yyyy-MM-dd')}"></span>
+            </p>
+            <p>
+              <span class="label">설문 작성자 : </span>
+              <span th:text="${survey.createdBy}"></span>
+            </p>
+          </div>
+        </div>
         <div>
           <h2>설문 통계 <span th:text="'총 ' + ${participants} + '개'" style="font-size: 18px"/></h2>
           <div th:each="question, stat : ${survey.questions}" th:if="${participants} != 0">
-            <div class="question">
-              <p><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
-              <div th:if="${question.questionType == 'radio' or question.questionType == 'checkbox'}">
+            <div class="question section">
+              <p class="question-title"><span th:text="${(stat.index + 1) + '번'}"></span>. <span th:text="${question.questionText}">질문 텍스트</span></p>
+              <div class="flex-center" th:if="${question.questionType == 'radio' or question.questionType == 'checkbox'}">
                 <canvas th:attr="id='chart_' + ${question.id}" width="400" height="300"></canvas>
                 <script th:inline="javascript">
                   var responseMap = [[${question.statistics?.responseCounts}]];
@@ -126,7 +163,7 @@
                   });
                 </script>
               </div>
-              <div th:if="${question.questionType == 'date' or question.questionType == 'time'}">
+              <div class="flex-center" th:if="${question.questionType == 'date' or question.questionType == 'time'}">
                 <canvas th:attr="id='chart_' + ${question.id}" width="400" height="300"></canvas>
                 <script th:inline="javascript">
                   var responseMap = [[${question.statistics?.responseCounts}]];
@@ -178,15 +215,15 @@
                   });
                 </script>
               </div>
-              <div th:if="${question.questionType == 'text' or question.questionType == 'textarea'}">
-                <div id="wordCloud" style="width: 400px; height: 300px;"></div>
-                <div>
-                  <button type="button" onclick="toggleResponses()">전체 응답 보기</button>
-                  <button type="button" onclick="toggleWords()">단어 통계 보기</button>
+              <div class="flex-center" th:if="${question.questionType == 'text' or question.questionType == 'textarea'}" style="flex-direction: column;">
+                <div th:attr="id='wordCloud_' + ${question.id}" style="width: 400px; height: 300px;"></div>
+                <div class="btn-container">
+                  <button type="button" class="inner-btn" th:attr="onclick='toggleResponses(' + ${question.id} + ')'">전체 응답 보기</button>
+                  <button type="button" class="inner-btn" th:attr="onclick='toggleWords(' + ${question.id} + ')'">단어 통계 보기</button>
                 </div>
-                <div>
-                  <div class="responses" id="responses" style="display: none;">
-                    <table border="1">
+                <div class="flex-center" style="width: 50%;">
+                  <div class="responses" th:attr="id='responses_' + ${question.id}" style="display: none;">
+                    <table class="list">
                       <thead>
                       <th>사원 ID</th>
                       <th>응답</th>
@@ -197,8 +234,8 @@
                       </tbody>
                     </table>
                   </div>
-                  <div class="words" id="words" style="display: none;">
-                    <table border="1">
+                  <div class="words" th:attr="id='words_' + ${question.id}" style="display: none;">
+                    <table class="list">
                       <thead>
                       <th>단어</th>
                       <th>개수</th>
@@ -211,10 +248,10 @@
                   </div>
                 </div>
                 <script th:inline="javascript">
-                  var wordList = [[${question.statistics?.wordList}]];
-
                   $(function() {
-                    $("#wordCloud").jQCloud(wordList, {
+                    var wordList = [[${question.statistics?.wordList}]];
+                    var wordCloudId = "#wordCloud_" + [[${question.id}]];
+                    $(wordCloudId).jQCloud(wordList, {
                       colors : [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
@@ -230,6 +267,7 @@
                     })
                   });
                 </script>
+              </div>
               </div>
             </div>
           </div>

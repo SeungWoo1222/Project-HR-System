@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='근태 목록 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='근태 목록 조회')}">
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/department-nav.css}" rel="stylesheet">
-    <link th:href="@{/css/yearmonth-nav.css}" rel="stylesheet">
-    <link th:href="@{/css/pagination.css}" rel="stylesheet">
-    <link th:href="@{/css/attendance/status.css}" rel="stylesheet">
+    <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/search.css}" rel="stylesheet">
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -21,7 +23,7 @@
             <div class="content-header-left">
                 <form id="pageSizeForm" th:action="@{/attendance/list}" method="get">
                     <input type="hidden" name="page" th:value="1"/>
-                    <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                    <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
                         <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
                         <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                         <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
@@ -29,6 +31,22 @@
                     <input type="hidden" name="keyword" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+                </form>
+                <form id="statusForm" th:action="@{/attendance/list}" method="get">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <input type="hidden" name="department" th:value="${department}">
+                    <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
+                        <option value="" th:selected="${status == ''}">근태 상태</option>
+                        <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
+                        <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
+                        <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
+                        <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
+                        <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
+                        <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
+                    </select>
                     <input type="hidden" name="yearmonth" th:value="${yearmonth}">
                 </form>
             </div>
@@ -47,33 +65,21 @@
                     <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
                 </form>
             </div>
-            <div class="search-option content-header-right">
-                <form id="statusForm" th:action="@{/attendance/list}" method="get">
+            <div class="content-header-right">
+                <form th:action="@{/attendance/list}" class="search-form" method="get">
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="hidden" name="keyword" th:value="${keyword}"/>
-                    <input type="hidden" name="department" th:value="${department}">
-                    <select name="status" onchange="document.getElementById('statusForm').submit()">
-                        <option value="" th:selected="${status == ''}">근태 상태</option>
-                        <option th:value="출근" th:text="출근" th:selected="${status == '출근'}">출근</option>
-                        <option th:value="결근" th:text="결근" th:selected="${status == '결근'}">결근</option>
-                        <option th:value="지각" th:text="지각" th:selected="${status == '지각'}">지각</option>
-                        <option th:value="조퇴" th:text="조퇴" th:selected="${status == '조퇴'}">조퇴</option>
-                        <option th:value="출장" th:text="출장" th:selected="${status == '출장'}">출장</option>
-                        <option th:value="휴가" th:text="휴가" th:selected="${status == '휴가'}">휴가</option>
-                    </select>
-                    <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                </form>
-                <form th:action="@{/attendance/list}" method="get">
-                    <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="size" th:value="${pageSize}"/>
-                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                    <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                     <input type="hidden" name="department" th:value="${department}">
                     <input type="hidden" name="status" th:value="${status}">
                     <input type="hidden" name="yearmonth" th:value="${yearmonth}">
-                    <button type="submit">검색</button>
+                    <button type="submit" class="search-btn">
+                        <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                    </button>
                 </form>
-                <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/attendance/list'"/>
+                <button type="button" class="reset-btn" onclick="window.location.href='/attendance/list'">
+                    <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+                </button>
             </div>
         </div>
         <form th:action="@{/attendance/list}" method="get" id="department-nav">
@@ -110,17 +116,16 @@
         <table border="1" class="list">
             <thead>
             <tr>
-                <th>근태 ID</th>
+                <th>날짜</th>
                 <th>사원 ID</th>
                 <th>이름</th>
                 <th>부서</th>
                 <th>직급</th>
                 <th>근태 상태</th>
-                <th>날짜</th>
                 <th>출근 시간</th>
                 <th>퇴근 시간</th>
-                <th>초과 근무</th>
                 <th>근무 시간</th>
+                <th>초과 근무</th>
             </tr>
             </thead>
             <tbody>
@@ -130,23 +135,23 @@
                 </td>
             </tr>
             <tr th:each="attendance : ${attendanceList}" th:attendanceId="${attendance.attendanceId}" th:onclick="openModal('/attendance/' + this.getAttribute('attendanceId'))">
-                <td th:text="${attendance.attendanceId}">근태 ID</td>
+                <td th:text="${#temporals.format(attendance.date, 'dd일 (EE)')}">날짜</td>
                 <td th:text="${attendance.employeeId}">사원 ID</td>
                 <td th:text="${attendance.employee?.name}">이름</td>
                 <td th:text="${attendance.employee?.department.name}">부서</td>
                 <td th:text="${attendance.employee?.position.name}">직급</td>
                 <td th:text="${attendance.status}"
-                    th:classappend="${attendance.status == '출근'} ? 'present' :
-                                    (${attendance.status == '결근'} ? 'absent' :
-                                    (${attendance.status == '지각'} ? 'late' :
-                                    (${attendance.status == '조퇴'} ? 'early-leave' :
-                                    (${attendance.status == '출장'} ? 'business-trip' :
-                                    (${attendance.status == '휴가'} ? 'vacation' : '')))))">근태 상태</td>
-                <td th:text="${#temporals.format(attendance.date, 'yy년 MM월 dd일')}">날짜</td>
+                    th:classappend="${attendance.status == '출근'} ? 'green' :
+                                    (${attendance.status == '결근'} ? 'red' :
+                                    (${attendance.status == '지각'} ? 'orange' :
+                                    (${attendance.status == '조퇴'} ? 'yellow' :
+                                    (${attendance.status == '출장'} ? 'purple' :
+                                    (${attendance.status == '휴가'} ? 'skyblue' : '')))))">근태 상태</td>
                 <td th:text="${#temporals.format(attendance.checkIn, 'HH:mm')}">출근 시간</td>
                 <td th:text="${#temporals.format(attendance.checkOut, 'HH:mm')}">퇴근 시간</td>
-                <td th:text="${attendance.overtimeId} == null ? 'N' : 'Y'"></td>
                 <td th:text="${attendance.workingHours} + '시간'"></td>
+                <td th:text="${attendance.overtimeId} == null ? 'N' : 'Y'"
+                    th:classappend="${attendance.overtimeId == null ? 'grey' : 'pink'}"></td>
             </tr>
             </tbody>
         </table>

@@ -169,7 +169,7 @@ public class AttendanceViewController {
         model.addAttribute("employee", employeeService.getEmployeeById(employeeId));
 
         // 사원의 휴가 정보 조회 후 승인된 휴가 정보만 모델에 추가
-        List<Vacation> vacationList = vacationService.getVacationByEmployeeId(employeeId).stream()
+        List<Vacation> vacationList = vacationService.getVacationsByEmployeeId(employeeId).stream()
                 .filter(vacation -> vacation.getApprovalStatus().equals("승인"))
                 .toList();
 
@@ -346,7 +346,7 @@ public class AttendanceViewController {
                 .collect(Collectors.groupingBy(Attendance::getStatus, Collectors.counting()));
 
         // 출석률 계산
-        int total = employeeService.getAllEmployee().size();
+        int total = employeeService.getEmployeesByDepartment(department).size();
         Long rate = (long) ((((attendanceList.size())
                 - Objects.requireNonNullElse(statusCount.get("결근"), 0L)
                 - Objects.requireNonNullElse(statusCount.get("출장"), 0L)
@@ -376,7 +376,7 @@ public class AttendanceViewController {
         model.addAttribute("tripCurrentPage", tripPage);
         model.addAttribute("tripTotalPages", (int) Math.ceil((double) vacationOrBusinessList.size() / size));
 
-        return "attendance/today";
+        return "attendance/today-department";
     }
 
     // 페이지 처리

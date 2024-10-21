@@ -1,26 +1,38 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<div>
-  <div>
-    <h3>공휴일 수정</h3>
-    <form action="/api/holiday" onsubmit="submitUpdateForm(event)">
-      <div class="form-group">
-        <label for="dateName" style="font-weight: bold;">공휴일 이름 : </label>
-        <input type="text" id="dateName" name="dateName" th:value="${holiday.dateName}"/>
-      </div>
-      <div class="form-group">
-        <label for="locDate" style="font-weight: bold;">날짜 : </label>
-        <input type="date" id="locDate" name="locDate" th:value="${holiday.locDate}"/>
-      </div>
-      <div class="form-group">
-        <input type="hidden" name="holidayId" th:value="${holiday.holidayId}"/>
-      </div>
-      <div id="error-message" class="error-message"></div>
+<th:block layout:fragment="css">
+  <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+  <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+  <style>
+    .input-modal .btn-container .btn {
+      width: 45%;
+      font-size: 16px;
+    }
+  </style>
+</th:block>
+
+<div class="input-modal">
+  <h3>공휴일 수정</h3>
+  <form action="/api/holiday" onsubmit="submitUpdateForm(event)">
+    <div class="input-container">
+      <label for="dateName" style="font-weight: bold;">공휴일 이름 : </label>
+      <input type="text" id="dateName" name="dateName" th:value="${holiday.dateName}"/>
+    </div>
+    <div class="input-container">
+      <label for="locDate" style="font-weight: bold;">날짜 : </label>
+      <input type="date" id="locDate" name="locDate" th:value="${holiday.locDate}"/>
+    </div>
+    <div class="input-container">
+      <input type="hidden" name="holidayId" th:value="${holiday.holidayId}"/>
+    </div>
+    <div id="error-message" class="error-message"></div>
+    <div class="btn-container">
       <button type="reset" class="btn">초기화</button>
       <button type="submit" class="btn">수정 완료</button>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>
 
 </html>

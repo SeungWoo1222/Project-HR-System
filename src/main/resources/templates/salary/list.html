@@ -1,17 +1,50 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='급여정보 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='급여정보 조회')}">
 
 <th:block layout:fragment="css">
-    <link th:href="@{/css/pagination.css}" rel="stylesheet">
-    <link th:href="@{/css/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/search.css}" rel="stylesheet">
+    <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
     <style>
-        .content-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .salary-list-container {
+            padding-bottom: 15px;
+            border-bottom: #DCDCDC solid 1px;
+            margin-bottom: 15px;
         }
+
+        .no-salary-list-container h3 {
+            margin-bottom: 15px;
+        }
+
+        .employee-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 35px;
+        }
+
+        .employee-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            width: 200px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .employee-card p {
+            font-size: 14px;
+        }
+
+        .employee-card .btn-container {
+            margin-top: 5px;
+        }
+        .employee-card .btn-container .inner-btn {
+            font-size: 12px;
+        }
+
     </style>
 </th:block>
 
@@ -21,13 +54,15 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="content-header">
-            <div class="content-header-left">
-                <h3>모든 급여정보 목록</h3>
-                <div>
+        <div class="salary-list-container">
+            <div class="content-header">
+                <div class="content-header-left">
+                    <h3>모든 급여정보 목록</h3>
+                </div>
+                <div class="content-header-right">
                     <form th:action="@{/salary/list}" method="get" id="pageSizeForm">
                         <input type="hidden" name="page" th:value="1"/>
-                        <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
                             <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
                             <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
                             <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
@@ -36,157 +71,146 @@
                         <input type="hidden" name="department" th:value="${department}">
                         <input type="hidden" name="status" th:value="${status}">
                     </form>
-                </div>
-            </div>
-            <div class="content-header-center"></div>
-            <div class="content-header-right">
-                <div class="search-option">
                     <form th:action="@{/salary/list}" method="get" id="statusForm">
                         <input type="hidden" name="page" th:value="1"/>
                         <input type="hidden" name="size" th:value="${pageSize}"/>
                         <input type="hidden" name="keyword" th:value="${keyword}"/>
                         <input type="hidden" name="department" th:value="${department}">
-                        <select name="status" onchange="document.getElementById('statusForm').submit()">
-                            <option value="" th:selected="${status == ''}" disabled>사용 여부</option>
+                        <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
+                            <option value="" th:selected="${status == ''}">사용 여부</option>
                             <option th:value="1" th:text="사용중" th:selected="${status == '1'}">사용 중</option>
                             <option th:value="0" th:text="사용중지" th:selected="${status == '0'}">사용 중지</option>
                         </select>
                     </form>
-                    <form th:action="@{/salary/list}" method="get">
+                    <form class="search-form" th:action="@{/salary/list}" method="get">
                         <input type="hidden" name="page" value="1">
                         <input type="hidden" name="size" th:value="${pageSize}"/>
-                        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+                        <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
                         <input type="hidden" name="department" th:value="${department}">
                         <input type="hidden" name="status" th:value="${status}">
-                        <button type="submit">검색</button>
+                        <button type="submit" class="search-btn">
+                            <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                        </button>
                     </form>
-                    <img th:src="@{/images/icons/reset.png}" class="image-btn" onclick="window.location.href='/salary/list'"/>
+                    <button type="button" class="reset-btn" onclick="window.location.href='/salary/list'">
+                        <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+                    </button>
+                </div>
+            </div>
+            <form th:action="@{/salary/list}" method="get" id="department-nav">
+                <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
+                <label for="all" class="radio-btn">전체 부서</label>
+
+                <input type="radio" id="HR" class="hidden" name="department" value="HR" th:checked="${department == 'HR'}" onclick="this.form.submit()">
+                <label for="HR" class="radio-btn">HR(인사)</label>
+
+                <input type="radio" id="FI" class="hidden" name="department" value="FI" th:checked="${department == 'FI'}" onclick="this.form.submit()">
+                <label for="FI" class="radio-btn">FI(재무)</label>
+
+                <input type="radio" id="SA" class="hidden" name="department" value="SA" th:checked="${department == 'SA'}" onclick="this.form.submit()">
+                <label for="SA" class="radio-btn">SA(영업)</label>
+
+                <input type="radio" id="MK" class="hidden" name="department" value="MK" th:checked="${department == 'MK'}" onclick="this.form.submit()">
+                <label for="MK" class="radio-btn">MK(마케팅)</label>
+
+                <input type="radio" id="PR" class="hidden" name="department" value="PR" th:checked="${department == 'PR'}" onclick="this.form.submit()">
+                <label for="PR" class="radio-btn">PR(생산)</label>
+
+                <input type="radio" id="QC" class="hidden" name="department" value="QC" th:checked="${department == 'QC'}" onclick="this.form.submit()">
+                <label for="QC" class="radio-btn">QC(품질관리)</label>
+
+                <input type="radio" id="RD" class="hidden" name="department" value="RD" th:checked="${department == 'RD'}" onclick="this.form.submit()">
+                <label for="RD" class="radio-btn">RD(연구개발)</label>
+
+                <input type="hidden" name="page" th:value="1"/>
+                <input type="hidden" name="size" th:value="${pageSize}"/>
+                <input type="hidden" name="keyword" th:value="${keyword}"/>
+                <input type="hidden" name="status" th:value="${status}">
+            </form>
+            <table class="list" style="table-layout: auto">
+                <thead>
+                    <tr>
+                        <th>사원 ID</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>계좌번호</th>
+                        <th>연봉</th>
+                        <th>등록된 날짜</th>
+                        <th>사용 여부</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${salaries.isEmpty()}">
+                        <td colspan="10" style="text-align: center; padding: 20px;">
+                            조회된 급여 정보가 없습니다. 다른 검색 조건을 시도해보세요.
+                        </td>
+                    </tr>
+                    <tr th:each="salary : ${salaries}" th:employeeId="${salary.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
+                        <td th:text="${salary.name + '(' + salary.employeeId + ')'}">사원 ID</td>
+                        <td th:text="${salary.department.name}">부서</td>
+                        <td th:text="${salary.position.name}">직급</td>
+                        <td th:text="${salary.bank + ' ' + salary.accountNumber}">계좌번호</td>
+                        <td th:text="${#numbers.formatInteger(salary.annualSalary, 3, 'COMMA')}" class="annualSalary">연봉</td>
+                        <td th:text="${salary.createdAt}">등록된 날짜</td>
+                        <td th:text="${salary.status} ? '사용 중' : '사용 중지'"
+                            th:classappend="${salary.status} ? 'green' : 'red'">사용 여부</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination" th:if="${totalPages > 0}">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{'/salary/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
+                        <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                    </a>
+                </span>
+                <div class="page-area">
+                    <span th:if="${totalPages <= 5}">
+                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                    <span th:if="${totalPages > 5}">
+                        <span th:each="i : ${#numbers.sequence(
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                        currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                            <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
+                               th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                        </span>
+                    </span>
+                </div>
+                <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{'/salary/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
+                        <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                    </a>
+                </span>
+            </div>
+        </div>
+
+        <div class="no-salary-list-container">
+            <h3>급여정보 미등록 사원 목록</h3>
+            <div class="employee-card" th:if="${employeesWithoutSalary.size() <= 0}"
+                style="width: auto; text-align: center;">
+                <h4>모든 사원의 급여 정보가 등록되어 있습니다.</h4>
+            </div>
+            <div class="employee-cards" th:if="${employeesWithoutSalary.size()} > 0">
+                <div class="employee-card" th:each="employee : ${employeesWithoutSalary}">
+                    <h4 th:text="${employee.name + '(' + employee.employeeId + ')'}"></h4>
+                    <p th:text="'부서 : ' + ${employee.department}"></p>
+                    <p th:text="'직급 : ' + ${employee.position}"></p>
+                    <p th:text="'입사일 : ' + ${employee.hireDate}"></p>
+                    <p>재직상태 :
+                        <span th:text="${employee.status}"
+                              th:classappend="${employee.status == '재직'} ? 'green' :
+                                              (${employee.status == '퇴사'} ? 'red' :
+                                              (${employee.status == '퇴사 예정'} ? 'orange' :
+                                              (${employee.status == '휴직'} ? 'yellow' : '')))"></span></p>
+                    <div class="btn-container flex-center">
+                        <button type="button" class="inner-btn blue-btn" th:employeeId="${employee.employeeId}" onclick="goToRegisterForm(event, this.getAttribute('employeeId'))">급여정보 등록</button>
+                    </div>
                 </div>
             </div>
         </div>
-        <form th:action="@{/salary/list}" method="get" id="department-nav">
-            <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
-            <label for="all" class="radio-btn">전체 부서</label>
-
-            <input type="radio" id="HR" class="hidden" name="department" value="HR" th:checked="${department == 'HR'}" onclick="this.form.submit()">
-            <label for="HR" class="radio-btn">HR(인사)</label>
-
-            <input type="radio" id="FI" class="hidden" name="department" value="FI" th:checked="${department == 'FI'}" onclick="this.form.submit()">
-            <label for="FI" class="radio-btn">FI(재무)</label>
-
-            <input type="radio" id="SA" class="hidden" name="department" value="SA" th:checked="${department == 'SA'}" onclick="this.form.submit()">
-            <label for="SA" class="radio-btn">SA(영업)</label>
-
-            <input type="radio" id="MK" class="hidden" name="department" value="MK" th:checked="${department == 'MK'}" onclick="this.form.submit()">
-            <label for="MK" class="radio-btn">MK(마케팅)</label>
-
-            <input type="radio" id="PR" class="hidden" name="department" value="PR" th:checked="${department == 'PR'}" onclick="this.form.submit()">
-            <label for="PR" class="radio-btn">PR(생산)</label>
-
-            <input type="radio" id="QC" class="hidden" name="department" value="QC" th:checked="${department == 'QC'}" onclick="this.form.submit()">
-            <label for="QC" class="radio-btn">QC(품질관리)</label>
-
-            <input type="radio" id="RD" class="hidden" name="department" value="RD" th:checked="${department == 'RD'}" onclick="this.form.submit()">
-            <label for="RD" class="radio-btn">RD(연구개발)</label>
-
-            <input type="hidden" name="page" th:value="1"/>
-            <input type="hidden" name="size" th:value="${pageSize}"/>
-            <input type="hidden" name="keyword" th:value="${keyword}"/>
-            <input type="hidden" name="status" th:value="${status}">
-        </form>
-        <table border="1" class="list">
-            <thead>
-                <tr>
-                    <th>급여 ID</th>
-                    <th>사원 ID</th>
-                    <th>이름</th>
-                    <th>부서</th>
-                    <th>직급</th>
-                    <th>은행</th>
-                    <th>계좌번호</th>
-                    <th>연봉</th>
-                    <th>등록된 날짜</th>
-                    <th>사용 여부</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:if="${salaries.isEmpty()}">
-                    <td colspan="10" style="text-align: center; padding: 20px;">
-                        조회된 급여 정보가 없습니다. 다른 검색 조건을 시도해보세요.
-                    </td>
-                </tr>
-                <tr th:each="salary : ${salaries}" th:employeeId="${salary.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
-                    <td th:text="${salary.salaryId}">급여 ID</td>
-                    <td th:text="${salary.employeeId}">사원 ID</td>
-                    <td th:text="${salary.name}">이름</td>
-                    <td th:text="${salary.department.name}">부서</td>
-                    <td th:text="${salary.position.name}">직급</td>
-                    <td th:text="${salary.bank}">은행</td>
-                    <td th:text="${salary.accountNumber}">계좌번호</td>
-                    <td th:text="${#numbers.formatInteger(salary.annualSalary, 3, 'COMMA')}" class="annualSalary">연봉</td>
-                    <td th:text="${salary.createdAt}">등록된 날짜</td>
-                    <td th:text="${salary.status} ? '사용 중' : '사용 중지'"
-                        th:classappend="${salary.status} ? 'true' : 'false'">사용 여부</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="pagination" th:if="${totalPages > 0}">
-            <span th:if="${currentPage > 1}">
-                <a th:href="@{'/salary/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
-                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
-                </a>
-            </span>
-            <div class="page-area">
-                <span th:if="${totalPages <= 5}">
-                    <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                        <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
-                    </span>
-                </span>
-                <span th:if="${totalPages > 5}">
-                    <span th:each="i : ${#numbers.sequence(
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
-                                    currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                        <a th:href="@{'/salary/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}"
-                           th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
-                    </span>
-                </span>
-            </div>
-            <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/salary/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&status=' + ${status}}">
-                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
-                </a>
-            </span>
-        </div>
-
-        <h3>급여정보 미등록 사원 목록</h3>
-        <table border="1" class="list">
-            <thead>
-            <tr>
-                <th>사원 ID</th>
-                <th>이름</th>
-                <th>부서</th>
-                <th>직급</th>
-                <th>급여정보 등록</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:if="${employeesWithoutSalary.isEmpty()}">
-                <td colspan="7" style="text-align: center; padding: 20px;">
-                    모든 사원의 급여 정보가 등록되어 있습니다.
-                </td>
-            </tr>
-            <tr th:each="employee : ${employeesWithoutSalary}" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
-                <td th:text="${employee.employeeId}">사원 ID</td>
-                <td th:text="${employee.name}">이름</td>
-                <td th:text="${employee.department}">부서</td>
-                <td th:text="${employee.position}">직급</td>
-                <td>
-                    <button type="button" th:employeeId="${employee.employeeId}" onclick="goToRegisterForm(event, this.getAttribute('employeeId'))">급여정보 등록</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 </html>

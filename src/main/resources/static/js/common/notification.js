@@ -140,7 +140,7 @@ function deleteNotification(notificationId) {
 // 모든 알림 삭제 처리
 function deleteAllNotification() {
     // 읽음 처리
-    if (!confirm('모든 알림을 삭제 처리하시겠습니까?')) {
+    if (confirm('모든 알림을 삭제 처리하시겠습니까?')) {
         fetch('/notification/all', {
             method: 'DELETE',
             headers: {

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='새 설문조사 작성')}">
+      layout:decorate="~{fragments/layout :: layout(title='새 설문 작성')}">
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/survey/form.css}" rel="stylesheet">
+    <link th:href="@{/css/common/input.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -12,22 +13,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             alignButtonsWithLastQuestion();
-
-            // 질문 추가 이벤트 등록
-            document.querySelector('.add-btn').addEventListener('click', function () {
-                addNewQuestion();
-            });
-
-            // 설문 등록 이벤트 등록
-            document.querySelector('.send-btn').addEventListener('click', function (e) {
-                e.preventDefault();
-                if (confirm('설문을 등록하시겠습니까?')) submitSurvey();
-            });
-
-            // 설문 목록으로 이동 이벤트 등록
-            document.querySelector('.exit-btn').addEventListener('click', function () {
-                if (confirm('설문 목록으로 이동하시겠습니까?')) window.location.href='/survey/list';
-            });
 
             const questionTypeSelects = document.querySelectorAll('select[name^="questionType"]');
 
@@ -53,17 +38,22 @@
 <div layout:fragment="~{content}">
     <form>
         <div class="survey-container">
-            <div class="content survey-header">
-                <input type="text" id="title" name="title" placeholder="설문조사 제목"/>
-                <input type="text" id="description" name="description" placeholder="설문조사 설명"/>
-                <label for="expiresAt">설문조사 종료일 : </label>
-                <input type="date" id="expiresAt" name="expiresAt"/>
+            <div class="survey-header">
+                <div class="color-area"></div>
+                <div class="input-area">
+                    <input type="text" id="title" name="title" placeholder="설문조사 제목"/>
+                    <textarea id="description" name="description" placeholder="설문조사 설명" rows="3"></textarea>
+                    <div class="expire-container">
+                        <label for="expiresAt">설문조사 종료일</label>
+                        <input type="date" id="expiresAt" name="expiresAt"/>
+                    </div>
+                </div>
             </div>
             <div class="question-row">
-                <div class="content question">
+                <div class="question">
                     <div class="question-header">
-                        <input type="text" id="questionText0" name="questionText0" placeholder="질문"/>
-                        <select id="questionType0" name="questionType0">
+                        <input type="text" class="question-text" id="questionText0" name="questionText0" placeholder="질문"/>
+                        <select class="question-type" id="questionType0" name="questionType0">
                             <option value="text">단답형</option>
                             <option value="textarea">장문형</option>
                             <option value="radio">단일 선택</option>
@@ -83,15 +73,15 @@
             </div>
         </div>
     </form>
-    <div class="content btn-container">
-        <div class="add-btn">
-            <img class="survey-form-btn" src="/images/icons/plus.png" alt="새 질문" title="새 질문 추가"/>
+    <div class="btn-container">
+        <div class="survey-btn" id="add-btn" onclick="addNewQuestion()">
+            <img src="/images/icons/plus.png" alt="새 질문" title="새 질문 추가"/>
         </div>
-        <div class="send-btn">
-            <img class="survey-form-btn" src="/images/icons/send.png" alt="설문 등록" title="설문 등록"/>
+        <div class="survey-btn" id="send-btn" onclick="submitSurvey(event)">
+            <img src="/images/icons/send.png" alt="설문 등록" title="설문 등록"/>
         </div>
-        <div class="exit-btn">
-            <img class="survey-form-btn" src="/images/icons/exit.png" alt="설문 목록" title="설문 목록으로"/>
+        <div class="survey-btn" id="exit-btn" onclick="goToList()">
+            <img src="/images/icons/exit.png" alt="설문 목록" title="설문 목록으로"/>
         </div>
     </div>
 </div>

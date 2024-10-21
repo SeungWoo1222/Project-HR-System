@@ -110,17 +110,6 @@
         WHERE compensation_month = #{yearMonthString}
     </select>
 
-    <!-- 해당 달 모든 급여명세서 조회 -->
-    <select id="selectPaymentBySalaryAndMonth" resultMap="SalaryPaymentResultMap">
-        SELECT *
-        FROM salary_payments
-        WHERE salary_id IN
-        <foreach item="salaryId" collection="salaryIdList" open="(" separator="," close=")">
-            #{salaryId}
-        </foreach>
-        AND compensation_month = #{yearMonth}
-    </select>
-
     <!-- 모든 급여명세서 - 검색어에 해당하는 데이터 결과 조회 -->
     <select id="searchPayslips" parameterType="map" resultMap="SalaryPaymentResultMap">
         SELECT sp.*, s.name
@@ -162,6 +151,12 @@
                 s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
                 s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
             </if>
         </where>
         ORDER BY sp.payment_date DESC
@@ -209,6 +204,12 @@
                 s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
                 s.status LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
             </if>
         </where>
     </select>

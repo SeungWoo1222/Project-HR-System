@@ -31,7 +31,12 @@ function openAttendanceModal(url) {
         // .then(response => response.text())
         .then(html => {
             modalBody.innerHTML = html;
-            modal.style.display = "block";
+            modal.style.display = "flex";
+
+            // 확대 애니메이션을 위해 'show' 클래스 추가
+            setTimeout(() => {
+                modal.classList.add("show");
+            }, 10);
 
             // 페이지 로드 시 즉시 시간을 업데이트하고, 1초마다 갱신
             setInterval(updateTime, 1000);

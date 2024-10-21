@@ -4,7 +4,8 @@
       layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <link rel="stylesheet" th:href="@{/css/common/input.css}">
+    <link rel="stylesheet" th:href="@{/css/common/button.css}">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -78,7 +79,7 @@
             <input type="hidden" id="nameListField" name="nameList" value="">
 
             <div id="error-alert"></div>
-            <button type="button" onclick="submitReportForm(event)">제출하기</button>
+            <button type="button" class="btn" onclick="submitReportForm(event)">제출하기</button>
         </form>
     </div>
 </div>

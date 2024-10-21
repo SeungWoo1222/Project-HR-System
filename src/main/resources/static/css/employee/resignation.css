@@ -1,0 +1,76 @@
+.resignation-wrapper {
+    width: 756px;
+}
+
+.upload-area {
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upload-area p {
+    font-style: italic;
+    color: #888;
+}
+
+.filebox {
+    margin: 10px;
+    padding: 5px 10px;
+    border: #EEE 1px solid;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filebox .name {
+    width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete-btn {
+    padding-top: 3px;
+    transition: transform 0.3s ease;
+}
+
+.delete-btn:hover {
+    transform: scale(1.2);
+}
+
+.resignation-container {
+    margin-top: 20px;
+}
+
+.resignation-container input[type="text"], .resignation-container input[type="date"] {
+    width: 515px;
+}
+
+.resignation-container textarea {
+    width: 510px;
+}
+
+select {
+    width: 535px;
+}
+
+.resignation-container .btn-container {
+    margin: 0;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resignation-container .btn {
+    width: 33%;
+    font-size: 16px;
+}
+
+.error-message {
+    margin-top: 10px;
+}

@@ -4,6 +4,7 @@ import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.salary.model.Salary;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class Employee {
     private String employeeId;                  // 사원 ID
     private String name;                        // 이름

@@ -97,7 +97,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public Object handleAllRuntimeExceptions(RuntimeException ex, HttpServletRequest request) {
         log.error("알 수 없는 오류가 발생했습니다: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>("시스템 오류가 발생했습니다. 관리자에게 문의하세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        String contentType = request.getContentType();
+        log.info("contentType : {}", contentType);
+
+        if (contentType == null) {
+            return "redirect:/error/500";
+        } else {
+            return new ResponseEntity<>("시스템 오류가 발생했습니다. 관리자에게 문의하세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
 

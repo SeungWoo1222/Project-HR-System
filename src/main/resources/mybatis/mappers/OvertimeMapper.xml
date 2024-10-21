@@ -117,4 +117,31 @@
         ORDER BY o.date DESC, o.start_time ASC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
+
+    <!-- 초과근무 목록 검색값 개수 조회 -->
+    <select id="countOvertime" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM overtime o
+        JOIN employees e ON o.employee_id = e.employee_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                o.overtime_id LIKE CONCAT('%', #{keyword}, '%') OR
+                o.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                o.start_time LIKE CONCAT('%', #{keyword}, '%') OR
+                o.end_time LIKE CONCAT('%', #{keyword}, '%') OR
+                o.night_hours LIKE CONCAT('%', #{keyword}, '%') OR
+                o.total_hours LIKE CONCAT('%', #{keyword}, '%') OR
+                e.name LIKE CONCAT('%', #{keyword}, '%') OR
+                e.position_id LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND e.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(o.date, '%Y-%m') = #{yearMonth}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -1,47 +1,56 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 
-<style>
-    #account-edit-form table input {
-        width: 90%;
-        text-align: center;
-    }
-</style>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+    <style>
+        .input-container select {
+            width: 65%;
+        }
+        .input-container input[type="text"] {
+            width: 58%;
+        }
+        .input-container label {
+            font-weight: bold;
+        }
+        .error-message {
+            margin: 10px 0;
+        }
+    </style>
+</th:block>
 
-<form id="account-edit-form" th:action="@{'/api/salary/' + ${salaryInfo.salaryId}}" onsubmit="submitUpdateForm(event)">
+<div class="input-modal">
     <h3>나의 계좌정보 수정</h3>
-    <table border="1">
-        <thead>
-        <tr>
-            <th>계좌은행</th>
-            <th>계좌번호</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                <select id="bank" name="bank">
-                    <option value="KB국민은행" th:selected="${salaryInfo.bank == 'KB국민은행'}">KB국민은행</option>
-                    <option value="카카오뱅크" th:selected="${salaryInfo.bank == '카카오뱅크'}">카카오뱅크</option>
-                    <option value="신한은행" th:selected="${salaryInfo.bank == '신한은행'}">신한은행</option>
-                    <option value="NH농협은행" th:selected="${salaryInfo.bank == 'NH농협은행'}">NH농협은행</option>
-                    <option value="하나은행" th:selected="${salaryInfo.bank == '하나은행'}">하나은행</option>
-                    <option value="우리은행" th:selected="${salaryInfo.bank == '우리은행'}">우리은행</option>
-                    <option value="IBK기업은행" th:selected="${salaryInfo.bank == 'IBK기업은행'}">IBK기업은행</option>
-                    <option value="케이뱅크" th:selected="${salaryInfo.bank == '케이뱅크'}">케이뱅크</option>
-                    <option value="새마을금고" th:selected="${salaryInfo.bank == '새마을금고'}">새마을금고</option>
-                    <option value="우체국" th:selected="${salaryInfo.bank == '우체국'}">우체국</option>
-                    <option value="신협" th:selected="${salaryInfo.bank == '신협'}">신협</option>
-                    <option value="SC제일은행" th:selected="${salaryInfo.bank == 'SC제일은행'}">SC제일은행</option>
-                </select>
-            </td>
-            <td><input type="text" name="accountNumber" th:value="${salaryInfo.accountNumber}" oninput="this.value = this.value.replace(/[^0-9]/g, '');"/></td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="btn-section">
-        <button type="reset" class="btn">초기화</button>
-        <button type="submit" class="btn">수정 완료</button>
-    </div>
-</form>
+    <form id="account-edit-form" th:action="@{'/api/salary/' + ${salaryInfo.salaryId}}" onsubmit="submitUpdateForm(event)">
+        <div class="input-container">
+            <label for="bank">계좌은행</label>
+            <select id="bank" name="bank">
+                <option value="KB국민은행" th:selected="${salaryInfo.bank == 'KB국민은행'}">KB국민은행</option>
+                <option value="카카오뱅크" th:selected="${salaryInfo.bank == '카카오뱅크'}">카카오뱅크</option>
+                <option value="신한은행" th:selected="${salaryInfo.bank == '신한은행'}">신한은행</option>
+                <option value="NH농협은행" th:selected="${salaryInfo.bank == 'NH농협은행'}">NH농협은행</option>
+                <option value="하나은행" th:selected="${salaryInfo.bank == '하나은행'}">하나은행</option>
+                <option value="우리은행" th:selected="${salaryInfo.bank == '우리은행'}">우리은행</option>
+                <option value="IBK기업은행" th:selected="${salaryInfo.bank == 'IBK기업은행'}">IBK기업은행</option>
+                <option value="케이뱅크" th:selected="${salaryInfo.bank == '케이뱅크'}">케이뱅크</option>
+                <option value="새마을금고" th:selected="${salaryInfo.bank == '새마을금고'}">새마을금고</option>
+                <option value="우체국" th:selected="${salaryInfo.bank == '우체국'}">우체국</option>
+                <option value="신협" th:selected="${salaryInfo.bank == '신협'}">신협</option>
+                <option value="SC제일은행" th:selected="${salaryInfo.bank == 'SC제일은행'}">SC제일은행</option>
+            </select>
+        </div>
+        <div class="input-container">
+            <label for="accountNumber">계좌번호</label>
+            <input type="text" id="accountNumber" name="accountNumber" th:value="${salaryInfo.accountNumber}" oninput="this.value = this.value.replace(/[^0-9]/g, '');"/>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div class="btn-container">
+            <button type="reset" class="btn">초기화</button>
+            <button type="submit" class="btn">수정 완료</button>
+        </div>
+    </form>
+</div>
 </html>

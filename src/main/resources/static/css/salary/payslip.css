@@ -2,9 +2,8 @@
     line-height: 1.6;
     width: 210mm;
     margin: 0;
-    padding: 15mm;
+    padding: 10mm;
     box-sizing: border-box;
-    border: 1px solid #000;
 }
 
 .title {
@@ -79,6 +78,8 @@
 .btn-container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
 td input[type="text"] {

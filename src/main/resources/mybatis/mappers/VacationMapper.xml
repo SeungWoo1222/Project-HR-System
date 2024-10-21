@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.vacation.dao.VacationDAO">
+<mapper namespace="vacation">
     <resultMap id="VacationResultMap" type="com.woosan.hr_system.vacation.model.Vacation">
         <id property="vacationId" column="vacation_id"/>
         <result property="employeeId" column="employee_id"/>
@@ -22,7 +22,7 @@
         SELECT * FROM vacation WHERE vacation_id = #{vacationId}
     </select>
 
-    <!-- 검색 조건에 맞는 휴가 정보 조회 -->
+    <!-- 휴가 내역 검색 조회 -->
     <select id="searchVacation" parameterType="map" resultMap="VacationResultMap">
         SELECT * FROM vacation
         <where>
@@ -36,8 +36,8 @@
                 reason LIKE CONCAT('%', #{keyword}, '%') OR
                 used_days LIKE CONCAT('%', #{keyword}, '%') OR
                 created_at LIKE CONCAT('%', #{keyword}, '%') OR
-                processingBy LIKE CONCAT('%', #{keyword}, '%') OR
-                processingAt LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_by LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_at LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
             <if test="department != null and department != ''">
@@ -46,25 +46,104 @@
             <if test="status != null and status != ''">
                 AND approval_status = #{status}
             </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
         </where>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 해당 사원의 모든 휴가 정보 조회 (페이징) -->
-    <select id="selectVacationByEmployeeId" parameterType="map" resultMap="VacationResultMap">
-        SELECT * FROM vacation WHERE employee_id = #{employeeId}
+    <!-- 휴가 내역 검색값 개수 조회 -->
+    <select id="countVacation" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM vacation
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                vacation_id LIKE CONCAT('%', #{keyword}, '%') OR
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                start_at LIKE CONCAT('%', #{keyword}, '%') OR
+                end_at LIKE CONCAT('%', #{keyword}, '%') OR
+                vacation_type LIKE CONCAT('%', #{keyword}, '%') OR
+                reason LIKE CONCAT('%', #{keyword}, '%') OR
+                used_days LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_by LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_at LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND LEFT(employee_id, 2) = #{department}
+            </if>
+            <if test="status != null and status != ''">
+                AND approval_status = #{status}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 조회 -->
+    <select id="selectVacationsByEmployeeId" parameterType="map" resultMap="VacationResultMap">
+        SELECT * FROM vacation
+        WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (start_at BETWEEN #{startDate} AND #{endDate})
+            OR (end_at BETWEEN #{startDate} AND #{endDate})
+            OR (start_at &lt;= #{startDate} AND end_at >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN start_at AND end_at)
+            OR (#{endDate} BETWEEN start_at AND end_at)
+            )
+        </if>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
+    <!-- 해당 사원의 모든 휴가 내역 개수 조회 -->
+    <select id="countVacationsByEmployeeId" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM vacation
+        WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
+    </select>
+
     <!-- 해당 사원의 모든 휴가 정보 조회 -->
-    <select id="getVacationByEmployeeId" parameterType="String" resultMap="VacationResultMap">
+    <select id="getVacationsByEmployeeId" parameterType="String" resultMap="VacationResultMap">
         SELECT * FROM vacation WHERE employee_id = #{employeeId}
     </select>
 
     <!-- 해당 부서의 모든 휴가 정보 조회 -->
-    <select id="selectVacationByDepartmentId" parameterType="map" resultMap="VacationResultMap">
+    <select id="selectVacationsByDepartmentId" parameterType="map" resultMap="VacationResultMap">
         SELECT *
         FROM vacation
         WHERE employee_id IN
@@ -74,8 +153,43 @@
         <if test="status != null and status != ''">
             AND approval_status = #{status}
         </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
         ORDER BY vacation_id DESC
         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 개수 조회 -->
+    <select id="countVacationsByDepartmentId" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM vacation
+        WHERE employee_id IN
+        <foreach item="employeeId" collection="employeeIdList" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+        <if test="status != null and status != ''">
+            AND approval_status = #{status}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
     </select>
 
     <!-- 휴가 등록 -->

@@ -31,6 +31,7 @@ function validateImage(obj) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('employee-picture').src = e.target.result;
+                document.getElementById('picture-area').classList.add('picture-uploaded'); // 사진 문구 삭제
             }
             reader.readAsDataURL(file);
         }

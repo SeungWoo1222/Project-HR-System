@@ -1,76 +1,73 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout-with-modal :: layout(title='휴가 내역 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='부서 휴가 내역 조회')}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/vacation/detail.css}"/>
-    <link rel="stylesheet" th:href="@{/css/pagination.css}"/>
-    <style>
-        .list tbody tr:hover {
-            cursor: pointer;
-        }
-        .pending {
-            color: #18a8f1;
-            font-weight: bold;
-        }
-        .approved {
-            color: green;
-            font-weight: bold;
-        }
-        .rejected {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+    <link th:href="@{/css/common/search.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
 </th:block>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/vacation/ajax.js}"></script>
-    <script th:src="@{/js/vacation/request.js}"></script>
-    <script th:src="@{/js/common/format.js}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            updateDateTimeElements();
-        });
-    </script>
+    <script th:src="@{/js/vacation/handler.js}"></script>
+    <script th:src="@{/js/common/search.js}"></script>
 </th:block>
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <div class="search-container">
-            <form th:action="@{/vacation/department}" method="get" id="pageSizeForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <select name="size" onchange="document.getElementById('pageSizeForm').submit()">
-                    <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
-                    <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
-                    <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
-                </select>
-                <input type="hidden" name="status" th:value="${status}">
-            </form>
-            <form th:action="@{/vacation/department}" method="get" id="statusForm">
-                <input type="hidden" name="page" th:value="1"/>
-                <input type="hidden" name="size" th:value="${pageSize}"/>
-                <select name="status" onchange="document.getElementById('statusForm').submit()">
-                    <option value="" th:text="승인상태" th:selected="${status == ''}" disabled>승인 상태</option>
-                    <option th:value="미처리" th:text="미처리" th:selected="${status == '미처리'}">미처리</option>
-                    <option th:value="승인" th:text="승인" th:selected="${status == '승인'}">승인</option>
-                    <option th:value="거절" th:text="거절" th:selected="${status == '거절'}">거절</option>
-                </select>
-            </form>
+        <div class="content-header">
+            <div class="content-header-left">
+                <form th:action="@{/vacation/department}" method="get" id="pageSizeForm">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
+                        <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+                        <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+                        <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+                    </select>
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input type="hidden" name="startDate" th:value="${startDate}"/>
+                    <input type="hidden" name="endDate" th:value="${endDate}"/>
+                </form>
+                <form th:action="@{/vacation/department}" method="get" id="statusForm">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <select class="search-select" name="status" onchange="document.getElementById('statusForm').submit()">
+                        <option value="" th:text="승인상태" th:selected="${status == ''}" disabled>승인 상태</option>
+                        <option th:value="미처리" th:text="미처리" th:selected="${status == '미처리'}">미처리</option>
+                        <option th:value="승인" th:text="승인" th:selected="${status == '승인'}">승인</option>
+                        <option th:value="거절" th:text="거절" th:selected="${status == '거절'}">거절</option>
+                    </select>
+                    <input type="hidden" name="startDate" th:value="${startDate}"/>
+                    <input type="hidden" name="endDate" th:value="${endDate}"/>
+                </form>
+                <form class="search-date-form" th:action="@{/vacation/department}" method="get" onsubmit="return validateSearchDate()">
+                    <input type="hidden" name="page" th:value="1"/>
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <input type="hidden" name="status" th:value="${status}">
+                    <input class="search-date" type="date" id="startDate" name="startDate" th:value="${startDate}"/>
+                    <div style="color: #DFDFDF; font-weight: bold">~</div>
+                    <input class="search-date" type="date" id="endDate" name="endDate" th:value="${endDate}"/>
+                    <button type="submit" class="search-btn">
+                        <img th:src="@{/images/icons/search-date.png}" class="search-img" alt="기간 검색"/>
+                    </button>
+                </form>
+                <button type="button" class="reset-btn" onclick="window.location.href='/vacation/department'">
+                    <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+                </button>
+            </div>
         </div>
-        <table border="1" class="list">
+        <table class="list" style="table-layout: auto;">
             <thead>
             <tr>
-                <th>휴가 ID</th>
-                <th>시작일</th>
-                <th>종료일</th>
-                <th>사용 연차</th>
+                <th>사원 ID</th>
+                <th>휴가 기간</th>
                 <th>휴가 유형</th>
+                <th>사용 연차</th>
                 <th>휴가 사유</th>
                 <th>승인 상태</th>
                 <th>처리 사원</th>
-                <th>처리 일시</th>
             </tr>
             </thead>
             <tbody>
@@ -80,31 +77,30 @@
                 </td>
             </tr>
             <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId') + '/process')">
-                <td th:text="${vacation.vacationId}">휴가 ID</td>
-                <td th:text="${vacation.startAt}" class="dateTime">시작일</td>
-                <td th:text="${vacation.endAt}" class="dateTime">종료일</td>
-                <td th:text="${vacation.usedDays}">사용 연차</td>
+                <td th:text="${vacation.employeeId}">사원 ID</td>
+                <td th:text="${#temporals.format(vacation.startAt, 'yyyy년 MM월 dd일')
+                               + ' ~ ' + #temporals.format(vacation.endAt, 'MM월 dd일')}">휴가 기간</td>
                 <td th:text="${vacation.vacationType}">휴가 유형</td>
-                <td th:text="${vacation.reason}">휴가 사유</td>
+                <td th:text="${vacation.usedDays}">사용 연차</td>
+                <td th:text="${vacation.reason}" style="max-width: 250px">휴가 사유</td>
                 <td th:text="${vacation.approvalStatus}"
-                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'pending' :
-                                    (${vacation.approvalStatus == '승인'} ? 'approved' :
-                                    (${vacation.approvalStatus == '거절'} ? 'rejected' : ''))">승인 상태</td>
+                    th:classappend="${vacation.approvalStatus == '미처리'} ? 'grey' :
+                                    (${vacation.approvalStatus == '승인'} ? 'green' :
+                                    (${vacation.approvalStatus == '거절'} ? 'red' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>
-                <td th:text="${vacation.processingAt}" class="dateTime">처리 일시</td>
             </tr>
             </tbody>
         </table>
         <div class="pagination" th:if="${totalPages > 0}">
         <span th:if="${currentPage > 1}">
-            <a th:href="@{'/vacation/department?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&status=' + ${status}}">
+            <a th:href="@{'/vacation/department?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&status=' + ${status} + '&startDate' + ${startDate} + '&endDate' + ${endDate}}">
                 <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
             </a>
         </span>
             <div class="page-area">
             <span th:if="${totalPages <= 5}">
                 <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:href="@{'/vacation/department?page=' + ${i} + '&size=' + ${pageSize} + '&status=' + ${status}}"
+                    <a th:href="@{'/vacation/department?page=' + ${i} + '&size=' + ${pageSize} + '&status=' + ${status} + '&startDate' + ${startDate} + '&endDate' + ${endDate}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
             </span>
@@ -112,13 +108,13 @@
                 <span th:each="i : ${#numbers.sequence(
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                    <a th:href="@{'/vacation/department?page=' + ${i} + '&size=' + ${pageSize} + '&status=' + ${status}}"
+                    <a th:href="@{'/vacation/department?page=' + ${i} + '&size=' + ${pageSize} + '&status=' + ${status} + '&startDate' + ${startDate} + '&endDate' + ${endDate}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
             </span>
             </div>
             <span th:if="${currentPage < totalPages}">
-            <a th:href="@{'/vacation/department?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&status=' + ${status}}">
+            <a th:href="@{'/vacation/department?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&status=' + ${status} + '&startDate' + ${startDate} + '&endDate' + ${endDate}}">
                 <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
             </a>
         </span>

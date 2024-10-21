@@ -1,6 +1,5 @@
 package com.woosan.hr_system.auth.controller;
 
-import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,27 +37,19 @@ public class AuthController {
     }
 
     @GetMapping("/pwd") // 비밀번호 검증 페이지 이동
-    public String viewPasswordForm(@RequestParam("redirectUrl") String redirectUrl, Model model) {
-        model.addAttribute("redirectUrl", redirectUrl);
+    public String viewPasswordForm() {
         return "/auth/pwd";
     }
 
-    @PostMapping("/verifyPassword") // 비밀번호 검증 로직
-    public ResponseEntity<String> verifyPassword(@RequestParam("password") String password, @RequestParam("url") String url) {
+    @PostMapping("/verifyPassword") // 비밀번호 검증 후 내 정보 수정 페이지 이동
+    public ResponseEntity<String> verifyPassword(@RequestParam("password") String password) {
         String employeeId = authService.getAuthenticatedUser().getUsername();
         int message = authService.verifyPasswordAttempts(password, employeeId);
         return switch (message) {
-            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 오류 횟수 초과로 계정이 차단되었습니다.\n관리자에게 문의해주세요.");
-            case 0 -> ResponseEntity.ok(url + employeeId);
+            case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("계정이 차단되었습니다.\n관리자에게 문의해주세요.");
+            case 0 -> ResponseEntity.ok(employeeId + "/edit");
             default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + message + " / 5 입니다.");
         };
-    }
-
-    @GetMapping("/pwd-management") // 비밀번호 관리 페이지 이동
-    public String viewPasswordManagement(Model model) {
-        Password password = authService.getPasswordInfoById(authService.getAuthenticatedUser().getUsername());
-        model.addAttribute("password", password);
-        return "/auth/pwd-management";
     }
 
     @GetMapping("/pwd-change") // 비밀번호 변경 페이지 이동

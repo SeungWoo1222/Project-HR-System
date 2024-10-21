@@ -21,6 +21,8 @@
         <result property="name" column="name"/>
         <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
         <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+        <result property="status" column="status"/>
+        <result property="hireDate" column="hire_date"/>
     </resultMap>
 
     <!-- 급여 ID를 이용한 특정 사원의 급여 정보 조회 -->
@@ -48,7 +50,7 @@
 
     <!-- 급여 정보가 없는 사원 리스트 조회 -->
     <select id="selectEmployeeList" resultMap="EmployeeResultMap">
-        SELECT e.employee_id, e.name, e.department_id, e.position_id
+        SELECT e.employee_id, e.name, e.department_id, e.position_id, e.status, e.hire_date
         FROM employees e
                  LEFT JOIN salaries s ON e.employee_id = s.employee_id
         WHERE s.employee_id IS NULL;
