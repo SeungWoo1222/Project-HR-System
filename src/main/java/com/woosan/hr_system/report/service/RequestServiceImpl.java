@@ -1,34 +1,32 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.report.dao.RequestDAO;
-import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 
 @Service
 @Slf4j
 public class RequestServiceImpl implements RequestService {
-
     @Autowired
     private RequestDAO requestDAO;
+    @Autowired
+    private AuthService authService;
 
 //===================================================생성 메소드=======================================================
 
@@ -98,7 +96,21 @@ public class RequestServiceImpl implements RequestService {
         return new PageResult<>(requests, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
+    @Override // 요청 수신자의 요청 조회
+    public Request getRequestByWriter(int requestId) {
+        // 요청 조회
+        Request request = requestDAO.getRequestById(requestId);
 
+        // 로그인한 사원 아이디 조회
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+
+        // 요청 수신자 ID와 로그인 사원의 ID 비교
+        if (!request.getWriterId().equals(employeeId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "보고서 작성자가 아닙니다.");
+        }
+
+        return request;
+    }
 
 //===================================================조회 메소드=======================================================
 
@@ -144,6 +156,7 @@ public class RequestServiceImpl implements RequestService {
     public void deleteReportId(Integer reportId) {
         requestDAO.deleteReportId(reportId);
     }
+
 //===================================================삭제 메소드=======================================================
 //===================================================기타 메소드=======================================================
     // 요청에 대한 접근 권한이 있는지 확인
@@ -155,7 +168,7 @@ public class RequestServiceImpl implements RequestService {
 
             // 작성자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
             if (!request.getRequesterId().equals(currentEmployeeId)) {
-                throw new SecurityException("권한이 없습니다.");
+                throw new AccessDeniedException("접근 권한이 없습니다");
             }
 
             return request; // 요청 정보 반환

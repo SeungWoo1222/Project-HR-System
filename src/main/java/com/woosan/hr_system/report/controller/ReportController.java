@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.file.model.File;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -15,8 +17,6 @@ import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.model.File;
-import com.woosan.hr_system.file.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,12 +54,11 @@ public class ReportController {
     @Autowired
     private ReportFileService reportFileService;
 
-    @GetMapping("/main") // main 페이지 이동
-    public String getMainPage(@RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+    @GetMapping("/my") // main 페이지 이동
+    public String getMainPage(@RequestParam(name = "searchDate", required = false) String searchDate,
+                              @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               Model model) throws JsonProcessingException {
-
-
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -85,7 +83,10 @@ public class ReportController {
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        return "report/main"; // main.html 반환
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        return "report/my";
     }
 
     //=====================================================생성 메소드======================================================
@@ -117,11 +118,11 @@ public class ReportController {
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
-    @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
-    public String showCreatePageFromRequest(@RequestParam("requestId") int requestId,
+    @GetMapping("/writeFromRequest/{requestId}") // 요청 들어온 보고서 생성 페이지 이동
+    public String showCreatePageFromRequest(@PathVariable("requestId") int requestId,
                                             Model model) {
 
-        Request request = requestService.getRequestById(requestId);
+        Request request = requestService.getRequestByWriter(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
         return "/report/write-from-request";

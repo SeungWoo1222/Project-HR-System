@@ -1,13 +1,10 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RequestService {
@@ -42,5 +39,7 @@ public interface RequestService {
     void deleteRequest(int requestId);
     // 요청에 의한 보고서 삭제 시 reportId삭제
     void deleteReportId(Integer reportId);
+
+    Request getRequestByWriter(int requestId);
 //=====================================================삭제 메소드======================================================
 }
