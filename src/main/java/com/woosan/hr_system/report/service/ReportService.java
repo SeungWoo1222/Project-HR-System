@@ -1,13 +1,11 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.report.model.ReportFileLink;
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
-import com.woosan.hr_system.report.model.Report;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,7 +28,7 @@ public interface ReportService {
     // 최근 5개 보고서 조회
     List<Report> getRecentReports(String writerId);
     // 내가 쓴 보고서 페이징, 검색 + 보고서 조회
-    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
+    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, String startDate, String endDate);
     // 결재 할 보고서 페이징, 검색 + 보고서 조회 (MANAGER)
     PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
     // 결재 미처리 보고서 조회(MANAGER)

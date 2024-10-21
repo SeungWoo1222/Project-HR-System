@@ -195,12 +195,12 @@ public class ReportController {
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "searchType", defaultValue = "0") int searchType,
                                  @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
-                                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                 @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                 @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                 @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                  Model model) {
-
         // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -214,8 +214,12 @@ public class ReportController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("approvalStatus", approvalStatus);
 
-        return "report/report-list";
+        return "report/list";
     }
 
     // 내게 온 요청 리스트

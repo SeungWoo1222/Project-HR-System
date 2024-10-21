@@ -3,7 +3,20 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.report.dao.ReportDAO">
+<mapper namespace="report">
+    <resultMap id="reportResultMap" type="com.woosan.hr_system.report.model.Report">
+        <id property="reportId" column="report_id"/>
+        <result property="writerId" column="writer_id"/>
+        <result property="approverId" column="approver_id"/>
+        <result property="approverName" column="approver_Name"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="modifiedDate" column="modified_date"/>
+        <result property="status" column="status"/>
+        <result property="rejectReason" column="reject_reason"/>
+        <result property="completeDate" column="complete_date"/>
+    </resultMap>
 <!--============================================== 생성 SQL문 =======================================================-->
     <!-- 보고서 생성 -->
     <insert id="createReport" parameterType="map" useGeneratedKeys="true" keyProperty="reportId">
@@ -48,14 +61,8 @@
     </select>
 
     <!-- 내가 작성한 보고서 검색 -->
-    <select id="search" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
-        SELECT
-        report_id AS reportId,
-        writer_id AS writerId,
-        title,
-        created_date AS createdDate,
-        approver_name AS approverName,
-        status
+    <select id="search" parameterType="map" resultMap="reportResultMap">
+        SELECT *
         FROM reports
         <where>
             writer_id = #{writerId}
@@ -76,7 +83,7 @@
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (approver_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
             <if test="approvalStatus != null and approvalStatus != ''" >
@@ -89,7 +96,7 @@
 
     <!-- 내가 작성한 보고서 검색 -->
     <select id="count" parameterType="map" resultType="int">
-        SELECT COUNT(writer_id) FROM reports
+        SELECT COUNT(*) FROM reports
         <where>
             writer_id = #{writerId}
             <if test="keyword != null and keyword != '' and searchType == 0">
@@ -111,7 +118,7 @@
                 approver_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
             <if test="approvalStatus != null and approvalStatus != ''" >

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='보고서 목록 조회')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/table.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/search.css}"/>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/report/report.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleCustomDateFields();
+
+            // searchDate 선택 시 사용자 지정 날짜 필드 토글
+            document.getElementById('searchDate').addEventListener('change', toggleCustomDateFields);
+
+            // 폼 제출 시 유효성 검사와 검색을 동시에 실행
+            const form = document.getElementById('form');
+            form.addEventListener('submit', function(event) {
+                if (!validateDateRange()) {
+                    event.preventDefault();  // 유효성 검사가 실패하면 폼 제출을 막음
+                } else {
+                    submitReportSearchForm(event);  // 유효성 검사가 성공하면 검색 수행
+                }
+            });
+
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div>
+            <form id="form" th:action="@{/report/list}" method="get">
+                <div class="content-header">
+                    <input type="hidden" name="page" value="1"/>
+                    <input type="hidden" name="size" th:value="${pageSize}"/>
+                    <div class="content-header-left">
+                        <select class="search-select" id="size" onchange="submitReportSearchForm(event)">
+                            <option th:value="10" th:selected="${pageSize == 10}">10개씩 보기</option>
+                            <option th:value="1" th:selected="${pageSize == 1}">1개씩 보기</option>
+                            <option th:value="25" th:selected="${pageSize == 25}">25개씩 보기</option>
+                            <option th:value="40" th:selected="${pageSize == 40}">40개씩 보기</option>
+                        </select>
+                        <select class="search-select" id="searchDate" onchange="submitReportSearchForm(event)">
+                            <option value="" th:selected="${searchDate == ''}">전체기간</option>
+                            <option th:value="week" th:selected="${searchDate == 'week'}">1주</option>
+                            <option th:value="month" th:selected="${searchDate == 'month'}">1개월</option>
+                            <option th:value="sixMonth" th:selected="${searchDate == 'sixMonth'}">6개월</option>
+                            <option th:value="year" th:selected="${searchDate == 'year'}">1년</option>
+                            <option th:value="custom" th:selected="${searchDate == 'custom'}">사용자 지정</option>
+                        </select>
+
+                        <div id="customDateRange" style="display: none;">
+                            <input type="date" id="startDate" th:value="${startDate}"/>
+                            <input type="date" id="endDate" th:value="${endDate}"/>
+                        </div>
+
+                        <select class="search-select" id="approvalStatus" onchange="submitReportSearchForm(event)">
+                            <option value="" th:selected="${approvalStatus == ''}">결재상태</option>
+                            <option th:value="미처리" th:selected="${approvalStatus == '미처리'}">미처리</option>
+                            <option th:value="승인" th:selected="${approvalStatus == '승인'}">승인</option>
+                            <option th:value="거절" th:selected="${approvalStatus == '거절'}">거절</option>
+                        </select>
+                    </div>
+                    <div class="content-header-right">
+                        <select class="search-select" id="searchType">
+                            <option th:value="0" th:selected="${searchType == 0}">전체</option>
+                            <option th:value="1" th:selected="${searchType == 1}">제목+내용</option>
+                            <option th:value="2" th:selected="${searchType == 2}">보고서 결재자</option>
+                        </select>
+
+                        <input class="search-text" id="keywordField" type="text" placeholder="검색어 입력" th:value="${keyword}" th:selected="${keyword}"/>
+
+                        <button type="submit" class="search-btn">
+                            <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+                        </button>
+                        <button type="button" class="reset-btn" onclick="window.location.href='/report/list'">
+                            <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화"/>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <table class="list table-layout-auto">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>내용</th>
+                <th>작성일</th>
+                <th>업무 완료일</th>
+                <th>결재자</th>
+                <th>결재 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${reports.isEmpty()}">
+                <td colspan="4" style="text-align: center; padding: 20px;">
+                    조회된 보고서가 없습니다. 다른 검색 조건을 시도해보세요.
+                </td>
+            </tr>
+            <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
+                th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
+                <td th:text="${report.title}"></td>
+                <td th:text="${report.content}" style="max-width: 350px;"></td>
+                <td th:text="${report.approverName}"></td>
+                <td th:text="${#temporals.format(report.createdDate, 'yy.MM.dd(EE)')}"></td>
+                <td th:text="${#temporals.format(report.completeDate, 'yy.MM.dd(EE)')}"></td>
+                <td th:text="${report.status}"
+                    th:classappend="${report.status} == '승인' ? 'green' : (
+                                ${report.status} == '거절' ? 'red' : 'grey')"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination" th:if="${totalPages > 0}">
+            <span th:if="${currentPage > 1}">
+                <a th:href="@{'/report/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate} + '&approvalStatus' + ${approvalStatus}}">
+                    <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+                </a>
+            </span>
+            <th:block th:if="${totalPages != null}">
+            <span th:if="${totalPages <= 5}">
+
+                <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate} + '&approvalStatus' + ${approvalStatus}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+
+            </span>
+            <span th:if="${totalPages > 5}">
+                <span th:each="i : ${#numbers.sequence(
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                                currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                    <a th:href="@{'/report/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate} + '&approvalStatus' + ${approvalStatus}}"
+                       th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </span>
+                </span>
+            <span th:if="${currentPage < totalPages}">
+                <a th:href="@{'/report/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate} + '&approvalStatus' + ${approvalStatus}}">
+                    <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+                </a>
+            </span>
+            </th:block>
+        </div>
+    </div>
+</div>
+</html>
