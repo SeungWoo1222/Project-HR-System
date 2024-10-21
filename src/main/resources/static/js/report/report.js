@@ -57,12 +57,8 @@ function loadEmployeesByDepartment() {
     const departmentId = document.getElementById('departmentId').value;
     const selectAllButton = document.getElementById('selectAllEmployeesButton');
 
-    // 부서 선택 시 employeeSection을 보여줌
-    const employeeSection = document.getElementById('employeeSection');
     if (departmentId) {
-        employeeSection.style.display = 'block';
-    } else {
-        employeeSection.style.display = 'none';
+        selectAllButton.style.display = 'block';
     }
 
     fetch(`/api/employee/department/list/` + departmentId)
@@ -73,114 +69,193 @@ function loadEmployeesByDepartment() {
             return response.json();
         })
         .then(employeeList => {
-            const availableContainer = document.getElementById('idContainer');
-            availableContainer.innerHTML = '';
+            const employeeSelect = document.getElementById('employeeSelect');
+            employeeSelect.innerHTML = ''; // 기존 옵션 삭제
 
             if (employeeList.length === 0) {
-                // 부서에 맞는 임원이 없을 경우 메시지 출력
-                const noEmployeesMessage = document.createElement('div');
-                noEmployeesMessage.textContent = "선택한 부서에 임원이 없습니다.";
-                availableContainer.appendChild(noEmployeesMessage);
+                // 부서에 맞는 임원이 없을 경우 메시지 출력 및 버튼 숨기기
+                const noEmployeesMessage = document.createElement('option');
+                noEmployeesMessage.textContent = "해당 부서에 등록된 임원이 없습니다.";
+                noEmployeesMessage.value = "";
+                noEmployeesMessage.selected = true;
+                employeeSelect.appendChild(noEmployeesMessage);
                 selectAllButton.style.display = 'none';
-            }
+            } else {
+                // 선택 옵션 추가
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "임원을 선택하세요.";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                employeeSelect.appendChild(defaultOption);
 
-            employeeList.forEach(employee => {
-                if (!selectedEmployees[employee.employeeId]) {
-                    const employeeItem = createEmployeeItem(employee.employeeId, employee.name, false);
-                    availableContainer.appendChild(employeeItem);
-                }
-            });
+                // 임원 리스트 추가
+                employeeList.forEach(employee => {
+                    if (!selectedEmployees[employee.employeeId]) {
+                        const employeeOption = document.createElement('option');
+                        employeeOption.value = employee.employeeId;
+                        employeeOption.textContent = employee.name + '(' + employee.employeeId + ')';
+                        employeeSelect.appendChild(employeeOption);
+                    }
+                });
+            }
         })
         .catch(error => console.error('데이터를 읽어 올 수 없음', error))
-    checkEmployees();
 }
 
-// 임원 리스트 아이템 생성
-function createEmployeeItem(employeeId, employeeName, isSelected) {
-    const div = document.createElement('div');
-    div.className = 'employee-item';
-    div.textContent = employeeName;
+// 선택된 임원을 추가하는 함수
+document.addEventListener('DOMContentLoaded', function() {
+    const employeeSelect = document.getElementById('employeeSelect');
 
-    const actionButton = document.createElement('button');
-    actionButton.dataset.id = employeeId; // 버튼에 data-id 속성을 추가
-    if (isSelected) {
-        actionButton.textContent = '해제';
-        actionButton.addEventListener('click', () => {
-            delete selectedEmployees[employeeId];
-            updateSelectedEmployees();
-        });
-    } else {
-        actionButton.textContent = '선택';
-        actionButton.addEventListener('click', () => {
-            selectedEmployees[employeeId] = employeeName;
-            updateSelectedEmployees();
+    if (employeeSelect) {
+        employeeSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const employeeId = selectedOption.value;
+            const employeeName = selectedOption.text;
+
+            if (employeeId) {
+                selectedEmployees[employeeId] = employeeName;
+                updateSelectedEmployees(); // 선택된 임원 목록 갱신
+            }
         });
     }
+});
 
-    div.appendChild(actionButton);
-    return div;
-}
 
-// 선택된 임원들이 있는지 체크함
-function checkEmployees() {
-    const selectedEmployeesContainer = document.getElementById('selectedEmployees');
-    const availableContainer = document.getElementById('idContainer');
-    const deselectButton = document.getElementById('deselectAllEmployeesButton');
+// // 임원 리스트 아이템 생성
+// function createEmployeeItem(employeeId, employeeName, isSelected) {
+//     const div = document.createElement('div');
+//     div.className = 'employee-item';
+//     div.textContent = employeeName;
+//
+//     const actionButton = document.createElement('button');
+//     actionButton.dataset.id = employeeId; // 버튼에 data-id 속성을 추가
+//     if (isSelected) {
+//         actionButton.textContent = '해제';
+//         actionButton.addEventListener('click', () => {
+//             delete selectedEmployees[employeeId];
+//             updateSelectedEmployees();
+//         });
+//     } else {
+//         actionButton.textContent = '선택';
+//         actionButton.addEventListener('click', () => {
+//             selectedEmployees[employeeId] = employeeName;
+//             updateSelectedEmployees();
+//         });
+//     }
+//
+//     div.appendChild(actionButton);
+//     return div;
+// }
 
-    // 선택된 임원이 있는지 체크
-    if (Object.keys(selectedEmployees).length === 0) {
-        // 선택된 임원이 없으면 경고 메시지 출력
-        if (!document.getElementById('noEmployeesMessage')) { // 이미 메시지가 있으면 추가하지 않음
-            const noEmployeesMessage = document.createElement('div');
-            noEmployeesMessage.id = 'noEmployeesMessage'; // ID를 설정하여 중복 생성을 방지
-            noEmployeesMessage.textContent = "선택된 임원이 없습니다.";
-            selectedEmployeesContainer.appendChild(noEmployeesMessage);
-        }
-        deselectButton.style.display = 'none'; // 해제 버튼 숨기기
-    } else {
-        // 선택된 임원이 있을 때 메시지 삭제 및 해제 버튼 표시
-        const noEmployeesMessage = document.getElementById('noEmployeesMessage');
-        if (noEmployeesMessage) {
-            noEmployeesMessage.remove(); // 메시지가 있으면 삭제
-        }
-        deselectButton.style.display = 'inline'; // 해제 버튼 보이기
-    }
-}
+// // 선택된 임원들이 있는지 체크함
+// function checkEmployees() {
+//     const selectedEmployeesContainer = document.getElementById('selectedEmployees');
+//     const availableContainer = document.getElementById('idContainer');
+//     const deselectButton = document.getElementById('deselectAllEmployeesButton');
+//
+//     // 선택된 임원이 있는지 체크
+//     if (Object.keys(selectedEmployees).length === 0) {
+//         // 선택된 임원이 없으면 경고 메시지 출력
+//         if (!document.getElementById('noEmployeesMessage')) { // 이미 메시지가 있으면 추가하지 않음
+//             const noEmployeesMessage = document.createElement('div');
+//             noEmployeesMessage.id = 'noEmployeesMessage'; // ID를 설정하여 중복 생성을 방지
+//             noEmployeesMessage.textContent = "선택된 임원이 없습니다.";
+//             selectedEmployeesContainer.appendChild(noEmployeesMessage);
+//         }
+//         deselectButton.style.display = 'none'; // 해제 버튼 숨기기
+//     } else {
+//         // 선택된 임원이 있을 때 메시지 삭제 및 해제 버튼 표시
+//         const noEmployeesMessage = document.getElementById('noEmployeesMessage');
+//         if (noEmployeesMessage) {
+//             noEmployeesMessage.remove(); // 메시지가 있으면 삭제
+//         }
+//         deselectButton.style.display = 'inline'; // 해제 버튼 보이기
+//     }
+// }
+
+// // 선택된 임원들을 나열함
+// function updateSelectedEmployees() {
+//     const selectedEmployeesContainer = document.getElementById('selectedEmployees');
+//     const availableContainer = document.getElementById('idContainer');
+//
+//     selectedEmployeesContainer.innerHTML = '';
+//     availableContainer.innerHTML = '';
+//
+//     // 선택된 임원 목록을 먼저 갱신
+//     Object.keys(selectedEmployees).forEach(id => {
+//         const employeeItem = createEmployeeItem(id, selectedEmployees[id], true);
+//         selectedEmployeesContainer.appendChild(employeeItem);
+//     });
+//
+//     // 임원 리스트를 갱신하여 중복 없이 남은 임원만 다시 나열
+//     loadEmployeesByDepartment();
+// }
 
 // 선택된 임원들을 나열함
 function updateSelectedEmployees() {
     const selectedEmployeesContainer = document.getElementById('selectedEmployees');
-    const availableContainer = document.getElementById('idContainer');
+    selectedEmployeesContainer.innerHTML = ''; // 기존 선택된 임원 목록 초기화
 
-    selectedEmployeesContainer.innerHTML = '';
-    availableContainer.innerHTML = '';
-
-    // 선택된 임원 목록을 먼저 갱신
+    // 선택된 임원 목록을 업데이트
     Object.keys(selectedEmployees).forEach(id => {
-        const employeeItem = createEmployeeItem(id, selectedEmployees[id], true);
-        selectedEmployeesContainer.appendChild(employeeItem);
+        const employeeDiv = document.createElement('div');
+        employeeDiv.textContent = selectedEmployees[id] + " "; // 임원 이름
+        employeeDiv.classList.add('selected-employee');
+
+        // 해제 버튼 추가
+        const removeButton = document.createElement('button');
+        removeButton.classList.add('remove-btn');
+        removeButton.addEventListener('click', () => {
+            delete selectedEmployees[id];
+            updateSelectedEmployees();
+        });
+
+        employeeDiv.appendChild(removeButton);
+        selectedEmployeesContainer.appendChild(employeeDiv);
     });
 
-    // 임원 리스트를 갱신하여 중복 없이 남은 임원만 다시 나열
-    loadEmployeesByDepartment();
+    // 선택된 임원이 없으면 전체 해제 버튼 숨기기
+    const deselectButton = document.getElementById('deselectAllEmployeesButton');
+    if (Object.keys(selectedEmployees).length === 0) {
+        deselectButton.style.display = 'none';
+    } else {
+        deselectButton.style.display = 'inline';
+    }
 }
+
+// // 전체 선택 기능
+// function selectAllEmployees() {
+//     const employeeItems = document.querySelectorAll('#idContainer .employee-item'); // 임원 목록을 가져옴
+//
+//     employeeItems.forEach(item => {
+//         const button = item.querySelector('button');
+//         const employeeId = button.dataset.id; // 버튼에 설정된 data-id 속성값을 가져옴
+//         const employeeName = item.textContent.replace('선택', '').trim();
+//
+//         // 이미 선택된 임원이 아니라면 선택된 목록에 추가
+//         if (!selectedEmployees[employeeId]) {
+//             selectedEmployees[employeeId] = employeeName;
+//         }
+//     });
+//
+//     updateSelectedEmployees();
+// }
 
 // 전체 선택 기능
 function selectAllEmployees() {
-    const employeeItems = document.querySelectorAll('#idContainer .employee-item'); // 임원 목록을 가져옴
+    const employeeSelect = document.getElementById('employeeSelect');
 
-    employeeItems.forEach(item => {
-        const button = item.querySelector('button');
-        const employeeId = button.dataset.id; // 버튼에 설정된 data-id 속성값을 가져옴
-        const employeeName = item.textContent.replace('선택', '').trim();
+    for (let i = 1; i < employeeSelect.options.length; i++) { // 첫 번째 옵션(선택하세요)은 제외
+        const employeeId = employeeSelect.options[i].value;
+        const employeeName = employeeSelect.options[i].text;
 
-        // 이미 선택된 임원이 아니라면 선택된 목록에 추가
+        // 이미 선택되지 않은 임원만 추가
         if (!selectedEmployees[employeeId]) {
             selectedEmployees[employeeId] = employeeName;
         }
-    });
+    }
 
-    updateSelectedEmployees();
+    updateSelectedEmployees(); // 선택된 임원 목록 갱신
 }
 
 // 전체 해제
@@ -191,6 +266,33 @@ function deselectAllEmployees() {
 
 //=================================================== 임원 선택 =========================================================
 //============================================= formData 유효성 검사 ====================================================
+// 유효성 검사 함수
+function showError(inputId, message, isBottomBorder = false) {
+    const inputElement = document.getElementById(inputId);
+    const errorMessage = document.getElementById("error-alert");
+
+    errorMessage.textContent = '';
+
+    // 빨간 테두리와 흔들림 효과 추가
+    if (isBottomBorder) {
+        inputElement.classList.add("input-error-bottom", "shake");
+    } else {
+        inputElement.classList.add("input-error", "shake");
+    }
+
+    // 5초 후 빨간 테두리 제거
+    setTimeout(() => {
+        inputElement.classList.remove("input-error", "input-error-bottom");
+    }, 5000);
+
+    // 애니메이션이 끝난 후 흔들림 제거
+    setTimeout(() => {
+        inputElement.classList.remove("shake");
+    }, 300);
+
+    return false;
+}
+
 function validateReportForm(event) {
     event.preventDefault();
 
@@ -207,27 +309,19 @@ function validateReportForm(event) {
         nameList = document.getElementById('currentApproverName').value;
     }
 
-    if (errorAlert) {
-        errorAlert.textContent = "";
-    } else {
-        console.error("Error message element not found.");
-    }
+    errorAlert.textContent = "";
 
     if (title === "") {
-        errorAlert.textContent = "제목을 입력해주세요.";
-        return false;
-    }
-    if (content === "") {
-        errorAlert.textContent = "내용을 입력해주세요.";
-        return false;
+        return showError("title", "제목을 입력해주세요.", true);
     }
     if (nameList === "" && document.getElementById('currentApproverName') === null) {
-        errorAlert.textContent = "결재자를 선택해주세요.";
-        return false;
+        return showError("employeeSelect", "결재자를 선택해주세요.");
     }
     if (completeDate === "") {
-        errorAlert.textContent = "업무 완료 날짜를 입력해주세요";
-        return false;
+        return showError("completeDate", "업무 완료 날짜를 입력해주세요.", true);
+    }
+    if (content === "") {
+        return showError("content", "내용을 입력해주세요.");
     }
     return true;
 }
@@ -247,15 +341,11 @@ function validateRequestForm(event) {
     const dueDate = document.getElementById("dueDate").value;
     const errorAlert = document.getElementById("error-alert");
 
-    if (errorAlert) {
-        errorAlert.textContent = "";
-    } else {
-        console.error("Error message element not found.");
-    }
+    errorAlert.textContent = "";
 
     if (nameList.length === 0) {
         errorAlert.textContent = "작성자를 선택해주세요.";
-        return false;
+        return showError()
     }
     if (dueDate === "") {
         errorAlert.textContent = "마감일자를 입력해주세요.";
@@ -265,6 +355,8 @@ function validateRequestForm(event) {
         errorAlert.textContent = "요청사항을 입력해주세요.";
         return false;
     }
+
+    errorAlert.textContent = "";
     return true;
 }
 

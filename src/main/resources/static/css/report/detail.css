@@ -1,0 +1,135 @@
+.report-container {
+}
+
+.title-area {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.title-area .title {
+    width: 50%;
+    font-size: 24px;
+}
+
+.report-container table td {
+    border: 1px solid #000;
+    padding: 8px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.section-title {
+    font-weight: bold;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.dept-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.dept-table select {
+    width: auto;
+}
+
+.dept-table input[type="date"] {
+    width: 90%;
+}
+
+.dept-table textarea {
+    width: 90%;
+}
+
+.section-td {
+    width: 320px;
+}
+
+.selected-employees {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.selected-employee {
+    flex: 1 1 calc(33.333% - 10px);
+    box-sizing: border-box;
+    padding: 5px 8px;
+    border: 2px solid #EEE;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.remove-btn {
+    padding: 13px;
+    background-color: red;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-image: url('/images/icons/delete.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25px 25px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.remove-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.upload-area {
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upload-area p {
+    font-style: italic;
+    color: #888;
+}
+
+.filebox {
+    margin: 10px;
+    padding: 5px 10px;
+    border: #EEE 2px solid;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filebox .name {
+    width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete-btn {
+    padding-top: 3px;
+    transition: transform 0.3s ease;
+}
+
+.delete-btn:hover {
+    transform: scale(1.2);
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.btn-container .btn {
+    width: 40%;
+    font-size: 16px;
+}

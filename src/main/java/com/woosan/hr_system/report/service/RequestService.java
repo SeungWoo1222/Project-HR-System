@@ -27,6 +27,7 @@ public interface RequestService {
     List<Request> getMyPendingRequests(String writerId);
     // 페이지, 서칭 + 보고서 리스트 (STAFF)
     PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate);
+    Request getRequestByWriter(int requestId);
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
     // 요청 수정
@@ -39,7 +40,5 @@ public interface RequestService {
     void deleteRequest(int requestId);
     // 요청에 의한 보고서 삭제 시 reportId삭제
     void deleteReportId(Integer reportId);
-
-    Request getRequestByWriter(int requestId);
 //=====================================================삭제 메소드======================================================
 }

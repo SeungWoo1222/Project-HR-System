@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
+      layout:decorate="~{fragments/layout :: layout(title='새 보고서 작성')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/common/input.css}">
     <link rel="stylesheet" th:href="@{/css/common/button.css}">
+    <link rel="stylesheet" th:href="@{/css/report/detail.css}">
+    <link rel="stylesheet" th:href="@{/css/report/write.css}">
 </th:block>
 
 <th:block layout:fragment="script">
@@ -21,66 +23,81 @@
 
 <div layout:fragment="~{content}">
     <div class="content">
-        <h1>보고서 작성</h1>
-        <form id="form" th:action="@{/report/write}" method="post" enctype="multipart/form-data" onsubmit="return false;">
-
-            <div>
-                <label for="title">제목:</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-
-            <div>
-                <label for="content">내용:</label>
-                <textarea id="content" name="content" rows="10" required></textarea>
-            </div>
-
-            <div>
-                <label for="departmentId">부서 선택:</label>
-                <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
-                    <option value="" disabled selected>부서를 선택하세요</option>
-                    <option value="PR">생산(PR)</option>
-                    <option value="QC">품질 관리(QC)</option>
-                    <option value="SA">영업(SA)</option>
-                    <option value="MK">마케팅(MK)</option>
-                    <option value="FI">재무(FI)</option>
-                    <option value="HR">인사(HR)</option>
-                    <option value="RD">연구개발(RD)</option>
-                </select>
-            </div>
-
-            <div id="employeeSection" style="display:none;">
-                <label for="idContainer">임원 리스트</label>
-                <button id="selectAllEmployeesButton" type="button">전체 선택</button>
-
-                <div id="idContainer">
-                    <!-- 직원 목록이 여기에 추가됩니다. -->
+        <div class="report-container">
+            <form id="form" th:action="@{/report/write}" method="post" enctype="multipart/form-data" onsubmit="return false;">
+                <div class="title-area flex-center">
+                    <label for="title">제목 : </label>
+                    <input type="text" class="title" id="title" name="title"/>
                 </div>
+                <table class="dept-table">
+                    <tr>
+                        <td class="section-title">결재자 선택</td>
+                        <td class="section-td">
+                            <div class="flex-center">
+                                <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
+                                    <option value="" disabled selected>부서를 선택하세요.</option>
+                                    <option value="PR">생산(PR)</option>
+                                    <option value="QC">품질 관리(QC)</option>
+                                    <option value="SA">영업(SA)</option>
+                                    <option value="MK">마케팅(MK)</option>
+                                    <option value="FI">재무(FI)</option>
+                                    <option value="HR">인사(HR)</option>
+                                    <option value="RD">연구개발(RD)</option>
+                                </select>
+                                <button type="button" class="inner-btn" id="selectAllEmployeesButton">전체 선택</button>
+                            </div>
+                        </td>
+                        <td class="section-td">
+                            <select id="employeeSelect">
+                                <option value="" disabled selected>부서를 선택하세요.</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">
+                            <p>선택된 결재자</p>
+                            <button type="button" class="inner-btn tomato-btn hidden" id="deselectAllEmployeesButton">전체 해제</button>
+                        </td>
+                        <td colspan="2">
+                            <div id="selectedEmployees" class="selected-employees"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">업무 완료 날짜</td>
+                        <td colspan="2">
+                            <input type="date" id="completeDate" name="completeDate">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">내용</td>
+                        <td colspan="2">
+                            <textarea id="content" name="content" rows="15"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">첨부파일</td>
+                        <td colspan="2">
+                            <div class="upload-area">
+                                <p>최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
+                                <div class="file-btn-area">
+                                    <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
+                                </div>
+                            </div>
+                            <input type="file" id="reportDocuments" class="hidden" onchange="addFile(this)" multiple/>
+                            <div class="file-list"></div>
+                        </td>
+                    </tr>
+                </table>
 
-                <p>선택된 결재자</p>
-                <button id="deselectAllEmployeesButton" type="button">전체 해제</button>
+                <input type="hidden" id="idListField" name="idList" value="">
+                <input type="hidden" id="nameListField" name="nameList" value="">
 
-                <div id="selectedEmployees" class="selected-employees"></div>
-            </div>
-
-            <div>
-                <label for="completeDate">업무 완료 날짜:</label>
-                <input type="date" id="completeDate" name="completeDate" required>
-            </div>
-
-            <div class="file-area">
-                <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
-                <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
-                <input type="file" id="reportDocuments" class="hidden" onchange="addFile(this)"
-                       multiple/>
-                <div class="file-list"></div>
-            </div>
-
-            <input type="hidden" id="idListField" name="idList" value="">
-            <input type="hidden" id="nameListField" name="nameList" value="">
-
-            <div id="error-alert"></div>
-            <button type="button" class="btn" onclick="submitReportForm(event)">제출하기</button>
-        </form>
+                <div class="btn-container">
+                    <div id="error-alert" class="error-message"></div>
+                    <button type="button" class="btn" onclick="submitReportForm(event)">제출하기</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 </html>
