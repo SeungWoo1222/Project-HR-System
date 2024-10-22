@@ -106,7 +106,7 @@ public class ExecutiveController {
         List<Employee> employee = employeeDAO.getAllEmployees();
         model.addAttribute("request", new Request());
         model.addAttribute("employee", employee); // employees 목록 추가
-        return "admin/report/request-write";
+        return "admin/report/write";
     }
 
     // 요청 생성
