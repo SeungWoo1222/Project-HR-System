@@ -6,6 +6,8 @@ import com.woosan.hr_system.aspect.RequireManagerPermission;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.file.model.File;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -14,9 +16,6 @@ import com.woosan.hr_system.report.service.ReportService;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.model.File;
-import com.woosan.hr_system.file.service.FileService;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -49,10 +48,11 @@ public class ExecutiveController {
     @Autowired
     private ReportFileService reportFileService;
 
-    // main 페이지
+    // 결재 및 요청 현황
     @RequireManagerPermission
-    @GetMapping("/main")
-    public String getMainPage(@RequestParam(name = "idList", required = false) List<String> writerIdList,
+    @GetMapping("/dashboard")
+    public String getMainPage(@RequestParam(name = "searchDate", required = false) String searchDate,
+                              @RequestParam(name = "writerId", required = false) String writerId,
                               @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               Model model) throws JsonProcessingException {
@@ -69,28 +69,35 @@ public class ExecutiveController {
         model.addAttribute("reports", reports);
         model.addAttribute("requests", requests);
 
-        List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerIdList);
+        List<ReportStat> stats = reportService.getReportStats(startDate, endDate, writerId);
 
-        // 선택된 임원 목록 조회
-        List<Employee> selectedWriters = new ArrayList<>();
-        if (writerIdList != null && !writerIdList.isEmpty()) {
-            for (String writerId : writerIdList) {
-                Employee employee = employeeDAO.getEmployeeById(writerId);
-                selectedWriters.add(employee);
-            }
-            model.addAttribute("selectedWriters", selectedWriters);
-        }
+//        // 선택된 임원 목록 조회
+//        List<Employee> selectedWriters = new ArrayList<>();
+//        if (writerIdList != null && !writerIdList.isEmpty()) {
+//            for (String writerId : writerIdList) {
+//                Employee employee = employeeDAO.getEmployeeById(writerId);
+//                selectedWriters.add(employee);
+//            }
+//            model.addAttribute("selectedWriters", selectedWriters);
+//        }
 
         // 통계 View 관련 로직
         List<Object[]> statsArray = new ArrayList<>(); // JSON 변환
-        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재 된 보고서", "결재 대기인 보고서"});
+        statsArray.add(new Object[]{"월 별 보고서 통계", "총 보고서", "결재된 보고서", "결재 대기 보고서"});
         for (ReportStat stat : stats) {
             statsArray.add(new Object[]{stat.getMonth(), stat.getTotal(), stat.getFinished(), stat.getUnfinished()});
         }
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        return "admin/report/main";
+        model.addAttribute("writerId", writerId);
+        model.addAttribute("writerName", employeeDAO.getEmployeeName(writerId));
+
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        return "admin/report/approval-and-request";
     }
 //=====================================================생성 메소드========================================================
     @RequireManagerPermission

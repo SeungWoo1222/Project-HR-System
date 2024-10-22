@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='내 보고서')}">
+      layout:decorate="~{fragments/layout :: layout(title='결재 및 요청 현황')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/common/table.css}">
@@ -18,6 +18,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             toggleCustomDateFields();
+            initEventListeners();
+            loadEmployeesByDepartment();
 
             // searchDate 선택 시 사용자 지정 날짜 필드 토글
             document.getElementById('searchDate').addEventListener('change', toggleCustomDateFields);
@@ -28,7 +30,7 @@
                 if (document.getElementById('searchDate').value === 'custom' && !validateSearchDate()) {
                     event.preventDefault();  // 유효성 검사가 실패하면 폼 제출을 막음
                 } else {
-                    submitReportStatisticForm(event);  // 유효성 검사가 성공하면 검색 수행
+                    submitReportStatisticFormByManager(event);  // 유효성 검사가 성공하면 검색 수행
                 }
             });
         });
@@ -43,7 +45,6 @@
         function drawChart() {
             // hidden-stats 요소에서 데이터를 읽어와서 파싱
             var stats = JSON.parse(document.getElementById('hidden-stats').textContent);
-
             if (stats.length >= 2) {
                 var data = google.visualization.arrayToDataTable(stats);
                 var options = {};
@@ -63,13 +64,14 @@
         <div class="table-container">
             <div class="table-wrapper">
                 <div class="content-header-left">
-                    <h3>최근 작성한 보고서 목록</h3>
-                    <button type="button" class="inner-btn" onclick="window.location.href='/report/list'">더보기</button>
+                    <h3>결재 대기 중인 보고서 목록</h3>
+                    <button type="button" class="inner-btn" onclick="window.location.href='/'">더보기</button>
                 </div>
                 <div>
                     <table class="list table-layout-auto">
                         <thead>
                         <tr>
+                            <th>작성자</th>
                             <th>제목</th>
                             <th>작성일</th>
                             <th>결재 상태</th>
@@ -77,9 +79,10 @@
                         </thead>
                         <tbody>
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
-                            th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
+                            th:onclick="openModal('/admin/request/report/' + this.getAttribute('reportId'))">
+                            <td th:text="${report.writerName}"></td>
                             <td th:text="${report.title}"></td>
-                            <td th:text="${#temporals.format(report.createdDate, 'yy.MM.dd(EE) HH:mm')}"></td>
+                            <td th:text="${#temporals.format(report.createdDate, 'yy.MM.dd(EE)')}"></td>
                             <td th:text="${report.status}"
                                 th:classappend="${report.status} == '승인' ? 'green' : (
                                 ${report.status} == '거절' ? 'red' : 'grey')"></td>
@@ -90,33 +93,28 @@
             </div>
             <div class="table-wrapper">
                 <div class="content-header-left">
-                    <h3>최근 수신된 요청 목록</h3>
-                    <button type="button" class="inner-btn" onclick="window.location.href='/report/request/list'">더보기</button>
+                    <h3>요청에 따른 보고서 작성 목록</h3>
+                    <button type="button" class="inner-btn" onclick="window.location.href='/'">더보기</button>
                 </div>
                 <div>
                     <table class="list table-layout-auto">
                         <thead>
                         <tr>
-                            <th>요청자</th>
+                            <th>작성자</th>
                             <th>요청 일시</th>
                             <th>마감일</th>
-                            <th>보고서 처리</th>
+                            <th>보고서 조회</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="request : ${requests}">
-                            <td th:text="${request.requesterName}"></td>
+                            <td th:text="${request.writerName}"></td>
                             <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>
                             <td th:text="${#temporals.format(request.dueDate, 'yy.MM.dd(EE)')}"></td>
-                            <td class="flex-center">
+                            <td>
                                 <button th:if="${request.reportId != null}"
                                         type="button" class="inner-btn blue-btn" th:reportId="${request.reportId}"
                                         th:onclick="openModal('/report/' + this.getAttribute('reportId'))">작성한 보고서 조회</button>
-                                <button th:if="${request.reportId == null}"
-                                        type="button" class="inner-btn green-btn" th:requestId="${request.requestId}"
-                                        th:onclick="|window.location.href='/report/writeFromRequest/'
-                                        + this.getAttribute('requestId')|">새 보고서 작성
-                                </button>
                             </td>
                         </tr>
                         </tbody>
@@ -124,10 +122,23 @@
                 </div>
             </div>
         </div>
+
         <div class="stats-container">
             <div class="search-date-form">
-                <h3>작성한 보고서 통계</h3>
-                <form id="form" class="search-date-form" th:action="@{/report/my}" method="get">
+                <h3>
+                    <span th:if="${writerId} != null" th:text="${writerName + '(' + writerId + ') 사원의 '}"></span>
+                    <span th:if="${writerId == null}">
+                        <span th:if="${#authentication.principal.department == 'PR'}" th:text="'생산(PR) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'QC'}" th:text="'품질관리(QC) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'SA'}" th:text="'영업(SA) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'MK'}" th:text="'마케팅(MK) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'FI'}" th:text="'재무(FI) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'HR'}" th:text="'인사(HR) 부서'"></span>
+                        <span th:if="${#authentication.principal.department == 'RD'}" th:text="'연구개발(RD) 부서'"></span>
+                    </span>
+                    보고서 통계
+                </h3>
+                <form id="form" th:action="@{/admin/request/dashboard}" method="get" class="search-date-form">
                     <select class="search-select" id="searchDate" name="searchDate" th:value="${searchDate}">
                         <option th:value="null" th:text="'전체기간'" th:selected="${searchDate == null}">전체기간</option>
                         <option th:value="week" th:text="'1주'" th:selected="${searchDate == 'week'}">1주</option>
@@ -142,19 +153,24 @@
                         <div style="color: #DFDFDF; font-weight: bold">~</div>
                         <input type="date" class="search-date" id="endDate" th:value="${endDate}"/>
                     </div>
+
+                    <input type="hidden" id="departmentId" name="departmentId" th:value="${#authentication.principal.department}"/>
+
+                    <select id="employeeSelect" class="search-select" name="writerId">
+                        <option value="" disabled>사원 리스트</option>
+                    </select>
+
                     <button type="submit" class="search-btn">
-                        <img th:src="@{/images/icons/search-date.png}" class="search-img" alt="기간 검색" title="기간 검색"/>
+                        <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
                     </button>
-                    <button type="button" class="reset-btn" onclick="window.location.href='/report/my'">
+
+                    <button type="button" class="reset-btn" onclick="window.location.href='/admin/request/dashboard'">
                         <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
                     </button>
                 </form>
             </div>
             <div class="stats-wrapper flex-center">
-                <!-- 구글 차트 통계 추가 -->
-                <div id="columnchart_material" style="width: 600px; height: 500px;"></div>
-
-                <!-- 숨겨진 요소에 통계 데이터를 JSON 형식으로 저장 -->
+                <div id="columnchart_material" style="width: 900px; height: 500px;"></div>
                 <div id="hidden-stats" class="hidden" th:text="${statsJson}"></div>
             </div>
         </div>

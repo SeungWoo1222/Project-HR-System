@@ -256,6 +256,25 @@
         GROUP BY month
         ORDER BY month
     </select>
+
+    <select id="getReportStats2" parameterType="map" resultType="com.woosan.hr_system.report.model.ReportStat">
+        SELECT
+        DATE_FORMAT(created_date, '%Y-%m') AS month,
+        COUNT(status) AS total,
+        SUM(CASE WHEN status = '승인' THEN 1 ELSE 0 END) AS finished,
+        SUM(CASE WHEN status IN ('미처리', '거절') THEN 1 ELSE 0 END) AS unfinished
+        FROM reports
+        <where>
+            <if test="writerId != null and writerId != ''">
+                AND writer_id = #{writerId}
+            </if>
+            <if test="statisticStart != null and statisticEnd != null">
+                AND DATE_FORMAT(created_date, '%Y-%m-%d') BETWEEN #{statisticStart} AND #{statisticEnd}
+            </if>
+        </where>
+        GROUP BY month
+        ORDER BY month
+    </select>
 <!--============================================== 조회 SQL문 =======================================================-->
 <!--============================================== 수정 SQL문 =======================================================-->
     <!-- 보고서 수정 -->

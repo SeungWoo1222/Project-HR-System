@@ -203,6 +203,11 @@ public class ReportServiceImpl implements ReportService {
     public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
         return reportDAO.getReportStats(startDate, endDate, writerIdList);
     }
+
+    @Override // 보고서 통계 조회
+    public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, String writerId) {
+        return reportDAO.getReportStats(startDate, endDate, writerId);
+    }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
     @Transactional

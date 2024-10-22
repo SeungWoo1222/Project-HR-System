@@ -51,6 +51,18 @@ public class ReportDAO {
         return sqlSession.selectList("report.getReportStats", params);
     }
 
+    public List<ReportStat> getReportStats(LocalDate statisticStart, LocalDate statisticEnd, String writerId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("statisticStart", statisticStart);
+        params.put("statisticEnd", statisticEnd);
+        if (writerId != null && !writerId.isEmpty()) {
+            params.put("writerId", writerId);
+        } else {
+            params.put("writerId", null);  // writerIds가 null이면 임원 전체 선택
+        }
+        return sqlSession.selectList("report.getReportStats2", params);
+    }
+
     // 최근 보고서 5개 조회
     public List<Report> getRecentReports(String writerId) {
         return sqlSession.selectList("report.getRecentReports", writerId);

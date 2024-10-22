@@ -57,7 +57,7 @@ function loadEmployeesByDepartment() {
     const departmentId = document.getElementById('departmentId').value;
     const selectAllButton = document.getElementById('selectAllEmployeesButton');
 
-    if (departmentId) {
+    if (departmentId && selectAllButton) {
         selectAllButton.style.display = 'block';
     }
 
@@ -83,7 +83,7 @@ function loadEmployeesByDepartment() {
             } else {
                 // 선택 옵션 추가
                 const defaultOption = document.createElement('option');
-                defaultOption.textContent = "임원을 선택하세요.";
+                defaultOption.textContent = "사원을 선택하세요.";
                 defaultOption.disabled = true;
                 defaultOption.selected = true;
                 employeeSelect.appendChild(defaultOption);
@@ -842,14 +842,13 @@ function submitReportStatisticFormByManager(event) {
     const searchDateOption = document.getElementById('searchDate').value;
     const dateRange = getDateRangeByOption(searchDateOption);
     const searchDate = document.getElementById('searchDate').value;
+    const employeeSelect = document.getElementById('employeeSelect').value;
 
     let startDate = dateRange.startDate;
     let endDate = dateRange.endDate;
 
     const params = new URLSearchParams({
-        idList: Object.keys(selectedEmployees),
-        nameList: Object.values(selectedEmployees),
-        searchDate: searchDate
+        searchDate: searchDate,
     });
 
     if (searchDateOption === 'custom') {
@@ -860,6 +859,10 @@ function submitReportStatisticFormByManager(event) {
     if (startDate && endDate) {
         params.append('startDate', startDate);
         params.append('endDate', endDate);
+    }
+
+    if (employeeSelect !== '사원을 선택하세요.') {
+        params.append('writerId', employeeSelect);
     }
 
     // 데이터를 서버로 GET 요청 전송
