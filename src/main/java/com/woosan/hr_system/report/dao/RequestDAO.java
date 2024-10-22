@@ -1,20 +1,15 @@
 package com.woosan.hr_system.report.dao;
 
-import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @Slf4j
@@ -57,7 +52,7 @@ public class RequestDAO {
     }
 
     // 내게 온 요청 검색(STAFF)
-    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public List<Request> search(String keyword, int pageSize, int offset, String writerId,  Integer searchType, String startDate, String endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -66,12 +61,11 @@ public class RequestDAO {
         params.put("searchType", searchType);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
         return sqlSession.selectList(NAMESPACE + "search", params);
     }
 
     // 내게 온 요청 검색(STAFF)
-    public int count(String keyword, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public int count(String keyword, String writerId, Integer searchType, String startDate, String endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);

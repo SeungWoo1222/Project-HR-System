@@ -918,7 +918,7 @@ function toggleCustomDateFields() {
     const customDateRange = document.getElementById('customDateRange');
 
     if (searchDate === 'custom') {
-        customDateRange.style.display = 'block';
+        customDateRange.style.display = 'flex';
     } else {
         customDateRange.style.display = 'none';
     }

@@ -26,7 +26,8 @@ public interface RequestService {
     // 나에게 온 최근 5개 요청 조회 (STAFF)
     List<Request> getMyPendingRequests(String writerId);
     // 페이지, 서칭 + 보고서 리스트 (STAFF)
-    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate);
+    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType,
+                                       String startDate, String endDate);
     Request getRequestByWriter(int requestId);
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================

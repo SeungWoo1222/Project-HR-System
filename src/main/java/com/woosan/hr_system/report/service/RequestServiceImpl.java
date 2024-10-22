@@ -74,7 +74,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 내게 온 요청 검색 (STAFF)
-    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, String startDate, String endDate) {
 
         int offset = pageRequest.getPage() * pageRequest.getSize();
         List<Request> requests = requestDAO.search(pageRequest.getKeyword(), pageRequest.getSize(), offset, writerId, searchType, startDate, endDate);

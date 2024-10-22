@@ -91,7 +91,7 @@
             <div class="table-wrapper">
                 <div class="content-header-left">
                     <h3>최근 수신된 요청 목록</h3>
-                    <button type="button" class="inner-btn" onclick="window.location.href='/report/requestList'">더보기</button>
+                    <button type="button" class="inner-btn" onclick="window.location.href='/report/request/list'">더보기</button>
                 </div>
                 <div>
                     <table class="list table-layout-auto">
@@ -117,7 +117,6 @@
                                         th:onclick="|window.location.href='/report/writeFromRequest/'
                                         + this.getAttribute('requestId')|">새 보고서 작성
                                 </button>
-
                             </td>
                         </tr>
                         </tbody>
@@ -138,8 +137,9 @@
                         <option th:value="custom" th:text="'사용자 지정'" th:selected="${searchDate == 'custom'}">사용자 지정</option>
                     </select>
 
-                    <div id="customDateRange" style="display: none;">
+                    <div id="customDateRange" class="search-date-form" style="display: none;">
                         <input type="date" class="search-date" id="startDate" th:value="${startDate}"/>
+                        <div style="color: #DFDFDF; font-weight: bold">~</div>
                         <input type="date" class="search-date" id="endDate" th:value="${endDate}"/>
                     </div>
                     <button type="submit" class="search-btn">

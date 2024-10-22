@@ -174,7 +174,6 @@ public class ReportController {
 
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
-
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -223,13 +222,14 @@ public class ReportController {
     }
 
     // 내게 온 요청 리스트
-    @GetMapping("/requestList")
+    @GetMapping("/request/list")
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
-                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                  @RequestParam(name = "searchType", defaultValue = "0") int searchType,
+                                  @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                  @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                  @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                   Model model) {
 
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
@@ -239,15 +239,17 @@ public class ReportController {
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, startDate, endDate);
 
-
         model.addAttribute("requests", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
-        return "report/request-list";
+        return "report/request/list";
     }
 
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
