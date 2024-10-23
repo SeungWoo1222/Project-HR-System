@@ -128,15 +128,10 @@
     </select>
 
     <!-- 결재할 보고서 검색 -->
-    <select id="toApproveSearch" parameterType="map" resultType="com.woosan.hr_system.report.model.Report">
+    <select id="toApproveSearch" parameterType="map" resultMap="reportResultMap">
         SELECT
-        r.report_id AS reportId,
-        r.writer_id AS writerId,
-        e.name AS writerName,
-        r.title,
-        r.created_date AS createdDate,
-        r.approver_name AS approverName,
-        r.status
+        r.*,
+        e.name AS writerName
         FROM reports r JOIN employees e ON r.writer_id = e.employee_id
         <where>
             r.approver_id = #{approverId}
@@ -162,7 +157,7 @@
             <if test="approvalStatus != null and approvalStatus != ''" >
                 AND r.status = #{approvalStatus}
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(r.created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
@@ -197,7 +192,7 @@
             <if test="approvalStatus != null and approvalStatus != ''" >
                 AND r.status = #{approvalStatus}
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(r.created_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>

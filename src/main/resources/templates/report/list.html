@@ -113,9 +113,9 @@
                 th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
                 <td th:text="${report.title}"></td>
                 <td th:text="${report.content}" style="max-width: 350px;"></td>
-                <td th:text="${report.approverName}"></td>
                 <td th:text="${#temporals.format(report.createdDate, 'yy.MM.dd(EE)')}"></td>
                 <td th:text="${#temporals.format(report.completeDate, 'yy.MM.dd(EE)')}"></td>
+                <td th:text="${report.approverName}"></td>
                 <td th:text="${report.status}"
                     th:classappend="${report.status} == '승인' ? 'green' : (
                                 ${report.status} == '거절' ? 'red' : 'grey')"></td>

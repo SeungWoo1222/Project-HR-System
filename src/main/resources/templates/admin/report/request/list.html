@@ -75,7 +75,7 @@
                         <button type="submit" class="search-btn">
                             <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
                         </button>
-                        <button type="button" class="reset-btn" onclick="window.location.href='/report/request/list'">
+                        <button type="button" class="reset-btn" onclick="window.location.href='/admin/request/list'">
                             <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화"/>
                         </button>
                     </div>
@@ -99,7 +99,8 @@
                     조회된 보고서 요청이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
-            <tr th:each="request : ${requests}" th:requestId="${request.requestId}">
+            <tr th:each="request : ${requests}" th:requestId="${request.requestId}"
+                th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">
                 <td th:text="${request.requestNote}"></td>
                 <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>
                 <td th:text="${request.writerName}"></td>

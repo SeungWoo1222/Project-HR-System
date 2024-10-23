@@ -30,7 +30,7 @@ public interface ReportService {
     // 내가 쓴 보고서 페이징, 검색 + 보고서 조회
     PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, String startDate, String endDate);
     // 결재 할 보고서 페이징, 검색 + 보고서 조회 (MANAGER)
-    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
+    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, String startDate, String endDate);
     // 결재 미처리 보고서 조회(MANAGER)
     List<Report> getUnprocessedReports(String approverId);
     // 보고서 통계 조회

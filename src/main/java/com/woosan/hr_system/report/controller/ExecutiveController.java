@@ -154,14 +154,15 @@ public class ExecutiveController {
     }
 
     // 내가 결재할 보고서 목록
-    @GetMapping("toApproveReportList")
+    @GetMapping("/approval")
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "searchType", defaultValue = "0") int searchType,
                                  @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
-                                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                 @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                 @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                 @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                  Model model) {
         // 로그인한 계정 기준 employee_id를 approverId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -176,8 +177,12 @@ public class ExecutiveController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("approvalStatus", approvalStatus);
 
-        return "admin/report/report-list";
+        return "admin/report/approval";
     }
 
     @GetMapping("/{requestId}") // 요청 세부 조회
