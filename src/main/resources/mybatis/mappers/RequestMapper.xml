@@ -160,7 +160,7 @@
             <if test="keyword != null and keyword != '' and searchType == 2">
                 AND (writer_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
@@ -189,7 +189,7 @@
                 writer_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
-            <if test="startDate != null and endDate != null">
+            <if test="startDate != '' and startDate != null and endDate != '' and endDate != null">
                 AND DATE_FORMAT(request_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>

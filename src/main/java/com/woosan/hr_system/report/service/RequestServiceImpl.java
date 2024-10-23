@@ -13,7 +13,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +83,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override // 내가 작성한 요청 검색
-    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, String startDate, String endDate) {
 
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();

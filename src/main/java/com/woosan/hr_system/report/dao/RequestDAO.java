@@ -6,7 +6,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +76,7 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 검색
-    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public List<Request> searchMyRequests(String keyword, int pageSize, int offset, String requesterId,  Integer searchType, String startDate, String endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("pageSize", pageSize);
@@ -91,13 +90,14 @@ public class RequestDAO {
     }
 
     // 내가 작성한 요청 검색
-    public int countMyRequests(String keyword, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate) {
+    public int countMyRequests(String keyword, String requesterId, Integer searchType, String startDate, String endDate) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("searchType", searchType);
         params.put("requesterId", requesterId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
+
         return sqlSession.selectOne(NAMESPACE + "countMyRequests", params);
     }
 // ==================================================조회 메소드=======================================================

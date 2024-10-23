@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='요청 조회')}">
+      layout:decorate="~{fragments/layout :: layout(title='발신된 요청 목록 조회')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/common/table.css}"/>
@@ -36,7 +36,7 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <div>
-            <form id="form" th:action="@{/report/request/list}" method="get">
+            <form id="form" th:action="@{/admin/request/list}" method="get">
                 <div class="content-header">
                     <input type="hidden" name="page" value="1"/>
                     <input type="hidden" name="size" th:value="${pageSize}"/>
@@ -85,40 +85,40 @@
         <table class="list table-layout-auto">
             <thead>
             <tr>
-                <th>요청자</th>
-                <th>요청 사항</th>
+                <th>요청 내용</th>
                 <th>요청 일시</th>
+                <th>보고서 작성자</th>
                 <th>마감일</th>
-                <th>보고서 처리</th>
+                <th>보고서 상태</th>
+                <th>보고서 조회</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${requests.isEmpty()}">
-                <td colspan="5" style="text-align: center; padding: 20px;">
+                <td colspan="6" style="text-align: center; padding: 20px;">
                     조회된 보고서 요청이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
-            <tr th:each="request : ${requests}">
-                <td th:text="${request.requesterName}"></td>
+            <tr th:each="request : ${requests}" th:requestId="${request.requestId}">
                 <td th:text="${request.requestNote}"></td>
                 <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>
+                <td th:text="${request.writerName}"></td>
                 <td th:text="${#temporals.format(request.dueDate, 'yy.MM.dd(EE)')}"></td>
+                <td>
+                    <p th:if="${request.reportId != null}" class="green">작성 완료</p>
+                    <p th:if="${request.reportId == null}" class="red">미작성</p>
+                </td>
                 <td class="flex-center">
                     <button th:if="${request.reportId != null}"
                             type="button" class="inner-btn blue-btn" th:reportId="${request.reportId}"
                             th:onclick="openModal('/report/' + this.getAttribute('reportId'))">작성한 보고서 조회</button>
-                    <button th:if="${request.reportId == null}"
-                            type="button" class="inner-btn green-btn" th:requestId="${request.requestId}"
-                            th:onclick="|window.location.href='/report/writeFromRequest/'
-                                        + this.getAttribute('requestId')|">새 보고서 작성
-                    </button>
                 </td>
             </tr>
             </tbody>
         </table>
         <div class="pagination" th:if="${totalPages > 0}">
             <span th:if="${currentPage > 1}">
-                <a th:href="@{'/report/request/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}">
+                <a th:href="@{'/admin/request/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}">
                     <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
                 </a>
             </span>
@@ -126,7 +126,7 @@
             <span th:if="${totalPages <= 5}">
 
                 <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:href="@{'/report/request/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}"
+                    <a th:href="@{'/admin/request/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
 
@@ -135,12 +135,12 @@
                 <span th:each="i : ${#numbers.sequence(
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
                                 currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
-                    <a th:href="@{'/report/request/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}"
+                    <a th:href="@{'/admin/request/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}"
                        th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
                 </span>
                 </span>
                 <span th:if="${currentPage < totalPages}">
-                <a th:href="@{'/report/request/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}">
+                <a th:href="@{'/admin/request/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&searchType=' + ${searchType} + '&searchDate=' + ${searchDate} + '&startDate=' + ${startDate} + '&endDate' + ${endDate}}">
                     <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
                 </a>
             </span>

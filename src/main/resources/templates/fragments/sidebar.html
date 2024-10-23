@@ -58,13 +58,13 @@
                     <li><a th:href="@{/report/request/list}">- 수신된 요청 목록</a></li>
                     <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/dashboard}">- 결재 및 요청</a></li>
                     <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/write}">- 보고서 요청</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/list}">- 발신된 요청 목록</a></li>
                 </ul>
             </li>
             <li>
                 <p onclick="toggleSubmenu('request-submenu')">
                     <img src="/images/icons/contract.png" alt="Report" width="20"> 보고서 요청</p>
                 <ul id="request-submenu" class="submenu">
-                    <li><a th:href="@{/admin/request/requestList}">- 내 요청 목록</a></li>
                     <li><a th:href="@{/admin/request/toApproveReportList}">- 결재 할 보고서 목록</a></li>
                 </ul>
             </li>

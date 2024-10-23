@@ -124,13 +124,14 @@ public class ExecutiveController {
 
 //=====================================================조회 메소드========================================================
     // 내가 작성한 요청 리스트
-    @GetMapping("/requestList")
+    @GetMapping("/list")
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                 @RequestParam(name = "size", defaultValue = "10") int size,
-                                 @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
-                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                  @RequestParam(name = "size", defaultValue = "10") int size,
+                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
+                                  @RequestParam(name = "searchType", defaultValue = "0") int searchType,
+                                  @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                  @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                  @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                  Model model) {
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -145,8 +146,11 @@ public class ExecutiveController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
-        return "/admin/report/request-list";
+        return "/admin/report/request/list";
     }
 
     // 내가 결재할 보고서 목록
