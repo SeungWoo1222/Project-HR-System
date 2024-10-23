@@ -186,7 +186,10 @@ public class ReportController {
             model.addAttribute("files", files);
         }
 
-        return "/report/report-view";
+        model.addAttribute("writerName", employeeDAO.getEmployeeName(report.getWriterId()));
+
+
+        return "/report/detail";
     }
 
     // 내가 작성한 보고서 리스트

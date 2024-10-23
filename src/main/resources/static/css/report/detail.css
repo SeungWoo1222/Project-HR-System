@@ -26,9 +26,56 @@
     background-color: #f0f0f0;
 }
 
+.section-content {
+    text-align: left !important;
+    vertical-align: top;
+    white-space: normal !important;
+    word-wrap: break-word;
+    max-width: 577px;
+}
+
 .detail-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
 }
 
+.w-25 {
+    width: 25%;
+}
+
+.file-box {
+    margin: 10px;
+    padding: 5px 10px;
+    border: #EEE 2px solid;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.file-box .name {
+    width: 490px;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: default;
+    display: inline;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-box:hover {
+    background-color: #f0f0f0;
+}
+
+.file-box .name:hover {
+    background-color: transparent;
+}
