@@ -125,7 +125,7 @@ public class ReportController {
         Request request = requestService.getRequestByWriter(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
-        return "/report/write-from-request";
+        return "/report/request/write";
     }
 
     // 요청 들어온 보고서 생성

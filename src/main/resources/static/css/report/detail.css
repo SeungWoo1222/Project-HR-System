@@ -34,7 +34,7 @@
     max-width: 577px;
 }
 
-.detail-table {
+.detail-table, .request-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;

@@ -385,14 +385,15 @@ function submitReportForm(event) {
         title: form.title.value,
         content: form.content.value,
         idList: Object.keys(selectedEmployees),
-        nameList: Object.values(selectedEmployees),
+        nameList: Object.values(selectedEmployees).map(item => {
+            return item.split('(')[0];
+        }),
         completeDate: form.completeDate.value
     };
     formData.append("report", new Blob([JSON.stringify(report)], { type: "application/json" }));
 
     // filesArr에 저장된 파일들을 FormData에 추가
     if (filesArr != null) {
-
         filesArr.forEach((file, index) => {
             if (!file.is_delete) { // 삭제된 파일 제외
                 formData.append('reportFiles', file);
@@ -401,35 +402,37 @@ function submitReportForm(event) {
     }
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/report/list';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('보고서 작성 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm('보고서를 제출하시겠습니까?')) {
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.href = '/report/list';
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('보고서 작성 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 
