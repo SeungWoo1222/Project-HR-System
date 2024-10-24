@@ -86,6 +86,8 @@
 }
 
 .delete-btn {
+    width: 25px;
+    height: 25px;
     padding-top: 3px;
     transition: transform 0.3s ease;
 }

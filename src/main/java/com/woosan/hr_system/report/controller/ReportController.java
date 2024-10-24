@@ -295,7 +295,7 @@ public class ReportController {
 
     // 보고서 수정
     @Transactional
-    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
+    @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
     public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {

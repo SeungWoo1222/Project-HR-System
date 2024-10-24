@@ -438,11 +438,11 @@ function submitReportForm(event) {
 
 // 보고서 수정 시
 function updateReportForm(event) {
-    // 수정사항이 있는지 체크 (수정사항 추가)
-    if (!isFormChanged()) {
-        alert('수정사항이 없습니다.');
-        return;
-    }
+    // // 수정사항이 있는지 체크 (수정사항 추가)
+    // if (!isFormChanged()) {
+    //     alert('수정사항이 없습니다.');
+    //     return;
+    // }
 
     // 유효성 검사 실행
     if (!validateReportForm(event)) { return; }
@@ -492,35 +492,37 @@ function updateReportForm(event) {
     }
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'PUT',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/report/list';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('보고서 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm('보고서를 수정하시겠습니까?')) {
+        fetch(actionUrl, {
+            method: 'PUT',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.href = '/report/list';
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('보고서 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 // 보고서 수정 시 - 기존 파일 + 업로드 파일 관리
 function deleteReportFile(num) {
