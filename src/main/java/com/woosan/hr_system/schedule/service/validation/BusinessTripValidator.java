@@ -1,11 +1,9 @@
-package com.woosan.hr_system.schedule.service;
+package com.woosan.hr_system.schedule.service.validation;
 
 import com.woosan.hr_system.schedule.model.BusinessTrip;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class BusinessTripValidator implements ConstraintValidator<ValidateBusinessTrip, BusinessTrip> {
     @Override
     public boolean isValid(BusinessTrip businessTrip, ConstraintValidatorContext context) {
@@ -26,7 +24,6 @@ public class BusinessTripValidator implements ConstraintValidator<ValidateBusine
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
-
     private boolean isNotBlank(String value) {
         return value != null && !value.trim().isEmpty();
     }

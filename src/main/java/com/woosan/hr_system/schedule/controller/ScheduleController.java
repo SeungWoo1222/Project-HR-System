@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,10 +116,10 @@ public class ScheduleController {
     @PostMapping // 일정 등록
     public ResponseEntity<String> insertSchedule(@Valid @ModelAttribute Schedule schedule,
                                                  @Valid @ModelAttribute BusinessTrip businessTrip,
-                                                 Errors errors) {
+                                                 BindingResult bindingResult) {
         // 유효성 검사가 실패했을 경우 처리
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.status(422).body(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         int taskId = scheduleService.insertSchedule(schedule);
@@ -135,10 +136,10 @@ public class ScheduleController {
     @PutMapping("/edit") // 일정 수정
     public ResponseEntity<String> updateSchedule(@Valid @ModelAttribute Schedule schedule,
                                                  @Valid @ModelAttribute BusinessTrip businessTrip,
-                                                 Errors errors) {
+                                                 BindingResult bindingResult) {
         // 유효성 검사가 실패했을 경우 처리
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(422).body(errors.getAllErrors().get(0).getDefaultMessage());
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.status(422).body(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         scheduleService.updateSchedule(schedule);

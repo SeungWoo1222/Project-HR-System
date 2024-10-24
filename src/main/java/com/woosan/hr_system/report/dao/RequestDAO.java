@@ -24,8 +24,8 @@ public class RequestDAO {
     private static final String NAMESPACE = "com.woosan.hr_system.report.dao.RequestDAO.";
 //===================================================생성 메소드=======================================================
     // 요청 생성
-    public void createRequest(Map<String, Object> params) {
-        sqlSession.insert(NAMESPACE + "createRequest", params);
+    public int createRequest(Map<String, Object> params) {
+        return sqlSession.insert(NAMESPACE + "createRequest", params);
     }
 
 //===================================================생성 메소드=======================================================

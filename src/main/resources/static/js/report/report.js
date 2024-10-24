@@ -298,9 +298,13 @@ function submitReportForm(event) {
     };
     formData.append("report", new Blob([JSON.stringify(report)], { type: "application/json" }));
 
+    if (document.getElementById('taskId')) {
+        formData.append('taskId', document.getElementById('taskId').value);
+        console.log("taskId: " ,document.getElementById('taskId').value);
+    }
+
     // filesArr에 저장된 파일들을 FormData에 추가
     if (filesArr != null) {
-
         filesArr.forEach((file, index) => {
             if (!file.is_delete) { // 삭제된 파일 제외
                 formData.append('reportFiles', file);
@@ -318,7 +322,6 @@ function submitReportForm(event) {
             text: data
         })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text); // 성공 메시지 알림
                 window.location.href = '/report/list';
@@ -448,12 +451,6 @@ function deleteReportFile(num) {
 function updateReportApprove(event) {
     event.preventDefault();
 
-    // 수정사항이 있는지 체크 (수정사항 추가)
-    if (!isFormChanged()) {
-        alert('수정사항이 없습니다.');
-        return;
-    }
-
     const form = event.target.closest('form'); // 폼을 가져옴
     const actionUrl = form.action; // 폼의 action URL 가져옴
     const formData = new FormData(); // 기존 폼 데이터를 FormData 객체에 추가
@@ -469,27 +466,25 @@ function updateReportApprove(event) {
     formData.append("reportId", reportId);
     formData.append("status", status);
 
+    console.log(actionUrl);
+
     // 데이터를 서버로 전송
     fetch(actionUrl, {
         method: 'PUT',
         body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
+    }).then(response => response.text().then(data => ({
+        status: response.status,
+        text: data
+    })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
+            const errorStatuses = [400, 403, 404, 500];
             if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/admin/request/toApproveReportList';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
+                alert(response.text);
                 window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
+            } else if (errorStatuses.includes(response.status)) {
+                alert(response.text);
+            } else if (response.status === 422) { // 유효성 검사 오류 시
+                document.getElementById('error-message').textContent = response.text;
             } else {
                 alert('결재 처리 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
                 window.location.reload();
@@ -558,7 +553,7 @@ function submitRequestForm(event) {
 // 요청 수정 시
 function updateRequestForm(event) {
     // 수정사항이 있는지 체크 (수정사항 추가)
-    if (!isFormChanged()) {
+    if (!isRequestFormChanged()) {
         alert('수정사항이 없습니다.');
         return;
     }
@@ -604,7 +599,6 @@ function updateRequestForm(event) {
             text: data
         })))
         .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
             if (response.status === 200) {
                 alert(response.text); // 성공 메시지 알림
                 window.location.href = '/admin/request/requestList';
@@ -921,15 +915,71 @@ function validateRequestDueDate() {
 //============================================ 수정 메소드 =================================================================
 // 수정사항이 있는지 체크하는 함수 (수정사항 추가)
 function isFormChanged() {
-    const formElements = document.querySelectorAll('#form input, #form textarea');
     let isChanged = false;
 
+    const formElements = document.querySelectorAll('#form input, #form textarea');
     formElements.forEach(function (element) {
         if (element.type === "hidden") return; // hidden 필드를 건너뜀
         if (initialValues[element.id] !== element.value) {
             isChanged = true; // 변경된 값이 있으면 true 설정
         }
     });
+
+    // selectedEmployees (결재자 목록) 비교
+    const selectedEmployeesElements = document.querySelectorAll('#selectedEmployees .employee-item'); // 예: employee class를 가지고 있을 때
+    const currentSelectedEmployeeIds = Array.from(selectedEmployeesElements).map(e => e.querySelector('button').dataset.id);
+    const initialSelectedEmployeeIds = initialValues['selectedEmployees'] || [];
+
+    if (JSON.stringify(initialSelectedEmployeeIds) !== JSON.stringify(currentSelectedEmployeeIds)) {
+        isChanged = true;
+    }
+
+    // 파일 변경 여부 체크
+    if (isFilesChanged()) {
+        isChanged = true;
+    }
+
+    return isChanged;
+}
+
+function isFilesChanged() {
+    let isChanged = false;
+
+    // 기존 파일이 삭제되었는지 확인
+    filesArr.forEach(function (file) {
+        if (file.is_delete === true) {
+            isChanged = true;
+        }
+    });
+
+    // 새로 추가된 파일이 있는지 확인
+    const newFiles = document.getElementById('reportDocuments').files;
+    if (newFiles.length > 0) {
+        isChanged = true;
+    }
+
+    return isChanged;
+}
+
+function isRequestFormChanged() {
+    let isChanged = false;
+
+    const formElements = document.querySelectorAll('#form input, #form textarea');
+    formElements.forEach(function (element) {
+        if (element.type === "hidden") return; // hidden 필드를 건너뜀
+        if (initialValues[element.id] !== element.value) {
+            isChanged = true; // 변경된 값이 있으면 true 설정
+        }
+    });
+
+    // selectedEmployees (결재자 목록) 비교
+    const selectedEmployeesElements = document.querySelectorAll('#selectedEmployees .employee-item'); // 예: employee class를 가지고 있을 때
+    const currentSelectedEmployeeIds = Array.from(selectedEmployeesElements).map(e => e.querySelector('button').dataset.id);
+    const initialSelectedEmployeeIds = initialValues['selectedEmployees'] || [];
+
+    if (JSON.stringify(initialSelectedEmployeeIds) !== JSON.stringify(currentSelectedEmployeeIds)) {
+        isChanged = true;
+    }
 
     return isChanged;
 }

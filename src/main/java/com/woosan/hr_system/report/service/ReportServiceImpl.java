@@ -3,6 +3,8 @@ package com.woosan.hr_system.report.service;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
@@ -28,8 +30,6 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
     @Autowired
-    private EmployeeDAO employeeDAO;
-    @Autowired
     private FileService fileService;
     @Autowired
     private ReportFileDAO reportFileDAO;
@@ -37,13 +37,16 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileService reportFileService;
     @Autowired
     private RequestService requestService;
-
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private EmployeeService employeeService;
 
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
-    public List<Integer> createReport(Report report) {
-
+    public List<Integer> createReport(Report report, List<MultipartFile> reportDocuments) {
         List<Integer> reportIdList = new ArrayList<>();
+        List<Integer> fileIdList = new ArrayList<>();
 
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
@@ -58,46 +61,63 @@ public class ReportServiceImpl implements ReportService {
             params.put("approverName", report.getNameList().get(i));
             int reportId = reportDAO.createReport(params);
             reportIdList.add(reportId);
-        }
-        return reportIdList;
-    }
-
-    @Override // 보고서 + 파일 생성
-    public void createReportWithFile(Report report, List<MultipartFile> reportDocuments) {
-
-        List<Integer> fileIdlist = new ArrayList<>();
-        List<Integer> reportIdlist = new ArrayList<>();
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", report.getWriterId());
-        params.put("title", report.getTitle());
-        params.put("content", report.getContent());
-        params.put("createdDate", report.getCreatedDate());
-        params.put("status", "미처리");
-        params.put("completeDate", report.getCompleteDate());
-
-        for (int i = 0; i < report.getNameList().size(); i++) {
-            params.put("approverId", report.getIdList().get(i));
-            params.put("approverName", report.getNameList().get(i));
-            int reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
-            reportIdlist.add(reportId);
+            // 보고서 생성 후 결재자에게 알림 생성
+            String writerName = employeeService.getEmployeeNameById(report.getWriterId());
+            notificationService.createNotification(report.getIdList().get(i), "결재할 보고서가 있습니다. <br>작성자 : " + writerName, "/admin/request/notification?reportId=" + reportId);
         }
 
         if (reportDocuments != null) {
-            // 파일들 체크 후 DB에 저장할 파일명 반환
             for (MultipartFile reportdocument : reportDocuments) {
                 int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
-                fileIdlist.add(fileId);
+                fileIdList.add(fileId);
             }
         }
 
         // reportId와 fileId를 모두 순회하며 조인테이블 삽입
-        for (int reportId : reportIdlist) {
-            for (int fileId : fileIdlist) {
+        for (int reportId : reportIdList) {
+            for (int fileId : fileIdList) {
                 reportFileDAO.createReportFile(reportId, fileId);
             }
         }
+        return reportIdList;
     }
+
+//    @Override // 보고서 + 파일 생성
+//    public void createReportFile(List<MultipartFile> reportDocuments) {
+//        List<Integer> fileIdlist = new ArrayList<>();
+//        List<Integer> reportIdlist = new ArrayList<>();
+//
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("writerId", report.getWriterId());
+//        params.put("title", report.getTitle());
+//        params.put("content", report.getContent());
+//        params.put("createdDate", report.getCreatedDate());
+//        params.put("status", "미처리");
+//        params.put("completeDate", report.getCompleteDate());
+//
+//        for (int i = 0; i < report.getNameList().size(); i++) {
+//            params.put("approverId", report.getIdList().get(i));
+//            params.put("approverName", report.getNameList().get(i));
+//            int reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
+//            reportIdlist.add(reportId);
+//        }
+//
+//        if (reportDocuments != null) {
+//            log.info("hi");
+//            for (MultipartFile reportdocument : reportDocuments) {
+//                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
+//                fileIdlist.add(fileId);
+//            }
+//        }
+//
+//        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
+//        for (int reportId : reportIdlist) {
+//            log.info("hi");
+//            for (int fileId : fileIdlist) {
+//                reportFileDAO.createReportFile(reportId, fileId);
+//            }
+//        }
+//    }
 
     @Override // 요청 들어온 보고서 작성
     public int createReportFromRequest(Report report) {
@@ -164,7 +184,6 @@ public class ReportServiceImpl implements ReportService {
         return report;
     }
 
-
     @Override // 최근 5개 보고서 조회
     public List<Report> getRecentReports(String writerId) {
         return reportDAO.getRecentReports(writerId);
@@ -174,9 +193,6 @@ public class ReportServiceImpl implements ReportService {
     public List<Report> getUnprocessedReports(String approverId) {
         return reportDAO.getUnprocessedReports(approverId);
     }
-
-
-
 
     @Override // 보고서 검색
     public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
@@ -204,7 +220,6 @@ public class ReportServiceImpl implements ReportService {
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
         return reportDAO.getReportStats(startDate, endDate, writerIdList);
@@ -222,7 +237,7 @@ public class ReportServiceImpl implements ReportService {
         if (report.getIdList().size() > 1) {
             // 결재자 수가 여러명으로 바뀐 경우
             report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
-            createdReportIdList = createReport(report); // 보고서 생성 후 reportId 반환
+            createdReportIdList = createReport(report, null); // 보고서 생성 후 reportId 반환
             reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
             deleteReport(report.getReportId());
         } else {

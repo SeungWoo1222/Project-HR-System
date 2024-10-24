@@ -105,8 +105,8 @@
                 <td class="view" th:text="${request.dueDate}"></td>
                 <td class="view dateTime" th:text="${request.requestDate}"></td>
                 <td>
-                    <a th:if="${request.reportId != null}" th:reportId="${request.reportId}"
-                       th:onclick="openModal('/report/requestedReport/' + this.getAttribute('reportId'))">조회</a>
+                    <a th:if="${request.reportId != null}" th:requestId="${request.requestId}"
+                       th:onclick="openModal('/admin/request/' + this.getAttribute('requestId'))">조회</a>
                     <a th:if="${request.reportId == null}" th:href="@{/report/writeFromRequest(requestId=${request.requestId})}">작성하기</a>
                 </td>
             </tr>

@@ -1,16 +1,12 @@
 package com.woosan.hr_system.schedule.model;
 
-import com.woosan.hr_system.schedule.service.ValidateBusinessTrip;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.woosan.hr_system.schedule.service.validation.ValidateBusinessTrip;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data

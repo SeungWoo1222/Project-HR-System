@@ -1,4 +1,4 @@
-package com.woosan.hr_system.schedule.service;
+package com.woosan.hr_system.schedule.service.validation;
 
 import com.woosan.hr_system.schedule.model.Schedule;
 import jakarta.validation.ConstraintValidator;

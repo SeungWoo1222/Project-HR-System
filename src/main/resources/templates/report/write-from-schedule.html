@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='보고서 작성')}">
+      layout:decorate="~{fragments/layout-with-modal :: layout(title='보고서 작성')}">
 
 <th:block layout:fragment="css">
-  <link rel="stylesheet" th:href="@{/css/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+  <link rel="stylesheet" th:href="@{/css/vacation/detail.css}">
+  <link rel="stylesheet" th:href="@{/css/schedule/create.css}">
 </th:block>
 
 <th:block layout:fragment="script">
-  <script th:src="@{/js/report/report.js}"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script th:src="@{/js/report/report.js}"></script>
   <script th:src="@{/js/report/report-file.js}"></script>
+  <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uu5esh416f&submodules=geocoder"></script>
+  <script th:src="@{/js/schedule/trip.js}"></script>
+  <script th:src="@{/js/schedule/ajax.js}"></script>
   <script>
     $(document).ready(function () {
       initEventListeners();
@@ -21,19 +25,19 @@
 <div layout:fragment="~{content}">
   <div class="content">
     <h1>보고서 작성</h1>
-    <form id="form" th:action="@{/report/write}" method="post" enctype="multipart/form-data" onsubmit="return false;">
+    <form id="form" th:action="@{/report/writeFromSchedule}" method="post" enctype="multipart/form-data" onsubmit="return false;">
       <div>
-        <button th:taskId="${schedule.taskId}" th:onclick="openModal('/schedule/' + this.getAttribute('taskId'))">내가 쓴 일정 보기</button>
+        <button id="taskId" th:value="${schedule.taskId}" th:taskId="${schedule.taskId}" th:onclick="openModal('/schedule/' + this.getAttribute('taskId'))">내가 쓴 일정 보기</button>
       </div>
 
       <div>
         <label for="title">제목:</label>
-        <input type="text" id="title" name="title" required>
+        <input type="text" id="title" name="title">
       </div>
 
       <div>
         <label for="content">내용:</label>
-        <textarea id="content" name="content" rows="10" required></textarea>
+        <textarea id="content" name="content"  style="width:170px; height:150px;"></textarea>
       </div>
 
       <div>
@@ -66,7 +70,7 @@
 
       <div>
         <label for="completeDate">업무 완료 날짜:</label>
-        <input type="date" id="completeDate" name="completeDate" required>
+        <input type="date" id="completeDate" name="completeDate">
       </div>
 
       <div class="file-area">

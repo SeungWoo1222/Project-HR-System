@@ -17,12 +17,14 @@ import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -105,7 +107,13 @@ public class ExecutiveController {
     // 요청 생성
     @RequireManagerPermission
     @PostMapping("/write")
-    public ResponseEntity<String> createRequest(@RequestBody Request request) {
+    public ResponseEntity<String> createRequest(@Valid @RequestBody Request request,
+                                                BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
         // 현재 로그인한 계정의 employeeId를 요청자(requesterId)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String requesterId = userSessionInfo.getCurrentEmployeeId();
@@ -117,6 +125,7 @@ public class ExecutiveController {
 
 //=====================================================조회 메소드========================================================
     // 내가 작성한 요청 리스트
+    @RequireManagerPermission
     @GetMapping("/requestList")
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
@@ -143,6 +152,7 @@ public class ExecutiveController {
     }
 
     // 내가 결재할 보고서 목록
+    @RequireManagerPermission
     @GetMapping("toApproveReportList")
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
@@ -176,7 +186,7 @@ public class ExecutiveController {
         return "admin/report/request-view";
     }
 
-    @GetMapping("/report/{reportId}") // 특정 보고서 조회
+    @GetMapping("/report/{reportId}") // 결재할 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
         model.addAttribute("report", report);
@@ -187,8 +197,22 @@ public class ExecutiveController {
             List<File> files = fileService.getFileListById(fileIds);
             model.addAttribute("files", files);
         }
-
         return "admin/report/report-view";
+    }
+
+    @GetMapping("/notification") // 결재할 보고서 조회(알림에서 클릭 시)
+    public String viewReportByNotification(@RequestParam("reportId") int reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
+        model.addAttribute("report", report);
+
+        List<Integer> fileIds = reportFileService.getFileIdsByReportId(reportId);
+        // 보고서에 맞는 파일이 있다면 실행
+        if (!fileIds.isEmpty()) {
+            List<File> files = fileService.getFileListById(fileIds);
+            model.addAttribute("files", files);
+        }
+        log.info("반환");
+        return "admin/report/notification-view";
     }
 
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
@@ -242,8 +266,14 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @PostMapping("/edit") // 요청 수정
-    public ResponseEntity<String> updateRequest(@RequestBody Request request) {
+    @PutMapping("/edit") // 요청 수정
+    public ResponseEntity<String> updateRequest(@Valid @RequestBody Request request,
+                                                BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
         // ↓ 요청 수정 권한이 있는지 확인 ↓
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -266,16 +296,12 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @PostMapping("/approve") // 보고서 결재 처리
-    public String approveReport(@RequestParam("reportId") int reportId,
+    @PutMapping("/approve") // 보고서 결재 처리
+    public ResponseEntity<String> approveReport(@RequestParam("reportId") int reportId,
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
-        try {
-            reportService.updateApprovalStatus(reportId, status, rejectionReason);
-            return "redirect:/admin/request/toApproveReportList";
-        } catch (Exception e) {
-            return "error"; // 에러 메시지 표시
-        }
+        reportService.updateApprovalStatus(reportId, status, rejectionReason);
+        return ResponseEntity.ok("결재 처리가 완료되었습니다.");
     }
 //===================================================수정 메소드=========================================================
 

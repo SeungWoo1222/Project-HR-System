@@ -8,6 +8,7 @@ import java.util.List;
 public interface NotificationService {
     List<Notification> getAllNotification();
     int getUnreadCount();
+    int getNotificationId(String uniqueId);
     void createNotification(String employeeId, String message, String url);
     void createNotifications(List<String> employeeIdList, String message, String url);
     void createNotifications(String message, String url);

@@ -24,6 +24,10 @@ public class NotificationDAO {
     public int selectUnreadCount(String employeeId) {
         return sqlSession.selectOne(NAMESPACE + "selectUnreadCount", employeeId);
     }
+    // url에 저장돼있는 고유한 Id로 notificationId를 조회
+    public int getNotificationId(String uniqueId) {
+        return sqlSession.selectOne(NAMESPACE + "getNotificationId", uniqueId);
+    }
     // 단일 알림 생성
     public void insertNotification(Notification notification) {
         sqlSession.insert(NAMESPACE + "insertNotification", notification);

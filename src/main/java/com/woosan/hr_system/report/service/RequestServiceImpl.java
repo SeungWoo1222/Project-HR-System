@@ -1,6 +1,9 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.notification.service.NotificationService;
+import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
@@ -29,6 +32,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private RequestDAO requestDAO;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private EmployeeService employeeService;
 
 //===================================================생성 메소드=======================================================
 
@@ -45,7 +52,10 @@ public class RequestServiceImpl implements RequestService {
             params.put("requestNote", request.getRequestNote());
             params.put("requestDate", requestDate);
 
-            requestDAO.createRequest(params);
+            int requestId = requestDAO.createRequest(params);
+            // 보고서 생성 후 결재자에게 알림 생성
+            String requesterName = employeeService.getEmployeeNameById(request.getRequesterId());
+            notificationService.createNotification(request.getIdList().get(i), "보고서 작성 요청이 있습니다. <br>요청자 : " + requesterName, "/report/writeFromRequest?requestId=" + requestId);
         }
     }
 

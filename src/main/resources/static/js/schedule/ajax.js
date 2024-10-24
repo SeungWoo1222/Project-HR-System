@@ -43,13 +43,8 @@ function checkForUpdates() {
     const contactTelInput = document.getElementById('tripTel');
     const contactEmailInput = document.getElementById('emailLocalPart');
 
-    console.log("hadTripInfo 상태", hadTripInfo);
-    console.log("addressInput 상태", addressInput);
 
     if (hadTripInfo && addressInput.value) {
-        console.log("O O");
-        console.log("defaultValue값 : ", addressInput.defaultValue);
-        console.log("value값 : ", addressInput.value);
         if ( // 수정필요함 여기는
             addressInput.value !== addressInput.defaultValue ||
             detailedAddressInput.value !== detailedAddressInput.defaultValue ||
@@ -316,6 +311,7 @@ function submitUpdateForm(event) {
         });
     }
 
+    console.log(actionUrl);
     // 일정 수정
     if (confirm('일정을 수정하시겠습니까?')) {
         fetch(actionUrl, {

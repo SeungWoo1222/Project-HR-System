@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -18,6 +19,7 @@ import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,6 +57,8 @@ public class ReportController {
     private ObjectMapper objectMapper; // 통계 반환 후 view에 보내면서 JSON로 반환함
     @Autowired
     private ReportFileService reportFileService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/main") // main 페이지 이동
     public String getMainPage(@RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -100,8 +105,13 @@ public class ReportController {
     // 보고서 생성
     @ResponseBody
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createReport(@RequestPart(value="report") Report report,
-                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments) {
+    public ResponseEntity<String> createReport(@Valid @RequestPart(value="report") Report report,
+                                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
 
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -109,11 +119,7 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        if (reportDocuments == null || reportDocuments.isEmpty()) {
-            reportService.createReport(report);
-        } else {
-            reportService.createReportWithFile(report, reportDocuments);
-        }
+        reportService.createReport(report, reportDocuments);
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
@@ -131,7 +137,7 @@ public class ReportController {
     @ResponseBody
     @PostMapping(value = "/writeFromRequest", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> CreateReportFromRequest(
-                                          @RequestPart(value="report") Report report,
+                                          @Valid @RequestPart(value="report") Report report,
                                           @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
                                           @RequestParam(value="requestId") int requestId) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -153,12 +159,9 @@ public class ReportController {
     }
 
     // 일정 완료 된 보고서 생성 페이지 이동
-    @GetMapping("/writeFromSchedule/{taskId}")
-    public String showCreatePageFromSchedule(@PathVariable("taskId") int taskId,
+    @GetMapping("/writeFromSchedule")
+    public String showCreatePageFromSchedule(@RequestParam("taskId") int taskId,
                                             Model model) {
-
-        log.info("showCreatePageFromSchedule 도착 taskId : {}", taskId);
-
         Schedule schedule = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", schedule);
         model.addAttribute("report", new Report());
@@ -166,11 +169,22 @@ public class ReportController {
     }
 
     // 일정 완료 된 보고서 생성
-//    @PostMapping("writeFromSchedule")
-//    public ResponseEntity<String> createReportFromSchedule() {
-//        return "보고서 생성이 완료되었습니다.";
-//    }
+    @Transactional
+    @ResponseBody
+    @PostMapping(value = "/writeFromSchedule", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createReportFromSchedule(
+                               @Valid @RequestPart(value="report") Report report,
+                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                               @RequestParam(value="taskId") int taskId) {
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
+        LocalDateTime currentTime = userSessionInfo.getNow();
+        report.setWriterId(writerId);
+        report.setCreatedDate(currentTime);
 
+        reportService.createReport(report, reportDocuments);
+        return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
+    }
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
 
@@ -264,7 +278,6 @@ public class ReportController {
 
 //=================================================조회 메소드============================================================
 //=================================================수정 메소드============================================================
-
     @GetMapping("/edit") // 수정 페이지 이동
     public String updateReport(@RequestParam("reportId") int reportId, Model model) {
 
@@ -285,8 +298,8 @@ public class ReportController {
 
     // 보고서 수정
     @Transactional
-    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
-    public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
+    @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
+    public ResponseEntity<String> updateReport(@Valid @RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {
         // 요청 수정 권한이 있는지 확인

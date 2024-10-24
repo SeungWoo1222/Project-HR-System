@@ -41,8 +41,8 @@
         <!-- 결재 상태가 미처리인 경우 결재 상태 변경 폼을 바로 표시 -->
         <div th:if="${report.status == '미처리'}">
             <!-- 결재 상태 변경 기능 시작 -->
-            <form id="approvalForm1" th:action="@{/admin/request/approve}">
-                <input type="hidden" name="reportId" th:value="${report.reportId}" />
+            <form id="approvalForm1" th:action="@{/admin/request/approve}" method="post">
+                <input type="hidden" name="reportId" th:value="${report.reportId}"/>
                 <div>
                     <label for="statusSelect1">결재 상태:</label>
                     <select id="statusSelect1" name="status" onchange="toggleRejectionReason('statusSelect1', 'rejectionReasonContainer1')">
