@@ -154,7 +154,7 @@ public class ExecutiveController {
     }
 
     // 내가 결재할 보고서 목록
-    @GetMapping("/approval")
+    @GetMapping("/approval-list")
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
@@ -182,7 +182,7 @@ public class ExecutiveController {
         model.addAttribute("endDate", endDate);
         model.addAttribute("approvalStatus", approvalStatus);
 
-        return "admin/report/approval";
+        return "/admin/report/list";
     }
 
     @GetMapping("/{requestId}") // 요청 세부 조회
@@ -204,7 +204,9 @@ public class ExecutiveController {
             model.addAttribute("files", files);
         }
 
-        return "admin/report/report-view";
+        model.addAttribute("writerName", employeeDAO.getEmployeeName(report.getWriterId()));
+
+        return "admin/report/approval";
     }
 
     // 통계 - 선택된 임원 목록 중 삭제될 시 실행
@@ -282,16 +284,11 @@ public class ExecutiveController {
     }
 
     @RequireManagerPermission
-    @PostMapping("/approve") // 보고서 결재 처리
-    public String approveReport(@RequestParam("reportId") int reportId,
+    @PutMapping("/approve") // 보고서 결재 처리
+    public ResponseEntity<String> approveReport(@RequestParam("reportId") int reportId,
                                 @RequestParam("status") String status,
                                 @RequestParam(name = "rejectionReason", required = false) String rejectionReason) {
-        try {
-            reportService.updateApprovalStatus(reportId, status, rejectionReason);
-            return "redirect:/admin/request/toApproveReportList";
-        } catch (Exception e) {
-            return "error"; // 에러 메시지 표시
-        }
+        return ResponseEntity.ok(reportService.updateApprovalStatus(reportId, status, rejectionReason));
     }
 //===================================================수정 메소드=========================================================
 

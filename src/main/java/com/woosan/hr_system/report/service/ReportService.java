@@ -41,7 +41,7 @@ public interface ReportService {
     // 보고서 수정 관련 메소드
     void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList);
     // 보고서 결재 처리
-    void updateApprovalStatus(int reportId, String status, String rejectionReasont);
+    String updateApprovalStatus(int reportId, String status, String rejectionReasont);
 //======================================================수정============================================================
 //======================================================삭제============================================================
     // 보고서 삭제

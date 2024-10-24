@@ -234,7 +234,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
     @Override // 보고서 결재 처리
-    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
+    public String updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);
@@ -242,6 +242,7 @@ public class ReportServiceImpl implements ReportService {
         report.setRejectReason(rejectionReason);
 
         reportDAO.updateApprovalStatus(report);
+        return "보고서 결재가 완료되었습니다.";
     }
 //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================

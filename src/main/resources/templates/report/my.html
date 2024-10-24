@@ -76,6 +76,11 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <tr th:if="${reports.isEmpty()}">
+                            <td colspan="4" style="text-align: center; padding: 20px;">
+                                작성한 보고서가 없습니다.
+                            </td>
+                        </tr>
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
                             th:onclick="openModal('/report/' + this.getAttribute('reportId'))">
                             <td th:text="${report.title}"></td>
@@ -104,6 +109,11 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <tr th:if="${requests.isEmpty()}">
+                            <td colspan="4" style="text-align: center; padding: 20px;">
+                                수신된 요청이 없습니다.
+                            </td>
+                        </tr>
                         <tr th:each="request : ${requests}">
                             <td th:text="${request.requesterName}"></td>
                             <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>

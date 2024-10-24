@@ -188,7 +188,6 @@ public class ReportController {
 
         model.addAttribute("writerName", employeeDAO.getEmployeeName(report.getWriterId()));
 
-
         return "/report/detail";
     }
 

@@ -65,7 +65,7 @@
             <div class="table-wrapper">
                 <div class="content-header-left">
                     <h3>결재 대기 중인 보고서 목록</h3>
-                    <button type="button" class="inner-btn" onclick="window.location.href='/admin/request/approval'">더보기</button>
+                    <button type="button" class="inner-btn" onclick="window.location.href='/admin/request/approval-list'">더보기</button>
                 </div>
                 <div>
                     <table class="list table-layout-auto">
@@ -78,6 +78,11 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <tr th:if="${reports.isEmpty()}">
+                            <td colspan="4" style="text-align: center; padding: 20px;">
+                                결재 대기 중인 보고서가 없습니다.
+                            </td>
+                        </tr>
                         <tr th:each="report : ${reports}" th:reportId="${report.reportId}"
                             th:onclick="openModal('/admin/request/report/' + this.getAttribute('reportId'))">
                             <td th:text="${report.writerName}"></td>
@@ -107,6 +112,11 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <tr th:if="${requests.isEmpty()}">
+                            <td colspan="4" style="text-align: center; padding: 20px;">
+                                요청에 따라 작성된 보고서가 없습니다.
+                            </td>
+                        </tr>
                         <tr th:each="request : ${requests}">
                             <td th:text="${request.writerName}"></td>
                             <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>

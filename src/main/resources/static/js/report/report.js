@@ -457,8 +457,8 @@ function updateReportForm(event) {
         : Object.keys(selectedEmployees);
 
     const nameList = Object.keys(selectedEmployees).length === 0
-        ? [document.getElementById('currentApproverName').value]
-        : Object.values(selectedEmployees);
+        ? [document.getElementById('currentApproverName').value.split('(')[0]] // 괄호가 있으면 앞부분만 사용
+        : Object.values(selectedEmployees).map(item => item.split('(')[0]); // 각 항목에서 괄호 전의 이름만 사용
 
     const report = {
         reportId: document.getElementById('reportId').value,
@@ -470,6 +470,8 @@ function updateReportForm(event) {
         completeDate: document.getElementById('completeDate').value
     };
     formData.append("report", new Blob([JSON.stringify(report)], { type: "application/json" }));
+
+    console.log(report.nameList);
 
     // filesArr에 저장된 파일들을 FormData에 추가
     filesArr.forEach((file) => {
@@ -545,10 +547,39 @@ function deleteReportFile(num) {
 function updateReportApprove(event) {
     event.preventDefault();
 
-    // 수정사항이 있는지 체크 (수정사항 추가)
-    if (!isFormChanged()) {
-        alert('수정사항이 없습니다.');
-        return;
+    // 유효성 검사
+    const statusInput = document.getElementById('statusSelect1').value;
+    const reasonInput = document.getElementById('rejectionReason1').value;
+
+    console.log(statusInput);
+    console.log(reasonInput);
+
+    // 유효성 검사 함수
+    function showError(inputId) {
+        const inputElement = document.getElementById(inputId);
+
+        // 빨간 테두리와 흔들림 효과 추가
+        inputElement.classList.add("input-error", "shake");
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
+        return false;
+    }
+
+    if (statusInput === '') {
+        return showError('statusSelect1');
+    }
+
+    if (statusInput === '거절' && reasonInput === '') {
+        return showError('rejectionReason1');
     }
 
     const form = event.target.closest('form'); // 폼을 가져옴
@@ -567,35 +598,36 @@ function updateReportApprove(event) {
     formData.append("status", status);
 
     // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'PUT',
-        body: formData
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/admin/request/toApproveReportList';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('결재 처리 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm('보고서를 결재하시겠습니까?')) {
+        fetch(actionUrl, {
+            method: 'PUT',
+            body: formData
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.reload();
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('결재 처리 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 요청 작성 시

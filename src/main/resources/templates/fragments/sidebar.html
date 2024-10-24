@@ -58,8 +58,8 @@
                     <li><a th:href="@{/report/request/list}">- 수신된 요청 목록</a></li>
                     <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/dashboard}">- 결재 및 요청</a></li>
                     <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/write}">- 보고서 요청</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/approval-list}">- 보고서 결재 목록</a></li>
                     <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/list}">- 발신된 요청 목록</a></li>
-                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/approval}">- 보고서 결재 목록</a></li>
                 </ul>
             </li>
             <li><a th:href="@{/error/ready}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>
