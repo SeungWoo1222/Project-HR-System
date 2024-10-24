@@ -189,7 +189,7 @@ public class ExecutiveController {
     public String viewRequest(@PathVariable("requestId") int requestId, Model model) {
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
-        return "admin/report/request-view";
+        return "admin/report/request/detail";
     }
 
     @GetMapping("/report/{reportId}") // 특정 보고서 조회
