@@ -271,7 +271,7 @@ function showError(inputId, message, isBottomBorder = false) {
     const inputElement = document.getElementById(inputId);
     const errorMessage = document.getElementById("error-alert");
 
-    errorMessage.textContent = '';
+    errorMessage.textContent = message;
 
     // 빨간 테두리와 흔들림 효과 추가
     if (isBottomBorder) {
@@ -691,29 +691,46 @@ function submitRequestForm(event) {
 // 요청 수정 시
 function updateRequestForm(event) {
     // 수정사항이 있는지 체크 (수정사항 추가)
-    if (!isFormChanged()) {
-        alert('수정사항이 없습니다.');
-        return;
-    }
+    // if (!isFormChanged()) {
+    //     alert('수정사항이 없습니다.');
+    //     return;
+    // }
 
-    // 유효성 검사 실행
-    // 내용들이 다 입력됐는지 확인
-    if (!validateRequestForm(event)) { return; }
-    // 마감일이 잘 설정됐는지 확인
-    if (!validateRequestDueDate()) { return; }
+    // // 유효성 검사 실행
+    // // 내용들이 다 입력됐는지 확인
+    // if (!validateRequestForm(event)) { return; }
+    // // 마감일이 잘 설정됐는지 확인
+    // if (!validateRequestDueDate()) { return; }
 
     // form 제출 처리
     const { form, actionUrl } = handleReportForm(event);
 
     // FormData 객체에 report 필드를 추가
     const idList = Object.keys(selectedEmployees).length === 0
-        ? [document.getElementById('currentApproverId').value]
+        ? [document.getElementById('currentWriterId').value]
         : Object.keys(selectedEmployees);
 
     const nameList = Object.keys(selectedEmployees).length === 0
-        ? [document.getElementById('currentApproverName').value]
-        : Object.values(selectedEmployees);
+        ? [document.getElementById('currentWriterName').value.split('(')[0]] // 괄호가 있으면 앞부분만 사용
+        : Object.values(selectedEmployees).map(item => item.split('(')[0]); // 각 항목에서 괄호 전의 이름만 사용
 
+    // 유효성 검사
+    const dueDate = document.getElementById("dueDate").value;
+    const requestNote = document.getElementById("requestNote").value;
+
+    const errorMessage = document.getElementById("error-alert");
+    errorMessage.textContent = '';
+
+    if (nameList.length <= 0) {
+        errorMessage.textContent = "보고서 작성자를 선택해주세요.";
+    }
+    if (!dueDate) {
+        return showError("dueDate", "마감일을 입력해주세요.", true);
+    }
+    if (!requestNote) {
+        return showError("requestNote", "요청 사항을 입력해주세요.");
+    }
+    errorMessage.textContent = '';
 
     const request = {
         requestId: form.requestId.value,
@@ -724,39 +741,41 @@ function updateRequestForm(event) {
         dueDate: form.dueDate.value
     };
 
-    // 데이터를 서버로 전송
-    fetch(actionUrl, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(request)
-    })
-        .then(response => response.text().then(data => ({
-            status: response.status,
-            text: data
-        })))
-        .then(response => {
-            console.log('서버 응답 데이터 :', response.text);
-            if (response.status === 200) {
-                alert(response.text); // 성공 메시지 알림
-                window.location.href = '/admin/request/requestList';
-            } else if (response.status === 404) {
-                alert(response.text); // 404 오류 메세지 알림
-                window.location.reload();
-            } else if (response.status === 400) {
-                alert(response.text); // 400 오류 메시지 알림
-            } else if (response.status === 500) {
-                alert(response.text); // 500 오류 메시지 알림
-            } else {
-                alert('요청 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
-                window.location.reload();
-            }
+    if (confirm("보고서 요청을 수정하시겠습니까?")) {
+        // 데이터를 서버로 전송
+        fetch(actionUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
         })
-        .catch(error => {
-            console.error('Error :', error.message);
-            alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
-        });
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                console.log('서버 응답 데이터 :', response.text);
+                if (response.status === 200) {
+                    alert(response.text); // 성공 메시지 알림
+                    window.location.href = '/admin/request/list';
+                } else if (response.status === 404) {
+                    alert(response.text); // 404 오류 메세지 알림
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    alert(response.text); // 400 오류 메시지 알림
+                } else if (response.status === 500) {
+                    alert(response.text); // 500 오류 메시지 알림
+                } else {
+                    alert('요청 수정 중 오류가 발생하였습니다.\n재등록 시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
 }
 
 // 내가 작성한 보고서(STAFF), 결재할 보고서(MANAGER) - 검색 시

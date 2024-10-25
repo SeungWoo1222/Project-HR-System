@@ -12,8 +12,8 @@
         <div class="content-header-left"></div>
         <div class="title content-header-center">휴가 신청서</div>
         <div class="content-header-right">
-            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
-            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
+            <button class="inner-btn tomato-btn big" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정</button>
+            <button class="inner-btn red-btn big" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제</button>
         </div>
     </div>
     <table class="employee-details">

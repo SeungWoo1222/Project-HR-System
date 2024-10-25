@@ -106,7 +106,7 @@ public class ExecutiveController {
         List<Employee> employee = employeeDAO.getAllEmployees();
         model.addAttribute("request", new Request());
         model.addAttribute("employee", employee); // employees 목록 추가
-        return "admin/report/write";
+        return "admin/report/request/write";
     }
 
     // 요청 생성
@@ -256,11 +256,11 @@ public class ExecutiveController {
         model.addAttribute("request", request);
 
         model.addAttribute("updateRequest", new Request());
-        return "admin/report/request-edit";
+        return "admin/report/request/edit";
     }
 
     @RequireManagerPermission
-    @PostMapping("/edit") // 요청 수정
+    @PutMapping("/edit") // 요청 수정
     public ResponseEntity<String> updateRequest(@RequestBody Request request) {
         // ↓ 요청 수정 권한이 있는지 확인 ↓
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
@@ -280,7 +280,7 @@ public class ExecutiveController {
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
-        return ResponseEntity.ok("요청 수정이 완료되었습니다.");
+        return ResponseEntity.ok("보고서 요청 수정이 완료되었습니다.");
     }
 
     @RequireManagerPermission
