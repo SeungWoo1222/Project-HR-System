@@ -12,8 +12,8 @@
         <div class="content-header-left"></div>
         <div class="title content-header-center">휴가 신청서</div>
         <div class="content-header-right">
-            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정하기</button>
-            <button class="btn" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제하기</button>
+            <button class="inner-btn tomato-btn big" th:vacationId="${vacationInfo.vacationId}" th:onclick="goToUpdateForm(this.getAttribute('vacationId'))">수정</button>
+            <button class="inner-btn red-btn big" th:vacationId="${vacationInfo.vacationId}" th:onclick="deleteVacation(this.getAttribute('vacationId'))">삭제</button>
         </div>
     </div>
     <table class="employee-details">
@@ -43,11 +43,11 @@
         </tr>
         <tr>
             <td class="section-title">휴가 시작일</td>
-            <td th:text="${#temporals.format(vacationInfo.startAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(vacationInfo.startAt, 'yyyy.MM.dd(EE) HH:mm')}"></td>
         </tr>
         <tr>
             <td class="section-title" colspan="1">휴가 종료일</td>
-            <td th:text="${#temporals.format(vacationInfo.endAt, 'yyyy-MM-dd HH:mm')}" colspan="2"></td>
+            <td th:text="${#temporals.format(vacationInfo.endAt, 'yyyy.MM.dd(EE) HH:mm')}" colspan="2"></td>
         </tr>
         <tr>
             <td class="section-title" style="height: 80px">사유</td>
@@ -68,7 +68,7 @@
         </tr>
         <tr>
             <td class="section-title">처리 일시</td>
-            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy.MM.dd(EE) HH:mm')}"></td>
         </tr>
     </table>
     <div class="submission-declaration">

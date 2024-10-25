@@ -11,6 +11,10 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+.table-layout-auto {
+    table-layout: auto;
+}
+
 .list thead th {
     background-color: #18a8f1;
     color: white;

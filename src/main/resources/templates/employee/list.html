@@ -103,13 +103,12 @@
                 <th>직급</th>
                 <th>상태</th>
                 <th>전화번호</th>
-                <th>이메일</th>
                 <th>입사일</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${employees.isEmpty()}">
-                <td colspan="10" style="text-align: center; padding: 20px;">
+                <td colspan="9" style="text-align: center; padding: 20px;">
                     조회된 사원 정보가 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
             </tr>
@@ -125,8 +124,7 @@
                                     (${employee.status == '퇴사 예정'} ? 'orange' :
                                     (${employee.status == '휴직'} ? 'yellow' : '')))">상태</td>
                 <td th:text="${employee.phone}">전화번호</td>
-                <td th:text="${employee.email}">이메일</td>
-                <td th:text="${employee.hireDate}">입사일</td>
+                <td th:text="${#temporals.format(employee.hireDate, 'yy.MM.dd(EE)')}">입사일</td>
             </tr>
             </tbody>
         </table>

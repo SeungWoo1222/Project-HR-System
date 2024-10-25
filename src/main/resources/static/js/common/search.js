@@ -5,18 +5,18 @@ function validateSearchDate() {
 
     // 시작일이나 종료일이 입력되지 않았을 경우
     if (!startDate) {
-        showError("startDate");
+        showSearchError("startDate");
         return false;
     }
     if (!endDate) {
-        showError("endDate");
+        showSearchError("endDate");
         return false;
     }
 
     // 시작일이 종료일 이후일 경우
     if (startDate > endDate) {
-        showError("startDate");
-        showError("endDate");
+        showSearchError("startDate");
+        showSearchError("endDate");
         return false;
     }
 
@@ -24,7 +24,7 @@ function validateSearchDate() {
 }
 
 // 유효성 검사 함수
-function showError(inputId) {
+function showSearchError(inputId) {
     const inputElement = document.getElementById(inputId);
 
     // 빨간 테두리와 흔들림 효과 추가

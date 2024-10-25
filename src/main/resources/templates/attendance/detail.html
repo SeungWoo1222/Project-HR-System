@@ -5,12 +5,13 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/color.css}" rel="stylesheet"/>
     <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
 </th:block>
 
 <div class="attendance-detail-container">
     <div class="content-header">
-        <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+    <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
             <button type="button" class="inner-btn" th:attendanceId="${attendance.attendanceId}"
                     th:onclick="goToUpdateForm(this.getAttribute('attendanceId'))">수정</button>
         </div>

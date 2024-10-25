@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.file.model.File;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.report.model.Request;
@@ -15,8 +17,6 @@ import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.model.File;
-import com.woosan.hr_system.file.service.FileService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,12 +54,11 @@ public class ReportController {
     @Autowired
     private ReportFileService reportFileService;
 
-    @GetMapping("/main") // main 페이지 이동
-    public String getMainPage(@RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+    @GetMapping("/my") // main 페이지 이동
+    public String getMainPage(@RequestParam(name = "searchDate", required = false) String searchDate,
+                              @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                               @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                               Model model) throws JsonProcessingException {
-
-
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -85,7 +83,10 @@ public class ReportController {
         String statsJson = objectMapper.writeValueAsString(statsArray);
         model.addAttribute("statsJson", statsJson);
 
-        return "report/main"; // main.html 반환
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        return "report/my";
     }
 
     //=====================================================생성 메소드======================================================
@@ -117,14 +118,14 @@ public class ReportController {
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
-    @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
-    public String showCreatePageFromRequest(@RequestParam("requestId") int requestId,
+    @GetMapping("/writeFromRequest/{requestId}") // 요청 들어온 보고서 생성 페이지 이동
+    public String showCreatePageFromRequest(@PathVariable("requestId") int requestId,
                                             Model model) {
 
-        Request request = requestService.getRequestById(requestId);
+        Request request = requestService.getRequestByWriter(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
-        return "/report/write-from-request";
+        return "/report/request/write";
     }
 
     // 요청 들어온 보고서 생성
@@ -173,7 +174,6 @@ public class ReportController {
 
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
-
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -186,7 +186,9 @@ public class ReportController {
             model.addAttribute("files", files);
         }
 
-        return "/report/report-view";
+        model.addAttribute("writerName", employeeDAO.getEmployeeName(report.getWriterId()));
+
+        return "/report/detail";
     }
 
     // 내가 작성한 보고서 리스트
@@ -194,12 +196,12 @@ public class ReportController {
     public String showReportList(@RequestParam(name = "page", defaultValue = "1") int page,
                                  @RequestParam(name = "size", defaultValue = "10") int size,
                                  @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                 @RequestParam(name = "searchType", defaultValue = "1") int searchType,
+                                 @RequestParam(name = "searchType", defaultValue = "0") int searchType,
                                  @RequestParam(name = "approvalStatus", defaultValue = "") String approvalStatus,
-                                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                 @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                 @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                 @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                  Model model) {
-
         // 내가 쓴 보고서를 보기위해 writerId를 전송
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -213,18 +215,23 @@ public class ReportController {
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("approvalStatus", approvalStatus);
 
-        return "report/report-list";
+        return "report/list";
     }
 
     // 내게 온 요청 리스트
-    @GetMapping("/requestList")
+    @GetMapping("/request/list")
     public String showRequestList(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                   @RequestParam(name = "keyword", defaultValue = "") String keyword,
-                                  @RequestParam(name = "searchType", defaultValue = "1") int searchType,
-                                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                  @RequestParam(name = "searchType", defaultValue = "0") int searchType,
+                                  @RequestParam(name = "searchDate", defaultValue = "") String searchDate,
+                                  @RequestParam(name = "startDate", defaultValue = "") String startDate,
+                                  @RequestParam(name = "endDate", defaultValue = "") String endDate,
                                   Model model) {
 
         // 로그인한 계정 기준 employee_id를 writerId(작성자)로 설정
@@ -234,15 +241,17 @@ public class ReportController {
         PageRequest pageRequest = new PageRequest(page - 1, size, keyword); // 페이지 번호 인덱싱을 위해 다시 -1
         PageResult<Request> pageResult = requestService.searchRequests(pageRequest, writerId, searchType, startDate, endDate);
 
-
         model.addAttribute("requests", pageResult.getData());
         model.addAttribute("currentPage", pageResult.getCurrentPage() + 1); // 뷰에서 가독성을 위해 +1
         model.addAttribute("totalPages", pageResult.getTotalPages());
         model.addAttribute("pageSize", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("searchDate", searchDate);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
-        return "report/request-list";
+        return "report/request/list";
     }
 
     @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
@@ -285,7 +294,7 @@ public class ReportController {
 
     // 보고서 수정
     @Transactional
-    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
+    @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
     public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {

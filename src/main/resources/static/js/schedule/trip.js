@@ -9,8 +9,9 @@ function viewMap() {
         return;
     }
 
-    document.getElementById('map-section').style.display = 'block';
-    document.getElementById('mapButton').style.visibility = 'hidden';
+    document.getElementById('map-section').style.display = 'flex';
+    document.getElementById('mapButton2').style.display = 'block';
+    document.getElementById('mapButton').style.display = 'none';
 
     var fullAddress = address + ' ' + detailAddress;
 
@@ -58,7 +59,8 @@ function viewMap() {
 // 주소 수정 버튼 클릭 시 주소 입력창 다시 표시
 function closeMap() {
     document.getElementById('map-section').style.display = 'none';
-    document.getElementById('mapButton').style.visibility = 'visible';
+    document.getElementById('mapButton2').style.display = 'none';
+    document.getElementById('mapButton').style.display = 'block';
 }
 
 // 우편번호 입력 창 생성
@@ -295,4 +297,21 @@ function closeTripFields() {
     document.getElementById('emailLocalPart').value = '';
     document.getElementById('domainSelect').value = '';
     document.getElementById('domainInput').value = '';
+}
+
+// 프로젝트 및 출장 정보 테이블 표시 여부 토글
+function toggleProjectAndTravelTable() {
+    const table = document.getElementById('project-travel-table');
+    const toggleBtn = document.getElementById('toggleBtn');
+    if (table.style.display === 'none' || table.style.display === '') {
+        table.style.display = 'table';
+        toggleBtn.textContent = '삭제';
+    } else { // 테이블 안의 모든 입력 필드를 초기화
+        const inputs = table.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+        table.style.display = 'none';
+        toggleBtn.textContent = '추가';
+    }
 }

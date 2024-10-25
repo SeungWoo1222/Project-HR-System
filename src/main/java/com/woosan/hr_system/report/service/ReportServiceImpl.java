@@ -2,15 +2,13 @@ package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
-import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -164,7 +163,6 @@ public class ReportServiceImpl implements ReportService {
         return report;
     }
 
-
     @Override // 최근 5개 보고서 조회
     public List<Report> getRecentReports(String writerId) {
         return reportDAO.getRecentReports(writerId);
@@ -175,12 +173,8 @@ public class ReportServiceImpl implements ReportService {
         return reportDAO.getUnprocessedReports(approverId);
     }
 
-
-
-
     @Override // 보고서 검색
-    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
-
+    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, String startDate, String endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -193,7 +187,7 @@ public class ReportServiceImpl implements ReportService {
 
     // 결재할 보고서 검색
     @Override
-    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, String startDate, String endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -208,6 +202,11 @@ public class ReportServiceImpl implements ReportService {
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
         return reportDAO.getReportStats(startDate, endDate, writerIdList);
+    }
+
+    @Override // 보고서 통계 조회
+    public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, String writerId) {
+        return reportDAO.getReportStats(startDate, endDate, writerId);
     }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
@@ -235,7 +234,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
     @Override // 보고서 결재 처리
-    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
+    public String updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);
@@ -243,6 +242,7 @@ public class ReportServiceImpl implements ReportService {
         report.setRejectReason(rejectionReason);
 
         reportDAO.updateApprovalStatus(report);
+        return "보고서 결재가 완료되었습니다.";
     }
 //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================

@@ -25,7 +25,7 @@
             <li>
                 <p onclick="toggleSubmenu('schedule-submenu')"><img src="/images/icons/calendar.png" alt="Schedule" width="20">일정</p>
                 <ul id="schedule-submenu" class="submenu">
-                    <li><a th:href="@{/schedule/{employeeId}/list(employeeId=${#authentication.principal.username})}">- 일정 목록</a></li>
+                    <li><a th:href="@{/schedule/list}">- 일정 목록</a></li>
                     <li><a th:href="@{/schedule/new}">- 일정 등록</a></li>
                 </ul>
             </li>
@@ -52,20 +52,14 @@
             <li>
                 <p onclick="toggleSubmenu('report-submenu')"><img src="/images/icons/report.png" alt="Report" width="20"> 보고서</p>
                 <ul id="report-submenu" class="submenu">
-                    <li><a th:href="@{/report/main}">- 메인</a></li>
+                    <li><a th:href="@{/report/my}">- 내 보고서</a></li>
                     <li><a th:href="@{/report/showCreatePage}">- 보고서 작성</a></li>
-                    <li><a th:href="@{/report/list}">- 작성한 보고서 조회</a></li>
-                    <li><a th:href="@{/report/requestList}">- 작성 요청 조회</a></li>
-                </ul>
-            </li>
-            <li>
-                <p onclick="toggleSubmenu('request-submenu')" sec:authorize="hasRole('ROLE_MANAGER')">
-                    <img src="/images/icons/contract.png" alt="Report" width="20"> 보고서 요청</p>
-                <ul id="request-submenu" class="submenu">
-                    <li><a th:href="@{/admin/request/main}">- 메인</a></li>
-                    <li><a th:href="@{/admin/request/write}">- 요청 작성</a></li>
-                    <li><a th:href="@{/admin/request/requestList}">- 내 요청 목록</a></li>
-                    <li><a th:href="@{/admin/request/toApproveReportList}">- 결재 할 보고서 목록</a></li>
+                    <li><a th:href="@{/report/list}">- 보고서 목록</a></li>
+                    <li><a th:href="@{/report/request/list}">- 수신된 요청 목록</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/dashboard}">- 결재 및 요청</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/write}">- 보고서 요청</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/approval-list}">- 보고서 결재 목록</a></li>
+                    <li sec:authorize="hasRole('ROLE_MANAGER')"><a th:href="@{/admin/request/list}">- 발신된 요청 목록</a></li>
                 </ul>
             </li>
             <li><a th:href="@{/error/ready}"><img src="/images/icons/forum.png" alt="Forum" width="20"> 게시판</a></li>

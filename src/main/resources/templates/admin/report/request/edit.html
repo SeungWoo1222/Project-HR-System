@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='새 보고서 작성')}">
+      layout:decorate="~{fragments/layout :: layout(title='보고서 요청 수정')}">
 
 <th:block layout:fragment="css">
     <link rel="stylesheet" th:href="@{/css/common/input.css}">
@@ -11,12 +11,28 @@
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/report/report.js}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/js/report/report-file.js}"></script>
+    <script th:src="@{/js/report/report.js}"></script>
+
     <script>
+        let initialValues = {}; // 초기값을 저장할 객체 선언
+
         $(document).ready(function () {
-            initEventListeners();
+            // 초기 값 저장 (수정사항 추가)
+            const formElements = document.querySelectorAll('#form input, #form textarea');
+            formElements.forEach(function (element) {
+                initialValues[element.id] = element.value; // 각 필드의 초기 값을 저장
+            });
+            // console.log("초기 값 : ", initialValues);
+
+            $('#editButton').on('click', function () {
+                $('#departmentIdContainer').show();
+                $('#employeeSection').show();
+                initEventListeners(); //  부서 선택, 임원 전체선택 메소드 정의
+                $('#editButton').hide();
+                $('#currentWriter').hide();
+
+            });
         });
     </script>
 </th:block>
@@ -24,14 +40,12 @@
 <div layout:fragment="~{content}">
     <div class="content">
         <div class="report-container">
-            <form id="form" th:action="@{/report/write}" method="post" enctype="multipart/form-data" onsubmit="return false;">
-                <div class="title-area flex-center">
-                    <label for="title">제목 : </label>
-                    <input type="text" class="title" id="title" name="title"/>
-                </div>
+            <form id="form" th:action="@{/admin/request/edit}" onsubmit="return false;">
+                <input type="hidden" name="requestId" th:value="${request.requestId}">
+                <input type="hidden" name="requesterId" th:value="${request.requesterId}">
                 <table class="detail-table">
-                    <tr>
-                        <td class="section-title">결재자 선택</td>
+                    <tr id="departmentIdContainer" style="display: none;">
+                        <td class="section-title">요청 대상 선택</td>
                         <td class="section-td">
                             <div class="flex-center">
                                 <select id="departmentId" name="departmentId" onchange="loadEmployeesByDepartment()">
@@ -53,51 +67,47 @@
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="employeeSection" style="display:none;">
                         <td class="section-title">
-                            <p>선택된 결재자</p>
+                            <p>선택된 사원</p>
                             <button type="button" class="inner-btn tomato-btn hidden" id="deselectAllEmployeesButton">전체 해제</button>
                         </td>
                         <td colspan="2">
                             <div id="selectedEmployees" class="selected-employees"></div>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="section-title">업무 완료 날짜</td>
-                        <td colspan="2">
-                            <input type="date" id="completeDate" name="completeDate">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="section-title">내용</td>
-                        <td colspan="2">
-                            <textarea id="content" name="content" rows="15"></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="section-title">첨부파일</td>
-                        <td colspan="2">
-                            <div class="upload-area">
-                                <p>최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
-                                <div class="file-btn-area">
-                                    <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
-                                </div>
+                    <tr id="currentWriter">
+                        <td class="section-title">작성자</td>
+                        <td>
+                            <div class="flex-center" style="gap: 10px;">
+                                <p id="current" th:text="${request.writerName}"></p>
+                                <button type="button" class="inner-btn tomato-btn" id="editButton">작성자 수정</button>
+                                <input type="hidden" id="currentWriterName" th:value="${request.writerName}"/>
+                                <input type="hidden" id="currentWriterId" th:value="${request.writerId}"/>
                             </div>
-                            <input type="file" id="reportDocuments" class="hidden" onchange="addFile(this)" multiple/>
-                            <div class="file-list"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">마감일</td>
+                        <td colspan="2">
+                            <input type="date" id="dueDate" name="dueDate" th:value="${request.dueDate}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">요청 사항</td>
+                        <td colspan="2">
+                            <textarea id="requestNote" name="requestNote" rows="15" th:text="${request.requestNote}"></textarea>
                         </td>
                     </tr>
                 </table>
 
-                <input type="hidden" id="idListField" name="idList" value="">
-                <input type="hidden" id="nameListField" name="nameList" value="">
-
                 <div class="btn-container">
                     <div id="error-alert" class="error-message"></div>
-                    <button type="button" class="btn" onclick="submitReportForm(event)">보고서 제출</button>
+                    <button type="button" class="btn" id="updateRequestButton" onclick="updateRequestForm(event)">수정 완료</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 </html>

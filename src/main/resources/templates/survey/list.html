@@ -88,8 +88,8 @@
                 <td th:text="${survey.id}"></td>
                 <td th:text="${survey.title}"></td>
                 <td th:text="${survey.createdBy}"></td>
-                <td th:text="${#temporals.format(survey.createdAt, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#temporals.format(survey.expiresAt, 'yyyy-MM-dd')}"></td>
+                <td th:text="${#temporals.format(survey.createdAt, 'yy.MM.dd(EE)')}"></td>
+                <td th:text="${#temporals.format(survey.expiresAt, 'yy.MM.dd(EE)')}"></td>
                 <td th:text="${survey.status}" th:classappend="${survey.status} == '조사 중' ? 'green' : 'red'"></td>
             </tr>
             </tbody>
