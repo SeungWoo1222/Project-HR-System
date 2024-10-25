@@ -60,7 +60,11 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Override // 사원 ID를 이용한 특정 사원의 모든 급여명세서 조회
     public List<SalaryPayment> getPaymentsByEmployeeId(String employeeId) {
         List<Integer> salaryIdList = salaryService.getSalaryIdList(employeeId);
-        return salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
+        List<SalaryPayment> payslips = new ArrayList<>();
+        if (!salaryIdList.isEmpty()) {
+            payslips = salaryPaymentDAO.getPaymentsByEmployeeId(salaryIdList);
+        }
+        return payslips;
     }
 
     @Override // 모든 사원의 급여 내역 검색

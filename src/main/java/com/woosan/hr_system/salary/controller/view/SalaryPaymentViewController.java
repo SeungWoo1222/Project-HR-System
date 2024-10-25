@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -199,7 +200,11 @@ public class SalaryPaymentViewController {
         // 내 급여 정보
         String employeeId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Integer> salaryIds = salaryService.getSalaryIdList(employeeId);
-        List<Salary> salaryList = salaryService.getSalariesByIds(salaryIds);
+        List<Salary> salaryList = new ArrayList<>();
+        if (!salaryIds.isEmpty()) {
+            log.debug("나 실행됨");
+            salaryList = salaryService.getSalariesByIds(salaryIds);
+        }
         model.addAttribute("salaryList", salaryList);
 
         // 내 급여명세서 검색 후 페이징
