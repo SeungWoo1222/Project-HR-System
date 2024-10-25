@@ -107,6 +107,7 @@
         <th style="font-size: 13px">야간근무시간</th>
         <th style="font-size: 13px">초과근무시간</th>
         <th>수정하기</th>
+        <th>삭제하기</th>
       </tr>
       </thead>
       <tbody>
@@ -128,6 +129,10 @@
         <td>
           <button type="button" class="inner-btn tomato-btn" th:overtimeId="${overtime.overtimeId}"
                   th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">수정</button>
+        </td>
+        <td>
+          <button type="button" class="inner-btn red-btn" th:overtimeId="${overtime.overtimeId}"
+                  th:onclick="deleteOvertime(this.getAttribute('overtimeId'))">삭제</button>
         </td>
       </tr>
       </tbody>

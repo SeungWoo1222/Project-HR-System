@@ -94,7 +94,7 @@ public class AttendanceViewController {
     public String viewAttendanceDetail(@PathVariable("attendanceId") int attendanceId, Model model) {
         // 근태 정보 상세 조회
         Attendance attendance = attendanceService.getAttendanceById(attendanceId);
-        model.addAttribute(attendance);
+        model.addAttribute("attendance", attendance);
 
         // 사원 정보 상세 조회 후 모델에 추가
         model.addAttribute("employee", employeeService.getEmployeeById(attendance.getEmployeeId()));
