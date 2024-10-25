@@ -1,15 +1,7 @@
 .slider::after {
     left: 0;
 }
-.task-name {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-}
+
 .color-area {
     display: flex;
     justify-content: center;
@@ -22,4 +14,70 @@
     border-radius: 50px;
     display: inline-block;
     background-color: #18a8f1;
+}
+
+.task-name {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-name input[type="text"] {
+    width: 75%;
+}
+
+input[type="text"] {
+    width: 93%;
+}
+
+select {
+    width: auto;
+}
+textarea, input[type="date"], input[type="datetime-local"] {
+    width: 92%;
+}
+.postcode-container input[type="text"] {
+    width: 73%;
+}
+.address-container input[type="text"] {
+    width: 93%;
+}
+.detail-address-container, .email-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.detail-address-container input[type="text"] {
+    width: 36%;
+}
+.email-container input[type="text"] {
+    width: 100%;
+}
+.characters {
+    display: flex;
+    align-items: center;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.project-travel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.create-btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.create-btn-container .btn {
+    width: 48%;
+    font-size: 16px;
 }

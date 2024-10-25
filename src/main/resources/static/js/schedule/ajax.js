@@ -12,7 +12,6 @@ function goToUpdateForm(taskId) {
 }
 
 function checkForUpdates() {
-    console.log("checkForupdates 실행");
     const inputs = document.querySelectorAll('#editForm input, #editForm textarea, #editForm select');
     let isChanged = false;
 
@@ -43,13 +42,7 @@ function checkForUpdates() {
     const contactTelInput = document.getElementById('tripTel');
     const contactEmailInput = document.getElementById('emailLocalPart');
 
-    console.log("hadTripInfo 상태", hadTripInfo);
-    console.log("addressInput 상태", addressInput);
-
     if (hadTripInfo && addressInput.value) {
-        console.log("O O");
-        console.log("defaultValue값 : ", addressInput.defaultValue);
-        console.log("value값 : ", addressInput.value);
         if ( // 수정필요함 여기는
             addressInput.value !== addressInput.defaultValue ||
             detailedAddressInput.value !== detailedAddressInput.defaultValue ||
@@ -60,7 +53,6 @@ function checkForUpdates() {
             isChanged = true;  // 출장 정보가 변경된 경우
         }
     } else if (hadTripInfo && !addressInput.value || !hadTripInfo && addressInput.value) {
-        console.log("O X or X O");
         isChanged = true;
     }
 
@@ -94,7 +86,6 @@ function fetchEmployeeInfo(employeeId) {
 
 // 유효성 검사
 function validateForm() {
-
     const taskName = document.getElementById('taskName').value.trim();
     const memberId = document.getElementById('memberId').value;
     const startDateTime = document.getElementById('startDateTime').value;
@@ -108,44 +99,62 @@ function validateForm() {
     const errorMessage = document.getElementById('error-message');
     errorMessage.textContent = '';
 
-    if (!taskName) {
-        errorMessage.textContent = '일정 이름을 입력해주세요.';
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
         return false;
+    }
+
+    if (!taskName) {
+        return showError('taskName', '일정 이름을 입력해주세요.', true);
     }
 
     if (!memberId) {
-        errorMessage.textContent = '사원을 선택해주세요.';
-        return false;
-    }
-
-    if (!content.trim()) {
-        errorMessage.textContent = '일정 내용을 입력해주세요.';
-        return false;
+        return showError('memberId', '사원을 선택해주세요.');
     }
 
     if (allDay) {
         if (!startDate) {
-            errorMessage.textContent = '시작일을 입력해주세요.';
-            return false;
+            return showError('startDate', '시작일을 입력해주세요.', true);
         }
         if (!endDate) {
-            errorMessage.textContent = '종료일을 입력해주세요.';
-            return false;
+            return showError('endDate', '종료일을 입력해주세요.', true);
         }
     } else {
         if (!startDateTime) {
-            errorMessage.textContent = '시작일을 입력해주세요.';
-            return false;
+            return showError('startDateTime', '시작일을 입력해주세요.', true);
         }
         if (!endDateTime) {
-            errorMessage.textContent = '종료일을 입력해주세요.';
-            return false;
+            return showError('endDateTime', '종료일을 입력해주세요.', true);
         }
     }
 
     if ((allDay && startDate > endDate) || (!allDay && startDateTime > endDateTime)) {
         errorMessage.textContent = '시작일이 종료일보다 빠르거나 같아야 합니다.';
         return false;
+    }
+
+    if (!content.trim()) {
+        return showError('content', '일정 내용을 입력해주세요.');
     }
 
     errorMessage.textContent = '';

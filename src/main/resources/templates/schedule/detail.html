@@ -18,20 +18,18 @@
         </button>
     </div>
     <div class="task-name" style="text-align: center; margin-bottom: 20px;">
-        <h2 th:text="'작업명 : ' + ${schedule.taskName}"></h2>
+        <p th:text="${schedule.taskName}"></p>
     </div>
     <table class="employee-details">
         <tr>
-            <td class="section-title">작업 ID</td>
             <td class="section-title">담당자</td>
             <td class="section-title">부서 / 직급</td>
-            <td class="section-title">작업 생성일</td>
+            <td class="section-title">일정 생성일</td>
         </tr>
         <tr>
-            <td th:text="${schedule.taskId}">일정 ID</td>
             <td th:text="${employee.name + '(' + schedule.memberId + ')'}">담당자</td>
             <td th:text="${employee.department + ' / ' + employee.position}">부서와 직급</td>
-            <td th:text="${#temporals.format(schedule.createdDate, 'yyyy년 MM월 dd일(EE) HH시 mm분')}">일정 생성일</td>
+            <td th:text="${#temporals.format(schedule.createdDate, 'yyyy년 MM월 dd일(EE)')}">일정 생성일</td>
         </tr>
     </table>
     <table class="details">
@@ -73,10 +71,6 @@
     </table>
     <table class="details">
         <tr>
-            <td class="section-title">일정 내용</td>
-            <td th:text="${schedule.content}">일정 내용</td>
-        </tr>
-        <tr>
             <td class="section-title">시작일</td>
             <td th:text="${#temporals.format(schedule.startTime, 'yyyy년 MM월 dd일(EE) HH시 mm분')}">시작일</td>
         </tr>
@@ -85,10 +79,19 @@
             <td th:text="${#temporals.format(schedule.endTime, 'yyyy년 MM월 dd일(EE) HH시 mm분')}">종료일</td>
         </tr>
         <tr>
-            <td class="section-title">프로젝트 정보</td>
-            <td th:text="${schedule.projectId}">프로젝트 번호</td>
+            <td class="section-title">일정 내용</td>
+            <td th:text="${schedule.content}">일정 내용</td>
         </tr>
     </table>
+    <div th:if="${schedule.projectId} != null">
+        <h3>프로젝트 정보</h3>
+        <table class="details">
+            <tr>
+                <td class="section-title">프로젝트 정보</td>
+                <td th:text="${schedule.projectId}">프로젝트 번호</td>
+            </tr>
+        </table>
+    </div>
     <div th:if="${trip} != null">
         <h3>출장 정보</h3>
         <table class="details">

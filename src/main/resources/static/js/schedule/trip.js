@@ -298,3 +298,20 @@ function closeTripFields() {
     document.getElementById('domainSelect').value = '';
     document.getElementById('domainInput').value = '';
 }
+
+// 프로젝트 및 출장 정보 테이블 표시 여부 토글
+function toggleProjectAndTravelTable() {
+    const table = document.getElementById('project-travel-table');
+    const toggleBtn = document.getElementById('toggleBtn');
+    if (table.style.display === 'none' || table.style.display === '') {
+        table.style.display = 'table';
+        toggleBtn.textContent = '삭제';
+    } else { // 테이블 안의 모든 입력 필드를 초기화
+        const inputs = table.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+        table.style.display = 'none';
+        toggleBtn.textContent = '추가';
+    }
+}
