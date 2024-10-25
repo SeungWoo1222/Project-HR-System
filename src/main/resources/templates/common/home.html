@@ -3,7 +3,13 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{fragments/layout :: layout(title='홈')}">
 
-<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/color.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/switch.css}" rel="stylesheet"/>
+    <link th:href="@{/css/layout/home.css}" rel="stylesheet"/>
+</th:block>
 
 <th:block layout:fragment="script">
     <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
@@ -23,6 +29,147 @@
 
     <div layout:fragment="~{content}">
         <div class="content">
+            <div class="grid-container">
+                <div class="grid-item">
+                    <div style="display:flex; flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
+                        <div>
+                            <h3>이번 주 근무 종합</h3>
+                            <table class="column-list">
+                                <tr>
+                                    <td class="table-header">기본 근무</td>
+                                    <td th:text="${workingHours + '시간'} + ' ' + (${workingMinutes} != '0' ? ${workingMinutes + '분'} : '') + ' / 40시간'"></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-header">초과 근무</td>
+                                    <td th:text="${totalOverHours + '시간'} + ' ' + (${totalOverMinutes} != '0' ? ${totalOverMinutes + '분'} : '') + ' / 12시간'"></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-header">연장 시간</td>
+                                    <td th:text="${overHours + '시간'} + ' ' + (${overMinutes} != 0 ? ${overMinutes + '분'} : '')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-header">연장 • 야간 시간</td>
+                                    <td th:text="${nightHours + '시간'} + ' ' + (${nightMinutes} != 0 ? ${nightMinutes + '분'} : '')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-header">전체 시간</td>
+                                    <td th:text="${totalHours + '시간'} + ' ' + (${totalMinutes} != 0 ? ${totalMinutes + '분'} : '') + ' / 52시간'"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="pic-container">
+                            <img th:src="${pictureUrl}" alt="사원 사진"/>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>이번 달 근무 종합</h3>
+                        <table class="list">
+                            <thead>
+                            <tr>
+                                <th>근무 일수</th>
+                                <th>근무 시간</th>
+                                <th>초과근무 시간</th>
+                                <th>야간근무 시간</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:text="${days + '일'}"></td>
+                                <td th:text="${workingTime + '시간'}"></td>
+                                <td th:text="${overtime + '시간'}"></td>
+                                <td th:text="${nightTime + '시간'}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-header">
+                        <h3>최근 수신된 요청 목록</h3>
+                        <div>
+                            <button type="button" class="inner-btn" onclick="window.location.href='/report/request/list'">더보기</button>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="list table-layout-auto">
+                            <thead>
+                            <tr>
+                                <th>요청자</th>
+                                <th>요청 일시</th>
+                                <th>마감일</th>
+                                <th>보고서 처리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${requests.isEmpty()}">
+                                <td colspan="4" style="text-align: center; padding: 20px;">
+                                    수신된 요청이 없습니다.
+                                </td>
+                            </tr>
+                            <tr th:each="request : ${requests}">
+                                <td th:text="${request.requesterName}"></td>
+                                <td th:text="${#temporals.format(request.requestDate, 'yy.MM.dd(EE) HH:mm')}"></td>
+                                <td th:text="${#temporals.format(request.dueDate, 'yy.MM.dd(EE)')}"></td>
+                                <td class="flex-center">
+                                    <button th:if="${request.reportId != null}"
+                                            type="button" class="inner-btn blue-btn" th:reportId="${request.reportId}"
+                                            th:onclick="openModal('/report/' + this.getAttribute('reportId'))">보고서 조회</button>
+                                    <button th:if="${request.reportId == null}"
+                                            type="button" class="inner-btn green-btn" th:requestId="${request.requestId}"
+                                            th:onclick="|window.location.href='/report/writeFromRequest/'
+                                        + this.getAttribute('requestId')|">보고서 작성
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-header">
+                        <h3>최근 일정 목록</h3>
+                        <div>
+                            <button type="button" class="inner-btn" onclick="window.location.href='/schedule/list'">더보기</button>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="list table-layout-auto">
+                            <thead>
+                            <tr>
+                                <th>일정 이름</th>
+                                <th>일정 기한</th>
+                                <th>일정 상태</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${schedules.isEmpty()}">
+                                <td colspan="4" style="text-align: center; padding: 20px;">
+                                    일정이 없습니다.
+                                </td>
+                            </tr>
+                            <tr th:each="schedule : ${schedules}" th:taskId="${schedule.taskId}" th:onclick="openModal('/schedule/' + this.getAttribute('taskId'))">
+                                <td th:text="${schedule.taskName}" style="max-width: 120px;">일정 이름</td>
+                                <td th:text="${#temporals.format(schedule.startTime, 'yy.MM.dd(EE)')
+                                               + ' ~ '+ #temporals.format(schedule.endTime, 'yy.MM.dd(EE)')}">일정 기한</td>
+                                <td th:text="${schedule.status}"
+                                    th:classappend="${schedule.status == '미완료'} ? 'yellow' :
+                                       (${schedule.status == '진행중'} ? 'orange' :
+                                       (${schedule.status == '완료'} ? 'green' : ''))">일정 상태</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-header">
+                        <h3>최근 공지 목록</h3>
+                        <div></div>
+                    </div>
+                    <div>
+                        <p>공지 게시판이 아직 준비중입니다.</p>
+                    </div>
+                </div>
+            </div>
             <input id="message" type="hidden" th:value="${message}">
         </div>
     </div>

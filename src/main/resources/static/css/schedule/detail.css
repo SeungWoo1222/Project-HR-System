@@ -60,3 +60,13 @@ input[type="radio"]:focus {
     border-color: #18A8F1;
     box-shadow: 0 0 5px rgba(24, 168, 241, 0.5);
 }
+
+.task-name {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
