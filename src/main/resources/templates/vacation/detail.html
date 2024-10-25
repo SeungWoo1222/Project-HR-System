@@ -43,11 +43,11 @@
         </tr>
         <tr>
             <td class="section-title">휴가 시작일</td>
-            <td th:text="${#temporals.format(vacationInfo.startAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(vacationInfo.startAt, 'yyyy.MM.dd(EE) HH:mm')}"></td>
         </tr>
         <tr>
             <td class="section-title" colspan="1">휴가 종료일</td>
-            <td th:text="${#temporals.format(vacationInfo.endAt, 'yyyy-MM-dd HH:mm')}" colspan="2"></td>
+            <td th:text="${#temporals.format(vacationInfo.endAt, 'yyyy.MM.dd(EE) HH:mm')}" colspan="2"></td>
         </tr>
         <tr>
             <td class="section-title" style="height: 80px">사유</td>
@@ -68,7 +68,7 @@
         </tr>
         <tr>
             <td class="section-title">처리 일시</td>
-            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy.MM.dd(EE) HH:mm')}"></td>
         </tr>
     </table>
     <div class="submission-declaration">

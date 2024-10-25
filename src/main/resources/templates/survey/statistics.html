@@ -89,9 +89,9 @@
           <div>
             <p>
               <span class="label">설문 기간 : </span>
-              <span th:text="${#temporals.format(survey.createdAt, 'yyyy-MM-dd')}"></span>
+              <span th:text="${#temporals.format(survey.createdAt, 'yyyy.MM.dd(EE)')}"></span>
               ~
-              <span th:text="${#temporals.format(survey.expiresAt, 'yyyy-MM-dd')}"></span>
+              <span th:text="${#temporals.format(survey.expiresAt, 'MM.dd(EE)')}"></span>
             </p>
             <p>
               <span class="label">설문 작성자 : </span>

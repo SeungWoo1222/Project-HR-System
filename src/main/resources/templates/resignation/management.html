@@ -79,7 +79,7 @@
                 <td th:text="${employee.name}">이름</td>
                 <td th:text="${employee.department}">부서</td>
                 <td th:text="${employee.position}">직급</td>
-                <td th:text="${employee.hireDate}">입사날짜</td>
+                <td th:text="${#temporals.format(employee.hireDate, 'yy.MM.dd(EE)')}">입사날짜</td>
                 <td>
                     <button type="button" class="inner-btn" th:employeeId="${employee.employeeId}" onclick="openResignationProcessModal(event, this)" style="background-color: #FF9933;">퇴사 처리</button>
                 </td>
@@ -111,7 +111,7 @@
             <tr th:each="employee : ${resignedEmployees}" th:employeeId="${employee.employeeId}" th:onclick="openModal('/employee/' + this.getAttribute('employeeId'))">
                 <td style="width: 8%" th:text="${employee.employeeId}">사원 ID</td>
                 <td style="width: 8%" th:text="${employee.name}">이름</td>
-                <td style="width: 8%" th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
+                <td style="width: 8%" th:text="${#temporals.format(employee.resignation?.resignationDate, 'yy.MM.dd(EE)')}">퇴사 날짜</td>
                 <td style="width: 25%" th:text="${employee.resignation?.resignationReason}">퇴사 사유</td>
                 <td style="width: 25%" th:text="${employee.resignation?.codeNumber}">퇴사 코드</td>
                 <td style="width: 25%" th:text="${employee.resignation?.specificReason}">구체적 사유</td>
@@ -148,7 +148,7 @@
                 <td th:text="${employee.name}">이름</td>
                 <td th:text="${employee.department}">부서</td>
                 <td th:text="${employee.position}">직급</td>
-                <td th:text="${employee.resignation?.resignationDate}">퇴사 날짜</td>
+                <td th:text="${#temporals.format(employee.resignation?.resignationDate, 'yy.MM.dd(EE)')}">퇴사 날짜</td>
                 <td>
                     <button type="button" class="inner-btn" th:employeeId="${employee.employeeId}" th:employeeName="${employee.name}" onclick="submitDelete(event)" style="background-color: #A155E8;">영구 삭제</button>
                 </td>

@@ -121,7 +121,7 @@
                 <td th:text="${payslip.salaryId}">급여 ID</td>
                 <td th:text="${payslip.paymentId}">급여지급 ID</td>
                 <td th:text="${#temporals.format(payslip.compensationMonth, 'yy년 MM월')}">지급대상 월</td>
-                <td th:text="${#temporals.format(payslip.paymentDate, 'yyyy-MM-dd')}">지급일</td>
+                <td th:text="${#temporals.format(payslip.paymentDate, 'yyyy.MM.dd(EE)')}">지급일</td>
                 <td th:text="${#numbers.formatInteger(payslip.grossSalary, 3, 'COMMA')}">총 급여</td>
                 <td th:text="${#numbers.formatInteger(payslip.deductions, 3, 'COMMA')}" class="red">총 공제 금액</td>
                 <td th:text="${#numbers.formatInteger(payslip.netSalary, 3, 'COMMA')}" class="green">실 지급액</td>

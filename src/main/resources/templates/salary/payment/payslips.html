@@ -114,7 +114,7 @@
                     <td th:text="${salaryInfo.position}"></td>
                     <td th:text="${salaryInfo.bank + ' ' + salaryInfo.accountNumber}"></td>
                     <td th:text="${#numbers.formatInteger(salaryInfo.annualSalary, 3, 'COMMA')}"></td>
-                    <td th:text="${salaryInfo.createdAt}"></td>
+                    <td th:text="${#temporals.format(salaryInfo.createdAt, 'yy.MM.dd(EE)')}"></td>
                     <td th:text="${salaryInfo.status} ? '사용 중' : '사용 중지'"
                         th:classappend="${salaryInfo.status} ? 'green' : 'red'"></td>
                 </tr>
@@ -139,7 +139,7 @@
                 <tbody>
                 <tr th:each="payslip : ${payslips}"  th:paymentId="${payslip.paymentId}" th:onclick="openModal('/salary/payment/' + this.getAttribute('paymentId'))">
                     <td th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월'"></td>
-                    <td th:text="${payslip.paymentDate}"></td>
+                    <td th:text="${#temporals.format(payslip.paymentDate, 'yy.MM.dd(EE)')}"></td>
                     <td th:text="${#numbers.formatInteger(payslip.baseSalary
                                                         + payslip.positionAllowance
                                                         + payslip.mealAllowance
