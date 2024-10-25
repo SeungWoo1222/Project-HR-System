@@ -9,8 +9,9 @@ function viewMap() {
         return;
     }
 
-    document.getElementById('map-section').style.display = 'block';
-    document.getElementById('mapButton').style.visibility = 'hidden';
+    document.getElementById('map-section').style.display = 'flex';
+    document.getElementById('mapButton2').style.display = 'block';
+    document.getElementById('mapButton').style.display = 'none';
 
     var fullAddress = address + ' ' + detailAddress;
 
@@ -58,7 +59,8 @@ function viewMap() {
 // 주소 수정 버튼 클릭 시 주소 입력창 다시 표시
 function closeMap() {
     document.getElementById('map-section').style.display = 'none';
-    document.getElementById('mapButton').style.visibility = 'visible';
+    document.getElementById('mapButton2').style.display = 'none';
+    document.getElementById('mapButton').style.display = 'block';
 }
 
 // 우편번호 입력 창 생성

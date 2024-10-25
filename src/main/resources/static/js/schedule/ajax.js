@@ -376,7 +376,7 @@ function deleteSchedule(taskId) {
 
 // AJAX PATCH 요청 - 일정 상태 변경
 function updateScheduleStatus(taskId) {
-    if (confirm("상태 변경하시겠습니까?")) {
+    if (confirm("일정 상태를 변경하시겠습니까?")) {
         const selectedStatus = document.querySelector('input[name="scheduleStatus"]:checked').value;
 
         // 폼데이터 생성
@@ -459,7 +459,7 @@ function updateScheduleStatus(taskId) {
 
 // 출장 상태 변경
 function updateTripStatus(tripId) {
-    if (confirm("상태 변경하시겠습니까?")) {
+    if (confirm("출장 상태를 변경하시겠습니까?")) {
         // 선택된 출장 상태값 가져오기
         const selectedTripStatus = document.querySelector('input[name="tripStatus"]:checked').value;
 
