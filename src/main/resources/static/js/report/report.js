@@ -331,7 +331,7 @@ function validateRequestForm(event) {
 
     const requestNote = document.getElementById("requestNote").value.trim();
     // 선택된 작성자를 nameList로 정의
-    let nameList="";
+    let nameList= "";
     if (Object.keys(selectedEmployees).length > 0) {
         nameList = Object.values(selectedEmployees);
     } else if (document.getElementById('currentApproverName')) {
@@ -344,16 +344,13 @@ function validateRequestForm(event) {
     errorAlert.textContent = "";
 
     if (nameList.length === 0) {
-        errorAlert.textContent = "작성자를 선택해주세요.";
-        return showError()
+        return showError('employeeSelect', '보고서 요청 대상을 선택해주세요.');
     }
     if (dueDate === "") {
-        errorAlert.textContent = "마감일자를 입력해주세요.";
-        return false;
+        return showError('dueDate', '마감일을 입력해주세요.', true);
     }
     if (requestNote === "") {
-        errorAlert.textContent = "요청사항을 입력해주세요.";
-        return false;
+        return showError('requestNote', '요청 사항을 입력해주세요.');
     }
 
     errorAlert.textContent = "";
@@ -668,7 +665,7 @@ function submitRequestForm(event) {
                 console.log('서버 응답 데이터 :', response.text);
                 if (response.status === 200) {
                     alert(response.text); // 성공 메시지 알림
-                    window.location.href = '/admin/request/requestList';
+                    window.location.href = '/admin/request/list';
                 } else if (response.status === 404) {
                     alert(response.text); // 404 오류 메세지 알림
                     window.location.reload();
