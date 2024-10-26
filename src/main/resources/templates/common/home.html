@@ -75,9 +75,9 @@
                             <tbody>
                             <tr>
                                 <td th:text="${days + '일'}"></td>
-                                <td th:text="${workingTime + '시간'}"></td>
-                                <td th:text="${overtime + '시간'}"></td>
-                                <td th:text="${nightTime + '시간'}"></td>
+                                <td th:text="${#numbers.formatDecimal(workingTime, 1, 2) + '시간'}"></td>
+                                <td th:text="${#numbers.formatDecimal(overtime, 1, 2) + '시간'}"></td>
+                                <td th:text="${#numbers.formatDecimal(nightTime, 1, 2) + '시간'}"></td>
                             </tr>
                             </tbody>
                         </table>
