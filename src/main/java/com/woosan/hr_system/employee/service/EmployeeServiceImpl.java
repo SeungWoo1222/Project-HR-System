@@ -160,6 +160,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         return responseData;
     }
 
+    @Override // 방문객 회원가입
+    public String join(Employee employee) {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+
+        // 사원 아이디 생성 후 중복 체크
+        employee.setHireDate(today);
+        String employeeId = createEmployeeId(employee, year);
+        verifyDuplicateId(employeeId);
+
+        Employee newEmployee = employee.toBuilder()
+                .employeeId(employeeId)
+                .birth("980101")
+                .residentRegistrationNumber("1234567")
+                .phone("01012345678")
+                .email("guest@naver.com")
+                .address("00000) 경기 의정부시 어딘가 123")
+                .detailAddress("101-202(무슨동)")
+                .hireDate(today)
+                .status("재직")
+                .remainingLeave(0)
+                .picture(1)
+                .maritalStatus(false)
+                .numDependents(1)
+                .numChildren(0)
+                .build();
+
+        // 사원 신규 등록
+        employeeDAO.insertEmployee(newEmployee);
+
+        // 첫 비밀번호 생년월일로 설정
+        String password = "1234";
+        authService.insertPassword(employeeId, password);
+
+        return "방문객 회원가입이 완료되었습니다." +
+                "\n아이디 : " + employeeId +
+                "\n비밀번호 : " + password +
+                "\n환영합니다!! 로그인 후 접속해주세요!";
+    }
+
     // 사원 등록 필수 필드 검증
     private void verifyRegisterEmployeeFields(Employee employee) {
         List<Object> requiredFields = Arrays.asList(

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-without-sidebar :: layout(title='방문객 회원가입')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/register.css}"/>
+    <style>
+        .section p {
+            margin-bottom: 10px;
+        }
+        .section p:last-child, .section:last-child {
+            margin-bottom: 0;
+        }
+        .error-message {
+            margin-bottom: 10px;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/file.js}"></script>
+    <script th:src="@{/js/employee/join.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <form th:action="@{/api/employee/join}" onsubmit="submitJoinForm(event)">
+            <div class="section">
+                <div class="form-group">
+                    <div class="label-area"><label for="name">이름</label></div>
+                    <input type="text" id="name" name="name" maxlength="100" placeholder="한글 또는 영문 이름을 입력해주세요.">
+                </div>
+                <div class="form-group">
+                    <div class="fgw-50">
+                        <div class="label-area"><label for="department">부서</label></div>
+                        <select id="department" name="department">
+                            <option value="">선택하세요</option>
+                            <option value="PR">생산</option>
+                            <option value="QC">품질관리</option>
+                            <option value="SA">영업</option>
+                            <option value="MK">마케팅</option>
+                            <option value="FI">재무</option>
+                            <option value="HR">인사</option>
+                            <option value="RD">연구개발</option>
+                        </select>
+                    </div>
+                    <div class="fgw-50">
+                        <div class="label-area"><label for="position">직위</label></div>
+                        <select id="position" name="position">
+                            <option value="">선택하세요</option>
+                            <option value="사원">사원</option>
+                            <option value="대리">대리</option>
+                            <option value="과장">과장</option>
+                            <option value="차장">차장</option>
+                            <option value="부장">부장</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section">
+                    <p>1. 나머지 정보는 자동으로 처리됩니다.</p>
+                    <p>2. 본 시스템은 인사 관리 기능에 중점을 두고 있으며,
+                        <br><b>인사(HR) 부서</b>를 제외한 다른 부서에는 별도의 권한이나 부서 메뉴가 제공되지 않습니다.</p>
+                    <p>3. 권한에 따라 접근할 수 있는 기능이 다릅니다.
+                        <br>사원, 대리, 과장은 <b>일반 사원(STAFF)</b> 권한을,
+                        <br>차장, 부장은 <b>관리자(MANAGER)</b> 권한을 부여받습니다.</p>
+                    <p style="color: #18a8f1; font-weight: bold;">시간이 되신다면 설문조사에 참여해 주시면 정말 감사하겠습니다!</p>
+                </div>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <div class="btn-container">
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">회원가입</button>
+            </div>
+        </form>
+    </div>
+</div>
+</html>
