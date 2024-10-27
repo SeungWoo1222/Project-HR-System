@@ -38,7 +38,6 @@ public class RequestServiceImpl implements RequestService {
     private EmployeeService employeeService;
 
 //===================================================생성 메소드=======================================================
-
     @Override // 요청 생성
     public void createRequest(Request request) {
         LocalDateTime requestDate = LocalDateTime.now();
@@ -64,9 +63,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 세부 조회
     public Request getRequestById(int requestId) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
-        Request request = checkRequestAuthorization(requestId, currentEmployeeId);
+        Request request = checkRequestAuthorization(requestId);
         return request;
     }
 
@@ -157,14 +154,16 @@ public class RequestServiceImpl implements RequestService {
 //===================================================삭제 메소드=======================================================
 //===================================================기타 메소드=======================================================
     // 요청에 대한 접근 권한이 있는지 확인
-    public Request checkRequestAuthorization(int requestId, String currentEmployeeId) {
+    public Request checkRequestAuthorization(int requestId) {
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
             Request request = requestDAO.getRequestById(requestId); // 요청 세부 정보 가져오기
             if (request == null) {
-                throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+                throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.\nReport ID : " + requestId);
             }
 
             // 작성자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
-            if (!request.getRequesterId().equals(currentEmployeeId)) {
+            if (!request.getRequesterId().equals(currentEmployeeId) && !request.getWriterId().equals(currentEmployeeId)) {
                 throw new SecurityException("권한이 없습니다.");
             }
 

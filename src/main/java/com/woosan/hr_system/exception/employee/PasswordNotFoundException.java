@@ -5,4 +5,3 @@ public class PasswordNotFoundException extends RuntimeException {
         super("비밀번호 정보를 찾을 수 없습니다.\n사원 ID : " + employeeId);
     }
 }
-

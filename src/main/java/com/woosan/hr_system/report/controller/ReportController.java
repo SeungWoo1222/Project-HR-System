@@ -126,7 +126,6 @@ public class ReportController {
     @GetMapping("/writeFromRequest") // 요청 들어온 보고서 생성 페이지 이동
     public String showCreatePageFromRequest(@RequestParam("requestId") int requestId,
                                             Model model) {
-
         Request request = requestService.getRequestById(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
@@ -259,21 +258,21 @@ public class ReportController {
         return "report/request-list";
     }
 
-    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
-    public String showStatisticPage() {
-        return "report/statistic";
-    }
-
-    @GetMapping("/stats") // 통계 날짜 설정
-    public String getReportStats(@RequestParam(name = "startDate") String statisticStart,
-                                 @RequestParam(name = "endDate") String statisticEnd,
-                                 HttpSession session) {
-        // 날짜 설정
-        session.setAttribute("staffStatisticStart", statisticStart);
-        session.setAttribute("staffStatisticEnd", statisticEnd);
-
-        return "redirect:/report/main";
-    }
+//    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
+//    public String showStatisticPage() {
+//        return "report/statistic";
+//    }
+//
+//    @GetMapping("/stats") // 통계 날짜 설정
+//    public String getReportStats(@RequestParam(name = "startDate") String statisticStart,
+//                                 @RequestParam(name = "endDate") String statisticEnd,
+//                                 HttpSession session) {
+//        // 날짜 설정
+//        session.setAttribute("staffStatisticStart", statisticStart);
+//        session.setAttribute("staffStatisticEnd", statisticEnd);
+//
+//        return "redirect:/report/main";
+//    }
 
 
 //=================================================조회 메소드============================================================
@@ -302,15 +301,7 @@ public class ReportController {
     public ResponseEntity<String> updateReport(@Valid @RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {
-        // 요청 수정 권한이 있는지 확인
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-
-        // 현재 로그인한 사용자와 requester_id 비교
-        if (report != null && report.getWriterId().equals(userSessionInfo.getCurrentEmployeeId())) {
-            reportService.updateReport(report, toUploadFileList, userSelectedFileIdList);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
+        reportService.updateReport(report, toUploadFileList, userSelectedFileIdList);
         return ResponseEntity.ok("보고서 수정이 완료되었습니다.");
     }
 
@@ -321,20 +312,7 @@ public class ReportController {
     @Transactional
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
-        // 보고서 삭제 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentId = userSessionInfo.getCurrentEmployeeId();
-
-        // 요청 ID로 요청 조회
-        Report report = reportService.getReportById(reportId);
-
-        // 현재 로그인한 사용자와 writer_id 비교
-        if (report != null && report.getWriterId().equals(currentId)) {
-            reportService.deleteReport(reportId);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
+        reportService.deleteReport(reportId);
         return "redirect:/report/list";
     }
 //=====================================================삭제 메소드========================================================

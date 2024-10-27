@@ -76,9 +76,7 @@ public class BusinessTripServiceImpl implements BusinessTripService {
 
     @Override
     public ResponseEntity <String> updateBusinessTrip(BusinessTrip businessTrip) {
-        log.info("taskId 확인 : {}", businessTrip.getTaskId());
         BusinessTrip existingBusinessTrip = businessTripDAO.getBusinessTripById(businessTrip.getTaskId());
-        log.info("existingBusinessTrip 호출 : {}", existingBusinessTrip);
 
         if (Objects.nonNull(existingBusinessTrip)) {
             if (Objects.isNull(businessTrip.getAddress())) {

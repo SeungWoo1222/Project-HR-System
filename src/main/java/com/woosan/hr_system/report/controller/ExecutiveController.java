@@ -311,7 +311,6 @@ public class ExecutiveController {
     @DeleteMapping("/delete/{requestId}") // 요청 삭제
     public String deleteRequest(@PathVariable("requestId") int requestId) {
         // 요청 삭제 권한이 있는지 확인
-
         // 현재 로그인한 계정의 employeeId를 currentId로 설정
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String currentId = userSessionInfo.getCurrentEmployeeId();

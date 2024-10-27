@@ -82,43 +82,6 @@ public class ReportServiceImpl implements ReportService {
         return reportIdList;
     }
 
-//    @Override // 보고서 + 파일 생성
-//    public void createReportFile(List<MultipartFile> reportDocuments) {
-//        List<Integer> fileIdlist = new ArrayList<>();
-//        List<Integer> reportIdlist = new ArrayList<>();
-//
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("writerId", report.getWriterId());
-//        params.put("title", report.getTitle());
-//        params.put("content", report.getContent());
-//        params.put("createdDate", report.getCreatedDate());
-//        params.put("status", "미처리");
-//        params.put("completeDate", report.getCompleteDate());
-//
-//        for (int i = 0; i < report.getNameList().size(); i++) {
-//            params.put("approverId", report.getIdList().get(i));
-//            params.put("approverName", report.getNameList().get(i));
-//            int reportId = reportDAO.createReport(params); // 생성된 reportId 가져옴
-//            reportIdlist.add(reportId);
-//        }
-//
-//        if (reportDocuments != null) {
-//            log.info("hi");
-//            for (MultipartFile reportdocument : reportDocuments) {
-//                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
-//                fileIdlist.add(fileId);
-//            }
-//        }
-//
-//        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
-//        for (int reportId : reportIdlist) {
-//            log.info("hi");
-//            for (int fileId : fileIdlist) {
-//                reportFileDAO.createReportFile(reportId, fileId);
-//            }
-//        }
-//    }
-
     @Override // 요청 들어온 보고서 작성
     public int createReportFromRequest(Report report) {
         Map<String, Object> params = new HashMap<>();
@@ -177,10 +140,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 특정 보고서 조회
     public Report getReportById(int reportId) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
-        Report report = checkReportAuthorization(reportId, currentEmployeeId);
-
+        Report report = checkReportAuthorization(reportId);
         return report;
     }
 
@@ -196,7 +156,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 보고서 검색
     public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
-
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -229,6 +188,9 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     @Override // 보고서 수정
     public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> userSelectedFileIdList) {
+        // 수정 권한 및 Report 유무 확인
+        checkReportAuthorization(report.getReportId());
+
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         List<Integer> createdReportIdList = new ArrayList<>();
         List<Integer> existingFileIdList = reportFileService.getFileIdsByReportId(report.getReportId());
@@ -251,6 +213,8 @@ public class ReportServiceImpl implements ReportService {
     }
     @Override // 보고서 결재 처리
     public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
+        // 결재 권한 및 Report 유무 확인
+        checkReportAuthorization(reportId);
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);
@@ -264,6 +228,9 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     @Override // 보고서 삭제
     public void deleteReport(int reportId) {
+        // 삭제 권한 및 Report 유무 확인
+        checkReportAuthorization(reportId);
+
         // shared_trash 테이블에 삭제될 데이터들 삽입
         reportDAO.insertReportIntoSharedTrash(reportId);
 
@@ -281,16 +248,20 @@ public class ReportServiceImpl implements ReportService {
 //=====================================================삭제 메소드======================================================
 //=====================================================기타 메소드======================================================
     // 요청에 대한 접근 권한이 있는지 확인
-    public Report checkReportAuthorization(int reportId, String currentEmployeeId) {
-        Report report = reportDAO.getReportById(reportId); // 요청 세부 정보 가져오기
+    public Report checkReportAuthorization(int reportId) {
+        // 현재 유저의 employeeId를 가져옴
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
+
+        // Report를 가져옴
+        Report report = reportDAO.getReportById(reportId);
+
         if (report == null) {
-            throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+            throw new IllegalArgumentException("해당 Report를 찾을 수 없습니다. \nReport ID : " + reportId);
         }
-        // 결재자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
-        if (!report.getApproverId().equals(currentEmployeeId)) {
-            if (!report.getWriterId().equals(currentEmployeeId)) {
-                throw new SecurityException("권한이 없습니다.");
-            }
+        // 작성자 혹은 결재자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
+        if (!report.getApproverId().equals(currentEmployeeId) && !report.getWriterId().equals(currentEmployeeId)) {
+                throw new SecurityException("접근 권한이 없습니다.");
         }
         return report; // 요청 정보 반환
     }
