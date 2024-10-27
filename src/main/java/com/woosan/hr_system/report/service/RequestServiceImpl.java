@@ -153,7 +153,7 @@ public class RequestServiceImpl implements RequestService {
     }
 //===================================================삭제 메소드=======================================================
 //===================================================기타 메소드=======================================================
-    // 요청에 대한 접근 권한이 있는지 확인
+    // 요청에 대한 접근 권한, 요청이 있는지 확인
     public Request checkRequestAuthorization(int requestId) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();

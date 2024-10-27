@@ -1,19 +1,11 @@
 package com.woosan.hr_system.schedule.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.schedule.dao.BusinessTripDAO;
 import com.woosan.hr_system.schedule.model.BusinessTrip;
-import com.woosan.hr_system.schedule.model.Schedule;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.Context;
 import javax.naming.NamingException;

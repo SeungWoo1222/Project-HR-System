@@ -247,7 +247,7 @@ public class ReportServiceImpl implements ReportService {
     }
 //=====================================================삭제 메소드======================================================
 //=====================================================기타 메소드======================================================
-    // 요청에 대한 접근 권한이 있는지 확인
+    // 보고서에 대한 접근 권한, 보고서가 있는지 확인
     public Report checkReportAuthorization(int reportId) {
         // 현재 유저의 employeeId를 가져옴
         UserSessionInfo userSessionInfo = new UserSessionInfo();
