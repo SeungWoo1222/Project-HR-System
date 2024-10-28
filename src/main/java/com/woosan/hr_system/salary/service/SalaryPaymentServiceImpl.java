@@ -4,8 +4,10 @@ import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.attendance.service.AttendanceService;
 import com.woosan.hr_system.attendance.service.OvertimeService;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.salary.dao.RatioDAO;
 import com.woosan.hr_system.salary.dao.SalaryDAO;
 import com.woosan.hr_system.salary.dao.SalaryPaymentDAO;
@@ -31,6 +33,8 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Autowired
     private CommonService commonService;
     @Autowired
+    private EmployeeService employeeService;
+    @Autowired
     private SalaryService salaryService;
     @Autowired
     private SalaryCalculation salaryCalculation;
@@ -39,11 +43,13 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
     @Autowired
     private OvertimeService overtimeService;
     @Autowired
+    private AuthService authService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
     private SalaryDAO salaryDAO;
     @Autowired
     private SalaryPaymentDAO salaryPaymentDAO;
-    @Autowired
-    private EmployeeDAO employeeDAO;
     @Autowired
     private RatioDAO ratioDAO;
 
@@ -139,7 +145,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
         YearMonth yearMonth = YearMonth.now();
         SalaryPayment payslip = createPayslip(salaryInfo, yearMonth);
         salaryPaymentDAO.insertPayment(payslip);
-        return "'" + employeeDAO.getEmployeeName(salaryInfo.getEmployeeId()) + "' 사원의 급여명세서가 등록되었습니다.";
+        return "'" + employeeService.getEmployeeNameById(salaryInfo.getEmployeeId()) + "' 사원의 급여명세서가 등록되었습니다.";
     }
     @Transactional
     @LogBeforeExecution
@@ -157,7 +163,14 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
             payslipList.add(payslip);
         }
         salaryPaymentDAO.insertPaymentList(payslipList);
-        return (salaryIdList.size()) + "명의 사원에게 급여가 지급되었습니다.";
+
+        // 인사(HR) 부장에게 알림 전송
+        String message = (salaryIdList.size()) + "명의 사원에게 급여가 지급되었습니다.";
+        List<String> managers = employeeService.convertEmployeesToIdList(employeeService.getEmployeesByDepartmentAndPosition("HR", "부장"));
+        notificationService.createNotifications(managers,
+                   message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(),
+                        "/salary/payment/list");
+        return message;
     }
 
     // 급여명세서 생성
@@ -180,7 +193,7 @@ public class SalaryPaymentServiceImpl implements SalaryPaymentService {
 
         double totalTime = totalWorkingTime + totalOvertime;
 
-        log.info("'{}' 사원의 {}년 {}월 급여명세서가 생성되었습니다.", employeeDAO.getEmployeeName(employeeId), yearMonth.getYear(), yearMonth.getMonthValue());
+        log.info("'{}' 사원의 {}년 {}월 급여명세서가 생성되었습니다.", employeeService.getEmployeeNameById(employeeId), yearMonth.getYear(), yearMonth.getMonthValue());
 
         // 급여명세서 작성
         return SalaryPayment.builder()
