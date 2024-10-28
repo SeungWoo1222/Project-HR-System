@@ -3,7 +3,9 @@ package com.woosan.hr_system.employee.controller;
 import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
+import com.woosan.hr_system.resignation.dao.ResignationFileDAO;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class EmployeeViewController {
     private EmployeeService employeeService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ResignationFileDAO resignationFileDAO;
 
     @RequireHRPermission
     @GetMapping("/list") // 모든 사원 정보 조회
@@ -52,11 +56,19 @@ public class EmployeeViewController {
     @RequireHRPermission
     @GetMapping("/{employeeId}") // 사원 정보 상세 조회 - modal
     public String viewEmployeeModal(@PathVariable("employeeId") String employeeId, Model model) {
-        // 예외 처리된 비밀번호 정보와 퇴사 정보가 포함된 employee
+        // 사원 상세 정보 조회
         Employee employee = employeeService.getEmployeeDetails(employeeId);
         model.addAttribute("employee", employee);
 
+        // 사원 사진
         model.addAttribute("pictureUrl", fileService.getUrl(employee.getPicture()));
+
+        // 퇴사 사원 문서 첨부
+        if (employee.getResignation() != null && employee.getStatus().equals("퇴사")) {
+            List<File> l = resignationFileDAO.selectAllFileInfo(employeeId);
+            log.debug("{}", l);
+            model.addAttribute("files", l);
+        }
 
         return "employee/detail";
     }
