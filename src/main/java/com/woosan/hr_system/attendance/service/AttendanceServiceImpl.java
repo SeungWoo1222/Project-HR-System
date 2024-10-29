@@ -1,13 +1,12 @@
 package com.woosan.hr_system.attendance.service;
 
-import com.woosan.hr_system.attendance.dao.AttendanceDAOImpl;
+import com.woosan.hr_system.attendance.dao.AttendanceDAO;
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
-import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
@@ -29,13 +28,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Autowired
     private CommonService commonService;
     @Autowired
-    private AttendanceDAOImpl attendanceDAO;
+    private AttendanceDAO attendanceDAO;
     @Autowired
     private HolidayService holidayService;
     @Autowired
     private VacationService vacationService;
-    @Autowired
-    private BusinessTripService businessTripService;
     @Autowired
     private EmployeeService employeeService;
     @Autowired
