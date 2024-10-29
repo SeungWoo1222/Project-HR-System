@@ -55,7 +55,7 @@
             original_file_name,
             stored_file_name,
             file_size,
-            uploaded_at,
+            upload_date,
             uploaded_by,
             file_id_usage
         ) VALUES (
@@ -66,7 +66,7 @@
                      #{originalFileName},
                      #{storedFileName},
                      #{fileSize},
-                     #{uploadedAt},
+                     #{uploadDate},
                      #{uploadedBy},
                      #{fileIdUsage}
                  )
@@ -81,7 +81,7 @@
             original_file_name,
             stored_file_name,
             file_size,
-            uploaded_at,
+            upload_date,
             uploaded_by,
             file_id_usage
         ) VALUES (
@@ -92,7 +92,7 @@
             #{originalFileName},
             #{storedFileName},
             #{fileSize},
-            #{uploadedAt},
+            #{uploadDate},
             #{uploadedBy},
             #{fileIdUsage}
             )
