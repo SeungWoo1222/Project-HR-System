@@ -129,8 +129,7 @@ public class AuthServiceImpl implements AuthService {
         Password pwd = findPasswordInfoById(employeeId);
 
         // 새로운 비밀번호 설정
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        pwd.initializePassword(passwordEncoder.encode(newPassword), userSessionInfo.getNow(), userSessionInfo.getCurrentEmployeeId(), strength);
+        pwd.initializePassword(passwordEncoder.encode(newPassword), LocalDateTime.now(), getAuthenticatedUser().getNameWithId(), strength);
 
         passwordDAO.updatePassword(pwd);
     }
