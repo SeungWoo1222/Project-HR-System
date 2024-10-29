@@ -2,7 +2,7 @@ package com.woosan.hr_system.auth.service;
 
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
-import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.dao.PasswordDAOImpl;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
@@ -27,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private PasswordDAO passwordDAO;
+    private PasswordDAOImpl passwordDAO;
 
     // 비밀번호 입력 최대 개수
     private static final int MAX_ATTEMPTS = 5;

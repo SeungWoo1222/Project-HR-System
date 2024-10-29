@@ -1,6 +1,6 @@
 package com.woosan.hr_system.auth.service;
 
-import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.dao.PasswordDAOImpl;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
@@ -23,11 +23,11 @@ import java.util.List;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final EmployeeDAO employeeDAO;
-    private final PasswordDAO passwordDAO;
+    private final PasswordDAOImpl passwordDAO;
     private final ResignationDAO resignationDAO;
 
     @Autowired
-    public CustomUserDetailsService(EmployeeDAOImpl employeeDAO, PasswordDAO passwordDAO, ResignationDAO resignationDAO) {
+    public CustomUserDetailsService(EmployeeDAOImpl employeeDAO, PasswordDAOImpl passwordDAO, ResignationDAO resignationDAO) {
         this.employeeDAO = employeeDAO;
         this.passwordDAO = passwordDAO;
         this.resignationDAO = resignationDAO;
