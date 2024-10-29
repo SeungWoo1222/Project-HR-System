@@ -3,38 +3,44 @@ package com.woosan.hr_system.resignation.service;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.exception.employee.NoChangesDetectedException;
 import com.woosan.hr_system.exception.employee.ResignationNotFoundException;
+import com.woosan.hr_system.file.model.File;
+import com.woosan.hr_system.file.service.FileService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.resignation.dao.ResignationDAO;
 import com.woosan.hr_system.resignation.dao.ResignationFileDAO;
 import com.woosan.hr_system.resignation.model.Resignation;
 import com.woosan.hr_system.resignation.model.ResignationFile;
-import com.woosan.hr_system.file.model.File;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
 @Service
 public class ResignationServiceImpl implements ResignationService {
-
+    @Autowired
+    private AuthService authService;
     @Autowired
     private CommonService commonService;
     @Autowired
     private FileService fileService;
     @Autowired
-    private EmployeeDAO employeeDAO;
+    private EmployeeService employeeService;
     @Autowired
     private ResignationDAO resignationDAO;
     @Autowired
     private ResignationFileDAO resignationFileDAO;
+    @Autowired
+    private NotificationService notificationService;
 
     private static final String FILE_USAGE = "resignation";
 
@@ -92,7 +98,18 @@ public class ResignationServiceImpl implements ResignationService {
         // 퇴사 정보 등록
         resignationDAO.insertResignation(resignation);
 
-        String message = "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원이 퇴사 처리되었습니다.";
+        // 인사(HR)부서 관리자에게 알림 전송
+        String message = "'" + employeeService.getEmployeeNameById(employeeId) + "' 사원이 퇴사 처리되었습니다.";
+        List<String> managers = new ArrayList<>();
+        managers.addAll(employeeService.convertEmployeesToIdList(
+                employeeService.getEmployeesByDepartmentAndPosition("HR", "차장")));
+        managers.addAll(employeeService.convertEmployeesToIdList(
+                employeeService.getEmployeesByDepartmentAndPosition("HR", "부장")));
+        if (!managers.isEmpty()) {
+            notificationService.createNotifications(managers,
+                    message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(),
+                    "/resignation/management");
+        }
         return message;
     }
 
@@ -172,7 +189,7 @@ public class ResignationServiceImpl implements ResignationService {
         // 퇴사 정보 수정
         if (hasChangedResignation) resignationDAO.updateResignation(resignation);
 
-        return "'" + employeeDAO.getEmployeeName(employeeId) + "' 사원의 퇴사 정보가 수정되었습니다.";
+        return "'" + employeeService.getEmployeeNameById(employeeId) + "' 사원의 퇴사 정보가 수정되었습니다.";
     }
 
     // 퇴사 정보 변경사항 확인
@@ -181,8 +198,8 @@ public class ResignationServiceImpl implements ResignationService {
         Resignation original = findResignationById(employeeId);
 
         // 퇴사 정보 수정할 updatedResignation 객체 초기화
-        UserSessionInfo processInfo = new UserSessionInfo();
-        updated.initializeResignationDetails(employeeId, updated, processInfo.getCurrentEmployeeId(), processInfo.getNow());
+        updated.initializeResignationDetails(employeeId, updated,
+                authService.getAuthenticatedUser().getNameWithId(), LocalDateTime.now());
 
         // Resignation의 특정 필드만 비교하도록 필드 이름을 Set으로 전달하는 메소드
         Set<String> fieldsToCompare = new HashSet<>(Arrays.asList(

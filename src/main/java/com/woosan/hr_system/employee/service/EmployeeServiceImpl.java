@@ -2,7 +2,6 @@ package com.woosan.hr_system.employee.service;
 
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
-import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
@@ -12,9 +11,6 @@ import com.woosan.hr_system.employee.model.Position;
 import com.woosan.hr_system.exception.employee.EmployeeNotFoundException;
 import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.notification.service.NotificationService;
-import com.woosan.hr_system.resignation.service.ResignationService;
-import com.woosan.hr_system.salary.model.Salary;
-import com.woosan.hr_system.salary.service.SalaryService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import lombok.extern.slf4j.Slf4j;
@@ -40,14 +36,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private FileService fileService;
     @Autowired
-    private ResignationService resignationService;
-    @Autowired
-    private SalaryService salaryService;
-    @Autowired
     private NotificationService notificationService;
 
     private static final int MAX_POSITION_RANK = 5;
-    private static final String RESIGNED_STATUS = "퇴사";
     // ============================================ 조회 관련 로직 start-point ============================================
     @Override // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) {
@@ -71,36 +62,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override // id를 이용한 특정 사원 정보 조회 (비밀번호 정보, 급여 정보, 퇴사 정보 포함)
     public Employee getEmployeeDetails(String employeeId) {
-        Employee employee = findEmployeeById(employeeId);
-        // 비밀번호 정보 조회 및 설정
-        verifyAndSetPasswordInfo(employee);
-        // 급여 정보 조회 및 설정
-        verifyAndSetSalaryInfo(employee);
-        // 퇴사 정보 조회 및 설정
-        verifyAndSetResignationInfo(employee);
-        return employee;
-    }
-
-    // 사원 비밀번호 정보 확인 후 설정하는 메소드
-    private void verifyAndSetPasswordInfo(Employee employee) {
-        String employeeId = employee.getEmployeeId();
-        Password passwordInfo = authService.getPasswordInfoById(employeeId);
-        employee.setPassword(passwordInfo);
-    }
-
-    // 사원 급여 정보 확인 후 설정하는 메소드
-    private void verifyAndSetSalaryInfo(Employee employee) {
-        String employeeId = employee.getEmployeeId();
-        Salary salaryInfo = salaryService.getSalaryByEmployeeId(employeeId);
-        employee.setSalary(salaryInfo);
-    }
-
-    // 사원 퇴사 정보 확인 후 설정하는 메소드
-    private void verifyAndSetResignationInfo(Employee employee) {
-        String employeeId = employee.getEmployeeId();
-        if (employee.getStatus().equals(RESIGNED_STATUS)) {
-            employee.setResignation(resignationService.getResignation(employeeId));
+        Employee employee = employeeDAO.getEmployeeDetails(employeeId);
+        if (employee == null) {
+            throw new EmployeeNotFoundException(employeeId);
         }
+        return employee;
     }
 
     @Override // 사원 정보 검색
@@ -192,6 +158,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         responseData.put("message", message);
         responseData.put("employeeId", employee.getEmployeeId());
         return responseData;
+    }
+
+    @Override // 방문객 회원가입
+    public String join(Employee employee) {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+
+        // 사원 아이디 생성 후 중복 체크
+        employee.setHireDate(today);
+        String employeeId = createEmployeeId(employee, year);
+        verifyDuplicateId(employeeId);
+
+        Employee newEmployee = employee.toBuilder()
+                .employeeId(employeeId)
+                .birth("980101")
+                .residentRegistrationNumber("1234567")
+                .phone("01012345678")
+                .email("guest@naver.com")
+                .address("00000) 경기 의정부시 어딘가 123")
+                .detailAddress("101-202(무슨동)")
+                .hireDate(today)
+                .status("재직")
+                .remainingLeave(0)
+                .picture(1)
+                .maritalStatus(false)
+                .numDependents(1)
+                .numChildren(0)
+                .build();
+
+        // 사원 신규 등록
+        employeeDAO.insertEmployee(newEmployee);
+
+        // 첫 비밀번호 생년월일로 설정
+        String password = "1234";
+        authService.insertPassword(employeeId, password);
+
+        return "방문객 회원가입이 완료되었습니다." +
+                "\n아이디 : " + employeeId +
+                "\n비밀번호 : " + password +
+                "\n환영합니다!! 로그인 후 접속해주세요!";
     }
 
     // 사원 등록 필수 필드 검증
@@ -337,22 +343,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     public String deleteEmployee(String employeeId) {
         Employee employee = findEmployeeById(employeeId);
 
-        // 삭제 전 퇴사 정보 확인
-        verifyAndSetResignationInfo(employee);
+        if (!employee.getStatus().equals("퇴사")) {
+            throw new IllegalArgumentException("해당 사원은 퇴사 상태가 아닙니다.");
+        }
 
-        LocalDate resignationDate = employee.getResignation().getResignationDate(); // 퇴사일자
+        // 퇴사 사원 정보 조회
+        Employee resignedEmployee = employeeDAO.getResignedEmployee(employeeId);
+
+        LocalDate resignationDate = resignedEmployee.getResignation().getResignationDate(); // 퇴사일자
         LocalDate oneYearLater = resignationDate.plusDays(365); // 퇴사일자 1년 경과일
         LocalDate now = LocalDate.now();
 
         if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
-            resignationService.deleteResignation(employeeId); // 퇴사 정보 삭제
-            fileService.deleteFile(employee.getPicture()); // 사원 사진 삭제
-            authService.deletePassword(employeeId); // 사원 비밀번호 정보 삭제
-            notificationService.removeAllNotification(employeeId); // 사원 모든 알림 삭제
             employeeDAO.deleteEmployee(employeeId); // 사원 정보 삭제
+            fileService.deleteFile(resignedEmployee.getPicture()); // 사원 사진 삭제
 
             // HR 부장에게 알림 전송 후 메세지 반환
-            String message = "'" + employee.getName() + "' 사원의 정보가 삭제되었습니다.";
+            String message = "'" + resignedEmployee.getName() + "' 사원의 정보가 삭제되었습니다.";
             sendNotification(message, null, "HR","부장");
             return message;
         } else {

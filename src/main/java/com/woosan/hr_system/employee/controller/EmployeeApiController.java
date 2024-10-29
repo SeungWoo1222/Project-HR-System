@@ -58,4 +58,9 @@ public class EmployeeApiController {
     public ResponseEntity<Employee> getEmployeeInfo(@PathVariable("employeeId") String employeeId) {
         return ResponseEntity.ok(employeeService.getEmployeeById(employeeId));
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<String> join(@ModelAttribute Employee employee) {
+        return ResponseEntity.ok(employeeService.join(employee));
+    }
 }

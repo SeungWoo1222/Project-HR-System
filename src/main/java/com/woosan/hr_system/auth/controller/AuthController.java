@@ -73,4 +73,9 @@ public class AuthController {
             default -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다.\n" + "현재 시도 횟수 : " + result + " / 5 입니다.");
         };
     }
+
+    @GetMapping("/join") // 방문객 회원가입
+    public String viewJoinForm(Model model) {
+        return "/auth/join";
+    }
 }

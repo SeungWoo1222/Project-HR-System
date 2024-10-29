@@ -3,11 +3,11 @@ package com.woosan.hr_system.survey.service;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
 import com.woosan.hr_system.survey.model.*;
-//import kr.pe.bab2min.Kiwi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,8 @@ public class SurveyServiceImpl implements SurveyService {
     private SurveyDAO surveyDAO;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private NotificationService notificationService;
 //    @Autowired
 //    private KiwiSingleton kiwiSingleton;
 
@@ -129,9 +130,10 @@ public class SurveyServiceImpl implements SurveyService {
         String employeeId = authService.getAuthenticatedUser().getUsername();
 
         int surveyId = responses.get(0).getSurveyId();
+        Survey survey = getSurveyById(surveyId);
 
         // 조사가 종료된 설문인지 확인
-        if (getSurveyById(surveyId).getStatus().equals("조사 종료")) {
+        if (survey.getStatus().equals("조사 종료")) {
             throw new IllegalArgumentException("조사가 종료된 설문입니다.");
         }
 
@@ -154,6 +156,15 @@ public class SurveyServiceImpl implements SurveyService {
 
         // 설문 참여자 등록
         surveyDAO.insertParticipant(employeeId, surveyId);
+
+        // 설문 조사자에게 알림 전송
+        String creator = survey.getCreatedBy();
+        int startIndex = creator.indexOf('(') + 1;
+        int endIndex = creator.indexOf(')');
+        String creatorId = creator.substring(startIndex, endIndex);
+        notificationService.createNotification(creatorId,
+                authService.getAuthenticatedUser().getNameWithId() + "가 설문에 참여하였습니다.",
+                "/survey/participants?surveyId=" + surveyId);
 
         return "응답이 성공적으로 제출되었습니다.\n감사합니다!";
     }

@@ -60,3 +60,32 @@ function submitUpdateOvertimeForm(event) {
             });
     }
 }
+
+// AJAX DELETE 요청 - 휴가 정보 삭제
+function deleteOvertime(overtimeId) {
+    if (confirm('초과근무 정보를 정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n이 작업을 계속하시려면 확인을 눌러주세요.')) {
+        fetch('/api/overtime/' + overtimeId, {
+            method: "DELETE"
+        })
+            .then(response => response.text().then(data => ({
+                status: response.status,
+                text: data
+            })))
+            .then(response => {
+                const errorStatuses = [400, 403, 404, 500];
+                if (response.status === 200) {
+                    alert(response.text);
+                    window.location.reload();
+                } else if (errorStatuses.includes(response.status)) {
+                    alert(response.text);
+                } else {
+                    alert('초과근무 삭제 중 오류가 발생하였습니다.\n재시도 후 여전히 문제가 발생하면 관리자에게 문의해주세요');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error :', error.message);
+                alert('오류가 발생하였습니다.\n관리자에게 문의해주세요.');
+            });
+    }
+}
