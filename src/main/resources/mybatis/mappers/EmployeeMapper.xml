@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.employee.dao.EmployeeDAO">
+<mapper namespace="employee">
     <resultMap id="EmployeeResultMap" type="com.woosan.hr_system.employee.model.Employee">
         <id property="employeeId" column="employee_id"/>
         <result property="name" column="name"/>

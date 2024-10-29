@@ -4,8 +4,9 @@ import com.woosan.hr_system.auth.dao.PasswordDAO;
 import com.woosan.hr_system.auth.model.CustomUserDetails;
 import com.woosan.hr_system.auth.model.Password;
 import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.resignation.dao.ResignationDAO;
+import com.woosan.hr_system.employee.dao.EmployeeDAOImpl;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.resignation.dao.ResignationDAO;
 import com.woosan.hr_system.resignation.model.Resignation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final ResignationDAO resignationDAO;
 
     @Autowired
-    public CustomUserDetailsService(EmployeeDAO employeeDAO, PasswordDAO passwordDAO, ResignationDAO resignationDAO) {
+    public CustomUserDetailsService(EmployeeDAOImpl employeeDAO, PasswordDAO passwordDAO, ResignationDAO resignationDAO) {
         this.employeeDAO = employeeDAO;
         this.passwordDAO = passwordDAO;
         this.resignationDAO = resignationDAO;

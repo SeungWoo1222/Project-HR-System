@@ -1,7 +1,6 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
@@ -27,8 +26,6 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
     @Autowired
-    private EmployeeDAO employeeDAO;
-    @Autowired
     private FileService fileService;
     @Autowired
     private ReportFileDAO reportFileDAO;
@@ -36,7 +33,6 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileService reportFileService;
     @Autowired
     private RequestService requestService;
-
 
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
