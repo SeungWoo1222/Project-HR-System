@@ -34,7 +34,7 @@
 
                     </form>
                     <div style="font-size: 10px; color: gray;">
-                        업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>
+                        업로드 날짜: <span th:text="${file.uploadedAt}" class="dateTime"></span>
                         파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>
                     </div>
                 </li>

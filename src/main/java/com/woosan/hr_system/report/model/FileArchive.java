@@ -16,7 +16,7 @@ public class FileArchive {
     String originalFileName;
     String storedFileName;
     Long fileSize;
-    LocalDateTime uploadDate;
+    LocalDateTime uploadedAt;
     String uploadedBy;
     String fileIdUsage;
 }

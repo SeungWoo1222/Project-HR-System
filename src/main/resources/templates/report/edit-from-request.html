@@ -1,126 +1,126 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout(title='보고서 수정')}">
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko" xmlns:th="http://www.thymeleaf.org"-->
+<!--      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"-->
+<!--      layout:decorate="~{fragments/layout :: layout(title='보고서 수정')}">-->
 
-<th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/layout/layout.css}">
-</th:block>
+<!--<th:block layout:fragment="css">-->
+<!--    <link rel="stylesheet" th:href="@{/css/layout/layout.css}">-->
+<!--</th:block>-->
 
-<th:block layout:fragment="script">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/js/report.js}"></script>
-    <script th:src="@{/js/report-file.js}"></script>
-    <script>
-        $(document).ready(function () {
-            initializeRegisteredFiles(); // 기존에 있는 파일을 IdList에 추가
+<!--<th:block layout:fragment="script">-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--    <script th:src="@{/js/report.js}"></script>-->
+<!--    <script th:src="@{/js/report-file.js}"></script>-->
+<!--    <script>-->
+<!--        $(document).ready(function () {-->
+<!--            initializeRegisteredFiles(); // 기존에 있는 파일을 IdList에 추가-->
 
-            $('#editFileButton').on('click', function () {
-                $('#file-area').show();
-                $('#fileList').hide();
-                $('#editFileButton').hide();
+<!--            $('#editFileButton').on('click', function () {-->
+<!--                $('#file-area').show();-->
+<!--                $('#fileList').hide();-->
+<!--                $('#editFileButton').hide();-->
 
-                // 기존 파일을 업로드 목록으로 복사
-                registeredFileIdList.forEach(fileId => {
-                    const fileElement = document.querySelector(`input[value="${fileId}"]`);
-                    const fileName = fileElement.closest('li').querySelector('button[type="submit"]').innerText;
+<!--                // 기존 파일을 업로드 목록으로 복사-->
+<!--                registeredFileIdList.forEach(fileId => {-->
+<!--                    const fileElement = document.querySelector(`input[value="${fileId}"]`);-->
+<!--                    const fileName = fileElement.closest('li').querySelector('button[type="submit"]').innerText;-->
 
-                    // 기존 파일을 filesArr에 추가
-                    filesArr.push({
-                        name: fileName,
-                        id: fileId, // ID를 추가하여 기존 파일임을 표시
-                        is_delete: false
-                    });
+<!--                    // 기존 파일을 filesArr에 추가-->
+<!--                    filesArr.push({-->
+<!--                        name: fileName,-->
+<!--                        id: fileId, // ID를 추가하여 기존 파일임을 표시-->
+<!--                        is_delete: false-->
+<!--                    });-->
 
-                    // 업로드 목록에 추가
-                    let htmlData = '';
-                    htmlData += '<div id="file' + fileNo + '" class="filebox">';
-                    htmlData += '   <p class="name">' + fileName + '</p>';
-                    htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><img src="/images/icons/delete.png" class="delete-btn" alt="delete-btn" width="20"/></a>';
-                    htmlData += '</div>';
-                    document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);
-                    fileNo++;
-                });
-            });
-            // 페이지에서 나갈 시 뜨는 경고문
-            function handleBeforeUnload(e) {
-                e.preventDefault();
-                e.returnValue = '사이트에서 나가시겠습니까? 변경사항이 저장되지 않을 수 있습니다.';
-                return e.returnValue;
-            }
+<!--                    // 업로드 목록에 추가-->
+<!--                    let htmlData = '';-->
+<!--                    htmlData += '<div id="file' + fileNo + '" class="filebox">';-->
+<!--                    htmlData += '   <p class="name">' + fileName + '</p>';-->
+<!--                    htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><img src="/images/icons/delete.png" class="delete-btn" alt="delete-btn" width="20"/></a>';-->
+<!--                    htmlData += '</div>';-->
+<!--                    document.querySelector('.file-list').insertAdjacentHTML('beforeend', htmlData);-->
+<!--                    fileNo++;-->
+<!--                });-->
+<!--            });-->
+<!--            // 페이지에서 나갈 시 뜨는 경고문-->
+<!--            function handleBeforeUnload(e) {-->
+<!--                e.preventDefault();-->
+<!--                e.returnValue = '사이트에서 나가시겠습니까? 변경사항이 저장되지 않을 수 있습니다.';-->
+<!--                return e.returnValue;-->
+<!--            }-->
 
-            // 이벤트 등록
-            window.addEventListener('beforeunload', handleBeforeUnload);
+<!--            // 이벤트 등록-->
+<!--            window.addEventListener('beforeunload', handleBeforeUnload);-->
 
-            // 보고서 수정 버튼 클릭 시 이벤트 제거
-            $('#updateReportButton').on('click', function() {
-                window.removeEventListener('beforeunload', handleBeforeUnload);
-            });
-        });
+<!--            // 보고서 수정 버튼 클릭 시 이벤트 제거-->
+<!--            $('#updateReportButton').on('click', function() {-->
+<!--                window.removeEventListener('beforeunload', handleBeforeUnload);-->
+<!--            });-->
+<!--        });-->
 
-    </script>
-</th:block>
+<!--    </script>-->
+<!--</th:block>-->
 
-<div layout:fragment="~{content}">
-    <div class="content">
-        <h1>보고서 수정</h1>
-        <form id="form" th:action="@{/report/edit}" method="post" enctype="multipart/form-data" onsubmit="return false">
-            <input id="reportId" type="hidden" th:value="${report.reportId}">
-            <input id="writerId" type="hidden" th:value="${report.writerId}">
+<!--<div layout:fragment="~{content}">-->
+<!--    <div class="content">-->
+<!--        <h1>보고서 수정</h1>-->
+<!--        <form id="form" th:action="@{/report/edit}" method="post" enctype="multipart/form-data" onsubmit="return false">-->
+<!--            <input id="reportId" type="hidden" th:value="${report.reportId}">-->
+<!--            <input id="writerId" type="hidden" th:value="${report.writerId}">-->
 
-            <div>
-                <label for="title">제목:</label>
-                <input id="title" type="text" name="title" th:value="${report.title}">
-            </div>
+<!--            <div>-->
+<!--                <label for="title">제목:</label>-->
+<!--                <input id="title" type="text" name="title" th:value="${report.title}">-->
+<!--            </div>-->
 
-            <div>
-                <label for="content">내용:</label>
-                <textarea id="content" th:text="${report.content}"></textarea>
-            </div>
-            <div>
-                <label id="currentLabel" >현재 보고서 결재자 : </label>
-                <span id="current" th:text="${report.approverName}"></span>
-                <input type="hidden" id="currentApproverName" th:value="${report.approverName}"/>
-                <input type="hidden" id="currentApproverId" th:value="${report.approverId}"/>
-            </div>
+<!--            <div>-->
+<!--                <label for="content">내용:</label>-->
+<!--                <textarea id="content" th:text="${report.content}"></textarea>-->
+<!--            </div>-->
+<!--            <div>-->
+<!--                <label id="currentLabel" >현재 보고서 결재자 : </label>-->
+<!--                <span id="current" th:text="${report.approverName}"></span>-->
+<!--                <input type="hidden" id="currentApproverName" th:value="${report.approverName}"/>-->
+<!--                <input type="hidden" id="currentApproverId" th:value="${report.approverId}"/>-->
+<!--            </div>-->
 
-            <div>
-                <label for="completeDate">업무 처리 날짜:</label>
-                <input type="date" id="completeDate" th:value="${report.completeDate}">
-            </div>
-            <!-- 첨부 파일 리스트 표시 -->
-            <button type="button" id="editFileButton">파일 수정</button>
-            <div th:if="${files != null}">
-                <span>첨부 파일</span>
-                <ul id="fileList">
-                    <li th:each="file : ${files}">
-                        <form th:action="@{'/report/downloadFile'}" method="get">
-                            <input type="hidden" class="editFileId" th:value="${file.fileId}"/>
+<!--            <div>-->
+<!--                <label for="completeDate">업무 처리 날짜:</label>-->
+<!--                <input type="date" id="completeDate" th:value="${report.completeDate}">-->
+<!--            </div>-->
+<!--            &lt;!&ndash; 첨부 파일 리스트 표시 &ndash;&gt;-->
+<!--            <button type="button" id="editFileButton">파일 수정</button>-->
+<!--            <div th:if="${files != null}">-->
+<!--                <span>첨부 파일</span>-->
+<!--                <ul id="fileList">-->
+<!--                    <li th:each="file : ${files}">-->
+<!--                        <form th:action="@{'/report/downloadFile'}" method="get">-->
+<!--                            <input type="hidden" class="editFileId" th:value="${file.fileId}"/>-->
 
-                            <button type="submit" th:text="${file.originalFileName}">다운로드</button>
-                            <button type="button" class="deleteRegisteredFileButton" th:fileId="${file.fileId}"
-                                    onclick="deleteRegisteredFile(this, this.getAttribute('fileId'))">X</button>
+<!--                            <button type="submit" th:text="${file.originalFileName}">다운로드</button>-->
+<!--                            <button type="button" class="deleteRegisteredFileButton" th:fileId="${file.fileId}"-->
+<!--                                    onclick="deleteRegisteredFile(this, this.getAttribute('fileId'))">X</button>-->
 
-                            <p style="font-size: 10px; color: gray;">
-                                업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>
-                                파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>
-                            </p>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+<!--                            <p style="font-size: 10px; color: gray;">-->
+<!--                                업로드 날짜: <span th:text="${file.uploadDate}" class="dateTime"></span>-->
+<!--                                파일 크기: <span th:text="${file.fileSize / 1024} + ' KB'"></span>-->
+<!--                            </p>-->
+<!--                        </form>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
 
-            <div id="file-area" style="display: none;">
-                <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>
-                <label for="reportDocuments" class="input-file-btn">문서 업로드</label>
-                <input type="file" id="reportDocuments" class="hidden"
-                       onchange="addFile(this)"
-                       multiple/>
-                <div class="file-list"></div>
-            </div>
-            <div id="error-alert"></div>
-            <button id="updateReportButton" type="button" onclick="updateReportForm(event)">수정하기</button>
-        </form>
-    </div>
-</div>
-</html>
+<!--            <div id="file-area" style="display: none;">-->
+<!--                <p>문서는 최대 3개, 각 10MB 이하까지 업로드 가능합니다.</p>-->
+<!--                <label for="reportDocuments" class="input-file-btn">문서 업로드</label>-->
+<!--                <input type="file" id="reportDocuments" class="hidden"-->
+<!--                       onchange="addFile(this)"-->
+<!--                       multiple/>-->
+<!--                <div class="file-list"></div>-->
+<!--            </div>-->
+<!--            <div id="error-alert"></div>-->
+<!--            <button id="updateReportButton" type="button" onclick="updateReportForm(event)">수정하기</button>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</html>-->

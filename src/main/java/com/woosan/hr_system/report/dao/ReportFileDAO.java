@@ -62,11 +62,9 @@ public class ReportFileDAO {
             params.put("originalFileName", file.getOriginalFileName()); // 원본 파일 이름
             params.put("storedFileName", file.getStoredFileName()); // 저장된 파일 이름
             params.put("fileSize", file.getFileSize()); // 파일 크기
-            params.put("uploadDate", file.getUploadDate()); // 업로드 날짜
+            params.put("uploadedAt", file.getUploadedAt()); // 업로드 날짜
             params.put("uploadedBy", file.getUploadedBy()); // 업로드한 사용자
             params.put("fileIdUsage", file.getFileIdUsage()); // 파일 ID 용도
-
-
 
         sqlSession.insert(NAMESPACE + "createReportFileArchive", params);
     }
