@@ -4,7 +4,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.report.dao.ReportFileDAO">
+<mapper namespace="reportFile">
 
     <insert id="createReportFile">
         INSERT INTO report_files
