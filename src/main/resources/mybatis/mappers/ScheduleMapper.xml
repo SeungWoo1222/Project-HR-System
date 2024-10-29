@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.schedule.dao.ScheduleDAO">
+<mapper namespace="schedule">
     <resultMap id="scheduleResultMap" type="com.woosan.hr_system.schedule.model.Schedule">
         <id property="taskId" column="task_id" />
         <result property="memberId" column="member_id" />
