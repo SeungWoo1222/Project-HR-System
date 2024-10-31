@@ -391,12 +391,8 @@ function updateScheduleStatus(taskId) {
         // 폼데이터 생성
         const formData = new FormData();
         formData.append("status", selectedStatus);
-        if (selectedStatus === "완료") {
-            const taskName = document.getElementById('taskName');
-            console.log(taskName);
-            console.log(taskName.value);
-            formData.append("taskName", taskName.value);
-        }
+        const taskName = document.getElementById('taskName');
+        formData.append("taskName", taskName.value);
 
         formData.forEach((value, key) => {
             console.log(key, value);

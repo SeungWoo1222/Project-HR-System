@@ -160,7 +160,6 @@ public class ScheduleController {
     public ResponseEntity<String> updateScheduleStatus(@PathVariable("taskId") int taskId,
                                                        @RequestParam("status") String status,
                                                        @RequestParam("taskName") String taskName) {
-        log.info("updateScheduleStatus 컨트롤러 도착");
         // 서비스 호출하여 상태 업데이트
         scheduleService.updateScheduleStatus(taskId, status, taskName);
 

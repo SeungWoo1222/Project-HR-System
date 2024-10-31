@@ -80,10 +80,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 상태 변경
     public void updateScheduleStatus(int taskId, String status, String taskName) {
-        log.info("updateScheduleStatus 서비스 도착");
-        // String employeeId, String message, String url
         if ("완료".equals(status)) {
-            log.info("status가 완료이므로 알림 생성");
             UserSessionInfo userSessionInfo = new UserSessionInfo();
             String employeeId = userSessionInfo.getCurrentEmployeeId();
             notificationService.createNotification(employeeId, taskName + "일정이 완료되었습니다. 보고서를 작성해주세요.", "/report/writeFromSchedule" + taskId);
@@ -93,22 +90,16 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 삭제
     public void deleteSchedule(int taskId) {
-        log.info("deleteSchedule 도착 : {}", taskId);
-
         Schedule schedule = scheduleDAO.getScheduleById(taskId);
         scheduleDAO.insertScheduleArchive(schedule);
 
-        log.info("insertScheduleArchive 완료");
         BusinessTrip businessTrip = businessTripService.getBusinessTripById(taskId);
         if (businessTrip != null) {
             businessTripService.insertTripInfoInArchive(businessTrip);
-            log.info("insertTripArchive 완료");
             businessTripService.deleteBusinessTrip(taskId);
-            log.info("deleteBusinessTrip 완료");
         }
 
         scheduleDAO.deleteSchedule(taskId);
-        log.info("deleteSchedule 완료");
     }
 
     // 일정 상태 변경 메소드 필요함

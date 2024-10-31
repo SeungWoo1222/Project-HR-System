@@ -46,7 +46,6 @@ public class ScheduleDAOImpl implements ScheduleDAO {
 
     // 일정 상태 변경
     public void updateScheduleStatus(int taskId, String status) {
-        log.info("status : {}", status);
         Map<String, Object> params = new HashMap<>();
         params.put("taskId", taskId);
         params.put("status", status);
