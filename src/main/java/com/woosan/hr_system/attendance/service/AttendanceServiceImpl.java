@@ -210,29 +210,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         LocalTime now = LocalTime.now();
 
-        // 초과근무 여부 확인 후 초과근무 등록
-        LocalTime checkInTime = todayAttendance.getCheckIn(); // 출근 시간
-        Duration duration = Duration.between(checkInTime, now);
-        float workingHours = duration.toMinutes() / 60.00f; // 근무 시간
-        // 근무 시간이 9시간(휴게시간 포함)을 초과한다면
-        if (workingHours > 9.0f) {
-            workingHours = 8.0f; // 휴게시간을 제외한 정규 근무 시간 : 8시간
-            // 이번 주 초과근무 총 시간 조회 후 12시간이 넘지 않는다면 초과근무 등록
-            if (overtimeService.getTotalWeeklyOvertime(todayAttendance.getEmployeeId(), LocalDate.now()) < 12.0f) {
-                LocalTime startTime = checkInTime.plusHours(9);
-                overtimeService.addOvertime(todayAttendanceId, todayAttendance.getDate(), startTime, now);
-            }
-        }
-
         // 퇴근 시간 설정
         LocalTime checkOutTime = setCheckOutTime(authService.getAuthenticatedUser().getUsername());
 
-        String status;
-        if (now.isBefore(checkOutTime)) {
-            status = "조퇴";
-        } else {
-            status = "출근";
-        }
+        // 근무 시간 설정
+        float workingHours = setWorkingHours(todayAttendance, now);
+
+        String status = now.isBefore(checkOutTime) ? "조퇴" : "출근";
 
         Map<String, Object> params = new HashMap<>();
         params.put("todayAttendanceId", todayAttendanceId);
@@ -247,6 +231,24 @@ public class AttendanceServiceImpl implements AttendanceService {
         return today.getYear() + "년 " + today.getMonthValue() + "월 " + today.getDayOfMonth() + "일 퇴근 체크가 완료되었습니다."
                 + "\n퇴근 시간은 " + now.getHour() + "시" + now.getMinute() + "분입니다."
                 + "\n오늘도 고생 많으셨습니다!";
+    }
+
+    // 근무시간 설정
+    private float setWorkingHours(Attendance attendance, LocalTime checkoutTime) {
+        // 초과근무 여부 확인 후 초과근무 등록
+        LocalTime checkInTime = attendance.getCheckIn(); // 출근 시간
+        Duration duration = Duration.between(checkInTime, checkoutTime);
+        float workingHours = duration.toMinutes() / 60.00f; // 근무 시간
+        // 근무 시간이 9시간(휴게시간 포함)을 초과한다면
+        if (workingHours > 9.0f) {
+            workingHours = 8.0f; // 휴게시간을 제외한 정규 근무 시간 : 8시간
+            // 이번 주 초과근무 총 시간 조회 후 12시간이 넘지 않는다면 초과근무 등록
+            if (overtimeService.getTotalWeeklyOvertime(attendance.getEmployeeId(), LocalDate.now()) < 12.0f) {
+                LocalTime startTime = checkInTime.plusHours(9);
+                overtimeService.addOvertime(attendance.getAttendanceId(), attendance.getEmployeeId(), attendance.getDate(), startTime, checkoutTime);
+            }
+        }
+        return workingHours;
     }
 
     // 퇴근 시간 설정
@@ -307,8 +309,15 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 변경사항 확인
         checkForAttendanceChanges(originalAttendance, attendance);
 
+        // 근무한 시간 설정
+        if (originalAttendance.getOvertimeId() != null) {
+            overtimeService.deleteOvertime(originalAttendance.getOvertimeId());
+        }
+        float workingHours = setWorkingHours(attendance, attendance.getCheckOut());
+
         // 마지막 수정 일시와 마지막 수정 사원 ID 세팅하여 새로운 객체 생성
         Attendance updatedAttendance = attendance.toBuilder()
+                .workingHours(workingHours)
                 .lastModified(LocalDateTime.now())
                 .modifiedBy(authService.getAuthenticatedUser().getNameWithId())
                 .build();

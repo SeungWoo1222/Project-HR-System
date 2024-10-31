@@ -1,13 +1,9 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RequestService {
@@ -25,11 +21,13 @@ public interface RequestService {
     // reportId로 요청 조회
     int getRequestByReportId(int reportId);
     // 페이지, 서칭 + 보고서 리스트 (MANAGER)
-    PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, LocalDate startDate, LocalDate endDate);
+    PageResult<Request> searchMyRequests(PageRequest pageRequest, String requesterId, Integer searchType, String startDate, String endDate);
     // 나에게 온 최근 5개 요청 조회 (STAFF)
     List<Request> getMyPendingRequests(String writerId);
     // 페이지, 서칭 + 보고서 리스트 (STAFF)
-    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType, LocalDate startDate, LocalDate endDate);
+    PageResult<Request> searchRequests(PageRequest pageRequest, String writerId, Integer searchType,
+                                       String startDate, String endDate);
+    Request getRequestByWriter(int requestId);
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
     // 요청 수정

@@ -47,6 +47,10 @@
     transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
+.big {
+    font-size: 16px;
+}
+
 .inner-btn:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);

@@ -2,6 +2,7 @@ package com.woosan.hr_system.attendance.dao;
 
 import com.woosan.hr_system.attendance.model.Attendance;
 import com.woosan.hr_system.attendance.model.Overtime;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Repository
 public class OvertimeDAO {
     @Autowired
@@ -53,11 +55,11 @@ public class OvertimeDAO {
 
     // 초과근무 등록
     public void insertOvertime(Overtime overtime, int attendanceId) {
-        int overtimeId = sqlSession.insert("overtime.insertOvertime", overtime);
+        sqlSession.insert("overtime.insertOvertime", overtime);
 
         // 근태 정보에 초과근무 ID 연결
         Map<String, Object> param = new HashMap<>();
-        param.put("overtimeId", overtimeId);
+        param.put("overtimeId", overtime.getOvertimeId());
         param.put("attendanceId", attendanceId);
         sqlSession.update("overtime.linkOvertimeToAttendance", param);
     }

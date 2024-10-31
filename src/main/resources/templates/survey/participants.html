@@ -55,7 +55,7 @@
                         <td th:text="${participant.employee?.name + '(' + participant.employeeId + ')'}"></td>
                         <td th:text="${participant.employee?.department}"></td>
                         <td th:text="${participant.employee?.position}"></td>
-                        <td th:text="${#temporals.format(participant.participationAt, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${#temporals.format(participant.participationAt, 'yy.MM.dd(EE)')}"></td>
                     </tr>
                     </tbody>
                 </table>

@@ -1,0 +1,88 @@
+.grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.grid-container h3 {
+    margin-bottom: 5px;
+}
+
+.grid-item {
+    width: 44%;
+    height: 400px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border: #EEE 2px solid;
+    border-radius: 10px;
+}
+
+.pic-container {
+    width : 188px;
+    height: 264px;
+}
+
+.pic-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.list {
+    margin: 0;
+}
+
+.column-list {
+    width: auto;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #fcfcfc;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.column-list .table-header {
+    background-color: #18a8f1;
+    color: white;
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: none;
+}
+
+.column-list td {
+    padding: 12px 15px;
+    border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.column-list tr {
+    border-bottom: #1386C1 1px solid;
+}
+.column-list tr:last-child {
+    border-bottom: none;
+}
+
+.column-list tr:first-child td {
+    border-top-left-radius: 10px;
+}
+
+.column-list tr:last-child td {
+    border-bottom-left-radius: 10px;
+}
+
+.slider::after {
+    left: 0;
+}
+
+.item-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}

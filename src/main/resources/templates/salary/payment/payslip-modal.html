@@ -10,12 +10,12 @@
 
 <div class="payslip-container" id="payslip-container">
     <div class="btn-container">
-        <button type="button" class="btn" th:onclick="'window.open(\'/salary/payment/' + ${payslip.paymentId} + '/print\', \'_blank\')'">
+        <button type="button" class="inner-btn green-btn big" th:onclick="'window.open(\'/salary/payment/' + ${payslip.paymentId} + '/print\', \'_blank\')'">
             인쇄하기, PDF로 저장
         </button>
         <div sec:authorize="principal.department == 'HR' and hasAnyRole('ROLE_MANAGER')">
-            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정</button>
-            <button type="button" class="btn" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제</button>
+            <button type="button" class="inner-btn tomato-btn big" th:data-paymentId="${payslip.paymentId}" onclick="goToUpdateForm(this)">수정</button>
+            <button type="button" class="inner-btn red-btn big" th:data-paymentId="${payslip.paymentId}" onclick="deletePayslip(this)">삭제</button>
         </div>
     </div>
     <div class="title" th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월' + ' 급여명세서'"></div>

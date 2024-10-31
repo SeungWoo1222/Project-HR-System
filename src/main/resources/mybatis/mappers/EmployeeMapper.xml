@@ -56,6 +56,65 @@
         </association>
     </resultMap>
 
+    <resultMap id="EmployeeDetailsResultMap" type="com.woosan.hr_system.employee.model.Employee">
+        <!-- Employee 기본 정보 -->
+        <id property="employeeId" column="employee_id"/>
+        <result property="name" column="name"/>
+        <result property="birth" column="birth"/>
+        <result property="residentRegistrationNumber" column="resident_registration_number"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="address" column="address"/>
+        <result property="detailAddress" column="detail_address"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+        <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+        <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+        <result property="remainingLeave" column="remaining_leave"/>
+        <result property="lastModified" column="last_modified"/>
+        <result property="modifiedBy" column="modified_by"/>
+        <result property="picture" column="picture"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="numDependents" column="num_dependents"/>
+        <result property="numChildren" column="num_children"/>
+
+        <!-- Password 정보 -->
+        <association property="password" javaType="com.woosan.hr_system.auth.model.Password">
+            <result property="employeeId" column="employee_id"/>
+            <result property="password" column="password"/>
+            <result property="passwordCount" column="password_count"/>
+            <result property="lastModified" column="last_modified"/>
+            <result property="modifiedBy" column="modified_by"/>
+            <result property="strength" column="strength"/>
+        </association>
+
+        <!-- Salary 정보 -->
+        <association property="salary" javaType="com.woosan.hr_system.salary.model.Salary">
+            <result property="salaryId" column="salary_id"/>
+            <result property="employeeId" column="employee_id"/>
+            <result property="name" column="name"/>
+            <result property="department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+            <result property="position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+            <result property="bank" column="bank"/>
+            <result property="accountNumber" column="account_number"/>
+            <result property="annualSalary" column="annual_salary"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="status" column="salary_status"/>
+        </association>
+
+        <!-- Resignation 정보 -->
+        <association property="resignation" javaType="com.woosan.hr_system.resignation.model.Resignation">
+            <result property="employeeId" column="employee_id"/>
+            <result property="resignationDate" column="resignation_date"/>
+            <result property="resignationReason" column="resignation_reason"/>
+            <result property="codeNumber" column="code_number"/>
+            <result property="specificReason" column="specific_reason"/>
+            <result property="resignationDocuments" column="resignation_documents"/>
+            <result property="processedBy" column="processed_by"/>
+            <result property="processedDate" column="processed_date"/>
+        </association>
+    </resultMap>
+
     <!-- 모든 사원 정보 조회 -->
     <select id="getAllEmployees" resultMap="EmployeeResultMap">
         SELECT * FROM employees
@@ -158,6 +217,14 @@
           AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
     </select>
 
+    <!-- 퇴사 사원 정보 조회 -->
+    <select id="getResignedEmployee" parameterType="String" resultMap="EmployeeWithResignationResultMap">
+        SELECT e.*, r.*
+        FROM employees e
+                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+        WHERE e.employee_id = #{employeeId}
+    </select>
+
     <!-- 모든 사원 정보 - 검색어와 부서에 해당하는 데이터 결과 조회 -->
     <select id="searchEmployees" parameterType="map" resultMap="EmployeeResultMap">
         SELECT * FROM employees
@@ -252,5 +319,15 @@
         SELECT *
         FROM employees
         WHERE department_id = #{department} AND position_id = #{position}
+    </select>
+
+    <!-- id를 이용한 특정 사원의 모든 정보 조회 -->
+    <select id="selectEmployeeDetails" parameterType="String" resultMap="EmployeeDetailsResultMap">
+        SELECT e.*, p.*, s.*, s.status AS salary_status, r.*
+        FROM employees e
+                 JOIN passwords p ON e.employee_id = p.employee_id
+                 LEFT JOIN salaries s ON e.employee_id = s.employee_id
+                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+        WHERE e.employee_id = #{employeeId};
     </select>
 </mapper>

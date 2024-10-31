@@ -109,3 +109,15 @@ form {
 .error-message {
     margin-bottom: 15px;
 }
+
+.join a {
+    text-decoration: none;
+    color: #666666;
+    font-weight: normal;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.join a:hover {
+    border-bottom-color: #666666;
+}

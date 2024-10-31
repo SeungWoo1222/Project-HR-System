@@ -132,8 +132,8 @@
             </tr>
             <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId'))">
                 <td th:text="${vacation.employeeId}"></td>
-                <td th:text="${#temporals.format(vacation.startAt, 'yyyy년 MM월 dd일')
-                               + ' ~ ' + #temporals.format(vacation.endAt, 'MM월 dd일')}"></td>
+                <td th:text="${#temporals.format(vacation.startAt, 'yyyy.MM.dd(EE)')
+                               + ' ~ ' + #temporals.format(vacation.endAt, 'MM.dd(EE)')}"></td>
                 <td th:text="${vacation.vacationType}">휴가 유형</td>
                 <td th:text="${vacation.usedDays + '일'}">사용 연차</td>
                 <td th:text="${vacation.reason}" style="max-width: 250px">휴가 사유</td>
