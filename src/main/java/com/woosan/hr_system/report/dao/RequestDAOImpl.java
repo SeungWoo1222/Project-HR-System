@@ -18,9 +18,9 @@ public class RequestDAOImpl implements RequestDAO {
     private static final String NAMESPACE = "request.";
 //===================================================생성 메소드=======================================================
     // 요청 생성
-    public void createRequest(Map<String, Object> params) {
+    public int createRequest(Map<String, Object> params) {
         log.debug(params.toString());
-        sqlSession.insert(NAMESPACE + "createRequest", params);
+        return sqlSession.insert(NAMESPACE + "createRequest", params);
     }
 
 //===================================================생성 메소드=======================================================

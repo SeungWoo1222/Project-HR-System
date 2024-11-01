@@ -41,11 +41,6 @@ public class NotificationServiceImpl implements NotificationService {
         }).toList();
     }
 
-    @Override // url에 저장돼있는 고유한 Id로 notificationId를 조회
-    public int getNotificationId(String uniqueId) {
-        return notificationDAO.getNotificationId(uniqueId);
-    }
-
     // 상대 시간 계산
     private String calculateRelativeTime(LocalDateTime createdAt) {
         Duration duration = Duration.between(createdAt, LocalDateTime.now());
