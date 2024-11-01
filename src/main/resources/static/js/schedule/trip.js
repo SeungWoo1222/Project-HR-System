@@ -219,7 +219,7 @@ function addTripFields() {
         tripFieldsContainer.classList.add('details');
 
         // 새로운 테이블을 일정 상세 정보 아래에 추가 (적절한 부모 요소 찾아서 append)
-        const detailContainer = document.querySelector('.detail-container'); // 적절한 부모 요소 선택
+        const detailContainer = document.querySelector('.trip-table-container'); // 적절한 부모 요소 선택
         detailContainer.appendChild(tripFieldsContainer);  // 부모 요소에 추가
     }
 

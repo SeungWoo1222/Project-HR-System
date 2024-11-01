@@ -8,6 +8,8 @@ import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.survey.dao.SurveyDAO;
 import com.woosan.hr_system.survey.model.*;
+import com.woosan.hr_system.utils.KiwiSingleton;
+import kr.pe.bab2min.Kiwi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +32,8 @@ public class SurveyServiceImpl implements SurveyService {
     private AuthService authService;
     @Autowired
     private NotificationService notificationService;
-//    @Autowired
-//    private KiwiSingleton kiwiSingleton;
+    @Autowired
+    private KiwiSingleton kiwiSingleton;
 
     @Override // ID를 이용한 설문 조회
     public Survey getSurveyById(int id) {
@@ -246,9 +249,9 @@ public class SurveyServiceImpl implements SurveyService {
                     // 질문 타입이 단답형(text) 또는 장문형(textarea)인 경우
                     } else if (question.getQuestionType().equals("text") || question.getQuestionType().equals("textarea")) {
                         // 질문의 각 답변 형태소 분석 처리
-//                        List<Map<String, Object>> wordList = processTextResponses(responses);
+                        List<Map<String, Object>> wordList = processTextResponses(responses);
                         // 통계 모델에 단어 구름으로 출력할 단어 리스트 추가
-//                        statistics.setWordList(wordList);
+                        statistics.setWordList(wordList);
                     // 나머지 날짜(date) 또는 시간(time)인 경우
                     } else {
                         Map<String, Integer> answerCounts = new HashMap<>();
@@ -292,49 +295,49 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     // 질문의 각 텍스트 kiwi 형태소 분석기 이용하여 응답 형태소 분석 후 단어 구름으로 출력할 단어 리스트 처리
-//    private List<Map<String, Object>> processTextResponses(List<Response> responses) {
-//        // kiwi 라이브러리를 이용하여 자연어 처리
-//        Kiwi kiwi = kiwiSingleton.getKiwi();
-//
-//        Map<String, Integer> wordCounts = new HashMap<>();
-//
-//        // 각 응답을 형태소 분석 후
-//        for (Response response : responses) {
-//            String answer = response.getAnswer();
-//            // 형태소 분석
-//            Kiwi.Token[] tokens = kiwi.tokenize(answer, Kiwi.Match.allWithNormalizing);
-//            for (Kiwi.Token token : tokens) {
-//                switch (token.tag) { // token.tag 타입이 byte
-//                    case 1: // 일반 명사, NNG, 1
-//                    case 2: // 고유 명사, NNP, 2
-//                        wordCounts.put(token.form, wordCounts.getOrDefault(token.form, 0) + 1);
-//                        break;
-//                    case 5: // 형용사, VA, 5
-//                        String word = token.form + "다"; // 형용사는 ~다 형태로
-//                        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
-//                        break;
-//                }
-//            }
-//        }
-//
-//        // JQCloud 출력을 위한 Map을 List<Map<String, Object>>로 변환
-//        List<Map<String, Object>> wordList = new ArrayList<>();
-//        for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
-//            Map<String, Object> word = new HashMap<>();
-//            word.put("text", entry.getKey()); // 키를 첫 번째 요소로
-//            word.put("weight", entry.getValue()); // 값을 두 번째 요소로 (String으로 변환)
-//            wordList.add(word);
-//        }
-//
-//        // 리스트 내림차순 정렬
-//        wordList.sort((map1, map2) -> {
-//            Integer weight1 = (Integer) map1.get("weight");
-//            Integer weight2 = (Integer) map2.get("weight");
-//            return weight2.compareTo(weight1);
-//        });
-//
-//        return wordList;
-//    }
+    private List<Map<String, Object>> processTextResponses(List<Response> responses) {
+        // kiwi 라이브러리를 이용하여 자연어 처리
+        Kiwi kiwi = kiwiSingleton.getKiwi();
+
+        Map<String, Integer> wordCounts = new HashMap<>();
+
+        // 각 응답을 형태소 분석 후
+        for (Response response : responses) {
+            String answer = response.getAnswer();
+            // 형태소 분석
+            Kiwi.Token[] tokens = kiwi.tokenize(answer, Kiwi.Match.allWithNormalizing);
+            for (Kiwi.Token token : tokens) {
+                switch (token.tag) { // token.tag 타입이 byte
+                    case 1: // 일반 명사, NNG, 1
+                    case 2: // 고유 명사, NNP, 2
+                        wordCounts.put(token.form, wordCounts.getOrDefault(token.form, 0) + 1);
+                        break;
+                    case 5: // 형용사, VA, 5
+                        String word = token.form + "다"; // 형용사는 ~다 형태로
+                        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
+                        break;
+                }
+            }
+        }
+
+        // JQCloud 출력을 위한 Map을 List<Map<String, Object>>로 변환
+        List<Map<String, Object>> wordList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
+            Map<String, Object> word = new HashMap<>();
+            word.put("text", entry.getKey()); // 키를 첫 번째 요소로
+            word.put("weight", entry.getValue()); // 값을 두 번째 요소로 (String으로 변환)
+            wordList.add(word);
+        }
+
+        // 리스트 내림차순 정렬
+        wordList.sort((map1, map2) -> {
+            Integer weight1 = (Integer) map1.get("weight");
+            Integer weight2 = (Integer) map2.get("weight");
+            return weight2.compareTo(weight1);
+        });
+
+        return wordList;
+    }
 
     // 설문조사 만료일이 지나면 설문 상태 변경
     @Scheduled(cron = "0 33 23 * * ?") // 매일 자정 00:00에 실행

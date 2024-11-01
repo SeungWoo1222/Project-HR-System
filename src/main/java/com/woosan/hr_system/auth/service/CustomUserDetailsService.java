@@ -55,7 +55,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 사용자 권한 설정
         String position = employee.getPosition().name();
         String authority = "STAFF";
-        if (position.equals("차장") || position.equals("부장")) authority = "MANAGER";
+        if (position.equals("차장") || position.equals("부장") || position.equals("사장")) authority = "MANAGER";
         List<SimpleGrantedAuthority> authorities = Arrays.asList(
             new SimpleGrantedAuthority("ROLE_" + authority),
             new SimpleGrantedAuthority("ROLE_" + employee.getDepartment().name())

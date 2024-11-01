@@ -106,6 +106,8 @@
             <button class="closeTripButton inner-btn big" th:if="${trip} != null" type="button" onclick="closeTripFields()">삭제</button>
         </div>
 
+        <div class="trip-table-container"></div>
+
         <div th:if="${trip} != null">
             <input type="hidden" id="tripId" th:value="${trip.tripId}">
             <table id="tripTable" class="details">
@@ -183,12 +185,12 @@
                     </td>
                 </tr>
             </table>
-            <div>
-                <div id="error-message" class="error-message"></div>
-                <div class="create-btn-container">
-                    <button type="reset" class="btn">초기화</button>
-                    <button type="submit" class="btn">일정 수정</button>
-                </div>
+        </div>
+        <div>
+            <div id="error-message" class="error-message"></div>
+            <div class="create-btn-container">
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">일정 수정</button>
             </div>
         </div>
     </div>

@@ -8,10 +8,8 @@ import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
-import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +39,6 @@ public class ReportServiceImpl implements ReportService {
     private EmployeeService employeeService;
     @Autowired
     private NotificationService notificationService;
-
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성 - 중앙 제어 함수(파일 유무에 따라 로직을 다르게 실행)
     public void createReportAndFile(Report report, List<MultipartFile> reportDocuments) {
