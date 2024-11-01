@@ -224,58 +224,83 @@ function addTripFields() {
     }
 
     const tripFieldsHTML = `
-            <tr>
-                <td class="section-title">출장지 주소</td>
-                <td>
-                    <div>
-                        <input type="text" id="sample6_postcode" placeholder="우편번호">
-                        <input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
-                        <input type="text" id="sample6_address" placeholder="주소"><br>
-                        <input type="text" id="sample6_detailAddress" placeholder="상세주소">
-                        <input type="text" id="sample6_extraAddress" placeholder="참고항목">
-                        <button id="mapButton" type="button" onclick="viewMap()">지도 보기</button>
-                    </div>
-                    <div id="map-section" style="display: none;">
-                        <!-- 지도와 수정 버튼 -->
-                        <div id="map" style="width:500px; height:400px;"></div>
-                        <button type="button" onclick="closeMap()">지도 닫기</button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td class="section-title">출장지 이름</td>
-                <td><input id="tripName" type="text" placeholder="출장지 이름을 입력하세요"></td>
-            </tr>
-            <tr>
-                <td class="section-title">전화번호</td>
-                <td>
-                    <input id="tripTel" type="text" oninput="localAutoHyphen(this)" maxlength="13" placeholder="전화번호를 입력하세요"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="section-title">이메일</td>
-                <td>
-                    <input id="emailLocalPart" type="text" placeholder="이메일을 입력하세요"> @
-                    <select id="domainSelect">
-                        <option value="" disabled selected>도메인 선택</option>
-                        <option value="naver.com">naver.com</option>
-                        <option value="google.com">google.com</option>
-                        <option value="hanmail.net">hanmail.net</option>
-                        <option value="nate.com">nate.com</option>
-                        <option value="kakao.com">kakao.com</option>
-                        <option value="custom">직접 입력</option>
-                    </select>
-                    <input id="domainInput" type="text" placeholder="직접 입력" disabled>
-                </td>
-            </tr>
-            <tr>
-                <td class="section-title">참고사항</td>
-                <td><input id="note" type="text" placeholder="참고사항을 입력하세요"></td>
-            </tr>`;
+    <table class="details" id="project-travel-table">
+      <tr>
+        <td class="section-title">연관된 프로젝트</td>
+        <td>
+          <select id="projectId" name="projectId">
+            <option value="" disabled selected>선택해주세요.</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장지 주소</td>
+        <td>
+          <div class="postcode-container">
+            <input type="text" id="sample6_postcode" placeholder="우편번호" readonly>
+            <button type="button" class="inner-btn blue-btn" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
+          </div>
+          <div class="address-container">
+            <input type="text" id="sample6_address" placeholder="주소" readonly>
+          </div>
+          <div class="detail-address-container">
+            <input type="text" id="sample6_detailAddress" placeholder="상세주소">
+            <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+            <div class="flex-center" style="gap: 10px;">
+              <button type="button" id="mapButton" class="inner-btn green-btn"
+                      onclick="viewMap()">지도 보기</button>
+              <button type="button" id="mapButton2" class="inner-btn green-btn"
+                      onclick="closeMap()" style="display: none;">지도 닫기</button>
+            </div>
+          </div>
+          <div id="map-section" class="flex-center" style="display: none; margin-top: 10px;">
+            <div id="map" style="width:500px; height:400px;"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장지 이름</td>
+        <td>
+          <input id="tripName" type="text"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">전화번호</td>
+        <td>
+          <input id="tripTel" type="text" class="input-text" oninput="localAutoHyphen(this)" maxlength="13" placeholder="숫자만 입력하세요."/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">이메일</td>
+        <td>
+          <div class="email-container">
+            <input id="emailLocalPart" type="text" class="input-text"/>
+            <div class="characters">@</div>
+            <input id="domainInput" type="text" style="display: none;" disabled>
+            <select id="domainSelect">
+              <option value="" disabled selected>도메인 선택</option>
+              <option value="naver.com">naver.com</option>
+              <option value="google.com">google.com</option>
+              <option value="hanmail.net">hanmail.net</option>
+              <option value="nate.com">nate.com</option>
+              <option value="kakao.com">kakao.com</option>
+              <option value="custom">직접 입력</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">참고사항</td>
+        <td>
+          <input id="note" type="text" class="input-text"/>
+        </td>
+      </tr>
+    </table>
+    `
 
     // 새로운 HTML 추가
     tripFieldsContainer.innerHTML = tripFieldsHTML;
-    tripFieldsContainer.style.display = 'block';
+    tripFieldsContainer.style.display = 'table';
     document.querySelector('.addTripButton').style.display = 'none';
     document.querySelector('.closeTripButton').style.display = 'block';
 }

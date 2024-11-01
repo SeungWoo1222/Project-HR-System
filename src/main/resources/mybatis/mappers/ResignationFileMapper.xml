@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.resignation.dao.ResignationFileDAO">
+<mapper namespace="resignationFile">
 
     <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
         <id property="fileId" column="file_id"/>
         <result property="originalFileName" column="original_file_name"/>
         <result property="storedFileName" column="stored_file_name"/>
         <result property="fileSize" column="file_size"/>
-        <result property="uploadDate" column="upload_date"/>
+        <result property="uploadedAt" column="uploaded_at"/>
         <result property="uploadedBy" column="uploaded_by"/>
         <result property="fileIdUsage" column="file_id_usage"/>
     </resultMap>
 
     <!-- resignationId(employeeId)의 모든 파일 정보 조회 -->
     <select id="selectAllFileInfo" parameterType="String" resultMap="FileResultMap">
-        SELECT f.file_id, f.original_file_name, f.stored_file_name, f.file_size, f.upload_date, f.uploaded_by, f.file_id_usage
+        SELECT f.file_id, f.original_file_name, f.stored_file_name, f.file_size, f.uploaded_at, f.uploaded_by, f.file_id_usage
         FROM files f
                  INNER JOIN resignation_files rf ON f.file_id = rf.file_id
         WHERE rf.resignation_id = #{resignationId}

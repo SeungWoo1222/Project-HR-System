@@ -20,7 +20,7 @@ public class Resignation {
     private String specificReason;
     private String resignationDocuments;
     private String processedBy;
-    private LocalDateTime processedDate;
+    private LocalDateTime processedAt;
 
     // 퇴사 정보를 초기화
     public void initializeResignationDetails(String employeeId, Resignation resignation, String processedBy, LocalDateTime processedDate) {
@@ -28,7 +28,7 @@ public class Resignation {
         this.resignationReason = classifyReason(resignation.getResignationReason());
         this.codeNumber = classifyCodeNumber(resignation.getCodeNumber());
         this.processedBy = processedBy;
-        this.processedDate = processedDate;
+        this.processedAt = processedDate;
     }
 
     // 퇴사 사유와 설명을 매핑하는 맵 초기화

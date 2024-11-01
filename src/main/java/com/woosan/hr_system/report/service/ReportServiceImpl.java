@@ -1,10 +1,7 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
-import com.woosan.hr_system.employee.model.Employee;
-import com.woosan.hr_system.employee.service.EmployeeService;
-import com.woosan.hr_system.notification.service.NotificationService;
+import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
@@ -31,8 +28,6 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
     @Autowired
-    private EmployeeDAO employeeDAO;
-    @Autowired
     private FileService fileService;
     @Autowired
     private ReportFileDAO reportFileDAO;
@@ -40,11 +35,6 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileService reportFileService;
     @Autowired
     private RequestService requestService;
-    @Autowired
-    private NotificationService notificationService;
-    @Autowired
-    private EmployeeService employeeService;
-
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
     public List<Integer> createReport(Report report, List<MultipartFile> reportDocuments) {

@@ -12,5 +12,4 @@ public interface ScheduleService {
     void updateSchedule(Schedule schedule);
     void updateScheduleStatus(int taskId, String status, String taskName);
     void deleteSchedule(int taskId);
-
 }

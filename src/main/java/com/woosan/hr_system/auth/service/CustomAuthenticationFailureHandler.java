@@ -1,6 +1,6 @@
 package com.woosan.hr_system.auth.service;
 
-import com.woosan.hr_system.auth.dao.PasswordDAO;
+import com.woosan.hr_system.auth.dao.PasswordDAOImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     @Autowired
-    private PasswordDAO passwordDAO;
+    private PasswordDAOImpl passwordDAO;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {

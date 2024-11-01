@@ -3,21 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.file.dao.FileDAO">
+<mapper namespace="file">
     <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
         <id property="fileId" column="file_id"/>
         <result property="originalFileName" column="original_file_name"/>
         <result property="storedFileName" column="stored_file_name"/>
         <result property="fileSize" column="file_size"/>
-        <result property="uploadDate" column="upload_date"/>
+        <result property="uploadedAt" column="uploaded_at"/>
         <result property="uploadedBy" column="uploaded_by"/>
         <result property="fileIdUsage" column="file_id_usage"/>
     </resultMap>
 
     <!-- 파일 정보 삽입 -->
     <insert id="insertFile" parameterType="com.woosan.hr_system.file.model.File" useGeneratedKeys="true" keyProperty="fileId">
-        INSERT INTO files (original_file_name, stored_file_name, file_size, upload_date, uploaded_by, file_id_usage)
-        VALUES (#{originalFileName}, #{storedFileName}, #{fileSize}, #{uploadDate}, #{uploadedBy}, #{fileIdUsage})
+        INSERT INTO files (original_file_name, stored_file_name, file_size, uploaded_at, uploaded_by, file_id_usage)
+        VALUES (#{originalFileName}, #{storedFileName}, #{fileSize}, #{uploadedAt}, #{uploadedBy}, #{fileIdUsage})
     </insert>
 
     <!-- 파일 ID로 파일 정보 조회 -->

@@ -3,7 +3,7 @@ package com.woosan.hr_system.holiday.service;
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.holiday.dao.HolidayDAO;
+import com.woosan.hr_system.holiday.dao.HolidayDAOImpl;
 import com.woosan.hr_system.holiday.model.Holiday;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.util.*;
 @Service
 public class HolidayServiceImpl implements HolidayService {
     @Autowired
-    private HolidayDAO holidayDAO;
+    private HolidayDAOImpl holidayDAO;
     @Autowired
     private CommonService commonService;
 
