@@ -88,6 +88,7 @@
         UPDATE attendance
         SET check_in = #{checkIn},
             check_out = #{checkOut},
+            working_hours = #{workingHours},
             status = #{status},
             vacation_id = #{vacationId},
             trip_id = #{tripId},

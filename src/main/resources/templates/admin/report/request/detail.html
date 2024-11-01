@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/report/request-detail.css}" rel="stylesheet"/>
+</th:block>
+
+
+<div>
+    <div class="detail-container">
+        <div class="content-header">
+            <div class="content-header-left">
+                <form th:action="@{'/admin/request/edit'}" method="get" style="display:inline;">
+                    <input type="hidden" name="requestId" th:value="${request.requestId}">
+                    <button type="submit" class="inner-btn tomato-btn big"
+                            onclick="return confirm('보고서 요청을 수정하시겠습니까?');">수정</button>
+                </form>
+
+                <form th:action="@{'/admin/request/delete/' + ${request.requestId}}" method="post" style="display:inline;">
+                    <input type="hidden" name="_method" value="delete">
+                    <button type="submit" class="inner-btn red-btn big"
+                            onclick="return confirm('보고서 요청을 삭제하시겠습니까?');">삭제</button>
+                </form>
+            </div>
+        </div>
+        <table>
+            <tr>
+                <td class="section-title">보고서 작성자</td>
+                <td th:text="${request.writerName}"></td>
+            </tr>
+            <tr>
+                <td class="section-title">요청 일시</td>
+                <td th:text="${#temporals.format(request.requestDate, 'yyyy년 MM월 dd일 HH:mm')}"></td>
+            </tr>
+            <tr>
+                <td class="section-title">마감일</td>
+                <td th:text="${request.dueDate}"></td>
+            </tr>
+            <tr>
+                <td class="section-title">요청 사항</td>
+                <td th:text="${request.requestNote}"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+</html>

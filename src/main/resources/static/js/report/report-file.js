@@ -5,24 +5,24 @@ let filesArr = [];
 
 // 기존 등록된 파일ID를 registeredFileIdList 저장
 function initializeRegisteredFiles() {
-    const registeredDocumentsElement = document.getElementById('fileList');
+    const registeredDocumentsElement = document.getElementById('current-file-list');
 
     if (registeredDocumentsElement) {
         // 기존 파일 목록에서 파일 정보를 가져옴
-        const fileElements = registeredDocumentsElement.querySelectorAll('li');
+        const fileElements = registeredDocumentsElement.querySelectorAll('.file-box');
 
-        fileElements.forEach((fileElement, index) => {
-            const fileId = fileElement.querySelector('.editFileId').value;
+        fileElements.forEach((fileElement) => {
+            const fileId = fileElement.querySelector('input[name="fileId"]').value;
 
             if (fileId) {
-                // 기존 파일을 filesMap에 추가
+                // 기존 파일을 registeredFileIdList에 추가
                 registeredFileIdList.push(fileId);
             }
         });
     }
 }
 
-// x버튼을 누르면 registeredFileIdList에서 파일 ID를 제거
+// remove-btn 버튼을 누르면 registeredFileIdList에서 파일 ID를 제거
 function deleteRegisteredFile(button, fileId) {
     const index = registeredFileIdList.indexOf(fileId);
     if (index > -1) {
@@ -30,8 +30,20 @@ function deleteRegisteredFile(button, fileId) {
     }
 
     // UI에서 파일 항목을 삭제
-    const fileItem = button.closest('li');
-    fileItem.remove();
+    const fileItem = button.closest('.file-box');
+    if (fileItem) {
+        fileItem.remove();
+    }
+
+    // 파일이 모두 삭제된 경우 "첨부된 파일이 없습니다." 메시지 출력
+    const currentFileList = document.getElementById('current-file-list');
+    if (currentFileList && currentFileList.querySelectorAll('.file-box').length === 0) {
+        const noFilesMessage = document.createElement('p');
+        noFilesMessage.style.fontStyle = 'italic';
+        noFilesMessage.style.color = '#888';
+        noFilesMessage.textContent = '첨부된 파일이 없습니다.';
+        currentFileList.appendChild(noFilesMessage);
+    }
 }
 
 // 첨부 파일 추가

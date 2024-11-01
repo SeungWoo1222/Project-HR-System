@@ -13,7 +13,6 @@ import java.util.Map;
 @Slf4j
 @Repository
 public class EmployeeDAO {
-
     @Autowired
     private SqlSession sqlSession;
 
@@ -27,8 +26,10 @@ public class EmployeeDAO {
     // id를 이용한 특정 사원 정보 조회
     public Employee getEmployeeById(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeById", employeeId); }
 
-    // id를 이용한 특정 사원의 모든 정보 조회
-    public Employee getEmployeeDetails(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeDetails", employeeId); }
+    // id를 이용한 특정 사원의 모든 정보 조회 (비밀번호 정보, 급여 정보, 퇴사 정보 포함)
+    public Employee getEmployeeDetails(String employeeId) {
+        return sqlSession.selectOne(NAMESPACE + "selectEmployeeDetails", employeeId);
+    }
 
     // id를 이용한 특정 사원의 이름 조회
     public String getEmployeeName(String employeeId) { return sqlSession.selectOne(NAMESPACE + "getEmployeeName", employeeId); }
@@ -47,6 +48,11 @@ public class EmployeeDAO {
 
     // 퇴사 후 12개월이 지난 사원 정보 조회
     public List<Employee> getPreDeletionEmployees() { return sqlSession.selectList(NAMESPACE + "getPreDeletionEmployees"); };
+
+    // 퇴사 사원 정보 조회
+    public Employee getResignedEmployee(String employeeId) {
+        return sqlSession.selectOne(NAMESPACE + "getResignedEmployee", employeeId);
+    }
 
     // 이번 년도 입사한 사람의 수 조회
     public int countEmployeesByYear(int year) { return sqlSession.selectOne(NAMESPACE + "countEmployeesByYear", year); };

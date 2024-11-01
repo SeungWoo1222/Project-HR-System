@@ -5,12 +5,13 @@
 
 <th:block layout:fragment="css">
     <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/color.css}" rel="stylesheet"/>
     <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
 </th:block>
 
 <div class="attendance-detail-container">
     <div class="content-header">
-        <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+    <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
             <button type="button" class="inner-btn" th:attendanceId="${attendance.attendanceId}"
                     th:onclick="goToUpdateForm(this.getAttribute('attendanceId'))">수정</button>
         </div>
@@ -50,8 +51,12 @@
                     <span th:text="${attendance.overtime?.totalHours} + '시간 '
                     + '(' + ${#temporals.format(attendance.overtime?.startTime, 'HH:mm')}
                     + '~' + ${#temporals.format(attendance.overtime?.endTime, 'HH:mm')} + ')'"></span>
-                    <button type="button" class="inner-btn blue-btn" th:overtimeId="${attendance.overtimeId}"
-                            th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">초과근무 수정</button>
+                    <div>
+                        <button type="button" class="inner-btn tomato-btn" th:overtimeId="${attendance.overtimeId}"
+                                th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">수정</button>
+                        <button type="button" class="inner-btn red-btn" th:overtimeId="${attendance.overtimeId}"
+                                th:onclick="deleteOvertime(this.getAttribute('overtimeId'))">삭제</button>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -72,7 +77,7 @@
         </tr>
         <tr>
             <td class="section-title">마지막 수정 일시</td>
-            <td th:text="${#temporals.format(attendance.lastModified, 'yyyy년 MM월 dd일 hh:mm')}"></td>
+            <td th:text="${#temporals.format(attendance.lastModified, 'yyyy.MM.dd(EE) hh:mm')}"></td>
             <td class="section-title" style="font-size: 15px">마지막 수정 사원 ID</td>
             <td th:text="${attendance.modifiedBy}"></td>
         </tr>

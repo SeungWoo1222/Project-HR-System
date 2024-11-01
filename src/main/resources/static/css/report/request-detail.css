@@ -1,0 +1,21 @@
+.detail-container {
+    width: 600px;
+}
+
+.detail-container table {
+    width: 100%;
+    border: solid 1px #ddd;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.detail-container table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.section-title {
+    font-weight: bold;
+    background-color: #f7f7f7;
+}

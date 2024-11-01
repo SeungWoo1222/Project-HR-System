@@ -24,6 +24,7 @@ public interface EmployeeService {
 
     // == 등록 ==
     Map<String, Object> insertEmployee(Employee employee, MultipartFile picture);
+    String join(Employee employee);
 
     // == 수정 ==
     String updateEmployee(Employee employee, MultipartFile picture);

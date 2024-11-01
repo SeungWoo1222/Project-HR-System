@@ -1,13 +1,11 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.report.model.ReportFileLink;
+import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import org.springframework.web.multipart.MultipartFile;
-import com.woosan.hr_system.report.model.Report;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,19 +26,20 @@ public interface ReportService {
     // 최근 5개 보고서 조회
     List<Report> getRecentReports(String writerId);
     // 내가 쓴 보고서 페이징, 검색 + 보고서 조회
-    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
+    PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, String startDate, String endDate);
     // 결재 할 보고서 페이징, 검색 + 보고서 조회 (MANAGER)
-    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate);
+    PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, String startDate, String endDate);
     // 결재 미처리 보고서 조회(MANAGER)
     List<Report> getUnprocessedReports(String approverId);
     // 보고서 통계 조회
     List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList);
+    List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, String writerId);
 //======================================================조회============================================================
 //======================================================수정============================================================
     // 보고서 수정 관련 메소드
     void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> registeredFileIdList);
     // 보고서 결재 처리
-    void updateApprovalStatus(int reportId, String status, String rejectionReasont);
+    String updateApprovalStatus(int reportId, String status, String rejectionReasont);
 //======================================================수정============================================================
 //======================================================삭제============================================================
     // 보고서 삭제

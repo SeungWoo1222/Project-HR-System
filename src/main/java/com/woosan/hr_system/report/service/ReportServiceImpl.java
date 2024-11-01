@@ -20,15 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
+    @Autowired
+    private EmployeeDAO employeeDAO;
     @Autowired
     private FileService fileService;
     @Autowired
@@ -144,6 +147,7 @@ public class ReportServiceImpl implements ReportService {
         return report;
     }
 
+
     @Override // 최근 5개 보고서 조회
     public List<Report> getRecentReports(String writerId) {
         return reportDAO.getRecentReports(writerId);
@@ -155,7 +159,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override // 보고서 검색
-    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Report> searchReports(PageRequest pageRequest, String writerId, Integer searchType, String approvalStatus, String startDate, String endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -168,7 +172,7 @@ public class ReportServiceImpl implements ReportService {
 
     // 결재할 보고서 검색
     @Override
-    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, LocalDate startDate, LocalDate endDate) {
+    public PageResult<Report> toApproveSearchReports(PageRequest pageRequest, String approverId, Integer searchType, String approvalStatus, String startDate, String endDate) {
         // 보여줄 리스트의 범위를 지정
         int offset = pageRequest.getPage() * pageRequest.getSize();
         // 범위에 속하는 보고서를 검색함
@@ -182,6 +186,11 @@ public class ReportServiceImpl implements ReportService {
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
         return reportDAO.getReportStats(startDate, endDate, writerIdList);
+    }
+
+    @Override // 보고서 통계 조회
+    public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, String writerId) {
+        return reportDAO.getReportStats(startDate, endDate, writerId);
     }
 //=====================================================조회 메소드======================================================
 //=====================================================수정 메소드======================================================
@@ -212,9 +221,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
     @Override // 보고서 결재 처리
-    public void updateApprovalStatus(int reportId, String status, String rejectionReason) {
-        // 결재 권한 및 Report 유무 확인
-        checkReportAuthorization(reportId);
+    public String updateApprovalStatus(int reportId, String status, String rejectionReason) {
         // report 객체 설정
         Report report = new Report();
         report.setReportId(reportId);
@@ -222,6 +229,7 @@ public class ReportServiceImpl implements ReportService {
         report.setRejectReason(rejectionReason);
 
         reportDAO.updateApprovalStatus(report);
+        return "보고서 결재가 완료되었습니다.";
     }
 //=====================================================수정 메소드======================================================
 //=====================================================삭제 메소드======================================================

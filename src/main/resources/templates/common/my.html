@@ -131,13 +131,16 @@
                         </tr>
                         <tr>
                             <td class="section-title">부서 / 직급</td>
-                            <td th:text="${employee.department == 'HR' ? 'HR(인사)' :
-                                  (employee.department == 'FI' ? 'FI(재무)' :
-                                  (employee.department == 'SA' ? 'SA(영업)' :
-                                  (employee.department == 'MK' ? 'MK(마케팅)' :
-                                  (employee.department == 'QC' ? 'QC(품질관리)' :
-                                  (employee.department == 'RD' ? 'RD(연구개발)' : 'PR(생산)')))))}
-                                  + ' / ' + ${employee.position}"></td>
+                            <td th:switch="${employee.department.name}">
+                                <span th:case="'HR'">HR(인사)</span>
+                                <span th:case="'FI'">FI(재무)</span>
+                                <span th:case="'SA'">SA(영업)</span>
+                                <span th:case="'MK'">MK(마케팅)</span>
+                                <span th:case="'QC'">QC(품질관리)</span>
+                                <span th:case="'RD'">RD(연구개발)</span>
+                                <span th:case="'PR'">PR(생산)</span>
+                                <span th:text="' / ' + ${employee.position}"></span>
+                            </td>
                         </tr>
                         <tr>
                             <td class="section-title">입사 날짜</td>

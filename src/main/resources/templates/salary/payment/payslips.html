@@ -95,7 +95,7 @@
                 <div class="content-header-left">
                     <h3>내 급여 정보</h3>
                 </div>
-                <div class="content-header-right">
+                <div class="content-header-right" th:unless="${salaryList.isEmpty()}">
                     <button type="button" class="btn" th:employeeId="${salaryList.get(0).employeeId}" onclick="openModal('/salary/' + this.getAttribute('employeeId') + '/account/edit')">현재 계좌 정보 수정</button>
                 </div>
             </div>
@@ -109,12 +109,17 @@
                 <th>사용 여부</th>
                 </thead>
                 <tbody>
+                <tr th:if="${salaryList.isEmpty()}">
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        아직 급여 정보가 없습니다. 인사(HR)부서에 문의해주세요.
+                    </td>
+                </tr>
                 <tr th:each="salaryInfo, stat : ${salaryList}">
                     <td th:text="${stat.index + 1}"></td>
                     <td th:text="${salaryInfo.position}"></td>
                     <td th:text="${salaryInfo.bank + ' ' + salaryInfo.accountNumber}"></td>
                     <td th:text="${#numbers.formatInteger(salaryInfo.annualSalary, 3, 'COMMA')}"></td>
-                    <td th:text="${salaryInfo.createdAt}"></td>
+                    <td th:text="${#temporals.format(salaryInfo.createdAt, 'yy.MM.dd(EE)')}"></td>
                     <td th:text="${salaryInfo.status} ? '사용 중' : '사용 중지'"
                         th:classappend="${salaryInfo.status} ? 'green' : 'red'"></td>
                 </tr>
@@ -137,9 +142,14 @@
                 <th>실 지급액</th>
                 </thead>
                 <tbody>
+                <tr th:if="${payslips.isEmpty()}">
+                    <td colspan="9" style="text-align: center; padding: 20px;">
+                        아직 확인할 수 있는 급여명세서가 없습니다.
+                    </td>
+                </tr>
                 <tr th:each="payslip : ${payslips}"  th:paymentId="${payslip.paymentId}" th:onclick="openModal('/salary/payment/' + this.getAttribute('paymentId'))">
                     <td th:text="${payslip.compensationMonth.year} + '년 ' + ${'%02d'.formatted(payslip.compensationMonth.monthValue)} + '월'"></td>
-                    <td th:text="${payslip.paymentDate}"></td>
+                    <td th:text="${#temporals.format(payslip.paymentDate, 'yy.MM.dd(EE)')}"></td>
                     <td th:text="${#numbers.formatInteger(payslip.baseSalary
                                                         + payslip.positionAllowance
                                                         + payslip.mealAllowance

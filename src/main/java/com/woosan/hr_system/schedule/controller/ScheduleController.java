@@ -1,18 +1,15 @@
 package com.woosan.hr_system.schedule.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.employee.service.EmployeeService;
-import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.holiday.service.HolidayService;
+import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.schedule.service.ScheduleService;
-import com.woosan.hr_system.survey.model.Response;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -41,8 +37,10 @@ public class ScheduleController {
     @Autowired
     private HolidayService holidayService;
 
-    @GetMapping("/{employeeId}/list") // 사원의 모든 일정 조회
-    public String viewScheduleList(@PathVariable("employeeId") String employeeId, Model model) {
+    @GetMapping("/list") // 사원의 모든 일정 조회
+    public String viewScheduleList(Model model) {
+        String employeeId = authService.getAuthenticatedUser().getUsername();
+
         // 사원의 일정 조회
         List<Schedule> scheduleList = scheduleService.getSchedulesByEmployeeId(employeeId);
         model.addAttribute("scheduleList", scheduleList);

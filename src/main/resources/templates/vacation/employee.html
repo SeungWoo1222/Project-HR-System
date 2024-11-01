@@ -66,8 +66,8 @@
             </tr>
             <tr th:each="vacation : ${vacationList}" th:vacationId="${vacation.vacationId}" th:onclick="openModal('/vacation/' + this.getAttribute('vacationId'))">
                 <td th:text="${vacation.vacationType}">휴가 유형</td>
-                <td th:text="${#temporals.format(vacation.startAt, 'yyyy년 MM월 dd일')
-                               + ' ~ ' + #temporals.format(vacation.endAt, 'MM월 dd일')}">휴가 기간</td>
+                <td th:text="${#temporals.format(vacation.startAt, 'yyyy.MM.dd(EE)')
+                               + ' ~ ' + #temporals.format(vacation.endAt, 'MM.dd(EE)')}">휴가 기간</td>
                 <td th:text="${vacation.usedDays}">사용 연차</td>
                 <td th:text="${vacation.reason}" style="max-width: 250px">휴가 사유</td>
                 <td th:text="${vacation.approvalStatus}"
@@ -75,7 +75,7 @@
                                     (${vacation.approvalStatus == '승인'} ? 'green' :
                                     (${vacation.approvalStatus == '거절'} ? 'red' : ''))">승인 상태</td>
                 <td th:text="${vacation.processingBy}">처리 사원</td>
-                <td th:text="${#temporals.format(vacation.processingAt, 'yyyy-MM-dd')}">처리 일시</td>
+                <td th:text="${#temporals.format(vacation.processingAt, 'yy.MM.dd(EE)')}">처리 일시</td>
             </tr>
             </tbody>
         </table>

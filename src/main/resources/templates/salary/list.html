@@ -151,7 +151,7 @@
                         <td th:text="${salary.position.name}">직급</td>
                         <td th:text="${salary.bank + ' ' + salary.accountNumber}">계좌번호</td>
                         <td th:text="${#numbers.formatInteger(salary.annualSalary, 3, 'COMMA')}" class="annualSalary">연봉</td>
-                        <td th:text="${salary.createdAt}">등록된 날짜</td>
+                        <td th:text="${#temporals.format(salary.createdAt, 'yy.MM.dd(EE)')}">등록된 날짜</td>
                         <td th:text="${salary.status} ? '사용 중' : '사용 중지'"
                             th:classappend="${salary.status} ? 'green' : 'red'">사용 여부</td>
                     </tr>

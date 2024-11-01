@@ -4,8 +4,9 @@ import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
 import com.woosan.hr_system.employee.model.Employee;
+import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.dao.VacationDAO;
@@ -25,11 +26,13 @@ public class VacationServiceImpl implements VacationService {
     @Autowired
     private VacationDAO vacationDAO;
     @Autowired
-    private EmployeeDAO employeeDAO;
+    private EmployeeService employeeService;
     @Autowired
     private CommonService commonService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override // 아이디를 이용한 휴가 정보 조회
     public Vacation getVacationById(int vacationId) {
@@ -90,7 +93,7 @@ public class VacationServiceImpl implements VacationService {
     @Override // 해당 부서의 모든 휴가 정보 조회
     public PageResult<Vacation> getVacationsByDepartmentId(PageRequest pageRequest, String departmentId, String status, String startDate, String endDate) {
         // 해당 부서 사원 조회 후 아이디 리스트로 반환
-        List<Employee> employeeList = employeeDAO.getEmployeesByDepartment(departmentId);
+        List<Employee> employeeList = employeeService.getEmployeesByDepartment(departmentId);
         List<String> employeeIdList = employeeList.stream()
                 .map(Employee::getEmployeeId)
                 .toList();
@@ -122,9 +125,20 @@ public class VacationServiceImpl implements VacationService {
         // 휴가 등록
         vacationDAO.insertVacation(vacation);
 
-        // 알림 전송 후 메세지 반환
-        String message = "'" + employeeDAO.getEmployeeName(vacation.getEmployeeId()) + "' 사원이 "
+        // 휴가 신청자 부서의 관리자에게 알림 전송 후 메세지 반환
+        String department = vacation.getEmployeeId().substring(0,2);
+        String message = "'" + employeeService.getEmployeeNameById(vacation.getEmployeeId()) + "' 사원이 "
                 + vacation.getVacationType()  + "를 신청하였습니다.";
+        List<String> managers = new ArrayList<>();
+        managers.addAll(employeeService.convertEmployeesToIdList(
+                employeeService.getEmployeesByDepartmentAndPosition(department, "차장")));
+        managers.addAll(employeeService.convertEmployeesToIdList(
+                employeeService.getEmployeesByDepartmentAndPosition(department, "부장")));
+        if (!managers.isEmpty()) {
+            notificationService.createNotifications(managers,
+                    message + "<br>처리자 : " + authService.getAuthenticatedUser().getNameWithId(),
+                    "/vacation/department");
+        }
         return vacation.getVacationType() + " 신청이 완료되었습니다.";
     }
 
@@ -166,7 +180,7 @@ public class VacationServiceImpl implements VacationService {
         if (!vacationInfo.getApprovalStatus().equals("미처리")) throw new IllegalArgumentException("이미 처리된 휴가입니다.");
 
         // 휴가 승인 시 잔여 연차 확인
-        float remainingLeave = employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()).getRemainingLeave();
+        float remainingLeave = employeeService.getEmployeeById(vacationInfo.getEmployeeId()).getRemainingLeave();
         if (vacationInfo.getApprovalStatus().equals("승인") && remainingLeave - vacationInfo.getUsedDays() < 0)
             throw new IllegalArgumentException("연차 사용 일수가 잔여 연차보다 많습니다.");
 
@@ -179,8 +193,9 @@ public class VacationServiceImpl implements VacationService {
                 .build();
         vacationDAO.approveVacation(updatedVacation);
 
-        // 알림 전송 후 메세지 반환
+        // 휴가 신청자에게 알림 전송 후 메세지 반환
         String message = "휴가('" + vacationId + "')가 " + status + "되었습니다.";
+        notificationService.createNotifications(vacationInfo.getEmployeeId(), message, "/vacation/employee");
         return message;
     }
 

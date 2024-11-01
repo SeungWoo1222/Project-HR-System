@@ -28,7 +28,7 @@ public class SecurityConfig {
                 // 요청에 대한 인가 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/login", "/auth/logout","/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update").permitAll() // 이 경로는 인증 없이 접근 허용
+                                .requestMatchers("/auth/login", "/auth/logout", "/auth/join","/auth/session-expired", "/error/**","/css/**", "/js/**", "/images/**", "/files/**", "/api/employee/update", "/api/employee/join").permitAll() // 이 경로는 인증 없이 접근 허용
 
                                 // 관리자 권한
                                 .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("MANAGER")

@@ -1,0 +1,33 @@
+.table-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.table-wrapper {
+    flex-basis: 50%;
+}
+
+.table-wrapper:first-child {
+    padding-right: 20px;
+    margin-right: 20px;
+}
+
+.table-wrapper .content-header-left {
+    gap: 10px;
+}
+
+.stats-container {
+    border-top: #DCDCDC 1px solid;
+    margin-top: 10px;
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stats-wrapper {
+    padding: 15px;
+    border: #EEE 2px solid;
+    border-radius: 10px;
+}

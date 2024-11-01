@@ -79,9 +79,7 @@ public class OvertimeServiceImpl implements OvertimeService{
     @LogBeforeExecution
     @LogAfterExecution
     @Override // 초과근무 등록
-    public String addOvertime(int attendanceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        String employeeId = authService.getAuthenticatedUser().getUsername();
-
+    public String addOvertime(int attendanceId, String employeeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         // 총 초과 근무 시간 설정
         Map<String, Object> map = setTotalHours(employeeId, startTime, endTime);
         float overtimeHours = (float) map.get("overtimeHours");
