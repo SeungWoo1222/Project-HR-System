@@ -145,6 +145,31 @@ function goToUpdateForm(attendanceId) {
 function submitUpdateForm(event) {
     event.preventDefault();
 
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
+        return false;
+    }
+
     // 유효성 검사
     const checkIn = document.getElementById('checkIn').value;
     const checkOut = document.getElementById('checkOut').value;
@@ -157,18 +182,15 @@ function submitUpdateForm(event) {
     errorMessage.textContent = '';
 
     if (!checkIn.match(timeRegex)) {
-        errorMessage.textContent = "출근 시간은 'HH:mm:ss' 형식이어야 합니다.";
-        return;
+        return showError('checkIn', '출근 시간은 \'HH:mm:ss\' 형식이어야 합니다.', true);
     }
 
     if (!checkOut.match(timeRegex)) {
-        errorMessage.textContent = "퇴근 시간은 'HH:mm:ss' 형식이어야 합니다.";
-        return;
+        return showError('checkOut', '퇴근 시간은 \'HH:mm:ss\' 형식이어야 합니다.', true);
     }
 
     if (!status) {
-        errorMessage.textContent = "근태 상태를 선택해주세요.";
-        return;
+        return showError('status', '근태 상태를 선택해주세요.');
     }
 
     errorMessage.textContent = '';

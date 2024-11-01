@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.employee.dao.EmployeeDAO">
+<mapper namespace="employee">
     <resultMap id="EmployeeResultMap" type="com.woosan.hr_system.employee.model.Employee">
         <id property="employeeId" column="employee_id"/>
         <result property="name" column="name"/>
@@ -52,7 +52,7 @@
             <result property="codeNumber" column="code_number"/>
             <result property="specificReason" column="specific_reason"/>
             <result property="processedBy" column="processed_by"/>
-            <result property="processedDate" column="processed_date"/>
+            <result property="processedAt" column="processed_At"/>
         </association>
     </resultMap>
 
@@ -111,7 +111,7 @@
             <result property="specificReason" column="specific_reason"/>
             <result property="resignationDocuments" column="resignation_documents"/>
             <result property="processedBy" column="processed_by"/>
-            <result property="processedDate" column="processed_date"/>
+            <result property="processedAt" column="processed_at"/>
         </association>
     </resultMap>
 
@@ -201,18 +201,18 @@
 
     <!-- 퇴사 후 2개월 이내의 사원 정보 조회 -->
     <select id="getResignedEmployees" resultMap="EmployeeWithResignationResultMap">
-        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_date
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_at
         FROM employees e
-                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+                 LEFT JOIN resignations r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
           AND r.resignation_date >= DATE_SUB(NOW(), INTERVAL 2 MONTH)
     </select>
 
     <!-- 퇴사 후 12개월이 지난 사원 정보 조회 -->
     <select id="getPreDeletionEmployees" resultMap="EmployeeWithResignationResultMap">
-        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_date
+        SELECT e.*, r.resignation_date, r.resignation_reason, r.code_number, r.specific_reason, r.processed_by, r.processed_at
         FROM employees e
-                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+                 LEFT JOIN resignations r ON e.employee_id = r.employee_id
         WHERE e.status = '퇴사'
           AND r.resignation_date &lt;= DATE_SUB(NOW(), INTERVAL 12 MONTH)
     </select>
@@ -221,7 +221,7 @@
     <select id="getResignedEmployee" parameterType="String" resultMap="EmployeeWithResignationResultMap">
         SELECT e.*, r.*
         FROM employees e
-                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+                 LEFT JOIN resignations r ON e.employee_id = r.employee_id
         WHERE e.employee_id = #{employeeId}
     </select>
 
@@ -327,7 +327,7 @@
         FROM employees e
                  JOIN passwords p ON e.employee_id = p.employee_id
                  LEFT JOIN salaries s ON e.employee_id = s.employee_id
-                 LEFT JOIN resignation r ON e.employee_id = r.employee_id
+                 LEFT JOIN resignations r ON e.employee_id = r.employee_id
         WHERE e.employee_id = #{employeeId};
     </select>
 </mapper>

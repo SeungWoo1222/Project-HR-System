@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +83,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 상태 변경
     public void updateScheduleStatus(int taskId, String status, String taskName) {
-        checkScheduleAuthorization(taskId);
         if ("완료".equals(status)) {
             UserSessionInfo userSessionInfo = new UserSessionInfo();
             String employeeId = userSessionInfo.getCurrentEmployeeId();
@@ -95,8 +93,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 삭제
     public void deleteSchedule(int taskId) {
-        checkScheduleAuthorization(taskId);
-
         Schedule schedule = scheduleDAO.getScheduleById(taskId);
         scheduleDAO.insertScheduleArchive(schedule);
 

@@ -2,6 +2,9 @@ package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
+import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.notification.service.NotificationService;
+import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.RequestDAO;
 import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
@@ -25,6 +28,10 @@ public class RequestServiceImpl implements RequestService {
     @Autowired
     private RequestDAO requestDAO;
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
     private AuthService authService;
 
 //===================================================생성 메소드=======================================================
@@ -42,7 +49,10 @@ public class RequestServiceImpl implements RequestService {
             params.put("requestNote", request.getRequestNote());
             params.put("requestDate", requestDate);
 
-            requestDAO.createRequest(params);
+            int requestId = requestDAO.createRequest(params);
+            // 보고서 생성 후 결재자에게 알림 생성
+            String requesterName = employeeService.getEmployeeNameById(request.getRequesterId());
+            notificationService.createNotification(request.getIdList().get(i), "보고서 작성 요청이 있습니다. <br>요청자 : " + requesterName, "/report/writeFromRequest?requestId=" + requestId);
         }
     }
 
@@ -51,9 +61,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override // 요청 세부 조회
     public Request getRequestById(int requestId) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
-        Request request = checkRequestAuthorization(requestId, currentEmployeeId);
+        Request request = checkRequestAuthorization(requestId);
         return request;
     }
 
@@ -158,11 +166,13 @@ public class RequestServiceImpl implements RequestService {
 
 //===================================================삭제 메소드=======================================================
 //===================================================기타 메소드=======================================================
-    // 요청에 대한 접근 권한이 있는지 확인
-    public Request checkRequestAuthorization(int requestId, String currentEmployeeId) {
+    // 요청에 대한 접근 권한, 요청이 있는지 확인
+    public Request checkRequestAuthorization(int requestId) {
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
             Request request = requestDAO.getRequestById(requestId); // 요청 세부 정보 가져오기
             if (request == null) {
-                throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+                throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.\nReport ID : " + requestId);
             }
 
             // 작성자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생

@@ -1,7 +1,7 @@
 package com.woosan.hr_system;
 
-import com.woosan.hr_system.resignation.dao.ResignationDAO;
 import com.woosan.hr_system.employee.service.EmployeeService;
+import com.woosan.hr_system.resignation.dao.ResignationDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

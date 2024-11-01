@@ -229,11 +229,11 @@
                     </table>
                 </div>
                 <div>
-                    <table th:if="${employee.salary == null}">
+                    <table th:if="${employee.salary == null or employee.salary?.salaryId == 0}">
                         <td class="section-title last-td w-25">급여 정보</td>
                         <td class="last-td" colspan="3">현재 등록된 급여 정보가 없습니다.</td>
                     </table>
-                    <table th:if="${employee.salary != null}">
+                    <table th:if="${employee.salary != null and employee.salary?.salaryId != 0}">
                         <tr>
                             <td class="section-title w-25">급여 ID</td>
                             <td class="w-25" th:text="${employee.salary?.salaryId}" ></td>

@@ -118,13 +118,15 @@
           <div class="detail-address-container">
             <input type="text" id="sample6_detailAddress" placeholder="상세주소">
             <input type="text" id="sample6_extraAddress" placeholder="참고항목">
-            <div>
-              <button id="mapButton" class="inner-btn green-btn" type="button" onclick="viewMap()">지도 보기</button>
+            <div class="flex-center" style="gap: 10px;">
+              <button type="button" id="mapButton" class="inner-btn green-btn"
+                      onclick="viewMap()">지도 보기</button>
+              <button type="button" id="mapButton2" class="inner-btn green-btn"
+                      onclick="closeMap()" style="display: none;">지도 닫기</button>
             </div>
           </div>
-          <div id="map-section" style="display: none;">
+          <div id="map-section" class="flex-center" style="display: none; margin-top: 10px;">
             <div id="map" style="width:500px; height:400px;"></div>
-            <button type="button" onclick="closeMap()">지도 닫기</button>
           </div>
         </td>
       </tr>

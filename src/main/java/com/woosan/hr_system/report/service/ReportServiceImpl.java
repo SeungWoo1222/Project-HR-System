@@ -1,14 +1,17 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
-import com.woosan.hr_system.employee.dao.EmployeeDAO;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.file.service.FileService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
+import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
+import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +30,6 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportDAO reportDAO;
     @Autowired
-    private EmployeeDAO employeeDAO;
-    @Autowired
     private FileService fileService;
     @Autowired
     private ReportFileDAO reportFileDAO;
@@ -36,6 +37,10 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileService reportFileService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private NotificationService notificationService;
 
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성 - 중앙 제어 함수(파일 유무에 따라 로직을 다르게 실행)
@@ -76,6 +81,7 @@ public class ReportServiceImpl implements ReportService {
     // 보고서 생성
     private List<Integer> createReport(Report report) {
         List<Integer> reportIdList = new ArrayList<>();
+        List<Integer> fileIdList = new ArrayList<>();
 
         Map<String, Object> params = new HashMap<>();
         params.put("writerId", report.getWriterId());
@@ -90,6 +96,9 @@ public class ReportServiceImpl implements ReportService {
             params.put("approverName", report.getNameList().get(i));
             int reportId = reportDAO.createReport(params);
             reportIdList.add(reportId);
+            // 보고서 생성 후 결재자에게 알림 생성
+            String writerName = employeeService.getEmployeeNameById(report.getWriterId());
+            notificationService.createNotification(report.getIdList().get(i), "결재할 보고서가 있습니다. <br>작성자 : " + writerName, "/admin/request/notification?reportId=" + reportId);
         }
         return reportIdList;
     }
@@ -112,12 +121,10 @@ public class ReportServiceImpl implements ReportService {
 
     @Override // 특정 보고서 조회
     public Report getReportById(int reportId) {
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
-        Report report = checkReportAuthorization(reportId, currentEmployeeId);
-
+        Report report = checkReportAuthorization(reportId);
         return report;
     }
+
 
     @Override // 최근 5개 보고서 조회
     public List<Report> getRecentReports(String writerId) {
@@ -154,7 +161,6 @@ public class ReportServiceImpl implements ReportService {
         return new PageResult<>(reports, (int) Math.ceil((double) total / pageRequest.getSize()), total, pageRequest.getPage());
     }
 
-
     @Override // 보고서 통계 조회
     public List<ReportStat> getReportStats(LocalDate startDate, LocalDate endDate, List<String> writerIdList) {
         return reportDAO.getReportStats(startDate, endDate, writerIdList);
@@ -169,6 +175,9 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     @Override // 보고서 수정
     public void updateReport(Report report, List<MultipartFile> toUploadFileList, List<Integer> userSelectedFileIdList) {
+        // 수정 권한 및 Report 유무 확인
+        checkReportAuthorization(report.getReportId());
+
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         List<Integer> createdReportIdList = new ArrayList<>();
         List<Integer> existingFileIdList = reportFileService.getFileIdsByReportId(report.getReportId());
@@ -205,6 +214,9 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     @Override // 보고서 삭제
     public void deleteReport(int reportId) {
+        // 삭제 권한 및 Report 유무 확인
+        checkReportAuthorization(reportId);
+
         // shared_trash 테이블에 삭제될 데이터들 삽입
         reportDAO.insertReportIntoSharedTrash(reportId);
 
@@ -221,17 +233,21 @@ public class ReportServiceImpl implements ReportService {
     }
 //=====================================================삭제 메소드======================================================
 //=====================================================기타 메소드======================================================
-    // 요청에 대한 접근 권한이 있는지 확인
-    public Report checkReportAuthorization(int reportId, String currentEmployeeId) {
-        Report report = reportDAO.getReportById(reportId); // 요청 세부 정보 가져오기
+    // 보고서에 대한 접근 권한, 보고서가 있는지 확인
+    public Report checkReportAuthorization(int reportId) {
+        // 현재 유저의 employeeId를 가져옴
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
+
+        // Report를 가져옴
+        Report report = reportDAO.getReportById(reportId);
+
         if (report == null) {
-            throw new IllegalArgumentException("해당 요청이 존재하지 않습니다.");
+            throw new IllegalArgumentException("해당 Report를 찾을 수 없습니다. \nReport ID : " + reportId);
         }
-        // 결재자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
-        if (!report.getApproverId().equals(currentEmployeeId)) {
-            if (!report.getWriterId().equals(currentEmployeeId)) {
-                throw new SecurityException("권한이 없습니다.");
-            }
+        // 작성자 혹은 결재자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
+        if (!report.getApproverId().equals(currentEmployeeId) && !report.getWriterId().equals(currentEmployeeId)) {
+                throw new SecurityException("접근 권한이 없습니다.");
         }
         return report; // 요청 정보 반환
     }

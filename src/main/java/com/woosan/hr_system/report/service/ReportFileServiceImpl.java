@@ -1,20 +1,16 @@
 package com.woosan.hr_system.report.service;
 
-import com.woosan.hr_system.report.dao.ReportDAO;
-import com.woosan.hr_system.report.dao.ReportFileDAO;
-import com.woosan.hr_system.report.model.Report;
-import com.woosan.hr_system.file.dao.FileDAO;
 import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
+import com.woosan.hr_system.report.dao.ReportFileDAO;
+import com.woosan.hr_system.report.model.Report;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -22,10 +18,7 @@ public class ReportFileServiceImpl implements ReportFileService {
     @Autowired
     private ReportFileDAO reportFileDAO;
     @Autowired
-    private FileDAO fileDAO;
-    @Autowired
     private FileService fileService;
-    private ReportDAO reportDAO;
 
     @Override // 보고서 파일 생성
     public void createReportFile(int reportId, int fileId) {

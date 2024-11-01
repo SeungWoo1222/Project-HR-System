@@ -7,7 +7,6 @@ import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.holiday.service.HolidayService;
-import com.woosan.hr_system.schedule.service.BusinessTripService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import com.woosan.hr_system.vacation.model.Vacation;
@@ -34,8 +33,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     private HolidayService holidayService;
     @Autowired
     private VacationService vacationService;
-    @Autowired
-    private BusinessTripService businessTripService;
     @Autowired
     private EmployeeService employeeService;
     @Autowired

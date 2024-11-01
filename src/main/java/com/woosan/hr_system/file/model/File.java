@@ -14,16 +14,16 @@ public class File {
     private String originalFileName;
     private String storedFileName;
     private long fileSize;
-    private LocalDateTime uploadDate;
+    private LocalDateTime uploadedAt;
     private String uploadedBy;
     private String fileIdUsage;
 
     // 생성자
-    public File(String originalFileName, String storedFileName, long fileSize, LocalDateTime uploadDate, String uploadedBy, String fileIdUsage) {
+    public File(String originalFileName, String storedFileName, long fileSize, LocalDateTime uploadedAt, String uploadedBy, String fileIdUsage) {
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
         this.fileSize = fileSize;
-        this.uploadDate = uploadDate;
+        this.uploadedAt = uploadedAt;
         this.uploadedBy = uploadedBy;
         this.fileIdUsage = fileIdUsage;
     }

@@ -8,7 +8,7 @@
         <id property="reportId" column="report_id"/>
         <result property="writerId" column="writer_id"/>
         <result property="approverId" column="approver_id"/>
-        <result property="approverName" column="approver_Name"/>
+        <result property="approverName" column="approver_name"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="createdDate" column="created_date"/>

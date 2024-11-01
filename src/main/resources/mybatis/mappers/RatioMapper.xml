@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.woosan.hr_system.salary.dao.RatioDAO">
+<mapper namespace="ratio">
     <resultMap id="PayrollDetailsResultMap" type="com.woosan.hr_system.salary.model.PayrollDetails">
         <result column="base_salary_ratio" property="baseSalaryRatio" />
         <result column="position_allowance_ratio" property="positionAllowanceRatio" />

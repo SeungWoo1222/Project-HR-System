@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.woosan.hr_system.schedule.dao.BusinessTripDAO">
+<mapper namespace="businessTrip">
     <resultMap id="BusinessTripResultMap" type="com.woosan.hr_system.schedule.model.BusinessTrip">
         <id property="tripId" column="trip_id" />
         <result property="taskId" column="task_id" />

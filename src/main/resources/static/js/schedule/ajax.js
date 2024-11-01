@@ -221,7 +221,7 @@ function submitInsertForm(event) {
                 const errorStatuses = [400, 403, 404, 500];
                 if (response.status === 200) {
                     alert(response.text);
-                    window.location.reload();
+                    window.location.href = '/schedule/list';
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else if (response.status === 422) { // 유효성 검사 오류 시
@@ -391,12 +391,8 @@ function updateScheduleStatus(taskId) {
         // 폼데이터 생성
         const formData = new FormData();
         formData.append("status", selectedStatus);
-        if (selectedStatus === "완료") {
-            const taskName = document.getElementById('taskName');
-            console.log(taskName);
-            console.log(taskName.value);
-            formData.append("taskName", taskName.value);
-        }
+        const taskName = document.getElementById('taskName');
+        formData.append("taskName", taskName.value);
 
         formData.forEach((value, key) => {
             console.log(key, value);

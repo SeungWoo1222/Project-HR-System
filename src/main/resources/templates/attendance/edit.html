@@ -5,7 +5,13 @@
 
 <th:block layout:fragment="css">
   <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
   <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
+  <style>
+    .input-area textarea {
+      width: 88%;
+    }
+  </style>
 </th:block>
 
 <div class="attendance-detail-container">
