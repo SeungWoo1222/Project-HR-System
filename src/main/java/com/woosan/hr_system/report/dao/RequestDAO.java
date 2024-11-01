@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface RequestDAO {
-    void createRequest(Map<String, Object> params);
+    int createRequest(Map<String, Object> params);
     List<Request> getAllRequests();
     Request getRequestById(int requestId);
     List<Request> getMyRequests(String requesterId);

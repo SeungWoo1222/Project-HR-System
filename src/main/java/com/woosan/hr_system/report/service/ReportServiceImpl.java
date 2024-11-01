@@ -1,15 +1,15 @@
 package com.woosan.hr_system.report.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
+import com.woosan.hr_system.employee.service.EmployeeService;
 import com.woosan.hr_system.file.service.FileService;
+import com.woosan.hr_system.notification.service.NotificationService;
 import com.woosan.hr_system.report.dao.ReportDAO;
 import com.woosan.hr_system.report.dao.ReportFileDAO;
 import com.woosan.hr_system.report.model.Report;
 import com.woosan.hr_system.report.model.ReportStat;
-import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import com.woosan.hr_system.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,10 @@ public class ReportServiceImpl implements ReportService {
     private ReportFileService reportFileService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private NotificationService notificationService;
     //=====================================================생성 메소드======================================================
     @Override // 보고서 생성
     public List<Integer> createReport(Report report, List<MultipartFile> reportDocuments) {
