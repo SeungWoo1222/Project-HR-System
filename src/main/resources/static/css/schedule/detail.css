@@ -70,3 +70,9 @@ input[type="radio"]:focus {
     align-items: center;
     justify-content: center;
 }
+
+.detail-container .btn-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
