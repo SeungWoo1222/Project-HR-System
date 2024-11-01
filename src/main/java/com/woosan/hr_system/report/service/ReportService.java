@@ -10,13 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReportService {
-//======================================================생성============================================================
+//======================================================생성============================================================\
     // 보고서 생성
-    List<Integer> createReport(Report report, List<MultipartFile> reportDocuments);
+    void createReportAndFile(Report report, List<MultipartFile> file);
     // 요청 들어온 보고서 생성
-    int createReportFromRequest(Report report);
-    // 요청 들어온 보고서 + 파일 생성
-    int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments);
+    int createReportFromRequest(Report report, List<MultipartFile> reportDocuments);
 //======================================================생성============================================================
 //======================================================조회============================================================
     // 모든 리포트 조회

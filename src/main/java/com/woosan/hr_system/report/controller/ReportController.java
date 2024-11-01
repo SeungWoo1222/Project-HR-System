@@ -118,7 +118,7 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        reportService.createReport(report, reportDocuments);
+        reportService.createReportAndFile(report, reportDocuments);
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
@@ -147,13 +147,8 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        if (reportDocuments == null || reportDocuments.isEmpty()) {
-            int reportId = reportService.createReportFromRequest(report);
-            requestService.updateReportId(requestId, reportId);
-        } else {
-            int reportId = reportService.createReportFromRequestWithFile(report, reportDocuments);
-            requestService.updateReportId(requestId, reportId);
-        }
+        int reportId = reportService.createReportFromRequest(report, reportDocuments);
+        requestService.updateReportId(requestId, reportId);
         return ResponseEntity.ok("보고서 생성이 완료되었습니다.");
     }
 
@@ -161,6 +156,9 @@ public class ReportController {
     @GetMapping("/writeFromSchedule")
     public String showCreatePageFromSchedule(@RequestParam("taskId") int taskId,
                                             Model model) {
+
+        log.info("showCreatePageFromSchedule 도착 taskId : {}", taskId);
+
         Schedule schedule = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", schedule);
         model.addAttribute("report", new Report());
@@ -181,7 +179,7 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        reportService.createReport(report, reportDocuments);
+        reportService.createReportAndFile(report, reportDocuments);
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 //=================================================생성 메소드============================================================

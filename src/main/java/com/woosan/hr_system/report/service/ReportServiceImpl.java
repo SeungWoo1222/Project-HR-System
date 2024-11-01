@@ -40,8 +40,43 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private NotificationService notificationService;
     //=====================================================생성 메소드======================================================
-    @Override // 보고서 생성
-    public List<Integer> createReport(Report report, List<MultipartFile> reportDocuments) {
+    @Override // 보고서 생성 - 중앙 제어 함수(파일 유무에 따라 로직을 다르게 실행)
+    public void createReportAndFile(Report report, List<MultipartFile> reportDocuments) {
+        // 보고서 생성 후 reportId 반환(파일이 있다면 조인테이블 연결을 위함)
+        List<Integer> reportIdlist = createReport(report);
+        List<Integer> fileIdlist = new ArrayList<>();
+
+        // 파일이 있다면 업로드 후 fileId 반환
+        if (reportDocuments != null) {
+            for (MultipartFile reportdocument : reportDocuments) {
+                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
+                fileIdlist.add(fileId);
+            }
+            // 조인 테이블 연결
+            joinReportAndFile(reportIdlist, fileIdlist);
+        }
+    }
+
+    @Override // 요청 들어온 보고서 작성
+    public int createReportFromRequest(Report report, List<MultipartFile> reportDocuments) {
+        List<Integer> reportIdlist = createReport(report);
+        List<Integer> fileIdlist = new ArrayList<>();
+
+        // 파일이 있다면 업로드 후 fileId 반환
+        if (reportDocuments != null) {
+            for (MultipartFile reportdocument : reportDocuments) {
+                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
+                fileIdlist.add(fileId);
+            }
+            // 조인 테이블 연결
+            joinReportAndFile(reportIdlist, fileIdlist);
+        }
+
+        return reportIdlist.get(0);
+    }
+
+    // 보고서 생성
+    private List<Integer> createReport(Report report) {
         List<Integer> reportIdList = new ArrayList<>();
         List<Integer> fileIdList = new ArrayList<>();
 
@@ -62,72 +97,18 @@ public class ReportServiceImpl implements ReportService {
             String writerName = employeeService.getEmployeeNameById(report.getWriterId());
             notificationService.createNotification(report.getIdList().get(i), "결재할 보고서가 있습니다. <br>작성자 : " + writerName, "/admin/request/notification?reportId=" + reportId);
         }
-
-        if (reportDocuments != null) {
-            for (MultipartFile reportdocument : reportDocuments) {
-                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
-                fileIdList.add(fileId);
-            }
-        }
-
-        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
-        for (int reportId : reportIdList) {
-            for (int fileId : fileIdList) {
-                reportFileDAO.createReportFile(reportId, fileId);
-            }
-        }
         return reportIdList;
     }
 
-    @Override // 요청 들어온 보고서 작성
-    public int createReportFromRequest(Report report) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", report.getWriterId());
-        params.put("approverId", report.getIdList().get(0));
-        params.put("approverName", report.getNameList().get(0));
-        params.put("title", report.getTitle());
-        params.put("content", report.getContent());
-        params.put("createdDate", report.getCreatedDate());
-        params.put("status", "미처리");
-        params.put("completeDate", report.getCompleteDate());
-
-        int reportId = reportDAO.createReport(params);
-        return reportId;
-    }
-
-    @Override // 요청 들어온 보고서 + 파일 작성
-    public int createReportFromRequestWithFile(Report report, List<MultipartFile> reportDocuments) {
-        // 조인 테이블에 연결 할 file, report Id리스트 생성
-        List<Integer> fileIdlist = new ArrayList<>();
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("writerId", report.getWriterId());
-        params.put("approverId", report.getIdList().get(0));
-        params.put("approverName", report.getNameList().get(0));
-        params.put("title", report.getTitle());
-        params.put("content", report.getContent());
-        params.put("createdDate", report.getCreatedDate());
-        params.put("status", "미처리");
-        params.put("completeDate", report.getCompleteDate());
-
-        int reportId = reportDAO.createReport(params);
-
-        if (reportDocuments != null) {
-            // 파일들 체크 후 DB에 저장할 파일명 반환
-            for (MultipartFile reportdocument : reportDocuments) {
-                int fileId = fileService.uploadingFile(reportdocument, "report"); // 생성된 fileId 가져옴
-                fileIdlist.add(fileId);
+    // 보고서, 파일 조인테이블 연결 함수
+    private void joinReportAndFile(List<Integer> reportIdlist, List<Integer> fileIdlist) {
+        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
+        for (int reportId : reportIdlist) {
+            for (int fileId : fileIdlist) {
+                reportFileDAO.createReportFile(reportId, fileId);
             }
         }
-
-        // reportId와 fileId를 모두 순회하며 조인테이블 삽입
-        for (int fileId : fileIdlist) {
-            reportFileDAO.createReportFile(reportId, fileId);
-        }
-
-        return reportId;
     }
-
 //=====================================================생성 메소드======================================================
 //=====================================================조회 메소드======================================================
     @Override // 모든 보고서 조회
@@ -202,7 +183,7 @@ public class ReportServiceImpl implements ReportService {
         if (report.getIdList().size() > 1) {
             // 결재자 수가 여러명으로 바뀐 경우
             report.setCreatedDate(userSessionInfo.getNow()); // 현재시간 설정
-            createdReportIdList = createReport(report, null); // 보고서 생성 후 reportId 반환
+            createdReportIdList = createReport(report); // 보고서 생성 후 reportId 반환
             reportFileService.updateReportFile(report, toUploadFileList, userSelectedFileIdList, existingFileIdList, createdReportIdList);
             deleteReport(report.getReportId());
         } else {

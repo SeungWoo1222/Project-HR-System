@@ -548,9 +548,6 @@ function updateReportApprove(event) {
     const statusInput = document.getElementById('statusSelect1').value;
     const reasonInput = document.getElementById('rejectionReason1').value;
 
-    console.log(statusInput);
-    console.log(reasonInput);
-
     // 유효성 검사 함수
     function showError(inputId) {
         const inputElement = document.getElementById(inputId);
