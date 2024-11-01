@@ -179,7 +179,7 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        reportService.createReport(report, reportDocuments);
+        reportService.createReportAndFile(report, reportDocuments);
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 //=================================================생성 메소드============================================================
