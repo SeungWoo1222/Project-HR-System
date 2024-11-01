@@ -195,7 +195,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 휴가 신청자에게 알림 전송 후 메세지 반환
         String message = "휴가('" + vacationId + "')가 " + status + "되었습니다.";
-        notificationService.createNotifications(vacationInfo.getEmployeeId(), message, "/vacation/employee");
+        notificationService.createNotification(vacationInfo.getEmployeeId(), message, "/vacation/employee");
         return message;
     }
 
