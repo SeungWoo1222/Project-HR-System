@@ -18,6 +18,7 @@ import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,9 +27,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,8 +104,13 @@ public class ReportController {
     // 보고서 생성
     @ResponseBody
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createReport(@RequestPart(value="report") Report report,
-                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments) {
+    public ResponseEntity<String> createReport(@Valid @RequestPart(value="report") Report report,
+                                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
 
         UserSessionInfo userSessionInfo = new UserSessionInfo();
         String writerId = userSessionInfo.getCurrentEmployeeId();
@@ -110,11 +118,7 @@ public class ReportController {
         report.setWriterId(writerId);
         report.setCreatedDate(currentTime);
 
-        if (reportDocuments == null || reportDocuments.isEmpty()) {
-            reportService.createReport(report);
-        } else {
-            reportService.createReportWithFile(report, reportDocuments);
-        }
+        reportService.createReport(report, reportDocuments);
         return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
     }
 
@@ -132,7 +136,7 @@ public class ReportController {
     @ResponseBody
     @PostMapping(value = "/writeFromRequest", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> CreateReportFromRequest(
-                                          @RequestPart(value="report") Report report,
+                                          @Valid @RequestPart(value="report") Report report,
                                           @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
                                           @RequestParam(value="requestId") int requestId) {
         UserSessionInfo userSessionInfo = new UserSessionInfo();
@@ -154,12 +158,9 @@ public class ReportController {
     }
 
     // 일정 완료 된 보고서 생성 페이지 이동
-    @GetMapping("/writeFromSchedule/{taskId}")
-    public String showCreatePageFromSchedule(@PathVariable("taskId") int taskId,
+    @GetMapping("/writeFromSchedule")
+    public String showCreatePageFromSchedule(@RequestParam("taskId") int taskId,
                                             Model model) {
-
-        log.info("showCreatePageFromSchedule 도착 taskId : {}", taskId);
-
         Schedule schedule = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", schedule);
         model.addAttribute("report", new Report());
@@ -167,13 +168,25 @@ public class ReportController {
     }
 
     // 일정 완료 된 보고서 생성
-//    @PostMapping("writeFromSchedule")
-//    public ResponseEntity<String> createReportFromSchedule() {
-//        return "보고서 생성이 완료되었습니다.";
-//    }
+    @Transactional
+    @ResponseBody
+    @PostMapping(value = "/writeFromSchedule", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createReportFromSchedule(
+                               @Valid @RequestPart(value="report") Report report,
+                               @RequestPart(value="reportFiles", required=false) List<MultipartFile> reportDocuments,
+                               @RequestParam(value="taskId") int taskId) {
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String writerId = userSessionInfo.getCurrentEmployeeId();
+        LocalDateTime currentTime = userSessionInfo.getNow();
+        report.setWriterId(writerId);
+        report.setCreatedDate(currentTime);
 
+        reportService.createReport(report, reportDocuments);
+        return ResponseEntity.ok("보고서 작성이 완료되었습니다.");
+    }
 //=================================================생성 메소드============================================================
 //=================================================조회 메소드============================================================
+
     @GetMapping("/{reportId}") // 특정 보고서 조회
     public String viewReport(@PathVariable("reportId") int reportId, Model model) {
         Report report = reportService.getReportById(reportId);
@@ -254,22 +267,6 @@ public class ReportController {
         return "report/request/list";
     }
 
-    @GetMapping("/statistic") // 통계 날짜설정 페이지 이동
-    public String showStatisticPage() {
-        return "report/statistic";
-    }
-
-    @GetMapping("/stats") // 통계 날짜 설정
-    public String getReportStats(@RequestParam(name = "startDate") String statisticStart,
-                                 @RequestParam(name = "endDate") String statisticEnd,
-                                 HttpSession session) {
-        // 날짜 설정
-        session.setAttribute("staffStatisticStart", statisticStart);
-        session.setAttribute("staffStatisticEnd", statisticEnd);
-
-        return "redirect:/report/main";
-    }
-
 
 //=================================================조회 메소드============================================================
 //=================================================수정 메소드============================================================
@@ -295,18 +292,10 @@ public class ReportController {
     // 보고서 수정
     @Transactional
     @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 보고서 수정
-    public ResponseEntity<String> updateReport(@RequestPart(value="report") Report report,
+    public ResponseEntity<String> updateReport(@Valid @RequestPart(value="report") Report report,
                                @RequestPart(value = "reportFiles", required = false) List<MultipartFile> toUploadFileList,
                                @RequestParam(value = "registeredFileIdList", required = false) List<Integer> userSelectedFileIdList) {
-        // 요청 수정 권한이 있는지 확인
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-
-        // 현재 로그인한 사용자와 requester_id 비교
-        if (report != null && report.getWriterId().equals(userSessionInfo.getCurrentEmployeeId())) {
-            reportService.updateReport(report, toUploadFileList, userSelectedFileIdList);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
+        reportService.updateReport(report, toUploadFileList, userSelectedFileIdList);
         return ResponseEntity.ok("보고서 수정이 완료되었습니다.");
     }
 
@@ -317,20 +306,7 @@ public class ReportController {
     @Transactional
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
-        // 보고서 삭제 권한이 있는지 확인
-        // 현재 로그인한 계정의 employeeId를 currentId로 설정
-        UserSessionInfo userSessionInfo = new UserSessionInfo();
-        String currentId = userSessionInfo.getCurrentEmployeeId();
-
-        // 요청 ID로 요청 조회
-        Report report = reportService.getReportById(reportId);
-
-        // 현재 로그인한 사용자와 writer_id 비교
-        if (report != null && report.getWriterId().equals(currentId)) {
-            reportService.deleteReport(reportId);
-        } else {
-            throw new SecurityException("권한이 없습니다.");
-        }
+        reportService.deleteReport(reportId);
         return "redirect:/report/list";
     }
 //=====================================================삭제 메소드========================================================

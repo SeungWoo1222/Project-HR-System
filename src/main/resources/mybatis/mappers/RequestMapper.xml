@@ -6,7 +6,7 @@
 <mapper namespace="com.woosan.hr_system.report.dao.RequestDAO">
 <!-- ==================================================생성 SQL문=======================================================-->
     <!-- 요청 생성 -->
-    <insert id="createRequest" parameterType="map">
+    <insert id="createRequest" parameterType="map" useGeneratedKeys="true" keyProperty="reportId">
         INSERT INTO report_requests
         (requester_id, writer_id, writer_name, due_date, request_note, request_date)
         VALUES

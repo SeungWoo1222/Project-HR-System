@@ -2,6 +2,7 @@ package com.woosan.hr_system.schedule.service;
 
 import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.notification.service.NotificationService;
+import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.schedule.dao.ScheduleDAO;
 import com.woosan.hr_system.schedule.model.BusinessTrip;
 import com.woosan.hr_system.schedule.model.Schedule;
@@ -36,7 +37,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Schedule getScheduleById(int taskId) {
-        return scheduleDAO.getScheduleById(taskId);
+        Schedule schedule = checkScheduleAuthorization(taskId);
+        return schedule;
     }
 
     @Override // 일정 등록
@@ -60,6 +62,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 수정
     public void updateSchedule(Schedule schedule) {
+        checkScheduleAuthorization(schedule.getTaskId());
         // 기존 스케줄 정보 가져오기
         Schedule existingSchedule = scheduleDAO.getScheduleById(schedule.getTaskId());
 
@@ -81,36 +84,45 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override // 일정 상태 변경
     public void updateScheduleStatus(int taskId, String status, String taskName) {
-        log.info("updateScheduleStatus 서비스 도착");
-        // String employeeId, String message, String url
+        checkScheduleAuthorization(taskId);
         if ("완료".equals(status)) {
-            log.info("status가 완료이므로 알림 생성");
             UserSessionInfo userSessionInfo = new UserSessionInfo();
             String employeeId = userSessionInfo.getCurrentEmployeeId();
-            notificationService.createNotification(employeeId, taskName + "일정이 완료되었습니다. 보고서를 작성해주세요.", "/report/writeFromSchedule" + taskId);
+            notificationService.createNotification(employeeId, taskName + " 일정이 완료되었습니다. 보고서를 작성해주세요.", "/report/writeFromSchedule" + taskId);
         }
         scheduleDAO.updateScheduleStatus(taskId, status);
     }
 
     @Override // 일정 삭제
     public void deleteSchedule(int taskId) {
-        log.info("deleteSchedule 도착 : {}", taskId);
+        checkScheduleAuthorization(taskId);
 
         Schedule schedule = scheduleDAO.getScheduleById(taskId);
         scheduleDAO.insertScheduleArchive(schedule);
 
-        log.info("insertScheduleArchive 완료");
         BusinessTrip businessTrip = businessTripService.getBusinessTripById(taskId);
         if (businessTrip != null) {
             businessTripService.insertTripInfoInArchive(businessTrip);
-            log.info("insertTripArchive 완료");
             businessTripService.deleteBusinessTrip(taskId);
-            log.info("deleteBusinessTrip 완료");
         }
 
         scheduleDAO.deleteSchedule(taskId);
-        log.info("deleteSchedule 완료");
     }
 
-    // 일정 상태 변경 메소드 필요함
+    // 일정에 대한 접근 권한, 일정이 있는지 확인
+    public Schedule checkScheduleAuthorization(int taskId) {
+        UserSessionInfo userSessionInfo = new UserSessionInfo();
+        String currentEmployeeId = userSessionInfo.getCurrentEmployeeId();
+        Schedule schedule = scheduleDAO.getScheduleById(taskId); // 요청 세부 정보 가져오기
+        if (schedule == null) {
+            throw new IllegalArgumentException("해당 일정이 존재하지 않습니다.\n일정 ID : " + taskId);
+        }
+
+        // 작성자와 로그인한 사용자가 동일하지 않으면 권한 오류 발생
+        if (!schedule.getMemberId().equals(currentEmployeeId)) {
+            throw new SecurityException("권한이 없습니다.");
+        }
+
+        return schedule; // 요청 정보 반환
+    }
 }

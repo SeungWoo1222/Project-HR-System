@@ -1,13 +1,11 @@
 package com.woosan.hr_system.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-//import com.woosan.hr_system.schedule.service.ValidScheduleDates;
-import com.woosan.hr_system.schedule.service.ValidScheduleDates;
+//import com.woosan.hr_system.schedule.service.validation.ValidScheduleDates;
+import com.woosan.hr_system.schedule.service.validation.ValidScheduleDates;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +17,9 @@ import java.time.LocalDateTime;
 public class Schedule {
     private int taskId;
     private String memberId;
+    private String status;
+    private LocalDateTime createdDate;
+    private Integer projectId;
 
     @NotBlank(message = "일정 제목을 입력해주세요.")
     private String taskName;
@@ -33,10 +34,6 @@ public class Schedule {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @NotNull(message ="종료일을 입력해주세요.")
     private LocalDateTime endTime;
-
-    private String status;
-    private LocalDateTime createdDate;
-    private Integer projectId;
 
     @NotNull(message = "하루종일 유무를 체크해주세요.")
     private boolean allDay;
