@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+</th:block>
+
+<div class="input-modal">
+    <h3>연도 단위 공휴일 생성</h3>
+    <form action="/api/holiday/" onsubmit="submitYearForm(event)">
+        <div class="input-container">
+            <label for="yearInput" style="font-weight: bold;">연도</label>
+            <input type="text" id="yearInput" name="year" placeholder="연도를 입력해주세요."/>
+        </div>
+        <div class="btn-container">
+            <div id="error-message" class="error-message"></div>
+            <button type="submit" class="btn">등록</button>
+        </div>
+    </form>
+</div>
+
+</html>

@@ -1,0 +1,27 @@
+.calendar-container {
+    margin-top: 20px;
+}
+
+/* 일요일 날짜 */
+.fc-day-sun a {
+    color: red;
+}
+
+/* 토요일 날짜 */
+.fc-day-sat a {
+    color: blue;
+}
+
+.fc-daygrid-day-frame {
+    height: 115px;
+}
+
+:root {
+    --fc-button-bg-color: #18A8F1;
+    --fc-button-border-color: #18A8F1;
+    --fc-button-hover-bg-color: #0F6B9A;
+    --fc-button-hover-border-color: #0F6B9A;
+    --fc-button-active-bg-color: #0F6B9A;
+    --fc-button-active-border-color: #0F6B9A;
+    --fc-today-bg-color: #E1F4FD;
+}

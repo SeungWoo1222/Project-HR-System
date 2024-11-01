@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-without-sidebar :: layout(title='500 Error')}">
+
+<head>
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/error/httpstatus.css}">
+  </th:block>
+</head>
+
+<body>
+<div layout:fragment="~{content}">
+  <div class="content">
+    <section class="httpstatus-section">
+      <div class="httpstatus-container">
+        <div class="logo-area">
+          <img th:src="@{/images/logo/otter-sad.png}" alt="Logo" class="logo-image">
+        </div>
+        <div class="text-area">
+          <h1>500 Error - Internal Server Error</h1>
+          <p>죄송합니다. 서버에 문제가 발생했습니다.</p>
+          <p>일시적인 오류가 발생했습니다. 나중에 다시 시도해 주세요.</p>
+          <a th:href="@{/home}" class="a-btn">홈페이지로 이동</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

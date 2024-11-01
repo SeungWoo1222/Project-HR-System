@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="resignationFile">
+
+    <resultMap id="FileResultMap" type="com.woosan.hr_system.file.model.File">
+        <id property="fileId" column="file_id"/>
+        <result property="originalFileName" column="original_file_name"/>
+        <result property="storedFileName" column="stored_file_name"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="uploadedAt" column="uploaded_at"/>
+        <result property="uploadedBy" column="uploaded_by"/>
+        <result property="fileIdUsage" column="file_id_usage"/>
+    </resultMap>
+
+    <!-- resignationId(employeeId)의 모든 파일 정보 조회 -->
+    <select id="selectAllFileInfo" parameterType="String" resultMap="FileResultMap">
+        SELECT f.file_id, f.original_file_name, f.stored_file_name, f.file_size, f.uploaded_at, f.uploaded_by, f.file_id_usage
+        FROM files f
+                 INNER JOIN resignation_files rf ON f.file_id = rf.file_id
+        WHERE rf.resignation_id = #{resignationId}
+    </select>
+
+    <!-- resignationId(employeeId)의 모든 파일 ID 조회 -->
+    <select id="selectFileIdsByResignationId" parameterType="String"  resultType="int">
+        SELECT f.file_id
+        FROM files f
+                 INNER JOIN resignation_files rf ON f.file_id = rf.file_id
+        WHERE rf.resignation_id = #{resignationId}
+    </select>
+
+    <!-- resignationId(employeeId)의 파일 개수 조회 -->
+    <select id="countFilesByResignationId" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM resignation_files
+        WHERE resignation_id = #{resignationId}
+    </select>
+
+    <!-- resignationFile 등록 -->
+    <insert id="insertResignationFile" parameterType="com.woosan.hr_system.resignation.model.ResignationFile">
+        INSERT INTO resignation_files (resignation_id, file_id)
+        VALUES (#{resignationId}, #{fileId})
+    </insert>
+
+    <!-- resignationFile 삭제 -->
+    <delete id="deleteResignationFile" parameterType="com.woosan.hr_system.resignation.model.ResignationFile">
+        DELETE FROM resignation_files WHERE resignation_id = #{resignationId} AND file_id = #{fileId}
+    </delete>
+
+    <!-- 특정 resignationId에 대한 모든 파일 레코드 삭제 -->
+    <delete id="deleteAllResignationFile" parameterType="String">
+        DELETE FROM resignation_files WHERE resignation_id = #{resignationId}
+    </delete>
+</mapper>

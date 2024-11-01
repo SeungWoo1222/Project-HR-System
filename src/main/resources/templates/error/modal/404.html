@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/error/httpstatus-modal.css}">
+    </th:block>
+</head>
+
+<body>
+<div>
+    <div class="httpstatus-container">
+        <div class="logo-area">
+            <img th:src="@{/images/logo/otter-sad.png}" alt="Logo" class="logo-image">
+        </div>
+        <div class="text-area">
+            <h1>404 Error - Page Not Found</h1>
+            <p>죄송합니다. 페이지를 찾을 수 없습니다.</p>
+            <p>요청하신 페이지가 서버에 존재하지 않습니다.<br>URL을 확인하시거나, 홈페이지로 돌아가 주시기 바랍니다.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

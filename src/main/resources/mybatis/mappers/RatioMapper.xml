@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ratio">
+    <resultMap id="PayrollDetailsResultMap" type="com.woosan.hr_system.salary.model.PayrollDetails">
+        <result column="base_salary_ratio" property="baseSalaryRatio" />
+        <result column="position_allowance_ratio" property="positionAllowanceRatio" />
+        <result column="meal_allowance_ratio" property="mealAllowanceRatio" />
+        <result column="transport_allowance_ratio" property="transportAllowanceRatio" />
+        <result column="personal_bonus_ratio" property="personalBonusRatio" />
+        <result column="team_bonus_ratio" property="teamBonusRatio" />
+        <result column="holiday_bonus_ratio" property="holidayBonusRatio" />
+        <result column="year_end_bonus_ratio" property="yearEndBonusRatio" />
+    </resultMap>
+
+    <resultMap id="DeductionDetailsResultMap" type="com.woosan.hr_system.salary.model.DeductionDetails">
+        <result column="local_income_tax_rate" property="localIncomeTaxRate" />
+        <result column="national_pension_rate" property="nationalPensionRate" />
+        <result column="health_insurance_rate" property="healthInsuranceRate" />
+        <result column="long_term_care_rate" property="longTermCareRate" />
+        <result column="employment_insurance_rate" property="employmentInsuranceRate" />
+    </resultMap>
+
+    <!-- 급여 비율 조회 -->
+    <select id="selectPayrollRatios" resultMap="PayrollDetailsResultMap">
+        SELECT
+            base_salary_ratio,
+            position_allowance_ratio,
+            meal_allowance_ratio,
+            transport_allowance_ratio,
+            personal_bonus_ratio,
+            team_bonus_ratio,
+            holiday_bonus_ratio,
+            year_end_bonus_ratio
+        FROM payroll_ratios
+    </select>
+
+    <!-- 급여 비율 수정 -->
+    <update id="updatePayrollRatios" parameterType="com.woosan.hr_system.salary.model.PayrollDetails">
+        UPDATE payroll_ratios
+        SET
+            base_salary_ratio = #{baseSalaryRatio},
+            position_allowance_ratio = #{positionAllowanceRatio},
+            meal_allowance_ratio = #{mealAllowanceRatio},
+            transport_allowance_ratio = #{transportAllowanceRatio},
+            personal_bonus_ratio = #{personalBonusRatio},
+            team_bonus_ratio = #{teamBonusRatio},
+            holiday_bonus_ratio = #{holidayBonusRatio},
+            year_end_bonus_ratio = #{yearEndBonusRatio}
+    </update>
+
+    <!-- 공제 비율 조회 -->
+    <select id="selectDeductionRatios" resultMap="DeductionDetailsResultMap">
+        SELECT
+            local_income_tax_rate,
+            national_pension_rate,
+            health_insurance_rate,
+            long_term_care_rate,
+            employment_insurance_rate
+        FROM deduction_ratios
+    </select>
+
+    <!-- 공제 비율 수정 -->
+    <update id="updateDeductionRatios" parameterType="com.woosan.hr_system.salary.model.DeductionDetails">
+        UPDATE deduction_ratios
+        SET
+            local_income_tax_rate = #{localIncomeTaxRate},
+            national_pension_rate = #{nationalPensionRate},
+            health_insurance_rate = #{healthInsuranceRate},
+            long_term_care_rate = #{longTermCareRate},
+            employment_insurance_rate = #{employmentInsuranceRate}
+    </update>
+
+    <!-- 소득세 조회 -->
+    <select id="selectIncomeTax" parameterType="map" resultType="int">
+        SELECT
+            <choose>
+                <when test="numChildren == 2">
+                    tax_amount_for_2_dependent
+                </when>
+                <when test="numChildren == 3">
+                    tax_amount_for_3_dependent
+                </when>
+                <when test="numChildren == 4">
+                    tax_amount_for_4_dependent
+                </when>
+                <when test="numChildren == 5">
+                    tax_amount_for_5_dependent_dependent
+                </when>
+                <when test="numChildren == 6">
+                    tax_amount_for_6_dependent
+                </when>
+                <when test="numChildren == 7">
+                    tax_amount_for_8_dependent
+                </when>
+                <when test="numChildren == 9">
+                    tax_amount_for_9_dependent
+                </when>
+                <when test="numChildren == 10">
+                    tax_amount_for_10_dependent
+                </when>
+                <when test="numChildren == 11">
+                    tax_amount_for_11_dependent
+                </when>
+                <otherwise>
+                    tax_amount_for_1_dependent
+                </otherwise>
+            </choose>
+        FROM income_tax
+        WHERE #{taxableSalary} &gt;= salary_min AND #{taxableSalary} &lt; salary_max
+    </select>
+
+    <!-- 소득세 조회 (1억 이상) -->
+    <select id="selectIncomeTaxFor100Million" parameterType="map" resultType="int">
+        SELECT
+        <choose>
+            <when test="numChildren == 2">
+                tax_amount_for_2_dependent
+            </when>
+            <when test="numChildren == 3">
+                tax_amount_for_3_dependent
+            </when>
+            <when test="numChildren == 4">
+                tax_amount_for_4_dependent
+            </when>
+            <when test="numChildren == 5">
+                tax_amount_for_5_dependent_dependent
+            </when>
+            <when test="numChildren == 6">
+                tax_amount_for_6_dependent
+            </when>
+            <when test="numChildren == 7">
+                tax_amount_for_8_dependent
+            </when>
+            <when test="numChildren == 9">
+                tax_amount_for_9_dependent
+            </when>
+            <when test="numChildren == 10">
+                tax_amount_for_10_dependent
+            </when>
+            <when test="numChildren == 11">
+                tax_amount_for_11_dependent
+            </when>
+            <otherwise>
+                tax_amount_for_1_dependent
+            </otherwise>
+        </choose>
+        FROM income_tax
+        WHERE #{taxableSalary} = salary_min AND #{taxableSalary} = salary_max
+    </select>
+</mapper>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/layout/layout.css}"> <!-- 외부 CSS는 이렇게 -->
+    <style>
+        /*// 여기에 CSS를 입력*/
+    </style>
+</th:block>
+
+<div>
+    <!-- 여기에 추가 컨텐츠를 넣으면 됨 -->
+    <h1>날짜 범위 입력</h1>
+    <form action="#" th:action="@{/report/stats}" method="get" onsubmit="return validateDateRange()">
+        <label for="start">시작 월:</label>
+        <input type="month" id="start" name="startDate" required>
+        <label for="end">종료 월:</label>
+        <input type="month" id="end" name="endDate" required>
+        <button type="submit">통계 조회</button>
+    </form>
+</div>
+</html>

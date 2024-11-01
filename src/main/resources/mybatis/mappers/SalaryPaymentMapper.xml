@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="salaryPayment">
+    <resultMap id="SalaryPaymentResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
+        <id property="paymentId" column="payment_id" />
+        <result property="salaryId" column="salary_id" />
+        <result property="compensationMonth" column="compensation_month" />
+        <result property="paymentDate" column="payment_date" />
+        <result property="baseSalary" column="base_salary" />
+        <result property="positionAllowance" column="position_allowance" />
+        <result property="mealAllowance" column="meal_allowance" />
+        <result property="transportAllowance" column="transport_allowance" />
+        <result property="personalBonus" column="personal_bonus" />
+        <result property="teamBonus" column="team_bonus" />
+        <result property="holidayBonus" column="holiday_bonus" />
+        <result property="yearEndBonus" column="year_end_bonus" />
+        <result property="overtimePay" column="overtime_pay" />
+        <result property="incomeTax" column="income_tax" />
+        <result property="localIncomeTax" column="local_income_tax" />
+        <result property="nationalPension" column="national_pension" />
+        <result property="healthInsurance" column="health_insurance" />
+        <result property="longTermCareInsurance" column="long_term_care_insurance" />
+        <result property="employmentInsurance" column="employment_insurance" />
+        <result property="deductions" column="deductions" />
+        <result property="grossSalary" column="gross_salary" />
+        <result property="netSalary" column="net_salary" />
+        <result property="days" column="days" />
+        <result property="totalTime" column="total_time" />
+        <result property="totalOvertime" column="total_overtime" />
+        <result property="totalNightTime" column="total_night_time" />
+        <result property="remarks" column="remarks" />
+    </resultMap>
+
+    <resultMap id="SalaryPaymentWithSalaryResultMap" type="com.woosan.hr_system.salary.model.SalaryPayment">
+        <id property="paymentId" column="payment_id" />
+        <result property="salaryId" column="salary_id" />
+        <result property="compensationMonth" column="compensation_month" />
+        <result property="paymentDate" column="payment_date" />
+        <result property="baseSalary" column="base_salary" />
+        <result property="positionAllowance" column="position_allowance" />
+        <result property="mealAllowance" column="meal_allowance" />
+        <result property="transportAllowance" column="transport_allowance" />
+        <result property="personalBonus" column="personal_bonus" />
+        <result property="teamBonus" column="team_bonus" />
+        <result property="holidayBonus" column="holiday_bonus" />
+        <result property="yearEndBonus" column="year_end_bonus" />
+        <result property="overtimePay" column="overtime_pay" />
+        <result property="incomeTax" column="income_tax" />
+        <result property="localIncomeTax" column="local_income_tax" />
+        <result property="nationalPension" column="national_pension" />
+        <result property="healthInsurance" column="health_insurance" />
+        <result property="longTermCareInsurance" column="long_term_care_insurance" />
+        <result property="employmentInsurance" column="employment_insurance" />
+        <result property="deductions" column="deductions" />
+        <result property="grossSalary" column="gross_salary" />
+        <result property="netSalary" column="net_salary" />
+        <result property="days" column="days" />
+        <result property="totalTime" column="total_time" />
+        <result property="totalOvertime" column="total_overtime" />
+        <result property="totalNightTime" column="total_night_time" />
+        <result property="remarks" column="remarks" />
+        <!-- 급여 관련 정보 -->
+        <result property="salary.salaryId" column="salary_id" />
+        <result property="salary.employeeId" column="employee_id" />
+        <result property="salary.name" column="name" />
+        <result property="salary.department" column="department_id" javaType="com.woosan.hr_system.employee.model.Department" typeHandler="com.woosan.hr_system.employee.model.DepartmentTypeHandler"/>
+        <result property="salary.position" column="position_id" javaType="com.woosan.hr_system.employee.model.Position" typeHandler="com.woosan.hr_system.employee.model.PositionTypeHandler"/>
+        <result property="salary.bank" column="bank" />
+        <result property="salary.accountNumber" column="account_number" />
+        <result property="salary.annualSalary" column="annual_salary" />
+        <result property="salary.createdAt" column="created_at" />
+        <result property="salary.status" column="status" />
+    </resultMap>
+
+    <!-- 지급 ID를 이용한 특정 사원의 급여명세서 조회 -->
+    <select id="selectPaymentById" parameterType="int" resultMap="SalaryPaymentResultMap">
+        SELECT * FROM salary_payments WHERE payment_id = #{paymentId}
+    </select>
+
+    <!-- 지급 ID를 이용한 특정 사원의 급여명세서 (급여정보 포함) 조회 -->
+    <select id="selectPaymentWithSalaryById" parameterType="int" resultMap="SalaryPaymentWithSalaryResultMap">
+        SELECT sp.*,
+               s.*
+        FROM salary_payments sp
+                 JOIN salaries s ON sp.salary_id = s.salary_id
+        WHERE sp.payment_id = #{paymentId}
+    </select>
+
+    <!-- 급여 ID 리스트를 이용한 특정 사원의 모든 급여명세서 조회 -->
+    <select id="selectPaymentsBySalaryIdList" parameterType="list" resultMap="SalaryPaymentResultMap">
+        SELECT *
+        FROM salary_payments
+        WHERE salary_id IN
+        <foreach item="salaryId" collection="list" open="(" separator="," close=")">
+            #{salaryId}
+        </foreach>
+    </select>
+
+    <!-- 모든 급여명세서 조회 -->
+    <select id="selectAllPayments" resultMap="SalaryPaymentResultMap">
+        SELECT * FROM salary_payments
+    </select>
+
+    <!-- 해당 달 모든 급여명세서 조회 -->
+    <select id="selectPaymentByMonth" parameterType="String" resultType="int">
+        SELECT salary_id
+        FROM salary_payments
+        WHERE compensation_month = #{yearMonthString}
+    </select>
+
+    <!-- 모든 급여명세서 - 검색어에 해당하는 데이터 결과 조회 -->
+    <select id="searchPayslips" parameterType="map" resultMap="SalaryPaymentResultMap">
+        SELECT sp.*, s.name
+        FROM salary_payments sp
+        JOIN salaries s ON sp.salary_id = s.salary_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                sp.payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.remarks LIKE CONCAT('%', #{keyword}, '%') OR
+                s.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.name LIKE CONCAT('%', #{keyword}, '%') OR
+                s.department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.bank LIKE CONCAT('%', #{keyword}, '%') OR
+                s.account_number LIKE CONCAT('%', #{keyword}, '%') OR
+                s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                s.status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
+            </if>
+        </where>
+        ORDER BY sp.payment_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 모든 급여명세서 - 검색어에 해당하는 전체 데이터 개수 조회 -->
+    <select id="countPayslips" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM salary_payments sp
+        JOIN salaries s ON sp.salary_id = s.salary_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                sp.payment_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.compensation_month LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.payment_date LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.base_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.position_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.meal_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.transport_allowance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.personal_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.team_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.holiday_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.year_end_bonus LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.overtime_pay LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.local_income_tax LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.national_pension LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.health_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.long_term_care_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.employment_insurance LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.deductions LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.gross_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.net_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                sp.remarks LIKE CONCAT('%', #{keyword}, '%') OR
+                s.salary_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.name LIKE CONCAT('%', #{keyword}, '%') OR
+                s.department_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.position_id LIKE CONCAT('%', #{keyword}, '%') OR
+                s.bank LIKE CONCAT('%', #{keyword}, '%') OR
+                s.account_number LIKE CONCAT('%', #{keyword}, '%') OR
+                s.annual_salary LIKE CONCAT('%', #{keyword}, '%') OR
+                s.status LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND s.department_id = #{department}
+            </if>
+            <if test="yearMonth != null">
+                AND DATE_FORMAT(sp.payment_date, '%Y-%m') = #{yearMonth}
+            </if>
+        </where>
+    </select>
+
+    <!-- 급여명세서 등록 -->
+    <insert id="insertPayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO salary_payments (
+            salary_id, compensation_month, payment_date, gross_salary, base_salary,
+            overtime_pay, position_allowance, meal_allowance, transport_allowance,
+            personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
+            local_income_tax, national_pension, health_insurance, long_term_care_insurance,
+            employment_insurance, deductions, net_salary, days, total_time, total_overtime, total_night_time, remarks
+        ) VALUES (
+                     #{salaryId}, #{compensationMonth}, #{paymentDate}, #{grossSalary}, #{baseSalary},
+                     #{overtimePay}, #{positionAllowance}, #{mealAllowance}, #{transportAllowance},
+                     #{personalBonus}, #{teamBonus}, #{holidayBonus}, #{yearEndBonus}, #{incomeTax},
+                     #{localIncomeTax}, #{nationalPension}, #{healthInsurance}, #{longTermCareInsurance},
+                     #{employmentInsurance}, #{deductions}, #{netSalary}, #{days}, #{totalTime}, #{totalOvertime},
+                     #{totalNightTime}, #{remarks}
+                 )
+    </insert>
+
+    <!-- 급여명세서 리스트 등록 -->
+    <insert id="insertPaymentList" parameterType="List" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO salary_payments (
+        salary_id, compensation_month, payment_date, gross_salary, base_salary,
+        overtime_pay, position_allowance, meal_allowance, transport_allowance,
+        personal_bonus, team_bonus, holiday_bonus, year_end_bonus, income_tax,
+        local_income_tax, national_pension, health_insurance, long_term_care_insurance,
+        employment_insurance, deductions, net_salary, days, total_time, total_overtime, total_night_time, remarks
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.salaryId}, #{item.compensationMonth}, #{item.paymentDate}, #{item.grossSalary}, #{item.baseSalary},
+            #{item.overtimePay}, #{item.positionAllowance}, #{item.mealAllowance}, #{item.transportAllowance},
+            #{item.personalBonus}, #{item.teamBonus}, #{item.holidayBonus}, #{item.yearEndBonus}, #{item.incomeTax},
+            #{item.localIncomeTax}, #{item.nationalPension}, #{item.healthInsurance}, #{item.longTermCareInsurance},
+            #{item.employmentInsurance}, #{item.deductions}, #{item.netSalary}, #{item.days}, #{item.totalTime},
+            #{item.totalOvertime}, #{item.totalNightTime}, #{item.remarks})
+        </foreach>
+    </insert>
+
+    <!-- 급여명세서 수정 -->
+    <update id="updatePayment" parameterType="com.woosan.hr_system.salary.model.SalaryPayment">
+        UPDATE salary_payments SET
+                                   salary_id = #{salaryId},
+                                   compensation_month = #{compensationMonth},
+                                   payment_date = #{paymentDate},
+                                   gross_salary = #{grossSalary},
+                                   base_salary = #{baseSalary},
+                                   overtime_pay = #{overtimePay},
+                                   position_allowance = #{positionAllowance},
+                                   meal_allowance = #{mealAllowance},
+                                   transport_allowance = #{transportAllowance},
+                                   personal_bonus = #{personalBonus},
+                                   team_bonus = #{teamBonus},
+                                   holiday_bonus = #{holidayBonus},
+                                   year_end_bonus = #{yearEndBonus},
+                                   income_tax = #{incomeTax},
+                                   local_income_tax = #{localIncomeTax},
+                                   national_pension = #{nationalPension},
+                                   health_insurance = #{healthInsurance},
+                                   long_term_care_insurance = #{longTermCareInsurance},
+                                   employment_insurance = #{employmentInsurance},
+                                   deductions = #{deductions},
+                                   net_salary = #{netSalary},
+                                   remarks = #{remarks}
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <!-- 급여명세서 삭제 -->
+    <delete id="deletePayment" parameterType="int">
+        DELETE FROM salary_payments WHERE payment_id = #{paymentId}
+    </delete>
+
+</mapper>

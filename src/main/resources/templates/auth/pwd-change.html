@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
+    <style>
+        .password-change-message {
+            color: #18a8f1;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #modal-body {
+            width: 450px;
+        }
+        .section {
+            padding: 10px;
+        }
+        .btn-container, .input-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-container label {
+            font-weight: bold;
+        }
+        input[type="password"] {
+            width: 65%;
+        }
+        .sub-text {
+            font-style: italic;
+            color: #CC0000;
+        }
+    </style>
+</th:block>
+
+<div>
+    <h3 style="margin: 5px 0 10px">비밀번호 변경</h3>
+    <div class="p-container">
+        <div th:if="${message} == 'FirstChangeRequired'">
+            <p class="password-change-message">입사를 축하합니다🎉<br>
+                현재 비밀번호는 생년월일 또는 초기비밀번호로 설정되어 있습니다.<br>
+                안전한 비밀번호로 변경해 주세요.</p>
+        </div>
+        <div th:if="${message} == 'ChangeRequired'">
+            <p class="password-change-message">비밀번호를 변경한 지 3개월이 지났습니다.<br>
+                안전한 계정 관리를 위해 비밀번호를 변경해 주세요.</p>
+        </div>
+    </div>
+    <div>
+        <form th:action="@{/auth/changePassword}"  onsubmit="summitUpdatePassword(event)">
+            <div class="section">
+                <div class="input-container">
+                    <label for="password">현재 비밀번호</label>
+                    <input type="password" id="password" class="first-input" name="password"/>
+                </div>
+            </div>
+            <div class="section">
+                <div class="sub-text">비밀번호는 8~20자 사이여야 하며,<br> 대문자, 소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.</div>
+                <div class="input-container">
+                    <label for="new-password">새로운 비밀번호</label>
+                    <input type="password" id="new-password" name="new-password" onchange="checkNewPassword()"/>
+                </div>
+                <div class="input-container">
+                    <label for="confirm-password">비밀번호 확인</label>
+                    <input type="password" id="confirm-password" name="confirm-password" onchange="checkConfirmPassword()"/>
+                </div>
+            </div>
+            <div class="section">
+                <div class="input-container">
+                    <div style="font-weight: bold;">비밀번호 강도 : </div>
+                    <div id="show-strength" style="margin-right: 10px;"></div>
+                    <input type="hidden" id="strength" name="strength"/>
+                </div>
+            </div>
+            <div class="btn-container">
+                <div class="error-message" id="pwd-error-message"></div>
+                <button type="submit" class="btn big">비밀번호 변경</button>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

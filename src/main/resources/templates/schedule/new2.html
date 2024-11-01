@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+  <link th:href="@{/css/common/button.css}" rel="stylesheet">
+  <link th:href="@{/css/common/input.css}" rel="stylesheet">
+  <link th:href="@{/css/schedule/detail.css}" rel="stylesheet">
+  <link th:href="@{/css/schedule/create.css}" rel="stylesheet">
+</th:block>
+
+<form action="/schedule" onsubmit="submitInsertForm(event)" novalidate>
+  <div class="detail-container">
+    <div class="task-name">
+        <div><label for="taskName">일정 :</label></div>
+        <input type="text" id="taskName" name="taskName"/>
+    </div>
+    <table class="employee-details">
+      <tr>
+        <td class="section-title">사원 ID</td>
+        <td class="section-title">이름</td>
+        <td class="section-title">부서</td>
+        <td class="section-title">직급</td>
+      </tr>
+      <tr>
+        <td th:text="${employee.employeeId}"></td>
+        <td th:text="${employee.name}"></td>
+        <td th:text="${employee.department}"></td>
+        <td th:text="${employee.position}"></td>
+        <input type="hidden" id="memberId" name="memberId" th:value="${employee.employeeId}"/>
+      </tr>
+    </table>
+    <table class="details">
+      <tr>
+        <td class="section-title">하루종일</td>
+        <td class="section-title">일정 색상</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="padding-top: 5px">
+            <label class="switch">
+              <input type="checkbox" id="allDay" name="allDay" onchange="toggleDateTimeFields()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </td>
+        <td style="text-align: center; vertical-align: middle;">
+          <div class="color-area">
+            <div id="colorPreview" class="color-preview"></div>
+            <select id="color" name="color" onchange="changeColor()">
+              <option value="#FF0000">빨강색</option>
+              <option value="#FF8000">주황색</option>
+              <option value="#FFD700">노랑색</option>
+              <option value="#32CD32">초록색</option>
+              <option value="#18A8F1" selected>하늘색</option>
+              <option value="#000080">남색</option>
+              <option value="#8A2BE2">보라색</option>
+              <option value="#FF1493">핑크색</option>
+              <option value="#8B4513">갈색</option>
+              <option value="#808080">회색</option>
+              <option value="#000000">검은색</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table class="details">
+      <tr>
+        <td class="section-title">시작일</td>
+        <td>
+          <div class="date-td">
+            <input type="datetime-local" id="startDateTime">
+            <input type="date" id="startDate" style="display: none">
+            <input type="hidden" id="startTime" name="startTime">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">종료일</td>
+        <td>
+          <div class="date-td">
+            <input type="datetime-local" id="endDateTime">
+            <input type="date" id="endDate" style="display: none">
+            <input type="hidden" id="endTime" name="endTime">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">일정 내용</td>
+        <td>
+          <textarea id="content" name="content" placeholder="일정 내용을 입력해주세요." rows="5"></textarea>
+        </td>
+      </tr>
+    </table>
+    <div class="project-travel-header">
+      <h3>프로젝트 및 출장 정보</h3>
+      <button type="button" class="inner-btn big" id="toggleBtn" onclick="toggleProjectAndTravelTable()">추가</button>
+    </div>
+    <table class="details" id="project-travel-table" style="display: none;">
+      <tr>
+        <td class="section-title">연관된 프로젝트</td>
+        <td>
+          <select id="projectId" name="projectId">
+            <option value="" disabled selected>선택해주세요.</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장지 주소</td>
+        <td>
+          <div class="postcode-container">
+            <input type="text" id="sample6_postcode" placeholder="우편번호" readonly>
+            <button type="button" class="inner-btn blue-btn" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
+          </div>
+          <div class="address-container">
+            <input type="text" id="sample6_address" placeholder="주소" readonly>
+          </div>
+          <div class="detail-address-container">
+            <input type="text" id="sample6_detailAddress" placeholder="상세주소">
+            <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+            <div class="flex-center" style="gap: 10px;">
+              <button type="button" id="mapButton" class="inner-btn green-btn"
+                      onclick="viewMap()">지도 보기</button>
+              <button type="button" id="mapButton2" class="inner-btn green-btn"
+                      onclick="closeMap()" style="display: none;">지도 닫기</button>
+            </div>
+          </div>
+          <div id="map-section" class="flex-center" style="display: none; margin-top: 10px;">
+            <div id="map" style="width:500px; height:400px;"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장지 이름</td>
+        <td>
+          <input id="tripName" type="text"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">전화번호</td>
+        <td>
+          <input id="tripTel" type="text" class="input-text" oninput="localAutoHyphen(this)" maxlength="13" placeholder="숫자만 입력하세요."/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">이메일</td>
+        <td>
+          <div class="email-container">
+            <input id="emailLocalPart" type="text" class="input-text"/>
+            <div class="characters">@</div>
+            <input id="domainInput" type="text" style="display: none;" disabled>
+            <select id="domainSelect">
+              <option value="" disabled selected>도메인 선택</option>
+              <option value="naver.com">naver.com</option>
+              <option value="google.com">google.com</option>
+              <option value="hanmail.net">hanmail.net</option>
+              <option value="nate.com">nate.com</option>
+              <option value="kakao.com">kakao.com</option>
+              <option value="custom">직접 입력</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">참고사항</td>
+        <td>
+          <input id="note" type="text" class="input-text"/>
+        </td>
+      </tr>
+    </table>
+    <div>
+      <div id="error-message" class="error-message"></div>
+      <div class="create-btn-container">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">일정 등록</button>
+      </div>
+    </div>
+  </div>
+</form>
+</html>

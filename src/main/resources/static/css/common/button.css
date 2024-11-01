@@ -1,0 +1,83 @@
+/* Button styles */
+/* 버튼에는 btn 클래스를 추가해주세요. */
+/* a에는 a-btn 클래스를 추가해주세요.  */
+/* 파일 버튼은 label에 input-file-btn 클래스를 추가해주세요. */
+/* 이미지 버튼에는 image-btn 클래스를 추가해주세요. */
+.btn {
+    padding: 10px;
+    background-color: #cfedfc;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover, .input-file-btn:hover {
+    background-color: #18a8f1;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.btn:active {
+    background-color: #18a8f1;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(2px);
+}
+
+.input-file-btn {
+    font-size: 13px;
+    padding: 10px;
+    background-color: #cfedfc;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inner-btn {
+    padding: 5px 15px;
+    background-color: #46B9F4;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.big {
+    font-size: 16px;
+}
+
+.inner-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.inner-btn:active {
+    transform: scale(0.9);
+}
+
+.red-btn {
+    background-color: #CC0000;
+}
+
+.tomato-btn {
+    background-color: #FF6347;
+}
+
+.green-btn {
+    background-color: #28A428;
+}
+
+.blue-btn {
+    background-color: #1386C1;
+}
+
+.inner-btn-area {
+    margin: 5px 10px;
+    display: flex;
+    align-items: center;
+}

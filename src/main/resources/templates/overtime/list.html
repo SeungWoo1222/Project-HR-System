@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='초과근무 목록 조회')}">
+
+<th:block layout:fragment="css">
+  <link th:href="@{/css/common/department-nav.css}" rel="stylesheet">
+  <link th:href="@{/css/common/yearmonth-nav.css}" rel="stylesheet">
+  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/search.css}" rel="stylesheet">
+  <link th:href="@{/css/common/button.css}" rel="stylesheet">
+  <link th:href="@{/css/common/table.css}" rel="stylesheet">
+  <link th:href="@{/css/common/color.css}" rel="stylesheet">
+</th:block>
+
+<th:block layout:fragment="script">
+  <script th:src="@{/js/common/yearmonth-nav.js}"></script>
+  <script th:src="@{/js/attendance/overtime.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+  <div class="content">
+    <div class="content-header">
+      <div class="content-header-left">
+        <form id="pageSizeForm" th:action="@{/overtime/list}" method="get">
+          <input type="hidden" name="page" th:value="1"/>
+          <select class="search-select" name="size" onchange="document.getElementById('pageSizeForm').submit()">
+            <option th:value="10" th:text="'10개씩 보기'" th:selected="${pageSize == 10}">10개씩 보기</option>
+            <option th:value="25" th:text="'25개씩 보기'" th:selected="${pageSize == 25}">25개씩 보기</option>
+            <option th:value="50" th:text="'50개씩 보기'" th:selected="${pageSize == 50}">50개씩 보기</option>
+          </select>
+          <input type="hidden" name="keyword" th:value="${keyword}"/>
+          <input type="hidden" name="department" th:value="${department}">
+          <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+        </form>
+      </div>
+      <div class="content-header-center">
+        <form id="yearMonthForm" th:action="@{/overtime/list}" method="get">
+          <div class="month-nav">
+            <div class="nav-btn prev" onclick="changeMonth(-1)"></div>
+            <span class="current-month" th:text="${yearmonth}"></span>
+            <div id="nextBtn" class="nav-btn next" onclick="changeMonth(1)"></div>
+          </div>
+          <input type="hidden" name="page" value="1">
+          <input type="hidden" name="size" th:value="${pageSize}"/>
+          <input type="hidden" name="keyword" th:value="${keyword}"/>
+          <input type="hidden" name="department" th:value="${department}">
+          <input type="hidden" id="yearmonth" name="yearmonth" th:value="${yearmonth}">
+        </form>
+      </div>
+      <div class="content-header-right">
+        <form th:action="@{/overtime/list}" class="search-form" method="get">
+          <input type="hidden" name="page" value="1">
+          <input type="hidden" name="size" th:value="${pageSize}"/>
+          <input class="search-text" type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}"/>
+          <input type="hidden" name="department" th:value="${department}">
+          <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+          <button type="submit" class="search-btn">
+            <img th:src="@{/images/icons/search.png}" class="search-img" alt="검색"/>
+          </button>
+        </form>
+        <button type="button" class="reset-btn" onclick="window.location.href='/overtime/list'">
+          <img th:src="@{/images/icons/reset.png}" class="reset-img" alt="검색 초기화">
+        </button>
+      </div>
+    </div>
+    <form th:action="@{/overtime/list}" method="get" id="department-nav">
+      <input type="radio" id="all" class="hidden" name="department" value="" th:checked="${department == ''}" onclick="this.form.submit()">
+      <label for="all" class="radio-btn">전체 부서</label>
+
+      <input type="radio" id="HR" class="hidden" name="department" value="HR" th:checked="${department == 'HR'}" onclick="this.form.submit()">
+      <label for="HR" class="radio-btn">HR(인사)</label>
+
+      <input type="radio" id="FI" class="hidden" name="department" value="FI" th:checked="${department == 'FI'}" onclick="this.form.submit()">
+      <label for="FI" class="radio-btn">FI(재무)</label>
+
+      <input type="radio" id="SA" class="hidden" name="department" value="SA" th:checked="${department == 'SA'}" onclick="this.form.submit()">
+      <label for="SA" class="radio-btn">SA(영업)</label>
+
+      <input type="radio" id="MK" class="hidden" name="department" value="MK" th:checked="${department == 'MK'}" onclick="this.form.submit()">
+      <label for="MK" class="radio-btn">MK(마케팅)</label>
+
+      <input type="radio" id="PR" class="hidden" name="department" value="PR" th:checked="${department == 'PR'}" onclick="this.form.submit()">
+      <label for="PR" class="radio-btn">PR(생산)</label>
+
+      <input type="radio" id="QC" class="hidden" name="department" value="QC" th:checked="${department == 'QC'}" onclick="this.form.submit()">
+      <label for="QC" class="radio-btn">QC(품질관리)</label>
+
+      <input type="radio" id="RD" class="hidden" name="department" value="RD" th:checked="${department == 'RD'}" onclick="this.form.submit()">
+      <label for="RD" class="radio-btn">RD(연구개발)</label>
+
+      <input type="hidden" name="page" th:value="1"/>
+      <input type="hidden" name="size" th:value="${pageSize}"/>
+      <input type="hidden" name="keyword" th:value="${keyword}"/>
+      <input type="hidden" name="yearmonth" th:value="${yearmonth}">
+    </form>
+    <table border="1" class="list">
+      <thead>
+      <tr>
+        <th>날짜</th>
+        <th>사원 ID</th>
+        <th>이름</th>
+        <th>부서</th>
+        <th>직급</th>
+        <th>시작 시간</th>
+        <th>종료 시간</th>
+        <th>야간 근무</th>
+        <th>초과 근무</th>
+        <th>수정하기</th>
+        <th>삭제하기</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:if="${overtimeList.isEmpty()}">
+        <td colspan="10" style="text-align: center; padding: 20px;">
+          조회된 초과근무 내역이 없습니다. 다른 검색 조건을 시도해보세요.
+        </td>
+      </tr>
+      <tr th:each="overtime : ${overtimeList}">
+        <td th:text="${#temporals.format(overtime.date, 'dd일 (EE)')}">날짜</td>
+        <td th:text="${overtime.employeeId}">사원 ID</td>
+        <td th:text="${overtime.employee?.name}">이름</td>
+        <td th:text="${overtime.employee?.department.name}">부서</td>
+        <td th:text="${overtime.employee?.position.name}">직급</td>
+        <td th:text="${#temporals.format(overtime.startTime, 'HH:mm')}">시작 시간</td>
+        <td th:text="${#temporals.format(overtime.endTime, 'HH:mm')}">종료 시간</td>
+        <td th:text="${overtime.nightHours} + '시간'"></td>
+        <td th:text="${overtime.totalHours} + '시간'"></td>
+        <td>
+          <button type="button" class="inner-btn tomato-btn" th:overtimeId="${overtime.overtimeId}"
+                  th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">수정</button>
+        </td>
+        <td>
+          <button type="button" class="inner-btn red-btn" th:overtimeId="${overtime.overtimeId}"
+                  th:onclick="deleteOvertime(this.getAttribute('overtimeId'))">삭제</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="pagination-container" th:if="${totalPages > 0}">
+      <div class="pagination">
+        <span th:if="${currentPage > 1}">
+          <a th:href="@{'/overtime/list?page=' + (${currentPage - 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}">
+              <img th:src="@{/images/icons/arrow-left.png}" alt="이전" class="icon">
+          </a>
+        </span>
+        <div class="page-area">
+          <span th:if="${totalPages <= 5}">
+              <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                  <a th:href="@{'/overtime/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}"
+                     th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+              </span>
+          </span>
+          <span th:if="${totalPages > 5}">
+              <span th:each="i : ${#numbers.sequence(
+                              currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage - 2 : totalPages - 4) : 1,
+                              currentPage > 3 ? (currentPage < totalPages - 2 ? currentPage + 2 : totalPages) : 5)}">
+                  <a th:href="@{'/overtime/list?page=' + ${i} + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}"
+                     th:text="${i}" th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+              </span>
+          </span>
+        </div>
+        <span th:if="${currentPage < totalPages}">
+            <a th:href="@{'/overtime/list?page=' + (${currentPage + 1}) + '&size=' + ${pageSize} + '&keyword=' + ${keyword} + '&department=' + ${department} + '&yearmonth=' + ${yearmonth}}">
+                <img th:src="@{/images/icons/arrow-right.png}" alt="다음" class="icon">
+            </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+</html>

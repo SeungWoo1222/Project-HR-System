@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='내 정보 수정')}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/button.css}"/>
+    <link rel="stylesheet" th:href="@{/css/common/color.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/detail.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/register.css}"/>
+    <link rel="stylesheet" th:href="@{/css/employee/edit.css}"/>
+    <style>
+        .content {
+            width: 750px;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/common/daum-postcode-API.js}"></script>
+    <script th:src="@{/js/common/file.js}"></script>
+    <script th:src="@{/js/employee/employee.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            separateEmail();
+            updatePhoneNumberElement();
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="detail-wrapper">
+            <div class="detail-container">
+                <form th:action="@{/api/employee/update}" onsubmit="submitUpdateForm(event)" enctype="multipart/form-data">
+                    <div class="input-area upper-part">
+                        <div id="picture-area" class="picture-area">
+                            <img id="employee-picture" class="employee-picture" th:src="${pictureUrl}"/>
+                        </div>
+                        <div id="file-area" class="file-area">
+                            <p>사진은 10MB까지 업로드 가능합니다.</p>
+                            <p>파일 형식은 JPEG, PNG, SVG, WebP, HEIF만을 지원합니다.</p>
+                            <div class="upload-area">
+                                <div id="file-name" class="file-name" th:text="${originalFileName}"></div>
+                                <div class="file-btn-area">
+                                    <label for="picture" class="input-file-btn">사진 업로드</label>
+                                </div>
+                            </div>
+                            <input type="file" id="picture" class="hidden" name="picture" onchange="validateImage(this)">
+                            <input type="hidden" id="original-picture" name="original-picture" th:value="${employee.picture}">
+                        </div>
+                    </div>
+                    <div class="personal-info">
+                        <table>
+                            <tr>
+                                <td class="section-title w-25">사원 ID</td>
+                                <td th:text="${employee.employeeId}"></td>
+                                <td class="section-title w-25">이름</td>
+                                <td class="w-25" th:text="${employee.name}">/td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">주민등록번호</td>
+                                <td colspan="3" th:text="${employee.birth + ' - ' + employee.residentRegistrationNumber}"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">전화번호</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="phoneInput" name="phoneInput" maxlength="11" placeholder="숫자만 입력해주세요." th:value="${employee.phone}"/>
+                                    </div>
+                                    <input type="hidden" id="phone" name="phone"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">이메일</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="emailLocal" name="emailLocal"/>
+                                        @
+                                        <input type="text" id="customEmailDomain" name="customEmailDomain" class="hidden">
+                                        <select id="emailDomain" name="emailDomain" onchange="updateCustomField()">
+                                            <option value="custom">직접입력</option>
+                                            <option value="naver.com">naver.com</option>
+                                            <option value="gmail.com">gmail.com</option>
+                                            <option value="icloud.com">icloud.com</option>
+                                            <option value="outlook.com">outlook.com</option>
+                                            <option value="nate.com">nate.com</option>
+                                            <option value="daum.net">daum.net</option>
+                                            <option value="yahoo.com">yahoo.com</option>
+                                        </select>
+                                        <input type="hidden" id="email" name="email" th:value="${employee.email}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">주소</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="address" name="address" th:value="${employee.address}"/>
+                                        <input type="button" class="inner-btn blue-btn" onclick="execDaumPostcode()" value="우편번호 찾기"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">상세 주소</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <input type="text" id="detailAddressInput" name="detailAddressInput" th:value="${employee.detailAddress}">
+                                        <input type="text" id="extraAddress" placeholder="참고항목" readonly>
+                                    </div>
+                                    <input type="hidden" id="detailAddress" name="detailAddress" th:value="${employee.detailAddress}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">결혼 관계</td>
+                                <td colspan="3">
+                                    <div class="input-area">
+                                        <div class="radio-group" id="radioGroup">
+                                            <input type="radio" class="hidden-radio" id="marriedYes" name="maritalStatus" value="1"
+                                                   th:checked="${employee.maritalStatus == true}" onchange="updateDependents()">
+                                            <label for="marriedYes" class="radio-label">기혼</label>
+                                            <input type="radio" class="hidden-radio" id="marriedNo" name="maritalStatus" value="0"
+                                                   th:checked="${employee.maritalStatus == false}" onchange="updateDependents()">
+                                            <label for="marriedNo" class="radio-label">미혼 또는 이혼</label>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25" >부양 가족 수<span class="sub-text">(본인 포함)</span></td>
+                                <td class="w-25">
+                                    <div class="input-area">
+                                        <input type="number" id="numDependents" name="numDependents" min="1" max="11" th:value="${employee.numDependents}">
+                                        <div class="characters">인</div>
+                                    </div>
+                                </td>
+                                <td class="section-title w-25" >자녀 수<span class="sub-text">(8~20세)</span></td>
+                                <td class="w-25">
+                                    <div class="input-area">
+                                        <input type="number" id="numChildren" name="numChildren" min="0" max="11" th:value="${employee.numChildren}">
+                                        <div class="characters">명</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="section-title">부서 / 직급</td>
+                                <td th:text="${employee.department == 'HR' ? 'HR(인사)' :
+                                  (employee.department == 'FI' ? 'FI(재무)' :
+                                  (employee.department == 'SA' ? 'SA(영업)' :
+                                  (employee.department == 'MK' ? 'MK(마케팅)' :
+                                  (employee.department == 'QC' ? 'QC(품질관리)' :
+                                  (employee.department == 'RD' ? 'RD(연구개발)' : 'PR(생산)')))))}
+                                  + ' / ' + ${employee.position}"></td>
+                                <td class="section-title">잔여 연차</td>
+                                <td th:text="${employee.remainingLeave + '일'}"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title w-25">입사 날짜</td>
+                                <td class="w-25" th:text="${employee.hireDate}"></td>
+                                <td class="section-title w-25">재직 상태</td>
+                                <td class="w-25" th:text="${employee.status}"
+                                    th:classappend="${employee.status == '재직'} ? 'green' :
+                                    (${employee.status == '퇴사'} ? 'red' :
+                                    (${employee.status == '퇴사 예정'} ? 'orange' :
+                                    (${employee.status == '휴직'} ? 'yellow' : '')))"></td>
+                            </tr>
+                            <tr>
+                                <td class="section-title last-td">사원 정보 수정자</td>
+                                <td class="last-td" th:text="${employee.modifiedBy}"></td>
+                                <td class="section-title last-td">사원 정보 수정일시</td>
+                                <td class="last-td" th:text="${#temporals.format(employee.lastModified, 'yyyy-MM-dd HH:mm')}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="error-message" class="error-message"></div>
+                    <div class="button-container">
+                        <button type="button" class="btn" onclick="window.location.reload()">초기화</button>
+                        <button type="button" class="btn" th:onclick="'window.location.href=\'/my\''">수정 취소</button>
+                        <button type="submit" class="btn" data-url="/my">정보 수정</button>
+                    </div>
+                    <input type="hidden" id="employeeId" name="employeeId" th:value="${employee.employeeId}" readonly/>
+                    <input type="hidden" id="name" name="name" th:value="${employee.name}" readonly/>
+                    <input type="hidden" id="birth" name="birth" th:value="${employee.birth}" readonly/>
+                    <input type="hidden" id="residentRegistrationNumber" name="residentRegistrationNumber" th:value="${employee.residentRegistrationNumber}" readonly/>
+                    <input type="hidden" id="remainingLeave" name="remainingLeave" th:value="${employee.remainingLeave}" readonly/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

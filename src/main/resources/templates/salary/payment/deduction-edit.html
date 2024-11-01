@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/common/input.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout/input-modal.css}"/>
+</th:block>
+
+<div class="input-modal">
+    <h3>공제 비율 수정</h3>
+    <form id="deduction-edit-form" class="ratio-edit-form" th:action="@{/api/salary/payment/deduction}" onsubmit="submitUpdateForm(event)">
+        <div class="input-container">
+            <label for="localIncomeTaxRate">지방소득세</label>
+            <input type="number" step="0.5" id="localIncomeTaxRate" name="localIncomeTaxRate" th:value="${deductionRatios.localIncomeTaxRate}"/>
+        </div>
+        <div class="input-container">
+            <label for="nationalPensionRate">국민연금</label>
+            <input type="number" step="0.5" id="nationalPensionRate" name="nationalPensionRate" th:value="${deductionRatios.nationalPensionRate}"/>
+        </div>
+        <div class="input-container">
+            <label for="healthInsuranceRate">건강보험</label>
+            <input type="number" step="0.5" id="healthInsuranceRate" name="healthInsuranceRate" th:value="${deductionRatios.healthInsuranceRate}"/>
+        </div>
+        <div class="input-container">
+            <label for="longTermCareRate">장기요양보험</label>
+            <input type="number" step="0.5" id="longTermCareRate" name="longTermCareRate" th:value="${deductionRatios.longTermCareRate}"/>
+        </div>
+        <div class="input-container">
+            <label for="employmentInsuranceRate">고용보험</label>
+            <input type="number" step="0.5" id="employmentInsuranceRate" name="employmentInsuranceRate" th:value="${deductionRatios.employmentInsuranceRate}"/>
+        </div>
+        <div class="btn-container">
+            <button type="reset" class="btn">초기화</button>
+            <button type="submit" id="edit-deduction-ratio" class="btn">수정 완료</button>
+        </div>
+    </form>
+</div>
+
+</html>

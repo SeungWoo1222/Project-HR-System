@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/vacation/detail.css}" rel="stylesheet"/>
+    <link th:href="@{/css/vacation/input.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+</th:block>
+
+<div class="vacation-edit-container">
+    <form action="/api/vacation" onsubmit="submitUpdateForm(event)">
+        <div class="content-header">
+            <div class="content-header-left">
+                <div id="error-message" class="error-message"></div>
+            </div>
+            <div class="title content-header-center">휴가 신청서</div>
+            <div class="content-header-right">
+                <button type="reset" class="btn">초기화</button>
+                <button type="submit" class="btn">수정 완료</button>
+            </div>
+        </div>
+        <table class="employee-details">
+            <tr>
+                <td class="section-title">사원 ID</td>
+                <td class="section-title">이름</td>
+                <td class="section-title">부서</td>
+                <td class="section-title">직급</td>
+                <td class="section-title">연락처</td>
+            </tr>
+            <tr>
+                <td th:text="${vacationInfo.employeeId}"></td>
+                <td th:text="${employeeInfo.name}"></td>
+                <td th:text="${employeeInfo.department}"></td>
+                <td th:text="${employeeInfo.position}"></td>
+                <td th:text="${employeeInfo.phone}"></td>
+            </tr>
+        </table>
+        <table class="details">
+            <tr>
+                <td class="section-title">휴가 유형</td>
+                <td>
+                    <select id="vacationType" name="vacationType" onchange="updateFormVisibility()">
+                        <option value="오전 반차" th:selected="${vacationInfo.vacationType == '오전 반차'}">오전 반차</option>
+                        <option value="오후 반차" th:selected="${vacationInfo.vacationType == '오후 반차'}">오후 반차</option>
+                        <option value="연차" th:selected="${vacationInfo.vacationType == '연차'}">연차</option>
+                        <option value="병가" th:selected="${vacationInfo.vacationType == '병가'}">병가</option>
+                        <option value="출산 휴가" th:selected="${vacationInfo.vacationType == '출산 휴가'}">출산 휴가</option>
+                        <option value="배우자 출산 휴가" th:selected="${vacationInfo.vacationType == '배우자 출산 휴가'}">배우자 출산 휴가</option>
+                        <option value="생리 휴가" th:selected="${vacationInfo.vacationType == '생리 휴가'}">생리 휴가</option>
+                        <option value="가족 돌봄 휴가" th:selected="${vacationInfo.vacationType == '가족 돌봄 휴가'}">가족 돌봄 휴가</option>
+                        <option value="경조사 휴가" th:selected="${vacationInfo.vacationType == '경조사 휴가'}">경조사 휴가</option>
+                        <option value="기타 휴가" th:selected="${vacationInfo.vacationType == '기타 휴가'}">기타 휴가</option>
+                        </select>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title">사용 일수</td>
+                <td>
+                    <input type="text" id="usedDays" name="usedDays" th:value="${vacationInfo.usedDays}" style="width: 30px; text-align: center" readonly/> 일
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title" colspan="1">휴가 시작일</td>
+                <td colspan="2">
+                    <div class="date-td">
+                        <input type="date" id="dateAt" onchange="setDateAt()" style="display: none;"/>
+                        <input type="date" id="startAt" name="startAt" th:value="${#temporals.format(vacationInfo.startAt, 'yyyy-MM-dd')}" oninput="calculateUsedDays()"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title" colspan="1">휴가 종료일</td>
+                <td colspan="2">
+                    <div class="date-td">
+                        <input type="date" id="endAt" name="endAt" th:value="${#temporals.format(vacationInfo.endAt, 'yyyy-MM-dd')}" oninput="calculateUsedDays()"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="section-title" style="height: 80px">사유</td>
+                <td>
+                    <textarea id="reason" name="reason" rows="2" th:text="${vacationInfo.reason}"></textarea>
+                </td>
+            </tr>
+            <input type="hidden" id="vacationId" name="vacationId" th:value="${vacationInfo.vacationId}"/>
+            <input type="hidden" id="approvalStatus" name="approvalStatus" th:value="${vacationInfo.approvalStatus}"/>
+            <input type="hidden" id="employeeId" name="employeeId" th:value="${employeeInfo.employeeId}"/>
+            <input type="hidden" id="remainingLeave" th:value="${employeeInfo.remainingLeave}"/>
+        </table>
+    </form>
+    <table class="details">
+        <tr>
+            <td class="section-title">승인 상태</td>
+            <td th:text="${vacationInfo.approvalStatus}"
+                th:classappend="${vacationInfo.approvalStatus == '미처리'} ? 'grey' :
+                                    (${vacationInfo.approvalStatus == '승인'} ? 'green' :
+                                    (${vacationInfo.approvalStatus == '거절'} ? 'red' : ''))"></td>
+        </tr>
+        <tr>
+            <td class="section-title">처리자</td>
+            <td th:text="${vacationInfo.processingBy}"></td>
+        </tr>
+        <tr>
+            <td class="section-title">처리 일시</td>
+            <td th:text="${#temporals.format(vacationInfo.processingAt, 'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+    </table>
+    <div class="submission-declaration">
+        <p>상기 본인은 위와 같이 휴가 신청서를 제출합니다.</p>
+    </div>
+    <div class="applicant-signature">
+        <span th:text="${#temporals.format(vacationInfo.createdAt, 'yyyy년 MM월 dd일')}"></span>
+        <span style="font-size:20px;">신청인 : <span th:text="${employeeInfo.name}" style="margin-right: 7px"></span>(인)</span>
+    </div>
+    <div class="company-signature">
+        <p>주식회사 하루하루</p>
+        <img class="signature" src="/images/icons/signature.png">
+    </div>
+</div>
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="resignation">
+    <resultMap id="ResignationResultMap" type="com.woosan.hr_system.resignation.model.Resignation">
+        <id property="employeeId" column="employee_id"/>
+        <result property="resignationReason" column="resignation_reason"/>
+        <result property="codeNumber" column="code_number"/>
+        <result property="specificReason" column="specific_reason"/>
+        <result property="resignationDate" column="resignation_date"/>
+        <result property="processedBy" column="processed_by"/>
+        <result property="processedAt" column="processed_at"/>
+    </resultMap>
+
+    <!-- id를 이용한 퇴직 사원 정보 조회 -->
+    <select id="getResignedEmployee" parameterType="String" resultMap="ResignationResultMap">
+        SELECT * FROM resignations
+        WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 모든 퇴직 사원 정보 조회 -->
+    <select id="getAllResignedEmployees" resultMap="ResignationResultMap">
+        SELECT * FROM resignations
+    </select>
+
+    <!-- 새로운 퇴직 사원 정보 등록 -->
+    <insert id="insertResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
+        INSERT INTO resignations (employee_id, resignation_reason, code_number, specific_reason, resignation_date, processed_by, processed_at)
+        VALUES (#{employeeId}, #{resignationReason}, #{codeNumber}, #{specificReason}, #{resignationDate}, #{processedBy}, #{processedAt})
+    </insert>
+
+    <!-- 사원 재직상태 퇴사 처리-->
+    <update id="processResignation" parameterType="string">
+        UPDATE employees
+        SET status = '퇴사'
+        WHERE employee_id = #{employeeId}
+    </update>
+
+    <!-- 퇴직 사원 정보 업데이트 -->
+    <update id="updateResignation" parameterType="com.woosan.hr_system.resignation.model.Resignation">
+        UPDATE resignations
+        SET resignation_reason = #{resignationReason},
+            code_number = #{codeNumber},
+            specific_reason = #{specificReason},
+            resignation_date = #{resignationDate},
+            processed_by = #{processedBy},
+            processed_at = #{processedDate}
+        WHERE employee_id = #{employeeId}
+    </update>
+
+    <!-- 퇴직 사원 정보 삭제 -->
+    <delete id="deleteResignation" parameterType="String">
+        DELETE FROM resignations
+        WHERE employee_id = #{employeeId}
+    </delete>
+
+</mapper>

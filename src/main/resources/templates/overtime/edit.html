@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block layout:fragment="css">
+  <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+  <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
+</th:block>
+
+<div class="attendance-detail-container">
+  <form action="/api/overtime" onsubmit="submitUpdateOvertimeForm(event)">
+    <div class="flex-center">
+      <h3 th:text="${#temporals.format(overtime.date, 'yyyy년 MM월 dd일 (EE)')}"></h3>
+    </div>
+    <table>
+      <tr>
+        <td class="section-title">이름 / 사원 ID</td>
+        <td th:text="${employee.name + ' (' + overtime.employeeId} + ')'"></td>
+      </tr>
+      <tr>
+        <td class="section-title">시작 시간<span class="sub-time">  (00:00:00)</span></td>
+        <td class="input-area">
+          <input type="text" id="startTime" name="startTime" th:value="${#temporals.format(overtime.startTime, 'HH:mm:ss')}"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">종료 시간<span class="sub-time">  (00:00:00)</span></td>
+        <td class="input-area">
+          <input type="text" id="endTime" name="endTime" th:value="${#temporals.format(overtime.endTime, 'HH:mm:ss')}"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">야간근무 시간</td>
+        <td th:text="${overtime.nightHours}"></td>
+      </tr>
+      <tr>
+        <td class="section-title">총 초과근무 시간</td>
+        <td th:text="${overtime.totalHours}"></td>
+      </tr>
+    </table>
+    <div class="bottom-container">
+      <div id="error-message" class="error-message">* 야간 및 총 초과근무 시간은 수정 완료 후 적용됩니다 *</div>
+      <div class="btn-container" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">수정 완료</button>
+      </div>
+    </div>
+    <input type="hidden" id="overtimeId" name="overtimeId" th:value="${overtime.overtimeId}"/>
+  </form>
+</div>
+
+</html>

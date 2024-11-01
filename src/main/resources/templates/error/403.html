@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-without-sidebar :: layout(title='403 Error')}">
+
+<head>
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/error/httpstatus.css}">
+  </th:block>
+</head>
+
+<body>
+<div layout:fragment="~{content}">
+  <div class="content">
+    <section class="httpstatus-section">
+      <div class="httpstatus-container">
+        <div class="logo-area">
+          <img th:src="@{/images/logo/otter-angry.png}" alt="Logo" class="logo-image">
+        </div>
+        <div class="text-area">
+          <h1>403 Error - Forbidden</h1>
+          <p>죄송합니다. 접근 권한이 없습니다.</p>
+          <p>이 페이지에 접근할 권한이 없습니다.<br>필요한 권한을 가지고 있는지 확인하세요.</p>
+          <a th:href="@{home}" class="a-btn">홈페이지로 이동</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

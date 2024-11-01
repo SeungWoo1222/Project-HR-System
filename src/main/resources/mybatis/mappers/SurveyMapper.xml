@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="survey">
+    <resultMap id="SurveyInfoResultMap" type="com.woosan.hr_system.survey.model.Survey">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+        <result property="expiresAt" column="expires_at"/>
+    </resultMap>
+
+    <resultMap id="SurveyResultMap" type="com.woosan.hr_system.survey.model.Survey">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+        <result property="expiresAt" column="expires_at"/>
+        <collection property="questions" ofType="com.woosan.hr_system.survey.model.Question" column="id"
+                    select="selectQuestionsBySurveyId"/>
+    </resultMap>
+
+    <resultMap id="QuestionResultMap" type="com.woosan.hr_system.survey.model.Question">
+        <id property="id" column="id"/>
+        <result property="questionText" column="question_text"/>
+        <result property="questionType" column="question_type"/>
+        <collection property="options" ofType="java.lang.Integer" column="id" select="selectOptionsByQuestionId"/>
+    </resultMap>
+
+    <resultMap id="ResponseResultMap" type="com.woosan.hr_system.survey.model.Response">
+        <id property="id" column="id"/>
+        <result property="surveyId" column="survey_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="answer" column="answer"/>
+    </resultMap>
+
+    <resultMap id="ParticipantResultMap" type="com.woosan.hr_system.survey.model.Participant">
+        <id property="surveyId" column="survey_id"/>
+        <id property="employeeId" column="employee_id"/>
+        <result property="participationAt" column="participation_at"/>
+        <!-- 사원 관련 정보 -->
+        <result property="employee.employeeId" column="employee_id" />
+        <result property="employee.name" column="name" />
+        <result property="employee.department" column="department_id" />
+        <result property="employee.position" column="position_id" />
+    </resultMap>
+
+    <!-- 설문 등록 -->
+    <insert id="insertSurvey" parameterType="com.woosan.hr_system.survey.model.Survey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO surveys (title, description, created_by, created_at, expires_at)
+        VALUES (#{title}, #{description}, #{createdBy}, #{createdAt}, #{expiresAt})
+    </insert>
+
+    <!-- 질문 등록 -->
+    <insert id="insertQuestion" parameterType="com.woosan.hr_system.survey.model.Survey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO questions (survey_id, question_text, question_type)
+        VALUES (#{surveyId}, #{questionText}, #{questionType})
+    </insert>
+
+    <!-- 옵션 등록 -->
+    <insert id="insertOption" parameterType="map">
+        INSERT INTO question_options (question_id, option_text)
+        VALUES (#{questionId}, #{optionText})
+    </insert>
+
+    <!-- 설문 검색 조회 -->
+    <select id="searchSurvey" parameterType="map" resultMap="SurveyResultMap">
+        SELECT * FROM surveys
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                id LIKE CONCAT('%', #{keyword}, '%') OR
+                title LIKE CONCAT('%', #{keyword}, '%') OR
+                description LIKE CONCAT('%', #{keyword}, '%') OR
+                resident_registration_number LIKE CONCAT('%', #{keyword}, '%') OR
+                created_by LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                status LIKE CONCAT('%', #{keyword}, '%') OR
+                expires_at LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectSurveyById" parameterType="int" resultMap="SurveyResultMap">
+        SELECT * FROM surveys
+        WHERE id = #{id}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectQuestionsBySurveyId" parameterType="int" resultMap="QuestionResultMap">
+        SELECT * FROM questions
+        WHERE survey_id = #{id}
+    </select>
+
+    <!-- 설문 ID를 이용한 설문조사의 질문들 조회-->
+    <select id="selectOptionsByQuestionId" parameterType="int" resultType="String">
+        SELECT option_text FROM question_options
+        WHERE question_id = #{id}
+    </select>
+
+    <!-- 설문 응답 등록 -->
+    <insert id="insertResponse" parameterType="com.woosan.hr_system.survey.model.Response">
+        INSERT INTO responses (survey_id, employee_id, question_id, answer)
+        VALUES (#{surveyId}, #{employeeId}, #{questionId}, #{answer})
+    </insert>
+
+    <!-- 설문 참여자 등록 -->
+    <insert id="insertParticipant" parameterType="map">
+        INSERT INTO survey_participants (survey_id, employee_id)
+        VALUES (#{surveyId}, #{employeeId})
+    </insert>
+
+    <!-- 설문 참여자 조회 -->
+    <select id="selectParticipantIds" parameterType="int" resultType="String">
+        SELECT employee_id
+        FROM survey_participants
+        WHERE survey_id = #{surveyId}
+    </select>
+
+    <!-- 설문 참여자 검색 조회 -->
+    <select id="searchParticipants" parameterType="map" resultMap="ParticipantResultMap">
+        SELECT sp.*, e.name, e.department_id, e.position_id
+        FROM survey_participants sp
+                 JOIN employees e ON sp.employee_id = e.employee_id
+        WHERE sp.survey_id = #{surveyId}
+        ORDER BY sp.participation_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 설문 응답 조회 -->
+    <select id="selectResponses" parameterType="map" resultMap="ResponseResultMap">
+        SELECT *
+        FROM responses
+        WHERE survey_id = #{surveyId} and employee_id = #{employeeId}
+    </select>
+
+    <!-- 설문 참여자 정보 조회 -->
+    <select id="selectParticipationInfo" parameterType="map" resultMap="ParticipantResultMap">
+        SELECT sp.*, e.name, e.department_id, e.position_id
+        FROM survey_participants sp
+                 JOIN employees e ON sp.employee_id = e.employee_id
+        WHERE sp.survey_id = #{surveyId} and sp.employee_id = #{employeeId}
+    </select>
+
+    <!-- 설문 삭제 -->
+    <delete id="deleteSurvey" parameterType="int">
+        DELETE FROM surveys WHERE id = #{id}
+    </delete>
+
+    <!-- 질문에 해당하는 모든 응답 조회 -->
+    <select id="selectResponsesByQuestionId" parameterType="int" resultMap="ResponseResultMap">
+        SELECT *
+        FROM responses
+        WHERE survey_id = ${surveyId} and question_id = ${questionId}
+    </select>
+
+    <!-- 조사 중인 설문 조회 -->
+    <select id="selectInvestigatingSurvey" resultMap="SurveyInfoResultMap">
+        SELECT *
+        FROM surveys
+        WHERE status = '조사 중'
+    </select>
+
+    <!-- 설문 조사 종료 처리 -->
+    <update id="closeSurvey" parameterType="int">
+        UPDATE surveys
+        SET status = '조사 종료'
+        WHERE id = #{id}
+    </update>
+</mapper>

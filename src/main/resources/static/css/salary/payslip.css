@@ -1,0 +1,87 @@
+.payslip-container {
+    line-height: 1.6;
+    width: 210mm;
+    margin: 0;
+    padding: 10mm;
+    box-sizing: border-box;
+}
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.header {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    padding: 0 0 10px 0;
+}
+
+.header td {
+    border: 1px solid #000;
+    padding: 5px;
+}
+
+.section-title {
+    font-weight: bold;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.details, .summary, .calculation {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.details td, .summary td, .calculation td {
+    border: 1px solid #000;
+    padding: 5px;
+}
+
+.details td:nth-child(1), .details td:nth-child(3) {
+    width: 25%;
+}
+
+.details td:nth-child(2), .details td:nth-child(4) {
+    width: 25%;
+}
+
+.calculation td {
+    text-align: center;
+}
+
+.calculation .left {
+    text-align: left;
+}
+
+.totals {
+    font-weight: bold;
+    text-align: center;
+}
+
+.totals td {
+    background-color: #f0f0f0;
+}
+
+.center {
+    text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+td input[type="text"] {
+    width: 95%;
+}

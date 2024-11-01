@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout :: layout(title='급여 및 공제 비율 조회')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/table.css}" rel="stylesheet">
+    <link th:href="@{/css/common/color.css}" rel="stylesheet">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet">
+    <style>
+        .ratio-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .payroll-section, .deduction-section {
+            flex-basis: 40%;
+            padding: 0 50px;
+        }
+
+        .payroll-section {
+            border-right: #DCDCDC solid 1px;
+        }
+
+        .ratio-section-header, .ratio-edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/salary/ratio.js}"></script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <div class="ratio-container">
+            <div class="payroll-section">
+                <div class="ratio-section-header">
+                    <h3>급여 비율</h3>
+                    <button type="button" id="edit-payroll-ratio" class="btn" onclick="openModal('/salary/payment/payroll/edit')">급여 비율 수정</button>
+                </div>
+                <table class="list">
+                    <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>비율</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="section-title">기본급</td>
+                        <td th:text="${payrollRatios.baseSalaryRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">직책 수당</td>
+                        <td th:text="${payrollRatios.positionAllowanceRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">식대</td>
+                        <td th:text="${payrollRatios.mealAllowanceRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">교통비</td>
+                        <td th:text="${payrollRatios.transportAllowanceRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">개인 성과급</td>
+                        <td th:text="${payrollRatios.personalBonusRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">팀 성과급</td>
+                        <td th:text="${payrollRatios.teamBonusRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">명절 보너스</td>
+                        <td th:text="${payrollRatios.holidayBonusRatio}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">연말 보너스</td>
+                        <td th:text="${payrollRatios.yearEndBonusRatio}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="deduction-section">
+                <div class="ratio-section-header">
+                    <h3>공제 비율</h3>
+                    <button type="button" id="edit-deduction-ratio" class="btn" onclick="openModal('/salary/payment/deduction/edit')">공제 비율 수정</button>
+                </div>
+                <table border="1" class="list">
+                    <thead>
+                    <th>항목</th>
+                    <th>비율</th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="section-title">근로소득세</td>
+                        <td>소득세율표에 따라 설정</td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">지방소득세</td>
+                        <td th:text="${deductionRatios.localIncomeTaxRate}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">국민연금</td>
+                        <td th:text="${deductionRatios.nationalPensionRate}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">건강보험</td>
+                        <td th:text="${deductionRatios.healthInsuranceRate}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">장기요양보험</td>
+                        <td th:text="${deductionRatios.longTermCareRate}"></td>
+                    </tr>
+                    <tr>
+                        <td class="section-title">고용보험</td>
+                        <td th:text="${deductionRatios.employmentInsuranceRate}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block layout:fragment="css">
+  <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+  <link th:href="@{/css/common/input.css}" rel="stylesheet"/>
+  <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
+  <style>
+    .input-area textarea {
+      width: 88%;
+    }
+  </style>
+</th:block>
+
+<div class="attendance-detail-container">
+  <form action="/api/attendance" onsubmit="submitUpdateForm(event)">
+    <div class="flex-center">
+        <h3 th:text="${#temporals.format(attendance.date, 'yyyy년 MM월 dd일 (EE)')}"></h3>
+    </div>
+    <table>
+      <tr>
+        <td class="section-title">이름 / 사원 ID</td>
+        <td th:text="${employee.name + ' (' + attendance.employeeId} + ')'"></td>
+      </tr>
+      <tr>
+        <td class="section-title">출근 시간<span class="sub-time">  (00:00:00)</span></td>
+        <td class="input-area">
+          <input type="text" id="checkIn" name="checkIn" th:value="${#temporals.format(attendance.checkIn, 'HH:mm:ss')}"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">퇴근 시간<span class="sub-time">  (00:00:00)</span></td>
+        <td class="input-area">
+          <input type="text" id="checkOut" name="checkOut" th:value="${#temporals.format(attendance.checkOut, 'HH:mm:ss')}"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">근태 상태</td>
+        <td class="input-area">
+          <select id="status" name="status">
+            <option value="출근" th:selected="${attendance.status == '출근'}">출근</option>
+            <option value="결근" th:selected="${attendance.status == '결근'}">결근</option>
+            <option value="지각" th:selected="${attendance.status == '지각'}">지각</option>
+            <option value="조퇴" th:selected="${attendance.status == '조퇴'}">조퇴</option>
+            <option value="출장" th:selected="${attendance.status == '출장'}">출장</option>
+            <option value="휴가" th:selected="${attendance.status == '휴가'}">휴가</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">휴가 ID</td>
+        <td class="input-area">
+          <select id="vacationId" name="vacationId">
+            <option value="" th:selected="${attendance.vacationId == ''}">해당 없음</option>
+            <option th:each="vacation : ${vacationList}"
+                    th:value="${vacation.vacationId}"
+                    th:text="${#temporals.format(vacation.processingAt, 'yy.MM.dd') + ' '
+                    + vacation.vacationType} + '(' + ${vacation.reason} + ')'"
+                    th:selected="${vacation.vacationId}"></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">출장 ID</td>
+        <td class="input-area">
+          <select id="tripId" name="tripId">
+            <option value="" th:selected="${attendance.tripId == ''}">해당 없음</option>
+            <!-- 출장 미구현으로 구현되면 주석 해제 후 수정 예정-->
+  <!--          <option th:each="trip : ${tripList}"-->
+  <!--                  th:value="${trip.tripId}"-->
+  <!--                  th:text="${trip.contact?.clientName} + '(' + ${trip.visitDate} + ')'"></option>-->
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">메모</td>
+        <td class="input-area">
+          <textarea id="notes" name="notes" th:text="${attendance.notes}" rows="2"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td class="section-title">마지막 수정 일시</td>
+        <td th:text="${#temporals.format(attendance.lastModified, 'yyyy년 MM월 dd일 HH:mm')}"></td>
+      </tr>
+      <tr>
+        <td class="section-title">마지막 수정 사원 ID</td>
+        <td th:text="${attendance.modifiedBy}"></td>
+      </tr>
+    </table>
+    <div class="bottom-container">
+      <div id="error-message" class="error-message"></div>
+      <div class="btn-container" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+        <button type="reset" class="btn">초기화</button>
+        <button type="submit" class="btn">수정 완료</button>
+      </div>
+    </div>
+    <input type="hidden" id="attendanceId" name="attendanceId" th:value="${attendance.attendanceId}"/>
+    <input type="hidden" name="date" th:value="${attendance.date}"/>
+    <input type="hidden" name="employeeId" th:value="${attendance.employeeId}"/>
+  </form>
+</div>
+
+</html>

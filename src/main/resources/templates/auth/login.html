@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{fragments/layout-without-sidebar :: layout(title='로그인')}">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/layout/layout.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login/login.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/layout.js}"></script>
+    <script th:if="${logoutMessage}">
+        alert("로그아웃 되었습니다.");
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById('login-form');
+            const usernameInput = document.getElementById('username');
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+
+            // 페이지 로드 시 저장된 아이디가 있으면 자동으로 입력
+            if (localStorage.getItem('rememberedUserId')) {
+                usernameInput.value = localStorage.getItem('rememberedUserId');
+                rememberMeCheckbox.checked = true;
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', submitForm);
+            }
+        });
+
+        // 유효성 검사
+        function validateForm(event) {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+
+            // 아이디 유효성 검사
+            if (usernameInput.value === "") {
+                errorMessage.textContent = '아이디를 입력해주세요';
+                usernameInput.focus();
+                event.preventDefault();
+                return false;
+            } else {
+                errorMessage.textContent = '';
+            }
+
+            // 비밀번호 유효성 검사
+            if (passwordInput.value === "") {
+                errorMessage.textContent = '비밀번호를 입력해주세요';
+                passwordInput.focus();
+                event.preventDefault();
+                return false;
+            } else {
+                errorMessage.textContent = '';
+            }
+
+            errorMessage.textContent = ''
+
+            return true;
+        }
+
+        // AJAX POST 요청 - 로그인
+        function submitForm(event) {
+            event.preventDefault();
+
+            // 유효성 검사 실행
+            if (!validateForm(event)) {
+                return;
+            }
+
+            const errorMessage = document.getElementById('error-message');
+
+            const loginForm = document.getElementById('login-form');
+            const formData = new FormData(loginForm);
+
+            // AJAX 요청 보내기
+            fetch('/auth/login', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // 로그인 성공 시, "아이디 기억하기" 체크박스 상태 확인
+                        const rememberMeCheckbox = document.getElementById('rememberMe');
+                        if (rememberMeCheckbox.checked) {
+                            localStorage.setItem('rememberedUserId', document.getElementById('username').value);
+                        } else {
+                            localStorage.removeItem('rememberedUserId');
+                        }
+                        // 홈페이지로 이동
+                        window.location.href = "/home";
+                    } else {
+                        return response.json().then(data => {
+                            errorMessage.textContent = decodeURIComponent(data.message).replace(/\+/g, ' ');
+                        });
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = '로그인 요청 중 오류가 발생했습니다.';
+                });
+        }
+    </script>
+</th:block>
+
+<div layout:fragment="~{content}">
+    <div class="content">
+        <section class="login-section">
+            <div class="login-container">
+                <img th:src="@{/images/logo/logo-with-otter.png}" alt="Logo-text" class="logo-image">
+                <form id="login-form" th:action="@{/auth/login}">
+                    <div class="form-group">
+                        <input type="text" id="username" name="username" placeholder="아이디"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" placeholder="비밀번호"/>
+                    </div>
+                    <div class="form-group" style="display: flex; justify-content: space-between;">
+                        <div class="remember-me">
+                            <label>
+                                <input type="checkbox" id="rememberMe" class="hidden">
+                                <span class="custom-checkbox"></span> 아이디 기억하기
+                            </label>
+                        </div>
+                        <div class="join">
+                            <a th:href="@{/auth/join}">방문객 회원가입</a>
+                        </div>
+                    </div>
+                    <div id="error-message" class="error-message">
+                        <span th:if="${error}" th:text="${message}"></span>
+                    </div>
+                    <button type="submit" class="btn">로그인</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+</html>

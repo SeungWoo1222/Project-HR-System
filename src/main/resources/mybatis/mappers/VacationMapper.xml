@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vacation">
+    <resultMap id="VacationResultMap" type="com.woosan.hr_system.vacation.model.Vacation">
+        <id property="vacationId" column="vacation_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="startAt" column="start_at"/>
+        <result property="endAt" column="end_at"/>
+        <result property="vacationType" column="vacation_type"/>
+        <result property="reason" column="reason"/>
+        <result property="usedDays" column="used_days"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="approvalStatus" column="approval_status"/>
+        <result property="processingBy" column="processing_by"/>
+        <result property="processingAt" column="processing_at"/>
+    </resultMap>
+
+    <!-- 아이디를 이용한 휴가 정보 조회 -->
+    <select id="selectVacationById" parameterType="int" resultMap="VacationResultMap">
+        SELECT * FROM vacation WHERE vacation_id = #{vacationId}
+    </select>
+
+    <!-- 휴가 내역 검색 조회 -->
+    <select id="searchVacation" parameterType="map" resultMap="VacationResultMap">
+        SELECT * FROM vacation
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                vacation_id LIKE CONCAT('%', #{keyword}, '%') OR
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                start_at LIKE CONCAT('%', #{keyword}, '%') OR
+                end_at LIKE CONCAT('%', #{keyword}, '%') OR
+                vacation_type LIKE CONCAT('%', #{keyword}, '%') OR
+                reason LIKE CONCAT('%', #{keyword}, '%') OR
+                used_days LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_by LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_at LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND LEFT(employee_id, 2) = #{department}
+            </if>
+            <if test="status != null and status != ''">
+                AND approval_status = #{status}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
+        </where>
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 휴가 내역 검색값 개수 조회 -->
+    <select id="countVacation" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM vacation
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                vacation_id LIKE CONCAT('%', #{keyword}, '%') OR
+                employee_id LIKE CONCAT('%', #{keyword}, '%') OR
+                start_at LIKE CONCAT('%', #{keyword}, '%') OR
+                end_at LIKE CONCAT('%', #{keyword}, '%') OR
+                vacation_type LIKE CONCAT('%', #{keyword}, '%') OR
+                reason LIKE CONCAT('%', #{keyword}, '%') OR
+                used_days LIKE CONCAT('%', #{keyword}, '%') OR
+                created_at LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_by LIKE CONCAT('%', #{keyword}, '%') OR
+                processing_at LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="department != null and department != ''">
+                AND LEFT(employee_id, 2) = #{department}
+            </if>
+            <if test="status != null and status != ''">
+                AND approval_status = #{status}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND (
+                -- 검색 기간이 휴가 기간을 포함하는 경우
+                (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+                OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+                -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+                OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 조회 -->
+    <select id="selectVacationsByEmployeeId" parameterType="map" resultMap="VacationResultMap">
+        SELECT * FROM vacation
+        WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (start_at BETWEEN #{startDate} AND #{endDate})
+            OR (end_at BETWEEN #{startDate} AND #{endDate})
+            OR (start_at &lt;= #{startDate} AND end_at >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN start_at AND end_at)
+            OR (#{endDate} BETWEEN start_at AND end_at)
+            )
+        </if>
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 개수 조회 -->
+    <select id="countVacationsByEmployeeId" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM vacation
+        WHERE employee_id = #{employeeId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 정보 조회 -->
+    <select id="getVacationsByEmployeeId" parameterType="String" resultMap="VacationResultMap">
+        SELECT * FROM vacation WHERE employee_id = #{employeeId}
+    </select>
+
+    <!-- 해당 부서의 모든 휴가 정보 조회 -->
+    <select id="selectVacationsByDepartmentId" parameterType="map" resultMap="VacationResultMap">
+        SELECT *
+        FROM vacation
+        WHERE employee_id IN
+        <foreach item="employeeId" collection="employeeIdList" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+        <if test="status != null and status != ''">
+            AND approval_status = #{status}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
+        ORDER BY vacation_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 해당 사원의 모든 휴가 내역 개수 조회 -->
+    <select id="countVacationsByDepartmentId" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM vacation
+        WHERE employee_id IN
+        <foreach item="employeeId" collection="employeeIdList" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+        <if test="status != null and status != ''">
+            AND approval_status = #{status}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (
+            -- 검색 기간이 휴가 기간을 포함하는 경우
+            (DATE(start_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(end_at) BETWEEN #{startDate} AND #{endDate})
+            OR (DATE(start_at) &lt;= #{startDate} AND DATE(end_at) >= #{endDate})
+            -- 검색 기간이 휴가 중간에 걸쳐 있는 경우
+            OR (#{startDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            OR (#{endDate} BETWEEN DATE(start_at) AND DATE(end_at))
+            )
+        </if>
+    </select>
+
+    <!-- 휴가 등록 -->
+    <insert id="insertVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        INSERT INTO vacation (employee_id, start_at, end_at, vacation_type, reason, used_days)
+        value (#{employeeId}, #{startAt}, #{endAt}, #{vacationType}, #{reason}, #{usedDays})
+    </insert>
+
+    <!-- 휴가 수정 -->
+    <update id="updateVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE vacation
+        SET
+            start_at = #{startAt},
+            end_at = #{endAt},
+            vacation_type = #{vacationType},
+            reason = #{reason},
+            used_days = #{usedDays}
+        WHERE vacation_id = #{vacationId}
+    </update>
+
+    <!-- 휴가 승인 상태 업데이트 -->
+    <update id="approveVacation" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE vacation
+        SET
+            approval_status = #{approvalStatus},
+            processing_by = #{processingBy},
+            processing_at = #{processingAt}
+        WHERE vacation_id = #{vacationId};
+    </update>
+
+    <!-- 잔여 연차 차감 -->
+    <update id="updateRemainingLeave" parameterType="com.woosan.hr_system.vacation.model.Vacation">
+        UPDATE employees
+        SET remaining_leave = remaining_leave - #{usedDays}
+        WHERE employee_id = #{employeeId};
+    </update>
+
+    <!-- 휴가 삭제 -->
+    <delete id="deleteVacation" parameterType="int">
+        DELETE FROM vacation WHERE vacation_id = #{vacationId}
+    </delete>
+
+    <!-- 오늘 휴가인 사원 조회 -->
+    <select id="getEmployeesOnVacationToday" parameterType="java.time.LocalDate" resultMap="VacationResultMap">
+        SELECT vacation_id, employee_id
+        FROM vacation
+        WHERE #{date} BETWEEN start_at AND end_at
+        AND approval_status = '승인'
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block layout:fragment="css">
+    <link th:href="@{/css/common/button.css}" rel="stylesheet"/>
+    <link th:href="@{/css/common/color.css}" rel="stylesheet"/>
+    <link th:href="@{/css/attendance/detail.css}" rel="stylesheet"/>
+</th:block>
+
+<div class="attendance-detail-container">
+    <div class="content-header">
+    <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+            <button type="button" class="inner-btn" th:attendanceId="${attendance.attendanceId}"
+                    th:onclick="goToUpdateForm(this.getAttribute('attendanceId'))">수정</button>
+        </div>
+        <div class="content-header-center">
+            <h3 th:text="${#temporals.format(attendance.date, 'yyyy년 MM월 dd일 (EE)')}"></h3>
+        </div>
+        <div class="content-header-right"></div>
+    </div>
+    <table>
+        <tr>
+            <td class="section-title w-25">이름 / 사원 ID</td>
+            <td class="w-25" th:text="${employee.name + ' (' + attendance.employeeId + ')'}"></td>
+            <td class="section-title w-25">근태 상태</td>
+            <td class="w-25" th:text="${attendance.status}"
+                th:classappend="${attendance.status == '출근'} ? 'green' :
+                                    (${attendance.status == '결근'} ? 'red' :
+                                    (${attendance.status == '지각'} ? 'orange' :
+                                    (${attendance.status == '조퇴'} ? 'yellow' :
+                                    (${attendance.status == '출장'} ? 'purple' :
+                                    (${attendance.status == '휴가'} ? 'skyblue' : '')))))"></td>
+        </tr>
+        <tr>
+            <td class="section-title">출근 시간</td>
+            <td th:text="${#temporals.format(attendance.checkIn, 'HH:mm')}"></td>
+            <td class="section-title">퇴근 시간</td>
+            <td th:text="${#temporals.format(attendance.checkOut, 'HH:mm')}"></td>
+        </tr>
+        <tr>
+            <td class="section-title">근무한 정규시간</td>
+            <td th:text="${attendance.workingHours} + '시간'" colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="section-title">초과 근무시간</td>
+            <td th:if="${attendance.overtimeId} == null" colspan="3"></td>
+            <td th:if="${attendance.overtimeId} != null" colspan="3">
+                <div class="overtime-td">
+                    <span th:text="${attendance.overtime?.totalHours} + '시간 '
+                    + '(' + ${#temporals.format(attendance.overtime?.startTime, 'HH:mm')}
+                    + '~' + ${#temporals.format(attendance.overtime?.endTime, 'HH:mm')} + ')'"></span>
+                    <div>
+                        <button type="button" class="inner-btn tomato-btn" th:overtimeId="${attendance.overtimeId}"
+                                th:onclick="goToUpdateOvertimeForm(this.getAttribute('overtimeId'))">수정</button>
+                        <button type="button" class="inner-btn red-btn" th:overtimeId="${attendance.overtimeId}"
+                                th:onclick="deleteOvertime(this.getAttribute('overtimeId'))">삭제</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="section-title">휴가 정보</td>
+            <td th:if="${attendance.vacationId} == null" colspan="3"></td>
+            <td th:if="${attendance.vacationId} != null" colspan="3"
+                th:text="${#temporals.format(attendance.vacation?.processingAt, 'yy.MM.dd') + ' '
+                    + attendance?.vacation.vacationType} + ' (' + ${attendance.vacation?.reason} + ')'" ></td>
+        </tr>
+        <tr>
+            <td class="section-title">출장 정보</td>
+            <td th:text="${attendance.tripId}" colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="section-title">메모</td>
+            <td th:text="${attendance.notes}" colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="section-title">마지막 수정 일시</td>
+            <td th:text="${#temporals.format(attendance.lastModified, 'yyyy.MM.dd(EE) hh:mm')}"></td>
+            <td class="section-title" style="font-size: 15px">마지막 수정 사원 ID</td>
+            <td th:text="${attendance.modifiedBy}"></td>
+        </tr>
+    </table>
+</div>
+
+</html>
