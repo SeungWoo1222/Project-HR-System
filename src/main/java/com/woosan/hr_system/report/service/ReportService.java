@@ -12,9 +12,7 @@ import java.util.List;
 public interface ReportService {
 //======================================================생성============================================================
     // 보고서 생성
-    List<Integer> createReport(Report report);
-    // 보고서 + 파일 생성
-    void createReportWithFile(Report report, List<MultipartFile> reportDocuments);
+    List<Integer> createReport(Report report, List<MultipartFile> reportDocuments);
     // 요청 들어온 보고서 생성
     int createReportFromRequest(Report report);
     // 요청 들어온 보고서 + 파일 생성

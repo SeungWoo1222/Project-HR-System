@@ -88,6 +88,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // 첫 번째 오류 메시지만 추출
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+
+        String errorMessage = errors.stream().findFirst().orElse("유효성 검사 오류가 발생했습니다.");
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
     // 500 Internal Server Error 처리
     @ExceptionHandler(FileProcessingException.class)
     public ResponseEntity<String> handleFileExceptions(FileProcessingException ex) {

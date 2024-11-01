@@ -1,9 +1,22 @@
 package com.woosan.hr_system.report.model;
 
+import com.woosan.hr_system.report.service.validation.ValidDueDate;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ValidDueDate
 public class Request {
     private int requestId;
     private Integer reportId;
@@ -12,116 +25,23 @@ public class Request {
     private String writerName;
     private LocalDateTime requestDate;
     private LocalDateTime modifiedDate;
-    private LocalDate dueDate;
-    private String requestNote;
-
-    // 요청 작성 시 작성자 선택에서 여러 임원을 선택하기 위한 변수
-    private List<String> nameList;
-    private List<String> idList;
-
     // 내게 온 요청 목록 조회 시
     private String requesterName;
 
+    @NotNull(message ="마감일을 입력해주세요.")
+    private LocalDate dueDate;
+
+    @NotBlank(message="요청 내용을 입력해주세요.")
+    private String requestNote;
+
+    // 요청 작성 시 작성자 선택에서 여러 임원을 선택하기 위한 변수
+    @Valid
+    @Size(min = 1, message = "작성자를 선택해주세요.")
+    private List<@NotBlank(message = "작성자를 선택해주세요.") String> nameList;
+
+    @Valid
+    @Size(min = 1, message = "작성자를 선택해주세요.")
+    private List<@NotBlank(message = "작성자를 선택해주세요.") String> idList;
 
 
-
-
-    // method
-    // Getters and Setters
-    public int getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
-    }
-
-    public String getRequesterId() {
-        return requesterId;
-    }
-
-    public void setRequesterId(String requesterId) {
-        this.requesterId = requesterId;
-    }
-
-    public String getWriterId() {
-        return writerId;
-    }
-
-    public void setWriterId(String writerId) {
-        this.writerId = writerId;
-    }
-
-    public String getWriterName() {
-        return writerName;
-    }
-
-    public void setWriterName(String writerName) {
-        this.writerName = writerName;
-    }
-
-    public LocalDateTime getRequestDate() {
-        return requestDate;
-    }
-
-    public void setRequestDate(LocalDateTime requestDate) {
-        this.requestDate = requestDate;
-    }
-
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(LocalDateTime modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public String getRequestNote() {
-        return requestNote;
-    }
-
-    public void setRequestNote(String requestNote) {
-        this.requestNote = requestNote;
-    }
-
-    public Integer getReportId() {
-        return reportId;
-    }
-
-    public void setReportId(Integer reportId) {
-        this.reportId = reportId;
-    }
-
-
-    public List<String> getIdList() {
-        return idList;
-    }
-
-    public void setIdList(List<String> idList) {
-        this.idList = idList;
-    }
-
-    public List<String> getNameList() {
-        return nameList;
-    }
-
-    public void setNameList(List<String> nameList) {
-        this.nameList = nameList;
-    }
-
-    public String getRequesterName() {
-        return requesterName;
-    }
-
-    public void setRequesterName(String requesterName) {
-        this.requesterName = requesterName;
-    }
 }

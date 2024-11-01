@@ -28,6 +28,13 @@
         WHERE employee_id = #{employeeId} AND read_status = FALSE
     </select>
 
+    <!-- url에 저장돼있는 고유한 Id로 notificationId를 조회 -->
+    <select id="getNotificationId" parameterType="String" resultType="int">
+        SELECT notification_id
+        FROM notifications
+        WHERE url LIKE CONCAT('%', #{uniqueId}, '%')
+    </select>
+
     <!-- 단일 알림 생성 -->
     <insert id="insertNotification" parameterType="com.woosan.hr_system.notification.model.Notification">
         INSERT INTO notifications (employee_id, message, url)
