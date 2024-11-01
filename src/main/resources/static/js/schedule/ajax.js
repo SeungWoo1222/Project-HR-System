@@ -221,7 +221,7 @@ function submitInsertForm(event) {
                 const errorStatuses = [400, 403, 404, 500];
                 if (response.status === 200) {
                     alert(response.text);
-                    window.location.reload();
+                    window.location.href = '/schedule/list';
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else if (response.status === 422) { // 유효성 검사 오류 시
