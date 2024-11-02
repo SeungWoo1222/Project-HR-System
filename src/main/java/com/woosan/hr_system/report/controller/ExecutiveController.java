@@ -312,7 +312,7 @@ public class ExecutiveController {
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
-        return "redirect:admin/request/main";
+        return "redirect:/admin/request/main";
     }
 
 //===================================================삭제 메소드=========================================================

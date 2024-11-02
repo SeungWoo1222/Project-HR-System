@@ -28,7 +28,7 @@ public class AuthController {
     @GetMapping("/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다.");
-        return "redirect:auth/login";
+        return "redirect:/auth/login";
     }
 
     @GetMapping("/session-expired") // 세션 만료시 페이지 이동
