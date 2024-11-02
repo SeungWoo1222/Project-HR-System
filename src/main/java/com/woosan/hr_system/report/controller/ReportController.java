@@ -303,7 +303,7 @@ public class ReportController {
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
         reportService.deleteReport(reportId);
-        return "redirect:report/list";
+        return "redirect:/report/list";
     }
 //=====================================================삭제 메소드========================================================
 
