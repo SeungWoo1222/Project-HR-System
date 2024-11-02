@@ -21,7 +21,7 @@ public class NotificationController {
     @GetMapping("/all") // 내 알림 조회
     public String getAllNotification(Model model) {
         model.addAttribute("notificationList", notificationService.getAllNotification());
-        return "/fragments/notification-content";
+        return "fragments/notification-content";
     }
 
     @GetMapping("/unread") // 읽지 않은 알림 개수 조회

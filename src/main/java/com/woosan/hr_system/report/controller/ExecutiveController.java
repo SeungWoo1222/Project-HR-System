@@ -150,7 +150,7 @@ public class ExecutiveController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        return "/admin/report/request/list";
+        return "admin/report/request/list";
     }
 
     // 내가 결재할 보고서 목록
@@ -182,7 +182,7 @@ public class ExecutiveController {
         model.addAttribute("endDate", endDate);
         model.addAttribute("approvalStatus", approvalStatus);
 
-        return "/admin/report/list";
+        return "admin/report/list";
     }
 
     @GetMapping("/{requestId}") // 요청 세부 조회
@@ -312,7 +312,7 @@ public class ExecutiveController {
         } else {
             throw new SecurityException("권한이 없습니다.");
         }
-        return "redirect:/admin/request/main";
+        return "redirect:admin/request/main";
     }
 
 //===================================================삭제 메소드=========================================================

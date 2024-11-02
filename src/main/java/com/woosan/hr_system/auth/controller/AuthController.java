@@ -22,23 +22,23 @@ public class AuthController {
                         Model model) {
         model.addAttribute("error", error);
         model.addAttribute("message", message);
-        return "/auth/login";
+        return "auth/login";
     }
 
     @GetMapping("/logout") // 로그아웃 로직
     public String logout(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다.");
-        return "redirect:/auth/login";
+        return "redirect:auth/login";
     }
 
     @GetMapping("/session-expired") // 세션 만료시 페이지 이동
     public String expireSession() {
-        return "/auth/session-expired";
+        return "auth/session-expired";
     }
 
     @GetMapping("/pwd") // 비밀번호 검증 페이지 이동
     public String viewPasswordForm() {
-        return "/auth/pwd";
+        return "auth/pwd";
     }
 
     @PostMapping("/verifyPassword") // 비밀번호 검증 후 내 정보 수정 페이지 이동
@@ -55,7 +55,7 @@ public class AuthController {
     @GetMapping("/pwd-change") // 비밀번호 변경 페이지 이동
     public String viewPasswordChangeForm(@RequestParam(value = "message", required = false) String message, Model model) {
         if (message != null) model.addAttribute("message", message);
-        return "/auth/pwd-change";
+        return "auth/pwd-change";
     }
 
     @PutMapping("/changePassword") // 비밀번호 변경 로직
@@ -76,6 +76,6 @@ public class AuthController {
 
     @GetMapping("/join") // 방문객 회원가입
     public String viewJoinForm(Model model) {
-        return "/auth/join";
+        return "auth/join";
     }
 }

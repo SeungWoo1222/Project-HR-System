@@ -17,7 +17,6 @@ import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.search.PageRequest;
 import com.woosan.hr_system.search.PageResult;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -129,7 +127,7 @@ public class ReportController {
         Request request = requestService.getRequestByWriter(requestId);
         model.addAttribute("request", request);
         model.addAttribute("report", new Report());
-        return "/report/request/write";
+        return "report/request/write";
     }
 
     // 요청 들어온 보고서 생성
@@ -162,7 +160,7 @@ public class ReportController {
         Schedule schedule = scheduleService.getScheduleById(taskId);
         model.addAttribute("schedule", schedule);
         model.addAttribute("report", new Report());
-        return "/report/write-from-schedule";
+        return "report/write-from-schedule";
     }
 
     // 일정 완료 된 보고서 생성
@@ -199,7 +197,7 @@ public class ReportController {
 
         model.addAttribute("writerName", employeeDAO.getEmployeeName(report.getWriterId()));
 
-        return "/report/detail";
+        return "report/detail";
     }
 
     // 내가 작성한 보고서 리스트
@@ -305,7 +303,7 @@ public class ReportController {
     @DeleteMapping("/delete/{reportId}")
     public String deleteReport(@RequestParam("reportId") int reportId) {
         reportService.deleteReport(reportId);
-        return "redirect:/report/list";
+        return "redirect:report/list";
     }
 //=====================================================삭제 메소드========================================================
 

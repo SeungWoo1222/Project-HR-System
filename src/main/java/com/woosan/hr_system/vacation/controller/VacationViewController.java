@@ -61,7 +61,7 @@ public class VacationViewController {
         model.addAttribute("vacationInfo", vacationInfo);
         model.addAttribute("employeeInfo",
                 employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
-        return "/vacation/detail";
+        return "vacation/detail";
     }
 
     @GetMapping("/{vacationId}/process") // 휴가 정보 상세 조회 (처리 기능 추가)
@@ -70,7 +70,7 @@ public class VacationViewController {
         model.addAttribute("vacationInfo", vacationInfo);
         model.addAttribute("employeeInfo",
                 employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
-        return "/vacation/detail-process";
+        return "vacation/detail-process";
     }
 
     @GetMapping("/employee") // 내 휴가 내역 조회
@@ -92,7 +92,7 @@ public class VacationViewController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        return "/vacation/employee";
+        return "vacation/employee";
     }
 
     @RequireManagerPermission
@@ -114,7 +114,7 @@ public class VacationViewController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        return "/vacation/department";
+        return "vacation/department";
     }
 
     @GetMapping("/{employeeId}/request") // 내 휴가 신청 페이지 이동
@@ -125,7 +125,7 @@ public class VacationViewController {
 
         // 모든 공휴일 모델에 추가
         model.addAttribute("holidays", holidayService.getAllHoliday());
-        return "/vacation/request";
+        return "vacation/request";
     }
 
     @GetMapping("/request") // 휴가 신청 페이지 이동
@@ -135,7 +135,7 @@ public class VacationViewController {
 
         // 모든 공휴일 모델에 추가
         model.addAttribute("holidays", holidayService.getAllHoliday());
-        return "/vacation/request2";
+        return "vacation/request2";
     }
 
     @GetMapping("/{vacationId}/edit") // 휴가 수정 페이지 이동
@@ -144,6 +144,6 @@ public class VacationViewController {
         model.addAttribute("vacationInfo", vacationInfo);
         model.addAttribute("employeeInfo",
                 employeeDAO.getEmployeeById(vacationInfo.getEmployeeId()));
-        return "/vacation/edit";
+        return "vacation/edit";
     }
 }
