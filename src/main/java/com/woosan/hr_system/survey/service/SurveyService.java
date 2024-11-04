@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface SurveyService {
     Survey getSurveyById(int id);
+    List<Survey> getAllSurvey();
     PageResult<Survey> searchSurvey(PageRequest pageRequest, String status);
     String submitSurvey(Survey survey);
     String deleteSurvey(int id);

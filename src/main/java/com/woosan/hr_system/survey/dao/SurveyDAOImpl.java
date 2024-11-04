@@ -116,4 +116,9 @@ public class SurveyDAOImpl implements SurveyDAO {
     public void closeSurvey(int id) {
         sqlSession.update("survey.closeSurvey", id);
     }
+
+    // 모든 설문 조회
+    public List<Survey> getAllSurvey() {
+        return sqlSession.selectList("survey.getAllSurvey");
+    }
 }

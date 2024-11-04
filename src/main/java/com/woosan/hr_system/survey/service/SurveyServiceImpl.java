@@ -44,6 +44,11 @@ public class SurveyServiceImpl implements SurveyService {
         return survey;
     }
 
+    @Override // 모든 설문 조회
+    public List<Survey> getAllSurvey() {
+        return surveyDAO.getAllSurvey();
+    }
+
     @Override // 설문 검색 조회
     public PageResult<Survey> searchSurvey(PageRequest pageRequest, String status) {
         // 페이징을 위해 조회할 데이터의 시작위치 계산

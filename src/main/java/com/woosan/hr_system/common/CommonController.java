@@ -11,6 +11,7 @@ import com.woosan.hr_system.report.model.Request;
 import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
+import com.woosan.hr_system.survey.service.SurveyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,6 +43,8 @@ public class CommonController {
     private RequestService requestService;
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private SurveyService surveyService;
 
     @GetMapping("home") // 홈 화면으로 이동
     public String home(Model model) {
