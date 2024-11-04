@@ -119,6 +119,6 @@ public class SurveyDAOImpl implements SurveyDAO {
 
     // 모든 설문 조회
     public List<Survey> getAllSurvey() {
-        return sqlSession.selectList("survey.getAllSurvey");
+        return sqlSession.selectList("survey.selectAllSurvey");
     }
 }
