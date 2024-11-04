@@ -19,6 +19,7 @@ public class KiwiSingleton {
 
     public KiwiSingleton() {
         try(KiwiBuilder builder = new KiwiBuilder("/home/ubuntu/models/base/")) {
+//        try(KiwiBuilder builder = new KiwiBuilder("/Users/san/kiwi/models/base")) {
             this.kiwi = builder.build(KiwiBuilder.basicTypoSet, 2.0f);
             log.info("Kiwi instance created");
         } catch (Exception e) {

@@ -162,11 +162,35 @@
                 </div>
                 <div class="grid-item">
                     <div class="item-header">
-                        <h3>최근 공지 목록</h3>
-                        <div></div>
+                        <h3>최근 설문 목록</h3>
+                        <div>
+                            <button type="button" class="inner-btn" onclick="window.location.href='/survey/list'">더보기</button>
+                        </div>
                     </div>
                     <div>
-                        <p>공지 게시판이 아직 준비중입니다.</p>
+                        <table class="list table-layout-auto">
+                            <thead>
+                            <tr>
+                                <th>제목</th>
+                                <th>설문 상태</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${surveys.isEmpty()}">
+                                <td colspan="4" style="text-align: center; padding: 20px;">
+                                    설문 조사가 없습니다.
+                                </td>
+                            </tr>
+                            <tr th:each="survey : ${surveys}" th:surveyId="${survey.id}" th:onclick="goToSurvey(this.getAttribute('surveyId'))">
+                                <td th:text="${survey.title}"></td>
+                                <td th:text="${survey.status}" th:classappend="${survey.status} == '조사 중' ? 'green' : 'red'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <p style="font-style: italic; color: #888888; margin-top: 20px;">
+                            바쁘시겠지만, 잠시 시간을 내어 프로젝트 피드백 설문조사에 참여해 주신다면 큰 도움이 되겠습니다. 소중한 의견 부탁드립니다.</p>
                     </div>
                 </div>
             </div>

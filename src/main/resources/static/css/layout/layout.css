@@ -169,13 +169,17 @@ p {
 .open {
     display: block;
 }
+
+.icon-area {
+    margin-top: 20px;
+}
 /* Sidebar styles */
 
 /* Logout styles */
 #logout-area {
-    padding: 15px 0 10px;
+    padding: 5px 0;
     border-top: 2px solid #f1f1f1;
-    margin: 10px 0 0 ;
+    margin: 10px 0 0 0;
 }
 
 /* Content styles */
@@ -187,7 +191,7 @@ p {
 
 .content-container {
     height: auto;
-    min-height: 85vh;
+    min-height: 80vh;
     display: flex;
     justify-content: center;
     background-color: #fff;
@@ -214,7 +218,7 @@ p {
     width: 100%;
 }
 
-.footer #icon-area {
+.footer #icon-area, .sidebar .icon-area {
     display: flex;
     flex-direction: row;
     justify-content: center;

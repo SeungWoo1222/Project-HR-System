@@ -180,4 +180,9 @@
         SET status = '조사 종료'
         WHERE id = #{id}
     </update>
+
+    <!-- 모든 설문 조회 -->
+    <select id="selectAllSurvey" resultMap="SurveyInfoResultMap">
+        SELECT * FROM surveys ORDER BY id DESC
+    </select>
 </mapper>

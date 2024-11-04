@@ -70,6 +70,7 @@ function addNewQuestion() {
     });
 
     alignButtonsWithLastQuestion();
+    newQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // 질문 유형에 따라 옵션 필드를 표시하거나 숨기기
@@ -103,6 +104,7 @@ function addNewOptionField(button) {
 
     optionsContainer.appendChild(newOption);
     alignButtonsWithLastQuestion();
+    newOption.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // 옵션 필드를 삭제

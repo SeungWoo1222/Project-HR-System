@@ -23,4 +23,5 @@ public interface SurveyDAO {
     List<Response> selectResponses(int surveyId, int questionId);
     List<Survey> selectInvestigatingSurvey();
     void closeSurvey(int id);
+    List<Survey> getAllSurvey();
 }
