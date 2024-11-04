@@ -95,7 +95,7 @@ public class ReportServiceImpl implements ReportService {
             reportIdList.add(reportId);
             // 보고서 생성 후 결재자에게 알림 생성
             String writerName = employeeService.getEmployeeNameById(report.getWriterId());
-            notificationService.createNotification(report.getIdList().get(i), "결재할 보고서가 있습니다. <br>작성자 : " + writerName, "/admin/request/notification?reportId=" + reportId);
+            notificationService.createNotification(report.getIdList().get(i), "보고서 결재 요청이 도착했습니다.<br>작성자 : " + writerName + "(" + report.getWriterId() + ")", "/admin/request/dashboard");
         }
         return reportIdList;
     }
