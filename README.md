@@ -23,9 +23,15 @@
 - 정규 퇴근 시간 이후에 퇴근할 경우 자동으로 초과근무가 적용되어 처리됩니다.
 - 영업일 오전 9시에 사원이 휴가 상태일 경우 자동으로 휴가 처리됩니다.
 - 반차일에는 정규 출근 시간이 조정되어 지각 및 조퇴 처리에서 제외됩니다.
-- 영업일 오후 6시에 미출근 상태인 경우 자동으로 결근 처리됩니다.
 
 ![commute](https://github.com/user-attachments/assets/a80a0df7-0a22-442f-85ee-3682b578a960)
+
+- 영업일 오후 6시에 미출근 상태인 경우 자동으로 결근 처리됩니다.
+
+<img width="45%" alt="스크린샷 2024-11-06 오후 6 45 33" src="https://github.com/user-attachments/assets/219a435f-240e-4e82-a3a2-cfe40d335b3e">
+<img width="45%" alt="스크린샷 2024-11-06 오후 6 45 56" src="https://github.com/user-attachments/assets/fe135cea-993c-4c7a-a8dc-b05912203119">
+<img width="1166" alt="스크린샷 2024-11-06 오후 6 29 58" src="https://github.com/user-attachments/assets/260caeef-e1f9-41d9-aa05-547c1d3529c5">
+
 #### 조퇴 기록 : 조퇴창을 통해 조퇴 사유를 등록 후 조퇴할수 있습니다. 
 ![early-leave](https://github.com/user-attachments/assets/87b8d230-a828-47dd-9ca5-0776ca6534cf)
 #### 나의 근태 현황을 월별로 조회할 수 있으며, 일별 근태 기록을 클릭하여 해당 일의 상세 정보를 확인할 수 있습니다.
@@ -57,6 +63,36 @@
 ![holiday](https://github.com/user-attachments/assets/27540968-d953-43cf-9790-81a637ae6c59)
 
 ### 3. 사원 관리(인사부서 권한 필요)
+#### 사원 목록 조회
+- 모든 사원 정보를 조회할 수 있습니다.
+- 사원 행을 선택하면 사원의 상세 조회 및 추가 작업을 진행할 수 있습니다.
+- 부서별, 월별, 재직 상태, 검색어를 통한 필터링 기능을 제공합니다.
 
+![employee-list](https://github.com/user-attachments/assets/b71c49ba-6cfa-4b07-8b5c-94ade3780fd8)
+
+#### 사원 정보 추가 작업
+- 사원의 재직 상태를 변경할 수 있습니다.
+
+![status-update](https://github.com/user-attachments/assets/f314fd57-e5e7-4cc8-83f7-d1984b8e9e43)
+
+- 사원의 직급을 한 단계 승진 처리할 수 있습니다.
+
+![promotion](https://github.com/user-attachments/assets/129a4eee-c869-4de1-b27b-54198a43ebb8)
+
+- 사원의 계정을 잠금 또는 잠금해제 할 수 있습니다.
+
+![account-lock](https://github.com/user-attachments/assets/0a1a3cf6-2e59-41d3-a026-75bab8f62412)
+![account-unlock](https://github.com/user-attachments/assets/211245af-052d-44d9-b5c7-a75b7d80fd16)
+
+#### 사원 정보 수정 : 사원 정보를 수정할 수 있습니다.
+<img width="1264" alt="스크린샷 2024-11-06 오후 7 17 10" src="https://github.com/user-attachments/assets/9ca4b6e9-980d-4ac7-84af-2e87311a193b">
+
+#### 사원 등록 : 신규 사원의 정보를 등록할 수 있습니다.
+![employee-register](https://github.com/user-attachments/assets/febc71bc-4fc0-498a-8fe3-87f97efef2c5)
+
+#### 퇴사 사원 관리
+- 퇴사 예정인 사원, 퇴사 처리된 사원, 퇴사 후 1년이 경과된 사원을 조회할 수 있습니다. 
+- 퇴사 예정 사원을 퇴사처리 할 수 있습니다.
+- 퇴사 후 1년이 경과된 사원의 정보를 영구 삭제할 수 있습니다.
 
 ## 진승우 담당 기능

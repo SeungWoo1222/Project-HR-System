@@ -230,7 +230,7 @@
                             </tr>
                             <tr>
                                 <td class="section-title w-25 last-td">퇴사 처리 일시</td>
-                                <td class="last-td" th:text="${#temporals.format(employee.resignation?.getProcessedDate(), 'yyyy-MM-dd HH:mm')}"></td>
+                                <td class="last-td" th:text="${#temporals.format(employee.resignation?.getProcessedAt(), 'yyyy-MM-dd HH:mm')}"></td>
                             </tr>
                         </table>
                         <div id="error-message" class="error-message"></div>

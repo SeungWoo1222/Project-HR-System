@@ -2,7 +2,6 @@ package com.woosan.hr_system.resignation.service;
 
 import com.woosan.hr_system.aspect.LogAfterExecution;
 import com.woosan.hr_system.aspect.LogBeforeExecution;
-import com.woosan.hr_system.auth.model.UserSessionInfo;
 import com.woosan.hr_system.auth.service.AuthService;
 import com.woosan.hr_system.common.service.CommonService;
 import com.woosan.hr_system.employee.service.EmployeeService;
@@ -86,17 +85,17 @@ public class ResignationServiceImpl implements ResignationService {
     @Transactional
     @Override // 사원 퇴사 처리 로직
     public String resignEmployee(String employeeId, Resignation resignation, MultipartFile[] resignationDocuments) {
+        // 퇴사 처리 할 resignation 객체 초기화
+        resignation.initializeResignationDetails(employeeId, resignation,
+                authService.getAuthenticatedUser().getNameWithId(), LocalDateTime.now());
+
+        // 퇴사 정보 등록
+        resignationDAO.insertResignation(resignation);
+
         // 퇴사 문서 파일 업로드
         if (resignationDocuments != null && resignationDocuments.length > 0) {
             uploadNewFiles(employeeId, resignationDocuments);
         }
-
-        // 퇴사 처리 할 resignation 객체 초기화
-        UserSessionInfo processInfo = new UserSessionInfo();
-        resignation.initializeResignationDetails(employeeId, resignation, processInfo.getCurrentEmployeeId(), processInfo.getNow());
-
-        // 퇴사 정보 등록
-        resignationDAO.insertResignation(resignation);
 
         // 인사(HR)부서 관리자에게 알림 전송
         String message = "'" + employeeService.getEmployeeNameById(employeeId) + "' 사원이 퇴사 처리되었습니다.";
