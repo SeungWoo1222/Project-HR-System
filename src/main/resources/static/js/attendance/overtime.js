@@ -7,6 +7,31 @@ function goToUpdateOvertimeForm(overtimeId) {
 function submitUpdateOvertimeForm(event) {
     event.preventDefault();
 
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
+        return false;
+    }
+
     // 유효성 검사
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
@@ -18,13 +43,25 @@ function submitUpdateOvertimeForm(event) {
     errorMessage.textContent = '';
 
     if (!startTime.match(timeRegex)) {
-        errorMessage.textContent = "시작 시간은 'HH:mm:ss' 형식이어야 합니다.";
-        return;
+        return showError('startTime', "시작 시간은 'HH:mm:ss' 형식이어야 합니다.", true);
     }
 
     if (!endTime.match(timeRegex)) {
-        errorMessage.textContent = "종료 시간은 'HH:mm:ss' 형식이어야 합니다.";
-        return;
+        return showError('endTime', "종료 시간은 'HH:mm:ss' 형식이어야 합니다.", true);
+    }
+
+    // 시작 시간과 종료 시간 비교
+    const [startHours, startMinutes, startSeconds] = startTime.split(':').map(Number);
+    const [endHours, endMinutes, endSeconds] = endTime.split(':').map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startHours, startMinutes, startSeconds);
+
+    const endDate = new Date();
+    endDate.setHours(endHours, endMinutes, endSeconds);
+
+    if (endDate <= startDate) {
+        return showError('endTime', '종료 시간은 시작 시간 이후여야 합니다.', true);
     }
 
     errorMessage.textContent = '';

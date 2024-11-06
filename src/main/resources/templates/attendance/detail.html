@@ -11,7 +11,9 @@
 
 <div class="attendance-detail-container">
     <div class="content-header">
-    <div class="btn-container content-header-left" sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')">
+    <div class="btn-container content-header-left"
+         sec:authorize="hasRole('ROLE_MANAGER') or hasRole('ROLE_HR')"
+         th:if="${#authentication.principal.username != attendance.employeeId}">
             <button type="button" class="inner-btn" th:attendanceId="${attendance.attendanceId}"
                     th:onclick="goToUpdateForm(this.getAttribute('attendanceId'))">수정</button>
         </div>
