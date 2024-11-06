@@ -103,6 +103,6 @@
 
 ### 4. 휴가 관리
 #### 휴가 신청 : 휴가를 신청할 수 있습니다.
-<img width="1273" alt="스크린샷 2024-11-06 오후 11 16 37" src="https://github.com/user-attachments/assets/39863fac-77a2-4340-aa53-992e831e6cd7">
+
 
 ## 진승우 담당 기능
