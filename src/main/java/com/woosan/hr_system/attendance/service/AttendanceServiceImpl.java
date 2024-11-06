@@ -213,7 +213,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 근무 시간 설정
         float workingHours = setWorkingHours(todayAttendance, now);
 
-        String status = now.isBefore(checkOutTime) ? "조퇴" : "출근";
+        String status = now.isBefore(checkOutTime) ? "조퇴" : todayAttendance.getStatus();
 
         Map<String, Object> params = new HashMap<>();
         params.put("todayAttendanceId", todayAttendanceId);

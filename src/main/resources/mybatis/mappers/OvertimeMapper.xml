@@ -84,7 +84,7 @@
 
     <!-- 근태 정보에 초과근무 ID 연결 -->
     <update id="linkOvertimeToAttendance" parameterType="map">
-        UPDATE Attendance
+        UPDATE attendance
         SET overtime_id = #{overtimeId}
         WHERE attendance_id = #{attendanceId}
     </update>

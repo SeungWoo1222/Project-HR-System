@@ -174,7 +174,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeId(employeeId)
                 .birth("980101")
                 .residentRegistrationNumber("1234567")
-                .phone("01012345678")
+                .phone("010-1234-5678")
                 .email("guest@naver.com")
                 .address("00000) 경기 의정부시 어딘가 123")
                 .detailAddress("101-202(무슨동)")
