@@ -5,16 +5,37 @@
 
 **기능 소개를 제외한 프로젝트 개요와 상세 정보는 [노션 문서](https://awake-reaction-86b.notion.site/HaruHaru-Project-with-160975df7b7b4aa483d2d3598cbd7ee2?pvs=4)를 참고해 주세요. 자세한 내용은 링크에서 확인하실 수 있습니다.**
 
-## 프로젝트 기능 소개
-### 방문자 회원가입 및 로그인
-<div style="display: inline-block; width: 45%; margin-right: 10px;">
-  <h4>방문자 회원가입 : 방문자 회원가입을 통해 손쉽게 사원 계정을 생성할 수 있습니다.</h4>
-  <h4>로그인 : 사원 아이디와 비밀번호을 통해 로그인할 수 있습니다.<br>아이디를 기억하는 옵션을 통해 더 편리하게 로그인할 수 있습니다.</h4>
-  <img src="https://github.com/user-attachments/assets/5f8d7dfb-acaa-422c-aa30-aa883ace94e6" alt="join-and-login" width="100%">
-</div>
+## 프로젝트 기능 소개 
+## 정회산 담당 기능
+### 1. 방문자 회원가입 및 로그인
+#### 방문자 회원가입 : 방문자 회원가입을 통해 손쉽게 사원 계정을 생성할 수 있습니다.
+#### 로그인 : 사원 아이디와 비밀번호을 통해 로그인할 수 있습니다. 아이디를 기억하는 옵션을 통해 더 편리하게 로그인할 수 있습니다.
+![join-and-login](https://github.com/user-attachments/assets/5f8d7dfb-acaa-422c-aa30-aa883ace94e6)
+#### 보안을 위해 처음 로그인하시는 경우 비밀번호 변경 창이 자동으로 표시됩니다.
+![first-password-change](https://github.com/user-attachments/assets/e3e1b685-0253-47bd-9764-46b881cf683e)
+### 2. 근태 관리
+#### 출근 퇴근 기록
+- 출퇴근 창을 통해 출퇴근 시간과 이번 주 근무 시간을 간편하게 확인하고, 출퇴근 기록을 손쉽게 등록할 수 있습니다. 
+- 정규 출근 시간 이후에 출근할 경우 자동으로 지각 처리됩니다. 
+- 정규 퇴근 시간 이전에 퇴근할 경우 자동으로 조퇴 처리됩니다. 
+- 영업일 오전 9시에 사원이 휴가 상태일 경우 자동으로 휴가 처리됩니다.
+- 반차일에는 정규 출근 시간이 조정되어 지각 및 조퇴 처리에서 제외됩니다.
+- 영업일 오후 6시에 미출근 상태인 경우 자동으로 결근 처리됩니다.
 
-<div style="display: inline-block; width: 45%;">
-  <h4>보안을 위해 처음 로그인하시는 경우 비밀번호 변경 창이 자동으로 표시됩니다.</h4>
-  <img src="https://github.com/user-attachments/assets/e3e1b685-0253-47bd-9764-46b881cf683e" alt="first-password-change" width="100%">
-</div>
+![commute](https://github.com/user-attachments/assets/a80a0df7-0a22-442f-85ee-3682b578a960)
+#### 조퇴 기록 : 조퇴창을 통해 조퇴 사유를 등록 후 조퇴할수 있습니다. 
+![early-leave](https://github.com/user-attachments/assets/87b8d230-a828-47dd-9ca5-0776ca6534cf)
+#### 나의 근태 현황을 월별로 조회할 수 있으며, 일별 근태 기록을 클릭하여 해당 일의 상세 정보를 확인할 수 있습니다.
+<img width="1278" alt="스크린샷 2024-11-06 오후 2 26 41" src="https://github.com/user-attachments/assets/bd2ce81f-b35f-4e66-a6a8-63a4612f47da"/>
 
+#### 오늘의 근태 현황(인사부서 권한 필요) : 
+#### 근태 목록(인사부서 권한 필요) : 모든 근태 기록을 조회할 수 있으며, 부서별, 근태 상태별, 월별, 검색어를 통한 필터링 기능을 제공합니다. 
+![attendance-list](https://github.com/user-attachments/assets/21c6b694-f394-41f2-b70e-1221641c4b72)
+#### 초과근무 목록(인사부서 권한 필요) : 
+#### 공휴일 관리(인사부서 권한 필요) : 모든 공휴일을 조회할 수 있으며, 인사부서 관리자 권한이 있다면 등록, 수정, 삭제할 수 있습니다.<br>공휴일이 등록되면 모든 사원의 캘린더에 자동으로 표시됩니다. 
+![holiday](https://github.com/user-attachments/assets/27540968-d953-43cf-9790-81a637ae6c59)
+
+### 3. 사원 관리
+
+
+## 진승우 담당 기능
