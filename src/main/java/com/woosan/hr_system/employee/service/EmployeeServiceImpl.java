@@ -180,7 +180,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .detailAddress("101-202(무슨동)")
                 .hireDate(today)
                 .status("재직")
-                .remainingLeave(0)
+                .remainingLeave(11)
                 .picture(1)
                 .maritalStatus(false)
                 .numDependents(1)

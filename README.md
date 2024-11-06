@@ -67,6 +67,7 @@
 - 모든 사원 정보를 조회할 수 있습니다.
 - 사원 행을 선택하면 사원의 상세 조회 및 추가 작업을 진행할 수 있습니다.
 - 부서별, 월별, 재직 상태, 검색어를 통한 필터링 기능을 제공합니다.
+- 사원 정보를 상세조회하면 사원 정보 수정, 퇴사 정보 수정(재직상태가 퇴사일 경우), 재직 상태 변경, 승진 처리, 계정 잠금/해제 등 작업을 할 수 있습니다.
 
 ![employee-list](https://github.com/user-attachments/assets/b71c49ba-6cfa-4b07-8b5c-94ade3780fd8)
 
@@ -96,5 +97,12 @@
 - 퇴사 후 1년이 경과된 사원의 정보를 영구 삭제할 수 있습니다.
 
 ![resignation](https://github.com/user-attachments/assets/adb626cb-fdf5-451d-814d-a260d2308752)
+
+#### 퇴사 정보 수정 : 사원의 퇴사 정보와 첨부된 문서를 수정할 수 있습니다.
+<img width="1285" alt="스크린샷 2024-11-06 오후 11 11 23" src="https://github.com/user-attachments/assets/66973fee-30ca-43a8-9a2e-22fe0f94183c">
+
+### 4. 휴가 관리
+#### 휴가 신청 : 휴가를 신청할 수 있습니다.
+<img width="1273" alt="스크린샷 2024-11-06 오후 11 16 37" src="https://github.com/user-attachments/assets/39863fac-77a2-4340-aa53-992e831e6cd7">
 
 ## 진승우 담당 기능
