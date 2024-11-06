@@ -42,9 +42,9 @@ dependencies {
 
 	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리
 
-	implementation files('libs/kiwi-java-v0.20.0-lnx-x86-64.jar')
+//	implementation files('libs/kiwi-java-v0.20.0-lnx-x86-64.jar')
 //	implementation files('libs/kiwi-java-v0.20.0-lnx-aarch64.jar')
-//	implementation files('libs/kiwi-java-v0.20.0-mac-arm64.jar')
+	implementation files('libs/kiwi-java-v0.20.0-mac-arm64.jar')
 
 	// lombok plugin
 	implementation('org.projectlombok:lombok')
