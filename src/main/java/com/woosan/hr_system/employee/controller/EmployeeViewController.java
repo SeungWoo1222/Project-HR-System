@@ -3,7 +3,6 @@ package com.woosan.hr_system.employee.controller;
 import com.woosan.hr_system.aspect.RequireHRPermission;
 import com.woosan.hr_system.employee.model.Employee;
 import com.woosan.hr_system.employee.service.EmployeeService;
-import com.woosan.hr_system.file.model.File;
 import com.woosan.hr_system.file.service.FileService;
 import com.woosan.hr_system.resignation.dao.ResignationFileDAO;
 import com.woosan.hr_system.search.PageRequest;
@@ -65,9 +64,7 @@ public class EmployeeViewController {
 
         // 퇴사 사원 문서 첨부
         if (employee.getResignation() != null && employee.getStatus().equals("퇴사")) {
-            List<File> l = resignationFileDAO.selectAllFileInfo(employeeId);
-            log.debug("{}", l);
-            model.addAttribute("files", l);
+            model.addAttribute("files", resignationFileDAO.selectAllFileInfo(employeeId));
         }
 
         return "employee/detail";
