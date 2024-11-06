@@ -95,4 +95,6 @@
 - 퇴사 예정 사원을 퇴사처리 할 수 있습니다.
 - 퇴사 후 1년이 경과된 사원의 정보를 영구 삭제할 수 있습니다.
 
+![resignation](https://github.com/user-attachments/assets/adb626cb-fdf5-451d-814d-a260d2308752)
+
 ## 진승우 담당 기능
