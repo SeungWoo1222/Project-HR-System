@@ -193,6 +193,20 @@ function submitUpdateForm(event) {
         return showError('status', '근태 상태를 선택해주세요.');
     }
 
+    // 출근 시간과 퇴근 시간 비교
+    const [checkInHours, checkInMinutes, checkInSeconds] = checkIn.split(':').map(Number);
+    const [checkOutHours, checkOutMinutes, checkOutSeconds] = checkOut.split(':').map(Number);
+
+    const checkInDate = new Date();
+    checkInDate.setHours(checkInHours, checkInMinutes, checkInSeconds);
+
+    const checkOutDate = new Date();
+    checkOutDate.setHours(checkOutHours, checkOutMinutes, checkOutSeconds);
+
+    if (checkOutDate <= checkInDate) {
+        return showError('checkOut', '퇴근 시간은 출근 시간 이후여야 합니다.', true);
+    }
+
     errorMessage.textContent = '';
 
     const form = event.target;

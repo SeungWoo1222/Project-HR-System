@@ -92,7 +92,7 @@ function checkNewPassword() {
     const errorMessage = document.getElementById('pwd-error-message');
 
     if (!validatePassword(newPassword)) {
-        errorMessage.innerHTML = '비밀번호는 8~20자 사이여야 하며,<br>대•소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
+        errorMessage.textContent = '새로운 비밀번호가 양식에 맞지 않습니다.';
         newPasswordInput.focus();
     } else {
         errorMessage.textContent = '';
@@ -119,6 +119,31 @@ function checkConfirmPassword() {
 function summitUpdatePassword(event) {
     event.preventDefault(); // 기본 폼 제출 방지
 
+    // 유효성 검사 함수
+    function showError(inputId, message, isBottomBorder = false) {
+        const inputElement = document.getElementById(inputId);
+        errorMessage.textContent = message;
+
+        // 빨간 테두리와 흔들림 효과 추가
+        if (isBottomBorder) {
+            inputElement.classList.add("input-error-bottom", "shake");
+        } else {
+            inputElement.classList.add("input-error", "shake");
+        }
+
+        // 5초 후 빨간 테두리 제거
+        setTimeout(() => {
+            inputElement.classList.remove("input-error", "input-error-bottom");
+        }, 5000);
+
+        // 애니메이션이 끝난 후 흔들림 제거
+        setTimeout(() => {
+            inputElement.classList.remove("shake");
+        }, 300);
+
+        return false;
+    }
+
     const passwordInput = document.getElementById('password');
     const newPasswordInput = document.getElementById('new-password');
     const confirmPasswordInput = document.getElementById('confirm-password');
@@ -131,34 +156,28 @@ function summitUpdatePassword(event) {
 
     // 유효성 검사
     if (!password) {
-        errorMessage.textContent = '현재 비밀번호를 입력해주세요.';
         passwordInput.focus();
-        return;
-
+        return showError("password", "현재 비밀번호를 입력해주세요.", true);
     }
 
     if (!newPassword) {
-        errorMessage.textContent = '새로운 비밀번호를 입력해주세요.';
         newPasswordInput.focus();
-        return;
+        return showError("new-password", "새로운 비밀번호를 입력해주세요.", true);
     }
 
     if (!validatePassword(newPassword)) {
-        errorMessage.innerHTML = '비밀번호는 8~20자 사이여야 하며,<br>대•소문자, 숫자 및 특수문자를 각각 하나 이상 포함해야 합니다.';
         newPasswordInput.focus();
-        return false;
+        return showError("new-password", "새로운 비밀번호가 양식에 맞지 않습니다.", true);
     }
 
     if (!confirmPassword) {
-        errorMessage.textContent = '확인 비밀번호를 입력해주세요.';
         confirmPasswordInput.focus();
-        return;
+        return showError("confirm-password", "확인 비밀번호를 입력해주세요.", true);
     }
 
     if (confirmPassword !== newPassword) {
-        errorMessage.textContent = '새로운 비밀번호와 확인 비밀번호가 일치하지 않습니다.';
         newPasswordInput.focus();
-        return;
+        return showError("new-password", "새로운 비밀번호와 확인 비밀번호가 일치하지 않습니다.", true);
     }
 
     errorMessage.textContent = '';
