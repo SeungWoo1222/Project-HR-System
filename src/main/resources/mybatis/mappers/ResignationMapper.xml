@@ -46,7 +46,7 @@
             specific_reason = #{specificReason},
             resignation_date = #{resignationDate},
             processed_by = #{processedBy},
-            processed_at = #{processedDate}
+            processed_at = #{processedAt}
         WHERE employee_id = #{employeeId}
     </update>
 

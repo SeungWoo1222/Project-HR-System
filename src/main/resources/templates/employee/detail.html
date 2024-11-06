@@ -210,7 +210,7 @@
                     <td class="section-title w-25 last-td">퇴사 처리한 사원 ID</td>
                     <td class="w-25 last-td" th:text="${employee.resignation?.getProcessedBy()}"></td>
                     <td class="section-title w-25 last-td">퇴사 처리 일시</td>
-                    <td class="w-25 last-td" th:text="${#temporals.format(employee.resignation?.getProcessedDate(), 'yyyy-MM-dd HH:mm')}"></td>
+                    <td class="w-25 last-td" th:text="${#temporals.format(employee.resignation?.getProcessedAt(), 'yyyy-MM-dd HH:mm')}"></td>
                 </tr>
             </table>
         </div>
