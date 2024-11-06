@@ -199,10 +199,12 @@ function deleteHoliday(dateName, holidayId) {
                 text: data
             })))
             .then(response => {
-                const errorStatuses = [400, 403, 404, 500];
+                const errorStatuses = [400, 404, 500];
                 if (response.status === 200) {
                     alert(response.text);
                     window.location.reload();
+                } else if (response.status === 403) {
+                    alert("접근 권한이 없습니다.");
                 } else if (errorStatuses.includes(response.status)) {
                     alert(response.text);
                 } else {
