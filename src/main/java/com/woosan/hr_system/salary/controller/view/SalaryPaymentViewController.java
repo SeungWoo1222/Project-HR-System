@@ -202,7 +202,6 @@ public class SalaryPaymentViewController {
         List<Integer> salaryIds = salaryService.getSalaryIdList(employeeId);
         List<Salary> salaryList = new ArrayList<>();
         if (!salaryIds.isEmpty()) {
-            log.debug("나 실행됨");
             salaryList = salaryService.getSalariesByIds(salaryIds);
         }
         model.addAttribute("salaryList", salaryList);
