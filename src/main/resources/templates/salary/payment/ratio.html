@@ -48,7 +48,7 @@
                     <thead>
                     <tr>
                         <th>항목</th>
-                        <th>비율</th>
+                        <th>비율(%)</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -96,7 +96,7 @@
                 <table border="1" class="list">
                     <thead>
                     <th>항목</th>
-                    <th>비율</th>
+                    <th>비율(%)</th>
                     </thead>
                     <tbody>
                     <tr>
@@ -105,7 +105,7 @@
                     </tr>
                     <tr>
                         <td class="section-title">지방소득세</td>
-                        <td th:text="${deductionRatios.localIncomeTaxRate}"></td>
+                        <td th:text="${'소득세의 ' + deductionRatios.localIncomeTaxRate}"></td>
                     </tr>
                     <tr>
                         <td class="section-title">국민연금</td>
