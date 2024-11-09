@@ -198,7 +198,7 @@ function summitUpdatePassword(event) {
             if (response.status === 200) {
                 alert(response.text);
                 window.location.href = "/auth/logout";
-            } else if (response.status === 404) {
+            } else if (response.status === 401) {
                 errorMessage.textContent = response.text;
             } else if (response.status === 400) {
                 errorMessage.textContent = response.text;
