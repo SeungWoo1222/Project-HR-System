@@ -180,7 +180,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .detailAddress("101-202(무슨동)")
                 .hireDate(today)
                 .status("재직")
-                .remainingLeave(0)
+                .remainingLeave(11)
                 .picture(1)
                 .maritalStatus(false)
                 .numDependents(1)
@@ -356,7 +356,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (oneYearLater.isBefore(now) || oneYearLater.isEqual(now)) {
             employeeDAO.deleteEmployee(employeeId); // 사원 정보 삭제
-            fileService.deleteFile(resignedEmployee.getPicture()); // 사원 사진 삭제
+
+            // 방문자 계정은 사진 ID를 1번으로 공유하여 사용하기 때문에
+            // 사진 ID가 1인 경우에는 사진을 삭제할 수 없도록 if문을 추가
+            int picId = resignedEmployee.getPicture();
+            if (picId != 1) fileService.deleteFile(picId); // 사원 사진 삭제
 
             // HR 부장에게 알림 전송 후 메세지 반환
             String message = "'" + resignedEmployee.getName() + "' 사원의 정보가 삭제되었습니다.";
