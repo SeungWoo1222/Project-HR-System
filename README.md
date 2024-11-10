@@ -205,6 +205,10 @@
 ![survey](https://github.com/user-attachments/assets/89a2c559-a0b9-474e-b4f5-747391892f79)
 
 #### 설문 응답 및 통계 조회(설문 등록자 권한 필요)
+- 응답 : 설문에 참여한 사원과 총 응답 수, 응답을 개별 조회할 수 있습니다.
+- 통계 : 설문 응답에 대한 통계를 조회할 수 있습니다.
+
+![stats](https://github.com/user-attachments/assets/99d02b69-967d-47fb-8610-a77bb67455d1)
 
 ### 7. 알림 수신함
 - 자신에게 온 알림을 확인할 수 있습니다.
