@@ -294,7 +294,7 @@ public class SurveyServiceImpl implements SurveyService {
         // 각 응답에 대해 선택된 값 카운트
         for (Response response : responses) {
             String selectedOption = response.getAnswer();
-            optionCounts.put(selectedOption, optionCounts.get(selectedOption) + 1);
+            optionCounts.put(selectedOption, optionCounts.getOrDefault(selectedOption, 0) + 1);
         }
         return optionCounts;
     }
