@@ -79,7 +79,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${surveys.isEmpty()}">
+            <tr th:if="${surveys != null and surveys.isEmpty()}">
                 <td colspan="6" style="text-align: center; padding: 20px;">
                     조회된 설문이 없습니다. 다른 검색 조건을 시도해보세요.
                 </td>
