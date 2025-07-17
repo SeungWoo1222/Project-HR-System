@@ -58,7 +58,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
 	// AWS
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store:3.0.2'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -73,10 +73,4 @@ tasks.named('test') {
 
 jar {
 	enabled = false
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
-	}
 }
