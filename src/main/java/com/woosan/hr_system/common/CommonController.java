@@ -12,7 +12,7 @@ import com.woosan.hr_system.report.service.RequestService;
 import com.woosan.hr_system.schedule.model.Schedule;
 import com.woosan.hr_system.schedule.service.ScheduleService;
 import com.woosan.hr_system.survey.model.Survey;
-import com.woosan.hr_system.survey.service.SurveyService;
+//import com.woosan.hr_system.survey.service.SurveyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,8 +44,8 @@ public class CommonController {
     private RequestService requestService;
     @Autowired
     private ScheduleService scheduleService;
-    @Autowired
-    private SurveyService surveyService;
+//    @Autowired
+//    private SurveyService surveyService;
 
     @GetMapping("home") // 홈 화면으로 이동
     public String home(Model model) {
@@ -102,9 +102,9 @@ public class CommonController {
         model.addAttribute("schedules", limitedScheduleList);
 
         // 최근 설문조사 목록
-        List<Survey> surveysList = surveyService.getAllSurvey();
-        List<Survey> limitedSurveysList = surveysList.size() > 5 ? surveysList.subList(0, 5) : surveysList;
-        model.addAttribute("surveys", limitedSurveysList);
+//        List<Survey> surveysList = surveyService.getAllSurvey();
+//        List<Survey> limitedSurveysList = surveysList.size() > 5 ? surveysList.subList(0, 5) : surveysList;
+//        model.addAttribute("surveys", limitedSurveysList);
 
         // 비밀번호 변경 모달
         String result = authService.isPasswordChangeRequired();

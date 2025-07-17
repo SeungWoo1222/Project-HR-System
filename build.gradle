@@ -37,7 +37,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-logging'// Logging
 
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // AWS
 	implementation 'software.amazon.awssdk:s3:2.20.64' // AWS S3
 
 	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리
@@ -58,6 +57,9 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
+	// AWS
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
@@ -67,4 +69,14 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jar {
+	enabled = false
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
+	}
 }
