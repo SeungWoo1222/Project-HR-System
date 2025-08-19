@@ -59,49 +59,49 @@ jobs:
           # 빌드 단계에서 생성된 jar파일
           path: build/libs/*.jar
 
- deploy:
-    # needs 키워드는 현재 작업이 의존하는 이전 작업을 지정한다.
-    # 즉, build 작업이 성공적으로 완료된 후에만 이 작업이 실행된다.
-    needs: build
+deploy:
+  # needs 키워드는 현재 작업이 의존하는 이전 작업을 지정한다.
+  # 즉, build 작업이 성공적으로 완료된 후에만 이 작업이 실행된다.
+  needs: build
 
-    # Ubuntu 환경에서 실행 (Github Actions에서 제공하는 기본 실행 중 하나)
-    runs-on: ubuntu-latest
+  # Ubuntu 환경에서 실행 (Github Actions에서 제공하는 기본 실행 중 하나)
+  runs-on: ubuntu-latest
 
-    # Github 이벤트가 push일 때만 작업을 실행
-    if: github.event_name == 'push'
+  # Github 이벤트가 push일 때만 작업을 실행
+  if: github.event_name == 'push'
 
-    steps:
-      # CI 단계에서 업로드한 artifact를 다운로드 한다.
-      # CI 단계에서 artifact를 업로드했으면 그냥 그거 쓰면 되는거 아닌가?
-      # -> CI에서 생성된 artifact를 CD단계에서 동일한 artifact를 사용하여 배포의 일관성을 유지
-      # -> CI에서 생성된 결과물을 바로 사용하기때문에 시간 절약
-      # -> CI에서 검증한 코드를 CD에서 사용하므로 배포 안정성 높일 수 있음
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          # Project 이름으로 업로드된 artifact를 build/libs 경로에 다운로드
-          name: Project
-          path: build/libs/
+  steps:
+    # CI 단계에서 업로드한 artifact를 다운로드 한다.
+    # CI 단계에서 artifact를 업로드했으면 그냥 그거 쓰면 되는거 아닌가?
+    # -> CI에서 생성된 artifact를 CD단계에서 동일한 artifact를 사용하여 배포의 일관성을 유지
+    # -> CI에서 생성된 결과물을 바로 사용하기때문에 시간 절약
+    # -> CI에서 검증한 코드를 CD에서 사용하므로 배포 안정성 높일 수 있음
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        # Project 이름으로 업로드된 artifact를 build/libs 경로에 다운로드
+        name: Project
+        path: build/libs/
 
-      - name: Create .ssh directory and add EC2 host key
-        # run은 명령을 실행하는데 사용한다.
-        # ssh 연결 시 해당 호스트에 연결할 때 호스트키를 확인하고, 연결을 안전하게 유지할 수 있다.
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+    - name: Create .ssh directory and add EC2 host key
+      # run은 명령을 실행하는데 사용한다.
+      # ssh 연결 시 해당 호스트에 연결할 때 호스트키를 확인하고, 연결을 안전하게 유지할 수 있다.
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      # ec2 접속을 위해 깃허브에서 설정한 ssh key (pem key)를 생성하고 권한을 부여
-      - name: Create private key file
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+    # ec2 접속을 위해 깃허브에서 설정한 ssh key (pem key)를 생성하고 권한을 부여
+    - name: Create private key file
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
 
-      # scp 명령을 통해 ec2에 jar 파일을 전송한다.
-      - name: Upload JAR to EC2
-        run: |
-          scp -i private_key.pem build/libs/*.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/opt/hr-system/app.jar
+    # scp 명령을 통해 ec2에 jar 파일을 전송한다.
+    - name: Upload JAR to EC2
+      run: |
+        scp -i private_key.pem build/libs/*.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/opt/hr-system/app.jar
 
-       # 2) 서비스 방식으로 교체/재기동 (nohup 스텝은 삭제!)
+    # 2) 서비스 방식으로 교체/재기동 (nohup 스텝은 삭제!)
     - name: Restart service
       uses: appleboy/ssh-action@master
       with:
