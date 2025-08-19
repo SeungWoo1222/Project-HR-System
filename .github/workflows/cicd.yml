@@ -98,8 +98,7 @@ jobs:
 
       # scp 명령을 통해 ec2에 jar 파일을 전송한다.
       - name: Upload JAR to EC2
-        run: |
-          scp -i private_key.pem build/libs/*.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/opt/hr-system/app.jar
+        run: scp -i private_key.pem build/libs/*.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:~/app-latest.jar
 
       # 2) 서비스 방식으로 교체/재기동 (nohup 스텝은 삭제!)
       - name: Restart service
