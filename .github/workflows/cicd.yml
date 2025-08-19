@@ -35,7 +35,7 @@ jobs:
         with:
           # Action에 전달할 매개변수 지정
           java-version: 17
-          distribution: 'haruharu'
+          distribution: 'temurin'
           cache: gradle # 빌드 속도를 높이기 위해 gradle 캐시 설정 (매번 gradle 종속성을 계속 설치할 순 없으니)
 
       # gradlew 실행 권한 얻기
