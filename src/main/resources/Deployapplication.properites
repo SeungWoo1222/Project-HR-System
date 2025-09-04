@@ -1,0 +1,64 @@
+spring.application.name=hr-system
+
+# AWS - Parameter Store
+spring.config.import=aws-parameterstore:
+aws.parameterstore.enabled=true
+aws.parameterstore.prefix=/haruharu
+aws.parameterstore.name=db_prod
+aws.parameterstore.profile-separator=_
+
+# AWS - S3
+cloud.aws.region.static=ap-northeast-2
+
+# S3 (업로드 용량 한도 – 필요 시)
+spring.servlet.multipart.max-file-size=50MB
+spring.servlet.multipart.max-request-size=50MB
+
+# IMDS 설정 (v2 차단 이슈 해결용)
+spring.cloud.aws.imds.enabled=true
+
+# Region 명시적으로 지정 (명확하게)
+spring.cloud.aws.region.static=ap-northeast-2
+
+# credentials 빈값으로 덮어쓰기 (로컬키 덮어쓰기용)
+# cloud.aws.credentials.instance-profile=true
+
+# spring.datasource.url={/db_prod/url}
+# spring.datasource.username={/db_prod/username}
+# spring.datasource.password={/db_prod/password}
+# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+  # MyBatis
+mybatis.mapper-locations=classpath:mybatis/mappers/**.xml
+
+  # Thymeleaf
+spring.thymeleaf.enabled=true
+spring.thymeleaf.cache=false
+spring.thymeleaf.check-template-location=true
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+spring.thymeleaf.mode=HTML
+
+  # Default timezone for Jackson
+spring.jackson.time-zone=Asia/Seoul
+
+spring.output.ansi.enabled=always
+
+  # Session
+server.servlet.session.timeout=1800
+
+  # Http Status error config
+server.error.whitelabel.enabled=false
+server.error.path=/error
+
+  # logging
+logging.level.root=INFO
+logging.level.org.springframework.web=ERROR
+logging.level.com.woosan.hr_system=DEBUG
+
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+server.port=8080
+server.address=0.0.0.0
