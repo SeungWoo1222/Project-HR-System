@@ -37,7 +37,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-logging'// Logging
 
-	implementation 'software.amazon.awssdk:s3:2.20.64' // AWS S3
+	// AWS
+	implementation 'software.amazon.awssdk:s3:2.20.64'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+	implementation 'software.amazon.awssdk:sts:2.20.64'
 
 	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리
 
@@ -57,8 +60,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
-	// AWS
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

@@ -64,7 +64,7 @@ public class ReportFileServiceImpl implements ReportFileService {
 
     // 기존의 파일 중 사용자가 삭제한 파일이 있는지 확인함
     private void handleRegisteredFile(List<Integer> userSelectedFileIdList, List<Integer> existingFileIdList, int reportId) {
-        
+
 
         // existingFileIdList 중에서 userSelectedFileIdList에 없는 파일을 삭제
         existingFileIdList.stream()
