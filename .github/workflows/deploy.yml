@@ -85,7 +85,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::188615717003:role/GitHubOIDC-Deploy
+          role-to-assume: arn:aws:iam::188615717003:role/GitHubAction
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload bundle to S3
