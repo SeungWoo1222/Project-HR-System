@@ -101,7 +101,7 @@ jobs:
           DEPLOY_ID=$(aws deploy create-deployment \
             --application-name "${{ env.APP_NAME }}" \
             --deployment-group-name "${{ env.DG_NAME }}" \
-            --revision "revisionType=S3Location,s3Location={bucket=${{ env.S3_BUCKET }},key=${KEY},bundleType=zip}" \
+            --revision "revisionType=S3,s3Location={bucket=${{ env.S3_BUCKET }},key=${KEY},bundleType=zip}" \
             --file-exists-behavior OVERWRITE \
             --query 'deploymentId' --output text)
           echo "deployment_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
