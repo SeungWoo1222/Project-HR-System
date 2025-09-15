@@ -82,3 +82,28 @@ dependencyManagement {
 		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
 	}
 }
+
+// CodeDeploy 번들(zip) 생성 태스크
+tasks.register('bundleForCodeDeploy', Zip) {
+	// Spring Boot면 bootJar, 아니면 jar
+	dependsOn tasks.findByName('bootJar') ?: tasks.named('jar')
+
+	archiveFileName = 'hr.zip'
+	destinationDirectory = file("$buildDir/codedeploy")
+
+	// appspec.yml 포함 (루트에 있어야 함)
+	from('appspec.yml')
+
+	// 스크립트 포함 + 실행 권한 부여
+	from('scripts') {
+		into 'scripts'
+		fileMode = 0755
+	}
+
+	// 빌드 산출물 JAR을 target/hr-system.jar 이름으로 고정해서 넣기
+	from('build/libs') {
+		include '*.jar'
+		into 'target'
+		rename { 'hr-system.jar' }
+	}
+}
