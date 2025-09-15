@@ -96,7 +96,7 @@ env:
   S3_PREFIX: hr-system
   APP_NAME: HrSystemApp
   DG_NAME: HrSystemDG-LB          # 필요하면 HrSystemDG-noLB
-  WORKDIR: WooSan                 # 소스 폴더
+  WORKDIR: .                 # 소스 폴더
 
 jobs:
   deploy:
