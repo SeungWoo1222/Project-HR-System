@@ -18,7 +18,7 @@ env:
   S3_BUCKET: woosan-deploy
   S3_PREFIX: hr-system
   APP_NAME: HrSystemApp
-  DG_NAME: HrSystemDG-LB
+  DG_NAME: haruharu-DG
   WORKDIR: .   # ← 레포 루트에서 빌드(폴더 옮기면 이 값만 바꾸면 됨)
 
 jobs:
