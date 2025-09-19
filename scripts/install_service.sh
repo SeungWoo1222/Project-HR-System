@@ -21,13 +21,5 @@ RestartSec=5
 WantedBy=multi-user.target
 UNIT
 
-# 기본 env (없으면 생성)
-[ -f /etc/hr/env ] || sudo tee /etc/hr/env >/dev/null <<'ENV'
-SPRING_PROFILES_ACTIVE=prod
-# SPRING_DATASOURCE_URL=jdbc:mysql://10.0.3.113:3306/hr?serverTimezone=Asia/Seoul&useSSL=false
-# SPRING_DATASOURCE_USERNAME=hrapp
-# SPRING_DATASOURCE_PASSWORD=******
-ENV
-
 sudo systemctl daemon-reload
 sudo systemctl enable hr
