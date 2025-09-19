@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-set -e
-systemctl stop hr || true
+set -euo pipefail
+sudo systemctl stop hr || true

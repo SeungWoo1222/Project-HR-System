@@ -12,8 +12,8 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/opt/hr
-ExecStart=/usr/bin/java -jar /opt/hr/hr-system.jar
 EnvironmentFile=/etc/hr/env
+ExecStart=/usr/bin/java -jar /opt/hr/hr-system.jar
 Restart=always
 RestartSec=5
 
