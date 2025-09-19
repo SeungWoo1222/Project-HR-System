@@ -9,9 +9,9 @@ if ! command -v aws >/dev/null; then
   sudo apt-get install -y awscli
 fi
 
-DB_URL=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/hr/prod/db/url" --query "Parameter.Value" --output text)
-DB_USER=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/hr/prod/db/username" --query "Parameter.Value" --output text)
-DB_PASS=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/hr/prod/db/password" --query "Parameter.Value" --output text)
+DB_URL=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.url" --query "Parameter.Value" --output text)
+DB_USER=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.username" --query "Parameter.Value" --output text)
+DB_PASS=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.password" --query "Parameter.Value" --output text)
 
 sudo mkdir -p /etc/hr
 sudo tee /etc/hr/env >/dev/null <<ENV
