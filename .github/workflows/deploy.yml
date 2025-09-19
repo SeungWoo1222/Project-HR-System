@@ -20,7 +20,6 @@ env:
   APP_NAME: HrSystemApp
   DG_NAME: haruharu-DG
   WORKDIR: .   # ← 레포 루트에서 빌드(폴더 옮기면 이 값만 바꾸면 됨)
-#--revision "revisionType=S3Location,s3Location={bucket=${{ env.S3_BUCKET }},key=${KEY},bundleType=zip}" \
 jobs:
   deploy:
     runs-on: ubuntu-latest
