@@ -3,10 +3,19 @@ set -euo pipefail
 
 REGION="ap-northeast-2"
 
-# awscli 필요 시 설치
-if ! command -v aws >/dev/null; then
+# awscli 없으면 설치 (공식 인스톨러)
+if ! command -v aws >/dev/null 2>&1; then
   sudo apt-get update -y
-  sudo apt-get install -y awscli
+  sudo apt-get install -y unzip curl
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+  else
+    URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
+  fi
+  curl -fsSL "$URL" -o /tmp/awscliv2.zip
+  unzip -q -o /tmp/awscliv2.zip -d /tmp
+  sudo /tmp/aws/install -i /usr/local/aws -b /usr/local/bin
 fi
 
 DB_URL=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.url" --query "Parameter.Value" --output text)
