@@ -21,8 +21,8 @@ DB_URL=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/har
 DB_USER=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.username" --query "Parameter.Value" --output text)
 DB_PASS=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/db_prod/spring.datasource.password" --query "Parameter.Value" --output text)
 
-AWS_ACCESS_KEY=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.access-key"  --query "Parameter.Value" -r text)
-AWS_BUCKET=$(aws ssm get-parameter    --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.bucket"      --query "Parameter.Value" -r text)
+#AWS_ACCESS_KEY=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.access-key"  --query "Parameter.Value" -r text)
+#AWS_BUCKET=$(aws ssm get-parameter    --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.bucket"      --query "Parameter.Value" -r text)
 
 
 sudo mkdir -p /etc/hr
@@ -33,9 +33,9 @@ SPRING_DATASOURCE_USERNAME=$DB_USER
 SPRING_DATASOURCE_PASSWORD=$DB_PASS
 
 # spring-cloud-aws 속성의 환경변수 매핑
-CLOUD_AWS_CREDENTIALS_ACCESS_KEY=$AWS_ACCESS_KEY
-CLOUD_AWS_REGION_STATIC=$REGION
-CLOUD_AWS_S3_BUCKET=$AWS_BUCKET
+#CLOUD_AWS_CREDENTIALS_ACCESS_KEY=$AWS_ACCESS_KEY
+#CLOUD_AWS_REGION_STATIC=$REGION
+#CLOUD_AWS_S3_BUCKET=$AWS_BUCKET
 ENV
 
 # 파일 권한 최소화
