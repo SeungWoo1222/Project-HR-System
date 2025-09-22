@@ -2,16 +2,15 @@
 set -euo pipefail
 REGION="ap-northeast-2"
 
-# awscli 없으면 설치 (공식 인스톨러)
+# 디버그가 필요할 때만 주석 해제
+# set -x
+
+# awscli v2 없으면 설치
 if ! command -v aws >/dev/null 2>&1; then
   sudo apt-get update -y
   sudo apt-get install -y unzip curl
-  ARCH=$(uname -m)
-  if [ "$ARCH" = "x86_64" ]; then
-    URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-  else
-    URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
-  fi
+  ARCH="$(uname -m)"
+  URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCH/x86_64/x86_64}${ARCH/aarch64/aarch64}.zip"
   curl -fsSL "$URL" -o /tmp/awscliv2.zip
   unzip -q -o /tmp/awscliv2.zip -d /tmp
   sudo /tmp/aws/install -i /usr/local/aws -b /usr/local/bin
@@ -24,6 +23,10 @@ DB_PASS=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/ha
 #AWS_ACCESS_KEY=$(aws ssm get-parameter --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.access-key"  --query "Parameter.Value" -r text)
 #AWS_BUCKET=$(aws ssm get-parameter    --with-decryption --region "$REGION" --name "/haruharu/application/cloud.aws.s3.bucket"      --query "Parameter.Value" -r text)
 
+# 필수값 검증
+for v in DB_URL DB_USER DB_PASS; do
+  [ -n "${!v:-}" ] || { echo "ERROR: $v is empty. Check SSM or IAM/KMS permission."; exit 1; }
+done
 
 sudo mkdir -p /etc/hr
 sudo tee /etc/hr/env >/dev/null <<ENV
