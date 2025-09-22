@@ -4,7 +4,7 @@ URL=${HEALTH_URL:-http://127.0.0.1:8080/actuator/health}
 if ! command -v curl >/dev/null 2>&1; then
   sudo apt-get update -y || true
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl || true
-end
+fi
 
 for i in {1..24}; do
   code=$(curl -s -o /tmp/health -w "%{http_code}" "$URL" || true)
