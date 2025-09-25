@@ -70,6 +70,11 @@ jobs:
           mkdir -p bundle/scripts bundle/target
           cp appspec.yml bundle/
           cp scripts/*.sh bundle/scripts/
+          chmod +x bundle/scripts/*.sh
+          # 👇 CRLF/BOM 제거 (중요)
+          sed -i 's/\r$//' bundle/scripts/*.sh || true
+          sed -i '1s/^\xEF\xBB\xBF//' bundle/scripts/*.sh || true
+          
           JAR=$(ls ${{ steps.detect.outputs.jar_glob }} | head -n1)
           cp "$JAR" bundle/target/hr-system.jar
           cd bundle && zip -r "../hr-${GITHUB_SHA}.zip" . && cd ..
