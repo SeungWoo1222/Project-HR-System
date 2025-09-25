@@ -39,7 +39,8 @@ dependencies {
 
 	// AWS
 	implementation 'software.amazon.awssdk:s3:2.20.64'
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+//	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1'
 	implementation 'software.amazon.awssdk:sts:2.20.64'
 
 	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리

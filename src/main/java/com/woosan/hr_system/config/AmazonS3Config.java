@@ -36,10 +36,10 @@ public class AmazonS3Config {
     }
 
     @Bean
-    public S3Client s3Client() {
-        return S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+    public software.amazon.awssdk.services.s3.S3Client s3Client() {
+        return software.amazon.awssdk.services.s3.S3Client.builder()
+                .region(software.amazon.awssdk.regions.Region.of(region))
+                .credentialsProvider(software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider.create())
                 .build();
     }
 

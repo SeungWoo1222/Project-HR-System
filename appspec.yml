@@ -4,6 +4,13 @@ os: linux
 files:
   - source: target/hr-system.jar
     destination: /opt/hr
+    overwrite: true
+
+permissions:
+  - object: /opt/hr/hr-system.jar
+    owner: ubuntu
+    group: ubuntu
+    mode: 644
 
 hooks:
   ApplicationStop:
