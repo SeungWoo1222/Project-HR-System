@@ -32,7 +32,8 @@ dependencies {
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // Thymeleaf-extras-springsecurity
 
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0' // MyBatis
-	implementation 'mysql:mysql-connector-java:8.0.33' // MySQL
+//	implementation 'mysql:mysql-connector-java:8.0.33' // MySQL
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-logging'// Logging
@@ -66,7 +67,6 @@ dependencies {
 	// localStack
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-mysql'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 
 }
 
@@ -78,11 +78,11 @@ jar {
 	enabled = false
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
-	}
-}
+//dependencyManagement {
+//	imports {
+//		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
+//	}
+//}
 
 // CodeDeploy 번들(zip) 생성 태스크
 tasks.register('bundleForCodeDeploy', Zip) {
