@@ -1,74 +1,69 @@
 package com.woosan.hr_system.file.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.woosan.hr_system.exception.file.FileProcessingException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "s3.enabled", havingValue = "true", matchIfMissing = false)
 public class S3Service {
-    private static final Logger logger = LoggerFactory.getLogger(S3Service.class);
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    private final S3Client s3Client;  // ✅ v2 클라이언트만 사용
 
-    @Autowired
-    private S3Client s3Client; // AWS SDK v2 S3Client
+    @Value("${aws.s3.bucket}")
+    private String bucketName;
 
-    private String bucketName = "haruharu-hrsystem-bucket";
-
-    // S3에 파일 업로드
+    /** 업로드 (임시 파일 없이 스트림으로 바로 업로드) */
     protected String uploadFile(MultipartFile file) throws IOException {
-        File convertedFile = convertMultiPartToFile(file);
-        String fileName = System.currentTimeMillis() + "." + file.getOriginalFilename();
-        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, convertedFile));
-        convertedFile.delete();
-        return fileName;
-    }
+        String key = System.currentTimeMillis() + "." + file.getOriginalFilename();
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        try (FileOutputStream fos = new FileOutputStream(convFile)) {
-            fos.write(file.getBytes());
+        PutObjectRequest putReq = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(file.getContentType())
+                .build();
+
+        try (InputStream in = file.getInputStream()) {
+            s3Client.putObject(putReq, RequestBody.fromInputStream(in, file.getSize()));
         }
-        return convFile;
+        return key;
     }
 
-    // S3에서 파일 다운로드
+    /** 다운로드 (바이트 반환) */
     protected byte[] downloadFile(String storedFileName) {
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        GetObjectRequest getReq = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(storedFileName)
                 .build();
 
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
-        return objectBytes.asByteArray();
+        ResponseBytes<GetObjectResponse> bytes = s3Client.getObjectAsBytes(getReq);
+        return bytes.asByteArray();
     }
 
-    // S3에서 파일 삭제
+    /** 삭제 */
     protected void deleteFileFromS3(String storedFileName) {
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, storedFileName));
-            logger.info("S3에서 '{}' 파일이 삭제되었습니다.", storedFileName);
+            DeleteObjectRequest delReq = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(storedFileName)
+                    .build();
+            s3Client.deleteObject(delReq);
+            log.info("S3에서 '{}' 파일이 삭제되었습니다.", storedFileName);
         } catch (Exception e) {
-            logger.error("S3에서 '{}' 파일 삭제 중 오류가 발생하였습니다.", storedFileName, e);
-            throw new FileProcessingException("파일 삭제 중 문제가 발생했습니다.");
+            log.error("S3 삭제 오류: {}", storedFileName, e);
+            throw new com.woosan.hr_system.exception.file.FileProcessingException("파일 삭제 중 문제가 발생했습니다.");
         }
     }
 }

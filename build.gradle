@@ -37,12 +37,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-logging'// Logging
 
-	// AWS
-	implementation 'software.amazon.awssdk:s3:2.20.64'
-//	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
-	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1'
-	implementation 'software.amazon.awssdk:sts:2.20.64'
-
 	implementation 'com.github.usingsky:KoreanLunarCalendar:0.3.1' // 한국 양음력 변환 github 라이브러리
 
 	implementation files('libs/kiwi-java-v0.20.0-lnx-x86-64.jar')
@@ -56,17 +50,23 @@ dependencies {
 	// test 환경
 	testImplementation('org.projectlombok:lombok')
 	testAnnotationProcessor('org.projectlombok:lombok')
-
 	implementation 'javax.annotation:javax.annotation-api:1.3.2'
-
 	implementation 'org.springframework.boot:spring-boot-devtools'
-
-
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+	// AWS
+	implementation 'software.amazon.awssdk:s3:2.20.64'
+//	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1'
+	implementation 'software.amazon.awssdk:sts:2.20.64'
+
+	// localStack
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 }
 

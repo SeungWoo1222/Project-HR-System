@@ -27,7 +27,7 @@ public class S3StorageService {
     private final S3Client s3;
     private final S3Presigner presigner;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${aws.s3.bucket}")
     private String bucket;
 
     @Value("${cloud.aws.s3.prefix:}")
