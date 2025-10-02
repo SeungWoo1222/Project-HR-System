@@ -30,7 +30,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
+          cache: gradle\
+
+      - name: Write Spring properties from secrets
+        run: |
+          mkdir -p src/main/resources
+          printf "%s" "${{ secrets.APP_COMMON_PROPERTIES }}" > src/main/resources/application.properties
+          printf "%s" "${{ secrets.APP_PROD_PROPERTIES }}" > src/main/resources/application-prod.properties
 
       # 0) 빌드 도구 자동 감지 (pom.xml 있으면 maven, 아니면 gradle)
       - name: Detect build tool
